@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "prisma generate && yarn graphql:generate && yarn abis:generate && next dev",
     "build": "prisma generate && yarn graphql:generate && yarn abis:generate && next build",
-    "vercel-build": "yum install libuuid-devel libmount-devel zlib && cp /lib64/{libuuid,libmount,libblkid,libz}.so.1 node_modules/canvas/build/Release/ && npm run build",
+    "vercel-build": "npm run build",
     "start": "next start",
     "storybook": "start-storybook -p 6006 -s ./public",
     "build-storybook": "build-storybook",
@@ -47,7 +47,6 @@
     "axios": "0.26.1",
     "datebook": "7.0.8",
     "dayjs": "1.11.0",
-    "discord.js": "12.5.3",
     "ethers": "5.6.2",
     "graphql": "16.3.0",
     "lodash": "4.17.21",
@@ -113,9 +112,6 @@
     "typechain": "7.0.1",
     "typescript": "4.6.2",
     "yarn": "1.22.18"
-  },
-  "resolutions": {
-    "canvas": "2.6.1"
   },
   "lint-staged": {
     "*.{ts,tsx,js,json}": [
