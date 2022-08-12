@@ -4,7 +4,9 @@ import {
   ERC20__factory,
   ERC721,
   ERC721__factory,
+  IQuoter__factory,
   NFTLoanFacilitator__factory,
+  Strategy__factory,
 } from 'types/generated/abis';
 import { configs, SupportedNetwork } from './config';
 import { COMMUNITY_NFT_CONTRACT_ADDRESS } from './constants';
@@ -42,7 +44,10 @@ export function web3LoanFacilitator(signer: Signer, network: SupportedNetwork) {
   return loanFacilitator(signer, network);
 }
 
-function makeProvider(jsonRpcProvider: string, network: SupportedNetwork) {
+export function makeProvider(
+  jsonRpcProvider: string,
+  network: SupportedNetwork,
+) {
   return new ethers.providers.JsonRpcProvider(
     jsonRpcProvider,
     configs[network].chainId,
@@ -121,6 +126,25 @@ export function communityNFT(
 ) {
   return CommunityNFT__factory.connect(
     COMMUNITY_NFT_CONTRACT_ADDRESS,
+    provider,
+  );
+}
+
+////// strategy code /////
+
+export function jsonRpcStrategyContract(
+  address: string,
+  jsonRpcProvider: string,
+  network: SupportedNetwork,
+) {
+  const provider = makeProvider(jsonRpcProvider, network);
+  return Strategy__factory.connect(address, provider);
+}
+
+export function Quoter(jsonRpcProvider: string, network: SupportedNetwork) {
+  const provider = makeProvider(jsonRpcProvider, network);
+  return IQuoter__factory.connect(
+    process.env.NEXT_PUBLIC_QUOTER as string,
     provider,
   );
 }
