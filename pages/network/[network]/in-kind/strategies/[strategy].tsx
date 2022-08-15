@@ -270,19 +270,13 @@ function Borrow({ strategy }: BorrowProps) {
         s: ethers.utils.formatBytes32String('y'),
       },
     };
+    console.log(request);
 
     const signerStrategy = Strategy__factory.connect(
       strategy.contract.address,
       signer!,
     );
-    // await signerStrategy.openVault(request)
-    // console.log(request)
-    // var x = Object.values(request)
-    // x[1] = x[1].toString()
-    // x[2] = Object.values(x[2])
-    // x[3] = Object.values(x[3])
-    // x[4] = Object.values(x[4])
-    // console.log(x)
+
     const signerCollateral = ERC721__factory.connect(
       strategy.collateral.contract.address,
       signer!,
@@ -291,17 +285,13 @@ function Borrow({ strategy }: BorrowProps) {
     const z = strategy.contract.interface.encodeFunctionData('openVault', [
       request,
     ]);
-    // console.log(z.substring(10))
+
     await signerCollateral['safeTransferFrom(address,address,uint256,bytes)'](
       address!,
       strategy.contract.address,
       ethers.BigNumber.from(collateralTokenId),
       '0x' + z.substring(10),
     );
-    // strategy.contract.interface._abiCoder
-    // const x = new ethers.utils.AbiCoder(strategy.contract.interface._abiCoder.encode([]))
-    const q = strategy.contract.interface._abiCoder; //.encode(strategy.contract.interface.structs['OpenVaultRequest'], x)
-    // console.log(strategy.contract.interface.)
   }, [strategy, debt, collateralTokenId]);
 
   return (
