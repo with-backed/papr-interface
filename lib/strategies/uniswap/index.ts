@@ -4,7 +4,7 @@ import { Token as UniswapToken } from '@uniswap/sdk-core';
 import { abi as IUniswapV3PoolABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
 import { IUniswapV3Pool } from 'types/generated/abis';
 import { Chain } from 'wagmi';
-import { Token } from 'lib/strategies/index';
+import { ERC20Token } from 'lib/strategies/index';
 
 // const provider = new ethers.providers.JsonRpcProvider('https://mainnet.infura.io/v3/<YOUR-ENDPOINT-HERE>')
 
@@ -76,8 +76,8 @@ export async function getPoolState(poolContract: IUniswapV3Pool) {
 
 export async function getPool(
   poolContract: IUniswapV3Pool,
-  token0: Token,
-  token1: Token,
+  token0: ERC20Token,
+  token1: ERC20Token,
   chain: Chain,
 ): Promise<Pool> {
   const [immutables, state] = await Promise.all([

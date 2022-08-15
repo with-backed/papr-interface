@@ -4,6 +4,8 @@ import { makeProvider } from 'lib/contracts';
 import {
   ERC20,
   ERC20__factory,
+  ERC721,
+  ERC721__factory,
   IUniswapV3Pool,
   IUniswapV3Pool__factory,
   Strategy,
@@ -13,16 +15,25 @@ import { Chain } from 'wagmi';
 import { getPool } from './uniswap';
 
 export type LendingStrategy = {
+  name: string;
+  symbol: string;
   contract: Strategy;
   pool: Pool;
-  token0: Token;
-  token1: Token;
-  underlying: Token;
+  token0: ERC20Token;
+  token1: ERC20Token;
+  underlying: ERC20Token;
+  collateral: ERC721Token;
 };
 
-export type Token = {
+export type ERC20Token = {
   contract: ERC20;
   decimals: number;
+  name: string;
+  symbol: string;
+};
+
+export type ERC721Token = {
+  contract: ERC721;
   name: string;
   symbol: string;
 };
@@ -53,16 +64,26 @@ export async function populateLendingStrategy(
 
   const pool = await getPool(poolContract, token0, token1, chain);
 
+  const collateralAddress = await contract.collateral();
+  const collateral = ERC721__factory.connect(collateralAddress, provider);
+
   return {
+    name: await contract.name(),
+    symbol: await contract.symbol(),
     contract: contract,
     pool: pool,
     token0: token0,
     token1: token1,
+    collateral: {
+      contract: collateral,
+      name: await collateral.name(),
+      symbol: await collateral.symbol(),
+    },
     underlying,
   };
 }
 
-async function buildToken(token: ERC20): Promise<Token> {
+async function buildToken(token: ERC20): Promise<ERC20Token> {
   return {
     contract: token,
     decimals: await token.decimals(),

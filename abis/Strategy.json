@@ -252,68 +252,109 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "mintTo",
+          "name": "",
           "type": "address"
         },
         {
-          "internalType": "uint128",
-          "name": "debt",
-          "type": "uint128"
+          "internalType": "address",
+          "name": "",
+          "type": "address"
         },
+        {
+          "internalType": "uint256",
+          "name": "_id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "onERC721Received",
+      "outputs": [
+        {
+          "internalType": "bytes4",
+          "name": "",
+          "type": "bytes4"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
         {
           "components": [
             {
-              "internalType": "contract ERC721",
-              "name": "nft",
+              "internalType": "address",
+              "name": "mintTo",
               "type": "address"
             },
             {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct Collateral",
-          "name": "collateral",
-          "type": "tuple"
-        },
-        {
-          "components": [
-            {
               "internalType": "uint128",
-              "name": "price",
+              "name": "debt",
               "type": "uint128"
             },
             {
-              "internalType": "enum OracleInfoPeriod",
-              "name": "period",
-              "type": "uint8"
-            }
-          ],
-          "internalType": "struct OracleInfo",
-          "name": "oracleInfo",
-          "type": "tuple"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint8",
-              "name": "v",
-              "type": "uint8"
+              "components": [
+                {
+                  "internalType": "contract ERC721",
+                  "name": "nft",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "id",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct Collateral",
+              "name": "collateral",
+              "type": "tuple"
             },
             {
-              "internalType": "bytes32",
-              "name": "r",
-              "type": "bytes32"
+              "components": [
+                {
+                  "internalType": "uint128",
+                  "name": "price",
+                  "type": "uint128"
+                },
+                {
+                  "internalType": "enum OracleInfoPeriod",
+                  "name": "period",
+                  "type": "uint8"
+                }
+              ],
+              "internalType": "struct OracleInfo",
+              "name": "oracleInfo",
+              "type": "tuple"
             },
             {
-              "internalType": "bytes32",
-              "name": "s",
-              "type": "bytes32"
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "v",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "r",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "s",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct Sig",
+              "name": "sig",
+              "type": "tuple"
             }
           ],
-          "internalType": "struct Sig",
-          "name": "sig",
+          "internalType": "struct OpenVaultRequest",
+          "name": "request",
           "type": "tuple"
         }
       ],
