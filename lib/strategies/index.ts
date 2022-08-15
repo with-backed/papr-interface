@@ -1,6 +1,6 @@
+import { Pool } from '@uniswap/v3-sdk';
 import { Config, SupportedNetwork } from 'lib/config';
 import { makeProvider } from 'lib/contracts';
-import { strategy } from 'sharp';
 import {
   ERC20,
   ERC20__factory,
@@ -9,10 +9,12 @@ import {
   Strategy,
   Strategy__factory,
 } from 'types/generated/abis';
+import { Chain } from 'wagmi';
+import { getPool } from './uniswap';
 
 export type LendingStrategy = {
   contract: Strategy;
-  pool: IUniswapV3Pool;
+  pool: Pool;
   token0: Token;
   token1: Token;
   underlying: Token;
@@ -28,6 +30,7 @@ export type Token = {
 export async function populateLendingStrategy(
   address: string,
   config: Config,
+  chain: Chain,
 ): Promise<LendingStrategy> {
   const provider = makeProvider(
     config.jsonRpcProvider,
@@ -35,9 +38,10 @@ export async function populateLendingStrategy(
   );
   const contract = Strategy__factory.connect(address, provider);
   const poolAddress = await contract.pool();
-  const pool = IUniswapV3Pool__factory.connect(poolAddress, provider);
-  const token0Address = await pool.token0();
-  const token1Address = await pool.token1();
+  const poolContract = IUniswapV3Pool__factory.connect(poolAddress, provider);
+
+  const token0Address = await poolContract.token0();
+  const token1Address = await poolContract.token1();
   const token0 = await buildToken(
     ERC20__factory.connect(token0Address, provider),
   );
@@ -46,6 +50,8 @@ export async function populateLendingStrategy(
   );
   const underlyingAddress = await contract.underlying();
   const underlying = underlyingAddress == token0Address ? token0 : token1;
+
+  const pool = await getPool(poolContract, token0, token1, chain);
 
   return {
     contract: contract,
