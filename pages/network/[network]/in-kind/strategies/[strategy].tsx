@@ -84,7 +84,7 @@ export default function Strategy({ address }: StrategyPageProps) {
         <div>
           <PoolState pool={lendingStrategy.pool} />
           <MintERC20 token={lendingStrategy.underlying} />
-          <ProvideLiquidity strategy={lendingStrategy} />
+          <ProvideLiquidity pool={lendingStrategy.pool} />
           <SwapQuote
             tokenIn={lendingStrategy!.token0}
             tokenOut={lendingStrategy!.token1}
