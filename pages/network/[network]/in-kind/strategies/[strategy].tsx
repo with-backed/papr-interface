@@ -82,6 +82,7 @@ export default function Strategy({ address }: StrategyPageProps) {
       <h3>Strategy</h3>
       {lendingStrategy != null ? (
         <div>
+          <StrategyState strategy={lendingStrategy} />
           <PoolState pool={lendingStrategy.pool} />
           <MintERC20 token={lendingStrategy.underlying} />
           <ProvideLiquidity pool={lendingStrategy.pool} />
@@ -106,6 +107,34 @@ export default function Strategy({ address }: StrategyPageProps) {
 type PoolStateProps = {
   pool: Pool;
 };
+
+function StrategyState({ strategy }: { strategy: LendingStrategy }) {
+  const [strategyIndex, setStrategyIndex] = useState<string>('');
+  const [strategyMultiplier, setStrategyMultiplier] = useState<string>('');
+
+  const updateStrategyIndex = useCallback(async () => {
+    const index = await strategy.contract.index();
+    setStrategyIndex(ethers.utils.formatEther(index));
+  }, [strategy]);
+
+  const updateStrategyMultiplier = useCallback(async () => {
+    const multiplier = await strategy.contract.targetMultiplier();
+    setStrategyMultiplier(ethers.utils.formatEther(multiplier));
+  }, [strategy]);
+
+  useEffect(() => {
+    updateStrategyIndex();
+    updateStrategyMultiplier();
+  });
+
+  return (
+    <fieldset>
+      <legend>Strategy State</legend>
+      <p>Index: {strategyIndex}</p>
+      <p>Multiplier: {strategyMultiplier}</p>
+    </fieldset>
+  );
+}
 
 function PoolState({ pool }: PoolStateProps) {
   const { chain } = useNetwork();
