@@ -4,7 +4,8 @@ import { makeProvider, Quoter } from 'lib/contracts';
 import {
   LendingStrategy,
   populateLendingStrategy,
-  Token,
+  ERC20Token,
+  ERC721Token,
 } from 'lib/strategies';
 import { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -22,7 +23,10 @@ import { ethers } from 'ethers';
 import { useAccount, useNetwork, useSigner } from 'wagmi';
 import { getPool, getPoolState } from 'lib/strategies/uniswap';
 import { SESSION_TRANSPORT_CATEGORY } from '@sentry/core/types/transports/base';
-import { MockDAI__factory } from 'types/generated/abis';
+import {
+  MockCollateral__factory,
+  MockDAI__factory,
+} from 'types/generated/abis';
 import { MockUnderlying__factory } from 'types/generated/abis/factories/MockUnderlying__factory';
 
 export type StrategyPageProps = {
@@ -42,6 +46,7 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
 };
 
 const TICK_SPACING = 200;
+const PRICE = 20_000;
 
 export default function Strategy({ address }: StrategyPageProps) {
   const { chain } = useNetwork();
@@ -80,10 +85,15 @@ export default function Strategy({ address }: StrategyPageProps) {
   return (
     <div>
       <h3>Strategy</h3>
+      <p>(fake) oracle price: {PRICE} </p>
       {lendingStrategy != null ? (
         <div>
+          <p>
+            {lendingStrategy.name} ({lendingStrategy.symbol})
+          </p>
           <PoolState pool={lendingStrategy.pool} />
           <MintERC20 token={lendingStrategy.underlying} />
+          <MintCollateral token={lendingStrategy.collateral} />
           <ProvideLiquidity pool={lendingStrategy.pool} />
           <SwapQuote
             tokenIn={lendingStrategy!.token0}
@@ -109,22 +119,6 @@ type PoolStateProps = {
 
 function PoolState({ pool }: PoolStateProps) {
   const { chain } = useNetwork();
-  // const [pool, setPool] = useState<Pool | undefined>(undefined)
-
-  // const fetchPool = useCallback(async () => {
-  //     const p = await getPool(
-  //         strategy.pool,
-  //         strategy.token0,
-  //         strategy.token1,
-  //         chain!
-  //     )
-
-  //     setPool(p)
-  // }, [strategy])
-
-  // useEffect(() => {
-  //     fetchPool()
-  // }, [strategy])
 
   return (
     <fieldset>
@@ -147,6 +141,10 @@ function PoolState({ pool }: PoolStateProps) {
   );
 }
 
+type TokenInfoProps = {
+  token: ERC20Token;
+};
+
 function MintERC20({ token }: TokenInfoProps) {
   const [balance, setBalance] = useState<string>('');
   const [value, setValue] = useState<string>('');
@@ -167,6 +165,8 @@ function MintERC20({ token }: TokenInfoProps) {
       token.contract.address,
       signer,
     );
+    console.log(value);
+    console.log(token.decimals);
     ethers.utils.parseUnits(value, token.decimals);
     const t = await contract.mint(
       address,
@@ -183,7 +183,7 @@ function MintERC20({ token }: TokenInfoProps) {
   return (
     <fieldset>
       <legend>Mint yourself {token.symbol}</legend>
-      <p> your balance {balance} </p>
+      <p> your balance: {balance} </p>
       <input
         placeholder={'amount'}
         onChange={(e) => setValue(e.target.value)}></input>
@@ -192,9 +192,46 @@ function MintERC20({ token }: TokenInfoProps) {
   );
 }
 
-type TokenInfoProps = {
-  token: Token;
+type MintCollateralProps = {
+  token: ERC721Token;
 };
+
+function MintCollateral({ token }: MintCollateralProps) {
+  const [balance, setBalance] = useState<string>('');
+  const { address } = useAccount();
+  const { data: signer } = useSigner();
+
+  const getBalance = useCallback(async () => {
+    const b = await token.contract.balanceOf(address!);
+    setBalance(b.toString());
+  }, [address]);
+
+  const mint = useCallback(async () => {
+    if (signer == null || address == null) {
+      console.log('address or sigenr null');
+      return;
+    }
+    const contract = MockCollateral__factory.connect(
+      token.contract.address,
+      signer,
+    );
+    const t = await contract.mint(address);
+    t.wait();
+    getBalance();
+  }, [address, signer]);
+
+  useEffect(() => {
+    getBalance();
+  });
+
+  return (
+    <fieldset>
+      <legend>Mint yourself {token.symbol}</legend>
+      <p> your balance: {balance} </p>
+      <button onClick={mint}>mint</button>
+    </fieldset>
+  );
+}
 
 function TokenInfo({ token }: TokenInfoProps) {
   return (
@@ -226,13 +263,14 @@ function ProvideLiquidity({ pool }: ProvideLiquidityProps) {
   return (
     <fieldset>
       <legend>provide liquidity</legend>
+      Go to Uniswap :-)
     </fieldset>
   );
 }
 
 type QuoteProps = {
-  tokenIn: Token;
-  tokenOut: Token;
+  tokenIn: ERC20Token;
+  tokenOut: ERC20Token;
   fee: ethers.BigNumber;
 };
 
