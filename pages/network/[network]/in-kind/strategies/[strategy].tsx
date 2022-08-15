@@ -174,7 +174,7 @@ function MintERC20({ token }: TokenInfoProps) {
     );
     t.wait();
     getBalance();
-  }, [address, signer]);
+  }, [address, signer, value]);
 
   useEffect(() => {
     getBalance();
