@@ -35,8 +35,8 @@ function Connected() {
     const tx = await strategy.newStrategy(
       'APE Loans',
       'AP',
-      process.env.NEXT_PUBLIC_MOCK_USDC as string,
       process.env.NEXT_PUBLIC_MOCK_APE as string,
+      process.env.NEXT_PUBLIC_MOCK_USDC as string,
     );
 
     const filter = strategy.filters.NewStrategy(null);
@@ -59,10 +59,10 @@ function Connected() {
     <div>
       {/* <div>{signer}</div> */}
       <TransactionButton
-        text={'hi'}
+        text={'Create a Strategy'}
         onClick={create}
-        txHash={''}
-        isPending={false}
+        txHash={txHash}
+        isPending={isPending}
       />
     </div>
   );

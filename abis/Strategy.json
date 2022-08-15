@@ -4,13 +4,18 @@
       "inputs": [
         {
           "internalType": "string",
-          "name": "name",
+          "name": "_name",
           "type": "string"
         },
         {
           "internalType": "string",
-          "name": "symbol",
+          "name": "_symbol",
           "type": "string"
+        },
+        {
+          "internalType": "contract ERC721",
+          "name": "_collateral",
+          "type": "address"
         },
         {
           "internalType": "contract ERC20",
@@ -206,6 +211,19 @@
     },
     {
       "inputs": [],
+      "name": "name",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "newNorm",
       "outputs": [
         {
@@ -333,6 +351,19 @@
       "name": "reduceDebt",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "symbol",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
