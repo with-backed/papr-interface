@@ -24,9 +24,15 @@ import { useAccount, useNetwork, useSigner } from 'wagmi';
 import { getPool, getPoolState } from 'lib/strategies/uniswap';
 import { SESSION_TRANSPORT_CATEGORY } from '@sentry/core/types/transports/base';
 import {
+  ERC721__factory,
   MockCollateral__factory,
   MockDAI__factory,
+  Strategy__factory,
 } from 'types/generated/abis';
+import {
+  OpenVaultRequestStruct,
+  OpenVaultRequestStructOutput,
+} from 'types/generated/abis/Strategy';
 import { MockUnderlying__factory } from 'types/generated/abis/factories/MockUnderlying__factory';
 
 export type StrategyPageProps = {
@@ -48,7 +54,7 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
 const TICK_SPACING = 200;
 const PRICE = 20_000;
 
-export default function Strategy({ address }: StrategyPageProps) {
+export default function StrategyPage({ address }: StrategyPageProps) {
   const { chain } = useNetwork();
   const config = useConfig();
   const [lendingStrategy, setLendingStrategy] =
@@ -95,6 +101,7 @@ export default function Strategy({ address }: StrategyPageProps) {
           <MintERC20 token={lendingStrategy.underlying} />
           <MintCollateral token={lendingStrategy.collateral} />
           <ProvideLiquidity pool={lendingStrategy.pool} />
+          <Borrow strategy={lendingStrategy} />
           <SwapQuote
             tokenIn={lendingStrategy!.token0}
             tokenOut={lendingStrategy!.token1}
@@ -165,8 +172,6 @@ function MintERC20({ token }: TokenInfoProps) {
       token.contract.address,
       signer,
     );
-    console.log(value);
-    console.log(token.decimals);
     ethers.utils.parseUnits(value, token.decimals);
     const t = await contract.mint(
       address,
@@ -233,6 +238,103 @@ function MintCollateral({ token }: MintCollateralProps) {
   );
 }
 
+type BorrowProps = {
+  strategy: LendingStrategy;
+};
+
+function Borrow({ strategy }: BorrowProps) {
+  const { address } = useAccount();
+  const { data: signer } = useSigner();
+  const [debt, setDebt] = useState<string>('');
+  const [collateralTokenId, setCollateralTokenId] = useState<string>('');
+
+  const create = useCallback(async () => {
+    // strategy.contract.openVault(
+    //   address,
+    //   ethers.utils.parseUnits(debt, strategy.underlying.decimals)
+    // )
+    const request: OpenVaultRequestStruct = {
+      mintTo: address!,
+      debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
+      collateral: {
+        nft: strategy.collateral.contract.address,
+        id: ethers.BigNumber.from(collateralTokenId),
+      },
+      oracleInfo: {
+        price: ethers.utils.parseUnits(PRICE.toString(), 18),
+        period: ethers.BigNumber.from(0),
+      },
+      sig: {
+        v: ethers.BigNumber.from(1),
+        r: ethers.utils.formatBytes32String('x'),
+        s: ethers.utils.formatBytes32String('y'),
+      },
+    };
+
+    const signerStrategy = Strategy__factory.connect(
+      strategy.contract.address,
+      signer!,
+    );
+    // await signerStrategy.openVault(request)
+    // console.log(request)
+    // var x = Object.values(request)
+    // x[1] = x[1].toString()
+    // x[2] = Object.values(x[2])
+    // x[3] = Object.values(x[3])
+    // x[4] = Object.values(x[4])
+    // console.log(x)
+    const signerCollateral = ERC721__factory.connect(
+      strategy.collateral.contract.address,
+      signer!,
+    );
+
+    const z = strategy.contract.interface.encodeFunctionData('openVault', [
+      request,
+    ]);
+    // console.log(z.substring(10))
+    await signerCollateral['safeTransferFrom(address,address,uint256,bytes)'](
+      address!,
+      strategy.contract.address,
+      ethers.BigNumber.from(collateralTokenId),
+      '0x' + z.substring(10),
+    );
+    // strategy.contract.interface._abiCoder
+    // const x = new ethers.utils.AbiCoder(strategy.contract.interface._abiCoder.encode([]))
+    const q = strategy.contract.interface._abiCoder; //.encode(strategy.contract.interface.structs['OpenVaultRequest'], x)
+    // console.log(strategy.contract.interface.)
+  }, [strategy, debt, collateralTokenId]);
+
+  return (
+    <fieldset>
+      <legend>borrow</legend>
+      <p> max debt: </p>
+      <input
+        placeholder="collateral token id"
+        onChange={(e) => setCollateralTokenId(e.target.value)}></input>
+      <input
+        placeholder="debt amount"
+        onChange={(e) => setDebt(e.target.value)}></input>
+      <button onClick={create}> borrow </button>
+    </fieldset>
+  );
+}
+
+const OpenVaultRequestAbiType = `(
+  address mintTo,
+  uint128 debt,
+  (address nft, uint256 id)[] collateral,
+  (uint128 price, uint8 period)[] oracleInfo,
+  (uint8 v, bytes32 r, bytes32 s)[] sig
+)`;
+
+const OpenVaultRequestAbiType1 = `(
+  address mintTo,
+  uint128 debt,
+  Collateral collateral,
+  OracleInfo oracleInfo,
+  Sig sig
+)`;
+
 function TokenInfo({ token }: TokenInfoProps) {
   return (
     <fieldset>
@@ -294,7 +396,7 @@ function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
     setQuote(
       ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
     );
-  }, []);
+  }, [amountIn]);
 
   return (
     <fieldset>
