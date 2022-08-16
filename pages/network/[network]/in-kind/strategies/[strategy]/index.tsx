@@ -1,20 +1,7 @@
 import { useConfig } from 'hooks/useConfig';
-import { SupportedNetwork } from 'lib/config';
-import { Quoter } from 'lib/contracts';
-import {
-  LendingStrategy,
-  populateLendingStrategy,
-  ERC20Token,
-} from 'lib/strategies';
+import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { GetServerSideProps } from 'next';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-
-import {
-  nearestUsableTick,
-  NonfungiblePositionManager,
-  Pool,
-  Position,
-} from '@uniswap/v3-sdk';
+import { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { useNetwork } from 'wagmi';
 import MintERC20 from 'components/Strategy/MintERC20';
@@ -42,7 +29,6 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
   };
 };
 
-const TICK_SPACING = 200;
 const PRICE = 20_000;
 
 export default function StrategyPage({ address }: StrategyPageProps) {
@@ -52,7 +38,7 @@ export default function StrategyPage({ address }: StrategyPageProps) {
     useState<LendingStrategy | null>(null);
 
   const populate = useCallback(async () => {
-    const s = await populateLendingStrategy(address, config, chain!);
+    const s = await populateLendingStrategy(address, config);
     setLendingStrategy(s);
   }, [address]);
 
