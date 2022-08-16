@@ -20,6 +20,10 @@ import { useNetwork } from 'wagmi';
 import MintERC20 from 'components/Strategy/MintERC20';
 import MintCollateral from 'components/Strategy/MintCollateral';
 import OpenVault from 'components/Strategy/OpenVault';
+import PoolState from 'components/Strategy/PoolState';
+import SwapQuote from 'components/Strategy/SwapQuote';
+import StrategyState from 'components/Strategy/StrategyState';
+import ProvideLiquidity from 'components/Strategy/ProvideLiquidty';
 
 export type StrategyPageProps = {
   address: string;
@@ -85,131 +89,5 @@ export default function StrategyPage({ address }: StrategyPageProps) {
         ''
       )}
     </div>
-  );
-}
-
-type PoolStateProps = {
-  pool: Pool;
-};
-
-function StrategyState({ strategy }: { strategy: LendingStrategy }) {
-  const [strategyIndex, setStrategyIndex] = useState<string>('');
-  const [strategyMultiplier, setStrategyMultiplier] = useState<string>('');
-
-  const updateStrategyIndex = useCallback(async () => {
-    const index = await strategy.contract.index();
-    setStrategyIndex(ethers.utils.formatEther(index));
-  }, [strategy]);
-
-  const updateStrategyMultiplier = useCallback(async () => {
-    const multiplier = await strategy.contract.targetMultiplier();
-    setStrategyMultiplier(ethers.utils.formatEther(multiplier));
-  }, [strategy]);
-
-  useEffect(() => {
-    updateStrategyIndex();
-    updateStrategyMultiplier();
-  });
-
-  return (
-    <fieldset>
-      <legend>Strategy State</legend>
-      <p>Index: {strategyIndex}</p>
-      <p>Multiplier: {strategyMultiplier}</p>
-    </fieldset>
-  );
-}
-
-function PoolState({ pool }: PoolStateProps) {
-  const { chain } = useNetwork();
-
-  return (
-    <fieldset>
-      <legend>Pool State</legend>
-      <a
-        target="_blank"
-        rel="noreferrer"
-        href={`https://app.uniswap.org/#/add/${pool?.token0.address}/${pool?.token1.address}/10000?chain=rinkeby`}>
-        {' '}
-        see it on app.uniswap.org{' '}
-      </a>
-      <p>liquidty: {pool?.liquidity.toString()}</p>
-      <p>
-        {pool?.token0.symbol} price: {pool?.token0Price.toFixed()}
-      </p>
-      <p>
-        {pool?.token1.symbol} price: {pool?.token1Price.toFixed()}
-      </p>
-    </fieldset>
-  );
-}
-
-type ProvideLiquidityProps = {
-  pool: Pool;
-};
-
-function ProvideLiquidity({ pool }: ProvideLiquidityProps) {
-  const mint = useCallback(async () => {
-    const position = new Position({
-      pool: pool,
-      liquidity: 1000,
-      tickLower:
-        nearestUsableTick(pool.tickCurrent, TICK_SPACING) - TICK_SPACING * 2,
-      tickUpper:
-        nearestUsableTick(pool.tickCurrent, TICK_SPACING) + TICK_SPACING * 2,
-    });
-    NonfungiblePositionManager.addCallParameters;
-  }, [pool]);
-
-  return (
-    <fieldset>
-      <legend>provide liquidity</legend>
-      Go to Uniswap :-)
-    </fieldset>
-  );
-}
-
-type QuoteProps = {
-  tokenIn: ERC20Token;
-  tokenOut: ERC20Token;
-  fee: ethers.BigNumber;
-};
-
-function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
-  const [amountIn, setAmountIn] = useState<string>('');
-  const [quote, setQuote] = useState<string>('');
-  const { jsonRpcProvider, network } = useConfig();
-  const getQuote = useCallback(async () => {
-    console.log(amountIn);
-    const amount = ethers.utils.parseUnits(amountIn, tokenIn.decimals);
-    console.log(amount);
-    const quoter = Quoter(jsonRpcProvider, network as SupportedNetwork);
-    const q: ethers.BigNumber = await quoter.callStatic.quoteExactInputSingle(
-      tokenIn.contract.address,
-      tokenOut.contract.address,
-      fee,
-      amount,
-      0,
-    );
-    console.log(`quote ${q} ${tokenOut.symbol}`);
-    setQuote(
-      ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
-    );
-  }, [amountIn]);
-
-  return (
-    <fieldset>
-      <legend>
-        {tokenIn.symbol} ➡ {tokenOut.symbol}
-      </legend>
-      <input
-        placeholder={`Enter ${tokenIn.symbol} amount`}
-        value={amountIn}
-        onChange={(e) => setAmountIn(e.target.value.trim())}></input>
-      <button onClick={getQuote}> get quote </button>
-      <p>
-        {quote} {tokenOut.symbol}
-      </p>
-    </fieldset>
   );
 }
