@@ -24,6 +24,7 @@ import PoolState from 'components/Strategy/PoolState';
 import SwapQuote from 'components/Strategy/SwapQuote';
 import StrategyState from 'components/Strategy/StrategyState';
 import ProvideLiquidity from 'components/Strategy/ProvideLiquidty';
+import SwapTokens from 'components/Strategy/SwapTokens';
 
 export type StrategyPageProps = {
   address: string;
@@ -83,6 +84,10 @@ export default function StrategyPage({ address }: StrategyPageProps) {
             tokenIn={lendingStrategy!.token1}
             tokenOut={lendingStrategy!.token0}
             fee={ethers.BigNumber.from(10).pow(4)} // 1% fee tier, should just fetch from pool directly
+          />
+          <SwapTokens
+            tokenOne={lendingStrategy!.token0}
+            tokenTwo={lendingStrategy!.token1}
           />
         </div>
       ) : (
