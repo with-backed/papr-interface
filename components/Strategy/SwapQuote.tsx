@@ -38,16 +38,6 @@ export default function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
       <legend>
         {tokenIn.symbol} ➡ {tokenOut.symbol}
       </legend>
-      <p>
-        Trade on
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenIn.contract.address}&outputCurrency=${tokenOut.contract.address}`}>
-          {' '}
-          uniswap
-        </a>
-      </p>
       <input
         placeholder={`Enter ${tokenIn.symbol} amount`}
         value={amountIn}
@@ -56,6 +46,18 @@ export default function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
       <p>
         {quote} {tokenOut.symbol}
       </p>
+      {!!quote && (
+        <p>
+          Trade on
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenIn.contract.address}&outputCurrency=${tokenOut.contract.address}&exactAmount=${amountIn}`}>
+            {' '}
+            uniswap
+          </a>
+        </p>
+      )}
     </fieldset>
   );
 }
