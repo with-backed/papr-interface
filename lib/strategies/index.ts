@@ -23,6 +23,7 @@ export type LendingStrategy = {
   token1: ERC20Token;
   underlying: ERC20Token;
   collateral: ERC721Token;
+  debtVault: ERC721;
 };
 
 export type ERC20Token = {
@@ -67,6 +68,9 @@ export async function populateLendingStrategy(
   const collateralAddress = await contract.collateral();
   const collateral = ERC721__factory.connect(collateralAddress, provider);
 
+  const debtVaultAddress = await contract.debtVault();
+  const debtVault = ERC721__factory.connect(debtVaultAddress, provider);
+
   return {
     name: await contract.name(),
     symbol: await contract.symbol(),
@@ -80,6 +84,7 @@ export async function populateLendingStrategy(
       symbol: await collateral.symbol(),
     },
     underlying,
+    debtVault: debtVault,
   };
 }
 
