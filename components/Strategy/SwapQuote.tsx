@@ -3,7 +3,6 @@ import { useConfig } from 'hooks/useConfig';
 import { SupportedNetwork } from 'lib/config';
 import { Quoter } from 'lib/contracts';
 import { ERC20Token } from 'lib/strategies';
-import Link from 'next/link';
 import { useCallback, useState } from 'react';
 
 type QuoteProps = {
@@ -43,6 +42,7 @@ export default function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
         Trade on
         <a
           target="_blank"
+          rel="noreferrer"
           href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenIn.contract.address}&outputCurrency=${tokenOut.contract.address}`}>
           {' '}
           uniswap
