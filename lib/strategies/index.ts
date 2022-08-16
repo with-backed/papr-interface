@@ -1,4 +1,5 @@
 import { Pool } from '@uniswap/v3-sdk';
+import { ethers } from 'ethers';
 import { Config, SupportedNetwork } from 'lib/config';
 import { makeProvider } from 'lib/contracts';
 import {
@@ -19,11 +20,14 @@ export type LendingStrategy = {
   symbol: string;
   contract: Strategy;
   pool: Pool;
+  token0IsUnderlying: boolean;
   token0: ERC20Token;
   token1: ERC20Token;
   underlying: ERC20Token;
   collateral: ERC721Token;
   debtVault: ERC721;
+  maxLTV: ethers.BigNumber;
+  targetGrowthPerPeriod: ethers.BigNumber;
 };
 
 export type ERC20Token = {
@@ -42,7 +46,6 @@ export type ERC721Token = {
 export async function populateLendingStrategy(
   address: string,
   config: Config,
-  chain: Chain,
 ): Promise<LendingStrategy> {
   const provider = makeProvider(
     config.jsonRpcProvider,
@@ -63,7 +66,7 @@ export async function populateLendingStrategy(
   const underlyingAddress = await contract.underlying();
   const underlying = underlyingAddress == token0Address ? token0 : token1;
 
-  const pool = await getPool(poolContract, token0, token1, chain);
+  const pool = await getPool(poolContract, token0, token1, config.chainId);
 
   const collateralAddress = await contract.collateral();
   const collateral = ERC721__factory.connect(collateralAddress, provider);
@@ -85,6 +88,9 @@ export async function populateLendingStrategy(
     },
     underlying,
     debtVault: debtVault,
+    maxLTV: await contract.maxLTV(),
+    targetGrowthPerPeriod: await contract.targetGrowthPerPeriod(),
+    token0IsUnderlying: token0.contract.address == underlying.contract.address,
   };
 }
 

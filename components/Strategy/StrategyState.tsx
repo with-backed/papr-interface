@@ -16,8 +16,12 @@ export default function StrategyState({
   }, [strategy]);
 
   const updateStrategyMultiplier = useCallback(async () => {
-    const multiplier = await strategy.contract.targetMultiplier();
-    setStrategyMultiplier(ethers.utils.formatEther(multiplier));
+    try {
+      const multiplier = await strategy.contract.targetMultiplier();
+      setStrategyMultiplier(ethers.utils.formatEther(multiplier));
+    } catch {
+      // this is erroring on first load. i think some liquidity issue
+    }
   }, [strategy]);
 
   useEffect(() => {

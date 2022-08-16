@@ -8,6 +8,8 @@ import {
   Strategy__factory,
 } from 'types/generated/abis';
 import { Chain } from 'wagmi';
+import { LendingStrategy, populateLendingStrategy } from '..';
+import { ONE } from '../constants';
 
 export type Vault = {
   contract: ERC721;
@@ -16,6 +18,7 @@ export type Vault = {
   debt: ethers.BigNumber;
   price: ethers.BigNumber;
   liquidationPrice: ethers.BigNumber; // liquidated when 1 DT = X underlying
+  strategy: LendingStrategy;
 };
 
 export async function getVaultInfo(
@@ -27,17 +30,14 @@ export async function getVaultInfo(
     config.jsonRpcProvider,
     config.network as SupportedNetwork,
   );
-  const strategy = Strategy__factory.connect(strategyAddress, provider);
-  const { debt, price } = await strategy.vaultInfo(id.toHexString());
+  const strategyContract = Strategy__factory.connect(strategyAddress, provider);
+  const { debt, price } = await strategyContract.vaultInfo(id.toHexString());
+  const strategy = await populateLendingStrategy(strategyAddress, config);
 
-  const vaultContract = ERC721__factory.connect(
-    await strategy.debtVault(),
-    provider,
-  );
+  const vaultContract = strategy.debtVault;
   const owner = await vaultContract.ownerOf(id);
 
-  const ONE = ethers.BigNumber.from(10).pow(18);
-  const maxLTV = ONE.div(2); // 50%, should be fetched from contract in future
+  const maxLTV = strategy.maxLTV;
   const maxUnderlying = price.mul(maxLTV).div(ONE);
   const liquidationPrice = maxUnderlying.div(debt);
 
@@ -48,5 +48,6 @@ export async function getVaultInfo(
     debt,
     price,
     liquidationPrice: liquidationPrice,
+    strategy: strategy,
   };
 }

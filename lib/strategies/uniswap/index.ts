@@ -78,7 +78,7 @@ export async function getPool(
   poolContract: IUniswapV3Pool,
   token0: ERC20Token,
   token1: ERC20Token,
-  chain: Chain,
+  chainId: number,
 ): Promise<Pool> {
   const [immutables, state] = await Promise.all([
     getPoolImmutables(poolContract),
@@ -86,7 +86,7 @@ export async function getPool(
   ]);
 
   const TokenA = new UniswapToken(
-    chain.id,
+    chainId,
     immutables.token0,
     token0.decimals,
     token0.symbol,
@@ -94,7 +94,7 @@ export async function getPool(
   );
 
   const TokenB = new UniswapToken(
-    chain.id,
+    chainId,
     immutables.token1,
     token1.decimals,
     token1.symbol,
