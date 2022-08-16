@@ -38,7 +38,7 @@ export default function StrategyPage({ address }: StrategyPageProps) {
     useState<LendingStrategy | null>(null);
 
   const populate = useCallback(async () => {
-    const s = await populateLendingStrategy(address, config, chain!);
+    const s = await populateLendingStrategy(address, config);
     setLendingStrategy(s);
   }, [address]);
 
