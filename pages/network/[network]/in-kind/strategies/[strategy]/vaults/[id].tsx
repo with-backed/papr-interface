@@ -101,6 +101,10 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
             current debt token price: {debtPrice}{' '}
             {vaultInfo.strategy.underlying.symbol}
           </p>
+          <p>
+            Strategy&apos;s Current APR:{' '}
+            {parseFloat(vaultInfo.strategy.currentAPRBIPs.toString()) / 100}%
+          </p>
         </fieldset>
       )}
     </div>

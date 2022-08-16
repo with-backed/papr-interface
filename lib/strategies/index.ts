@@ -13,6 +13,7 @@ import {
   Strategy__factory,
 } from 'types/generated/abis';
 import { Chain } from 'wagmi';
+import { ONE } from './constants';
 import { getPool } from './uniswap';
 
 export type LendingStrategy = {
@@ -28,6 +29,7 @@ export type LendingStrategy = {
   debtVault: ERC721;
   maxLTV: ethers.BigNumber;
   targetGrowthPerPeriod: ethers.BigNumber;
+  currentAPRBIPs: ethers.BigNumber;
 };
 
 export type ERC20Token = {
@@ -74,6 +76,14 @@ export async function populateLendingStrategy(
   const debtVaultAddress = await contract.debtVault();
   const debtVault = ERC721__factory.connect(debtVaultAddress, provider);
 
+  const targetGrowthPerPeriod = (await contract.targetGrowthPerPeriod()).mul(
+    52,
+  );
+  const currentAPRBIPs = (await contract.targetMultiplier())
+    .mul(targetGrowthPerPeriod)
+    .div(ONE)
+    .div(ONE.div(10000));
+
   return {
     name: await contract.name(),
     symbol: await contract.symbol(),
@@ -91,6 +101,7 @@ export async function populateLendingStrategy(
     maxLTV: await contract.maxLTV(),
     targetGrowthPerPeriod: await contract.targetGrowthPerPeriod(),
     token0IsUnderlying: token0.contract.address == underlying.contract.address,
+    currentAPRBIPs: currentAPRBIPs,
   };
 }
 
