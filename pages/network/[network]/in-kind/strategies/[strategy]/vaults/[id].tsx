@@ -4,6 +4,7 @@ import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSigner } from 'wagmi';
 
@@ -30,6 +31,7 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
   const [vaultInfo, setVaultInfo] = useState<Vault | null>(null);
   const config = useConfig();
   const { data: signer } = useSigner();
+  const { replace } = useRouter();
 
   const fetchVaultInfo = useCallback(async () => {
     if (signer) {
@@ -79,11 +81,13 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
 
   const closeVault = useCallback(() => {
     if (vaultInfo) {
-      vaultInfo.strategy.contract.closeVault({ nft: '', id });
+      vaultInfo.strategy.contract.closeVault({ nft: '', id }).then((_tx) => {
+        replace(`/network/${config.network}/in-kind/strategies/${strategy}`);
+      });
     } else {
       console.error('No vault info, cannot close vault');
     }
-  }, [id, vaultInfo]);
+  }, [config.network, id, replace, strategy, vaultInfo]);
 
   return (
     <div>
