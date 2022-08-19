@@ -29,7 +29,11 @@ export async function getVaultInfo(
 ): Promise<Vault> {
   const strategyContract = Strategy__factory.connect(strategyAddress, signer);
   const { debt, price } = await strategyContract.vaultInfo(id.toHexString());
-  const strategy = await populateLendingStrategy(strategyAddress, config);
+  const strategy = await populateLendingStrategy(
+    strategyAddress,
+    config,
+    signer,
+  );
 
   const vaultContract = strategy.debtVault;
   const owner = await vaultContract.ownerOf(id);

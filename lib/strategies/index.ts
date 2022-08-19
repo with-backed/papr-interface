@@ -49,12 +49,13 @@ export type ERC721Token = {
 export async function populateLendingStrategy(
   address: string,
   config: Config,
+  signer?: ethers.Signer,
 ): Promise<LendingStrategy> {
   const provider = makeProvider(
     config.jsonRpcProvider,
     config.network as SupportedNetwork,
   );
-  const contract = Strategy__factory.connect(address, provider);
+  const contract = Strategy__factory.connect(address, signer || provider);
   const poolAddress = await contract.pool();
   const poolContract = IUniswapV3Pool__factory.connect(poolAddress, provider);
 
