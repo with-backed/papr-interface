@@ -1,9 +1,11 @@
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
+import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
 import { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSigner } from 'wagmi';
 
 export type VaultPageProps = {
   strategy: string;
@@ -27,15 +29,23 @@ export const getServerSideProps: GetServerSideProps<VaultPageProps> = async (
 export default function VaultPage({ id, strategy }: VaultPageProps) {
   const [vaultInfo, setVaultInfo] = useState<Vault | null>(null);
   const config = useConfig();
+  const { data: signer } = useSigner();
 
   const fetchVaultInfo = useCallback(async () => {
-    const i = await getVaultInfo(ethers.BigNumber.from(id), strategy, config);
-    setVaultInfo(i);
-  }, [id, strategy]);
+    if (signer) {
+      const i = await getVaultInfo(
+        ethers.BigNumber.from(id),
+        strategy,
+        config,
+        signer,
+      );
+      setVaultInfo(i);
+    }
+  }, [config, id, signer, strategy]);
 
   useEffect(() => {
     fetchVaultInfo();
-  }, [id, strategy]);
+  }, [fetchVaultInfo]);
 
   const debtPrice = useMemo(() => {
     if (vaultInfo == null) {
@@ -67,45 +77,57 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     return ethers.utils.formatUnits(vaultInfo.debt, 18);
   }, [vaultInfo]);
 
+  const closeVault = useCallback(() => {
+    if (vaultInfo) {
+      vaultInfo.strategy.contract.closeVault({ nft: '', id });
+    } else {
+      console.error('No vault info, cannot close vault');
+    }
+  }, [id, vaultInfo]);
+
   return (
     <div>
       <a href={`/network/${config.network}/in-kind/strategies/${strategy}`}>
         {' '}
         ⬅ strategy{' '}
       </a>
-      {vaultInfo == null ? (
-        ''
-      ) : (
-        <fieldset>
-          <legend>Vault Info</legend>
-          <p>owner: {vaultInfo.owner}</p>
-          <p>debt: {debtAmount}</p>
-          {/* TODO should fetch underlying decimals */}
-          <p>collateral valuation {collateralVaulation}</p>
-          {/* Should fetch */}
-          <p>max LTV: {maxLTVPercent}%</p>
-          <p>
-            {' '}
-            current LTV:{' '}
-            {((parseFloat(debtPrice) * parseFloat(debtAmount)) /
-              parseFloat(collateralVaulation)) *
-              100}
-            %
-          </p>
-          <p>
-            liquidation price: when 1 DT ={' '}
-            {vaultInfo.liquidationPrice.toString()} underlying
-          </p>
-          <p>
-            {' '}
-            current debt token price: {debtPrice}{' '}
-            {vaultInfo.strategy.underlying.symbol}
-          </p>
-          <p>
-            Strategy&apos;s Current APR:{' '}
-            {parseFloat(vaultInfo.strategy.currentAPRBIPs.toString()) / 100}%
-          </p>
-        </fieldset>
+      {!!vaultInfo && (
+        <>
+          <fieldset>
+            <legend>Vault Info</legend>
+            <p>owner: {vaultInfo.owner}</p>
+            <p>debt: {debtAmount}</p>
+            {/* TODO should fetch underlying decimals */}
+            <p>collateral valuation {collateralVaulation}</p>
+            {/* Should fetch */}
+            <p>max LTV: {maxLTVPercent}%</p>
+            <p>
+              {' '}
+              current LTV:{' '}
+              {((parseFloat(debtPrice) * parseFloat(debtAmount)) /
+                parseFloat(collateralVaulation)) *
+                100}
+              %
+            </p>
+            <p>
+              liquidation price: when 1 DT ={' '}
+              {vaultInfo.liquidationPrice.toString()} underlying
+            </p>
+            <p>
+              {' '}
+              current debt token price: {debtPrice}{' '}
+              {vaultInfo.strategy.underlying.symbol}
+            </p>
+            <p>
+              Strategy&apos;s Current APR:{' '}
+              {parseFloat(vaultInfo.strategy.currentAPRBIPs.toString()) / 100}%
+            </p>
+          </fieldset>
+          <fieldset>
+            <legend>Vault Actions</legend>
+            <button onClick={closeVault}>Close Vault</button>
+          </fieldset>
+        </>
       )}
     </div>
   );

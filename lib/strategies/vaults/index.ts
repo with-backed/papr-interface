@@ -7,7 +7,7 @@ import {
   ERC721__factory,
   Strategy__factory,
 } from 'types/generated/abis';
-import { Chain } from 'wagmi';
+import { Chain, useSigner } from 'wagmi';
 import { LendingStrategy, populateLendingStrategy } from '..';
 import { ONE } from '../constants';
 
@@ -25,12 +25,9 @@ export async function getVaultInfo(
   id: ethers.BigNumber,
   strategyAddress: string,
   config: Config,
+  signer: ethers.Signer,
 ): Promise<Vault> {
-  const provider = makeProvider(
-    config.jsonRpcProvider,
-    config.network as SupportedNetwork,
-  );
-  const strategyContract = Strategy__factory.connect(strategyAddress, provider);
+  const strategyContract = Strategy__factory.connect(strategyAddress, signer);
   const { debt, price } = await strategyContract.vaultInfo(id.toHexString());
   const strategy = await populateLendingStrategy(strategyAddress, config);
 
