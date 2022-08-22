@@ -1,0 +1,9 @@
+fragment allLendingStrategyProperties on LendingStrategy {
+  id
+  name
+  symbol
+  poolAddress
+  underlying
+  collateral
+  normFactor
+}

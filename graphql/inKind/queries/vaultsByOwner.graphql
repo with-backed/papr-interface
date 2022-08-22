@@ -1,0 +1,5 @@
+query vaultsByOwner($owner: String) {
+  vaults(where: { owner: $owner }) {
+    ...allVaultProperties
+  }
+}

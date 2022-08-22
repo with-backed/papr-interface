@@ -1,0 +1,8 @@
+query lendingStrategies {
+  lendingStrategies {
+    ...allLendingStrategyProperties
+    vaults {
+      ...allVaultProperties
+    }
+  }
+}
