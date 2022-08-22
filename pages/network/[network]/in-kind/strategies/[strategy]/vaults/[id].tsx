@@ -139,6 +139,7 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
           </fieldset>
           <fieldset>
             <legend>Vault Actions</legend>
+            {/* TODO: button should be inactive when there is still debt to repay */}
             <button onClick={closeVault}>Close Vault</button>
           </fieldset>
         </>
