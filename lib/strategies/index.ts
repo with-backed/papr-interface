@@ -79,7 +79,7 @@ export async function populateLendingStrategy(
   const targetGrowthPerPeriod = (await contract.targetGrowthPerPeriod()).mul(
     52,
   );
-  const currentAPRBIPs = (await contract.targetMultiplier())
+  const currentAPRBIPs = (await contract.multiplier())
     .mul(targetGrowthPerPeriod)
     .div(ONE)
     .div(ONE.div(10000));
