@@ -2,12 +2,13 @@ import { TransactionButton } from 'components/Button';
 import { useConfig } from 'hooks/useConfig';
 import { validateNetwork } from 'lib/config';
 import { GetServerSideProps } from 'next';
-import { Suspense, useCallback, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useCallback, useState } from 'react';
 import { StrategyFactory__factory } from 'types/generated/abis';
-import { useAccount, useSigner } from 'wagmi';
+import { useSigner } from 'wagmi';
 
 export default function Factory() {
-  const { data: signer, isError, isLoading } = useSigner();
+  const { data: signer } = useSigner();
 
   return <div>{signer == undefined ? 'no signer' : <Connected />}</div>;
 }
@@ -21,11 +22,11 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
 };
 
 function Connected() {
-  const { address } = useAccount();
   const { data: signer } = useSigner();
   const [txHash, setTxHash] = useState('');
   const [isPending, setIsPending] = useState(false);
-  const { jsonRpcProvider, network } = useConfig();
+  const { network } = useConfig();
+  const { push } = useRouter();
 
   const create = useCallback(async () => {
     let strategy = StrategyFactory__factory.connect(
@@ -39,11 +40,9 @@ function Connected() {
       process.env.NEXT_PUBLIC_MOCK_USDC as string,
     );
 
-    const filter = strategy.filters.NewStrategy(null);
+    const filter = strategy.filters.LendingStrategyCreated(null);
     strategy.once(filter, (address) => {
-      window.location.assign(
-        `/network/${network}/in-kind/strategies/${address}`,
-      );
+      push(`/network/${network}/in-kind/strategies/${address}`);
     });
 
     setTxHash(tx.hash);
@@ -53,7 +52,7 @@ function Connected() {
         setIsPending(false);
       })
       .catch((reason) => console.log(reason));
-  }, [address, signer]);
+  }, [network, push, signer]);
 
   return (
     <div>

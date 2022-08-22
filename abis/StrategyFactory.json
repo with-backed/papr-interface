@@ -10,12 +10,36 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "contract LendingStrategy",
-          "name": "strategy",
+          "internalType": "address",
+          "name": "strategyAddress",
           "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "collateral",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "underlying",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "symbol",
+          "type": "string"
         }
       ],
-      "name": "NewStrategy",
+      "name": "LendingStrategyCreated",
       "type": "event"
     },
     {
