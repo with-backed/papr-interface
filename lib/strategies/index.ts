@@ -1,6 +1,7 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
 import { Config, SupportedNetwork } from 'lib/config';
+import { SECONDS_IN_A_YEAR } from 'lib/constants';
 import { makeProvider } from 'lib/contracts';
 import {
   ERC20,
@@ -28,7 +29,7 @@ export type LendingStrategy = {
   collateral: ERC721Token;
   debtVault: ERC721;
   maxLTV: ethers.BigNumber;
-  targetGrowthPerPeriod: ethers.BigNumber;
+  targetAnnualGrowth: ethers.BigNumber;
   currentAPRBIPs: ethers.BigNumber;
 };
 
@@ -76,13 +77,17 @@ export async function populateLendingStrategy(
   const debtVaultAddress = await contract.debtVault();
   const debtVault = ERC721__factory.connect(debtVaultAddress, provider);
 
-  const targetGrowthPerPeriod = (await contract.targetGrowthPerPeriod()).mul(
-    52,
-  );
-  const currentAPRBIPs = (await contract.multiplier())
-    .mul(targetGrowthPerPeriod)
-    .div(ONE)
+  /// TODO expose period from contract so we can not just assume period is 28 days.
+  const targetAnnualGrowth = (await contract.targetGrowthPerPeriod())
+    .mul(12)
     .div(ONE.div(10000));
+  const lastUpdated = await contract.lastUpdated();
+  const now = ethers.BigNumber.from(Date.now()).div(1000);
+  const currentAPRBIPs = (await contract.multiplier())
+    .sub(ONE) // only care about decimals
+    .div(now.sub(lastUpdated)) // how much growth per second
+    .mul(SECONDS_IN_A_YEAR) // annualize
+    .div(ONE.div(10000)); // convert to BIPs
 
   return {
     name: await contract.name(),
@@ -99,7 +104,7 @@ export async function populateLendingStrategy(
     underlying,
     debtVault: debtVault,
     maxLTV: await contract.maxLTV(),
-    targetGrowthPerPeriod: await contract.targetGrowthPerPeriod(),
+    targetAnnualGrowth: targetAnnualGrowth,
     token0IsUnderlying: token0.contract.address == underlying.contract.address,
     currentAPRBIPs: currentAPRBIPs,
   };

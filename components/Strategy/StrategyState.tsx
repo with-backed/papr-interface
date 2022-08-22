@@ -71,10 +71,7 @@ export default function StrategyState({
       </p>
       <p>
         Strategy&apos;s Target APR:{' '}
-        {parseFloat(
-          strategy.targetGrowthPerPeriod.mul(52).div(ONE.div(10000)).toString(),
-        ) / 100}{' '}
-        %
+        {parseFloat(strategy.targetAnnualGrowth.toString()) / 100} %
       </p>
     </fieldset>
   );
