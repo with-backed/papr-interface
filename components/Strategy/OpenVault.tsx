@@ -17,7 +17,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
   const { data: signer } = useSigner();
   const [debt, setDebt] = useState<string>('');
   const [collateralTokenId, setCollateralTokenId] = useState<string>('');
-  const { jsonRpcProvider, network } = useConfig();
+  const { network } = useConfig();
 
   const create = useCallback(async () => {
     const request: OpenVaultRequestStruct = {
@@ -62,7 +62,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
         `/network/${network}/in-kind/strategies/${strategy.contract.address}/vaults/${id}`,
       );
     });
-  }, [strategy, debt, collateralTokenId]);
+  }, [address, collateralTokenId, debt, network, signer, strategy]);
 
   return (
     <fieldset>
