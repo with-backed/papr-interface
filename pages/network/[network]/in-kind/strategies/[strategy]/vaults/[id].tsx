@@ -1,11 +1,12 @@
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
-import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { VaultByIdDocument } from 'types/generated/graphql/inKindSubgraph';
+import { useQuery } from 'urql';
 import { useSigner } from 'wagmi';
 
 export type VaultPageProps = {
@@ -32,6 +33,10 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
   const config = useConfig();
   const { data: signer } = useSigner();
   const { replace } = useRouter();
+  const [{ data }] = useQuery({
+    query: VaultByIdDocument,
+    variables: { id: ethers.BigNumber.from(id).toHexString() },
+  });
 
   const fetchVaultInfo = useCallback(async () => {
     if (signer) {
@@ -80,14 +85,19 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
   }, [vaultInfo]);
 
   const closeVault = useCallback(() => {
-    if (vaultInfo) {
-      vaultInfo.strategy.contract.closeVault({ nft: '', id }).then((_tx) => {
-        replace(`/network/${config.network}/in-kind/strategies/${strategy}`);
-      });
+    if (vaultInfo && data?.vault) {
+      vaultInfo.strategy.contract
+        .closeVault({
+          nft: data.vault.strategy.collateral,
+          id: data.vault.tokenId,
+        })
+        .then((_tx) => {
+          replace(`/network/${config.network}/in-kind/strategies/${strategy}`);
+        });
     } else {
       console.error('No vault info, cannot close vault');
     }
-  }, [config.network, id, replace, strategy, vaultInfo]);
+  }, [config.network, data?.vault, replace, strategy, vaultInfo]);
 
   return (
     <div>
