@@ -1,0 +1,10 @@
+overwrite: true
+schema: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox'
+documents: './graphql/inKind/**/*.graphql'
+generates:
+  types/generated/graphql/inKindSubgraph.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'urql-introspection'
+      - 'typed-document-node'
