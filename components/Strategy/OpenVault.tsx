@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy } from 'lib/strategies';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ERC721__factory } from 'types/generated/abis';
 import { OpenVaultRequestStruct } from 'types/generated/abis/Strategy';
 import { useAccount, useSigner } from 'wagmi';
@@ -16,6 +16,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
   const { address } = useAccount();
   const { data: signer } = useSigner();
   const [debt, setDebt] = useState<string>('');
+  const [maxDebt, setMaxDebt] = useState<string>('');
   const [collateralTokenId, setCollateralTokenId] = useState<string>('');
   const { jsonRpcProvider, network } = useConfig();
 
@@ -64,10 +65,21 @@ export default function OpenVault({ strategy }: BorrowProps) {
     });
   }, [strategy, debt, collateralTokenId]);
 
+  const getMaxDebt = useCallback(async () => {
+    const maxDebt = await strategy.contract.maxDebt(
+      ethers.utils.parseUnits(PRICE.toString(), 18),
+    );
+    setMaxDebt(maxDebt.toString());
+  }, [strategy]);
+
+  useEffect(() => {
+    getMaxDebt();
+  });
+
   return (
     <fieldset>
       <legend>borrow</legend>
-      <p> max debt: </p>
+      <p> max debt: {maxDebt}</p>
       <input
         placeholder="collateral token id"
         onChange={(e) => setCollateralTokenId(e.target.value)}></input>
