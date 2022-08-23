@@ -66,15 +66,17 @@ export default function OpenVault({ strategy }: BorrowProps) {
   }, [strategy, debt, collateralTokenId]);
 
   const getMaxDebt = useCallback(async () => {
-    const maxDebt = await strategy.contract.maxDebt(
-      ethers.utils.parseUnits(PRICE.toString(), 18),
-    );
+    const newNorm = await strategy.contract.newNorm();
+    const maxLTV = await strategy.contract.maxLTV();
+
+    const maxDebt = maxLTV.mul(ethers.BigNumber.from(PRICE)).div(newNorm);
+
     setMaxDebt(maxDebt.toString());
   }, [strategy]);
 
   useEffect(() => {
     getMaxDebt();
-  });
+  }, []);
 
   return (
     <fieldset>
