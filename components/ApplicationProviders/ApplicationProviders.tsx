@@ -15,6 +15,10 @@ import { WagmiConfig, chain, createClient, configureChains } from 'wagmi';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { infuraProvider } from 'wagmi/providers/infura';
 import { publicProvider } from 'wagmi/providers/public';
+import {
+  createClient as createUrqlClient,
+  Provider as UrqlProvider,
+} from 'urql';
 
 const prodChains = [chain.mainnet, chain.polygon, chain.optimism];
 const CHAINS =
@@ -71,6 +75,13 @@ export const ApplicationProviders = ({
     });
   }, [connectors, provider]);
 
+  // TODO: may want to compartmentalize this just to v2 pages; can make a higher-order component to wrap those routes
+  const inKindClient = useMemo(() => {
+    return createUrqlClient({
+      url: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+    });
+  }, []);
+
   return (
     <GlobalMessagingProvider>
       <WagmiConfig client={client}>
@@ -85,7 +96,7 @@ export const ApplicationProviders = ({
             <CachedRatesProvider>
               <HasCollapsedHeaderInfoProvider>
                 <CommunityGradientProvider>
-                  {children}
+                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
                 </CommunityGradientProvider>
               </HasCollapsedHeaderInfoProvider>
             </CachedRatesProvider>

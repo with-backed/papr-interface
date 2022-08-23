@@ -1,5 +1,8 @@
 query vaultById($id: ID!) {
   vault(id: $id) {
     ...allVaultProperties
+    strategy {
+      collateral
+    }
   }
 }
