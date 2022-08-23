@@ -2,9 +2,12 @@ import { TransactionButton } from 'components/Button';
 import { useConfig } from 'hooks/useConfig';
 import { validateNetwork } from 'lib/config';
 import { GetServerSideProps } from 'next';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { StrategyFactory__factory } from 'types/generated/abis';
+import { LendingStrategiesDocument } from 'types/generated/graphql/inKindSubgraph';
+import { useQuery } from 'urql';
 import { useSigner } from 'wagmi';
 
 export default function Factory() {
@@ -27,6 +30,7 @@ function Connected() {
   const [isPending, setIsPending] = useState(false);
   const { network } = useConfig();
   const { push } = useRouter();
+  const [{ data, fetching }] = useQuery({ query: LendingStrategiesDocument });
 
   const create = useCallback(async () => {
     let strategy = StrategyFactory__factory.connect(
@@ -63,6 +67,23 @@ function Connected() {
         txHash={txHash}
         isPending={isPending}
       />
+      <fieldset>
+        <legend>Existing strategies</legend>
+        {fetching && <p>Loading strategies...</p>}
+        {!fetching && !!data && (
+          <ul>
+            {data.lendingStrategies.map((s) => {
+              return (
+                <li key={s.id}>
+                  <Link href={`/network/${network}/in-kind/strategies/${s.id}`}>
+                    <a>{s.id}</a>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </fieldset>
     </div>
   );
 }
