@@ -1,13 +1,6 @@
 import { ethers } from 'ethers';
-import { Config, SupportedNetwork } from 'lib/config';
-import { makeProvider } from 'lib/contracts';
-import { divide } from 'lodash';
-import {
-  ERC721,
-  ERC721__factory,
-  Strategy__factory,
-} from 'types/generated/abis';
-import { Chain, useSigner } from 'wagmi';
+import { Config } from 'lib/config';
+import { ERC721, Strategy__factory } from 'types/generated/abis';
 import { LendingStrategy, populateLendingStrategy } from '..';
 import { ONE } from '../constants';
 
@@ -40,15 +33,16 @@ export async function getVaultInfo(
 
   const maxLTV = strategy.maxLTV;
   const maxUnderlying = price.mul(maxLTV).div(ONE);
-  const liquidationPrice = maxUnderlying.div(debt);
+  // TODO: how should we represent this when debt is zero?
+  const liquidationPrice = debt.eq(0) ? debt : maxUnderlying.div(debt);
 
   return {
     contract: vaultContract,
-    id: id,
+    id,
     owner,
     debt,
     price,
-    liquidationPrice: liquidationPrice,
-    strategy: strategy,
+    liquidationPrice,
+    strategy,
   };
 }

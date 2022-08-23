@@ -84,6 +84,16 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     return ethers.utils.formatUnits(vaultInfo.debt, 18);
   }, [vaultInfo]);
 
+  const repayDebt = useCallback(() => {
+    if (vaultInfo) {
+      vaultInfo.strategy.contract
+        .reduceDebt(ethers.BigNumber.from(id).toHexString(), vaultInfo.debt)
+        .then(fetchVaultInfo);
+    } else {
+      console.error('No vault info, cannot reduce debt');
+    }
+  }, [id, fetchVaultInfo, vaultInfo]);
+
   const closeVault = useCallback(() => {
     if (vaultInfo && data?.vault) {
       vaultInfo.strategy.contract
@@ -139,8 +149,13 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
           </fieldset>
           <fieldset>
             <legend>Vault Actions</legend>
-            {/* TODO: button should be inactive when there is still debt to repay */}
-            <button onClick={closeVault}>Close Vault</button>
+            <button onClick={repayDebt} disabled={vaultInfo.debt.eq(0)}>
+              Repay Debt
+            </button>
+            <br></br>
+            <button onClick={closeVault} disabled={vaultInfo.debt.gt(0)}>
+              Close Vault
+            </button>
           </fieldset>
         </>
       )}
