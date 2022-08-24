@@ -2,7 +2,6 @@
   border: none;
   border-radius: var(--border-radius-large);
   padding: var(--padding-button);
-  width: 100%;
   line-height: 1.6;
   cursor: pointer;
   font-size: var(--font-large);
@@ -150,6 +149,7 @@
 .button-link {
   text-align: center;
   display: inline-block;
+  line-height: 32px;
 }
 
 .primary.button-link:visited {

@@ -1,3 +1,4 @@
+import { TransactionButton } from 'components/Button';
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
@@ -8,7 +9,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { VaultByIdDocument } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
-import { useSigner } from 'wagmi';
+import { useAccount, useSigner } from 'wagmi';
 import styles from '../strategy.module.css';
 
 export type VaultPageProps = {
@@ -39,6 +40,12 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     query: VaultByIdDocument,
     variables: { id: ethers.BigNumber.from(id).toHexString() },
   });
+  const { address } = useAccount();
+
+  const userIsOwner = useMemo(
+    () => data?.vault?.owner.id.toLowerCase() === address?.toLowerCase(),
+    [address, data],
+  );
 
   const fetchVaultInfo = useCallback(async () => {
     if (signer) {
@@ -86,26 +93,40 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     return ethers.utils.formatUnits(vaultInfo.debt, 18);
   }, [vaultInfo]);
 
-  const repayDebt = useCallback(() => {
+  const [repayHash, setRepayHash] = useState('');
+  const [repayPending, setRepayPending] = useState(false);
+  const repayDebt = useCallback(async () => {
     if (vaultInfo) {
-      vaultInfo.strategy.contract
-        .reduceDebt(ethers.BigNumber.from(id).toHexString(), vaultInfo.debt)
-        .then(fetchVaultInfo);
+      const tx = await vaultInfo.strategy.contract.reduceDebt(
+        ethers.BigNumber.from(id).toHexString(),
+        vaultInfo.debt,
+      );
+      setRepayHash(tx.hash);
+      setRepayPending(true);
+
+      await tx.wait();
+      setRepayPending(false);
+      fetchVaultInfo();
     } else {
       console.error('No vault info, cannot reduce debt');
     }
   }, [id, fetchVaultInfo, vaultInfo]);
 
-  const closeVault = useCallback(() => {
+  const [closeHash, setCloseHash] = useState('');
+  const [closePending, setClosePending] = useState(false);
+  const closeVault = useCallback(async () => {
     if (vaultInfo && data?.vault) {
-      vaultInfo.strategy.contract
-        .closeVault({
-          nft: data.vault.strategy.collateral,
-          id: data.vault.tokenId,
-        })
-        .then((_tx) => {
-          replace(`/network/${config.network}/in-kind/strategies/${strategy}`);
-        });
+      const tx = await vaultInfo.strategy.contract.closeVault({
+        nft: data.vault.strategy.collateral,
+        id: data.vault.tokenId,
+      });
+
+      setCloseHash(tx.hash);
+      setClosePending(true);
+
+      await tx.wait();
+      setClosePending(false);
+      replace(`/network/${config.network}/in-kind/strategies/${strategy}`);
     } else {
       console.error('No vault info, cannot close vault');
     }
@@ -120,7 +141,9 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
       {!!vaultInfo && (
         <>
           <Fieldset legend="ℹ️ Vault Info">
-            <p>owner: {vaultInfo.owner}</p>
+            <p>
+              owner: {vaultInfo.owner} {userIsOwner ? '(you)' : '(not you)'}
+            </p>
             <p>debt: {debtAmount}</p>
             {/* TODO should fetch underlying decimals */}
             <p>collateral valuation {collateralVaulation}</p>
@@ -149,13 +172,22 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
             </p>
           </Fieldset>
           <Fieldset legend="🎬 Vault Actions">
-            <button onClick={repayDebt} disabled={vaultInfo.debt.eq(0)}>
-              Repay Debt
-            </button>
-            <br></br>
-            <button onClick={closeVault} disabled={vaultInfo.debt.gt(0)}>
-              Close Vault
-            </button>
+            <TransactionButton
+              text="Repay Debt"
+              onClick={repayDebt}
+              txHash={repayHash}
+              isPending={repayPending}
+              disabled={!userIsOwner || vaultInfo.debt.eq(0)}
+            />
+            <br />
+            <br />
+            <TransactionButton
+              text="Close Vault"
+              onClick={closeVault}
+              txHash={closeHash}
+              isPending={closePending}
+              disabled={!userIsOwner || vaultInfo.debt.gt(0)}
+            />
           </Fieldset>
         </>
       )}
