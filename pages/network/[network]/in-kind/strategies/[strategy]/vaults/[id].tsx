@@ -1,3 +1,4 @@
+import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { ONE } from 'lib/strategies/constants';
@@ -8,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { VaultByIdDocument } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 import { useSigner } from 'wagmi';
+import styles from '../strategy.module.css';
 
 export type VaultPageProps = {
   strategy: string;
@@ -110,15 +112,14 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
   }, [config.network, data?.vault, replace, strategy, vaultInfo]);
 
   return (
-    <div>
+    <div className={styles.column}>
       <a href={`/network/${config.network}/in-kind/strategies/${strategy}`}>
         {' '}
         ⬅ strategy{' '}
       </a>
       {!!vaultInfo && (
         <>
-          <fieldset>
-            <legend>Vault Info</legend>
+          <Fieldset legend="ℹ️ Vault Info">
             <p>owner: {vaultInfo.owner}</p>
             <p>debt: {debtAmount}</p>
             {/* TODO should fetch underlying decimals */}
@@ -146,9 +147,8 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
               Strategy&apos;s Current APR:{' '}
               {parseFloat(vaultInfo.strategy.currentAPRBIPs.toString()) / 100}%
             </p>
-          </fieldset>
-          <fieldset>
-            <legend>Vault Actions</legend>
+          </Fieldset>
+          <Fieldset legend="🎬 Vault Actions">
             <button onClick={repayDebt} disabled={vaultInfo.debt.eq(0)}>
               Repay Debt
             </button>
@@ -156,7 +156,7 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
             <button onClick={closeVault} disabled={vaultInfo.debt.gt(0)}>
               Close Vault
             </button>
-          </fieldset>
+          </Fieldset>
         </>
       )}
     </div>

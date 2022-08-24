@@ -1,16 +1,13 @@
 import { Pool } from '@uniswap/v3-sdk';
-import { useNetwork } from 'wagmi';
+import { Fieldset } from 'components/Fieldset';
 
 type PoolStateProps = {
   pool: Pool;
 };
 
 export default function PoolState({ pool }: PoolStateProps) {
-  const { chain } = useNetwork();
-
   return (
-    <fieldset>
-      <legend>Pool State</legend>
+    <Fieldset legend="🏊 Pool State">
       <a
         target="_blank"
         rel="noreferrer"
@@ -25,6 +22,6 @@ export default function PoolState({ pool }: PoolStateProps) {
       <p>
         {pool?.token1.symbol} price: {pool?.token1Price.toFixed()}
       </p>
-    </fieldset>
+    </Fieldset>
   );
 }

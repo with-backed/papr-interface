@@ -1,4 +1,5 @@
 import { TransactionButton } from 'components/Button';
+import { Fieldset } from 'components/Fieldset';
 import { useConfig } from 'hooks/useConfig';
 import { validateNetwork } from 'lib/config';
 import { GetServerSideProps } from 'next';
@@ -9,6 +10,7 @@ import { StrategyFactory__factory } from 'types/generated/abis';
 import { LendingStrategiesDocument } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 import { useSigner } from 'wagmi';
+import styles from './strategies/[strategy]/strategy.module.css';
 
 export default function Factory() {
   const { data: signer } = useSigner();
@@ -59,7 +61,7 @@ function Connected() {
   }, [network, push, signer]);
 
   return (
-    <div>
+    <div className={styles.column}>
       {/* <div>{signer}</div> */}
       <TransactionButton
         text={'Create a Strategy'}
@@ -67,8 +69,7 @@ function Connected() {
         txHash={txHash}
         isPending={isPending}
       />
-      <fieldset>
-        <legend>Existing strategies</legend>
+      <Fieldset legend="🗺️ Existing Strategies">
         {fetching && <p>Loading strategies...</p>}
         {!fetching && !!data && (
           <ul>
@@ -83,7 +84,7 @@ function Connected() {
             })}
           </ul>
         )}
-      </fieldset>
+      </Fieldset>
     </div>
   );
 }

@@ -52,7 +52,7 @@ export default function StrategyPage({ address }: StrategyPageProps) {
       <p>(fake) oracle price: {PRICE} </p>
       {lendingStrategy != null ? (
         <div className={styles.wrapper}>
-          <div>
+          <div className={styles.column}>
             <StrategyState strategy={lendingStrategy} />
             <p>
               {lendingStrategy.name} ({lendingStrategy.symbol})
@@ -77,7 +77,7 @@ export default function StrategyPage({ address }: StrategyPageProps) {
               tokenTwo={lendingStrategy!.token1}
             />
           </div>
-          <div>
+          <div className={styles.column}>
             <AssociatedVaults strategy={address} />
           </div>
         </div>

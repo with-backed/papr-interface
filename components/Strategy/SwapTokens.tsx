@@ -1,3 +1,4 @@
+import { Fieldset } from 'components/Fieldset';
 import { ERC20Token } from 'lib/strategies';
 
 type SwapTokensProps = {
@@ -7,10 +8,7 @@ type SwapTokensProps = {
 
 export default function SwapTokens({ tokenOne, tokenTwo }: SwapTokensProps) {
   return (
-    <fieldset>
-      <legend>
-        Swap {tokenOne.symbol} ⬅➡ {tokenTwo.symbol}
-      </legend>
+    <Fieldset legend={`🤝 Swap ${tokenOne.symbol} ⬅➡ ${tokenTwo.symbol}`}>
       <a
         target="_blank"
         rel="noreferrer"
@@ -24,6 +22,6 @@ export default function SwapTokens({ tokenOne, tokenTwo }: SwapTokensProps) {
         href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenOne.contract.address}&outputCurrency=${tokenTwo.contract.address}`}>
         Get {tokenTwo.symbol}
       </a>
-    </fieldset>
+    </Fieldset>
   );
 }

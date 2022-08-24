@@ -1,3 +1,4 @@
+import { Fieldset } from 'components/Fieldset';
 import { ERC721Token } from 'lib/strategies';
 import { useCallback, useEffect, useState } from 'react';
 import { MockCollateral__factory } from 'types/generated/abis';
@@ -36,10 +37,9 @@ export default function MintCollateral({ token }: MintCollateralProps) {
   });
 
   return (
-    <fieldset>
-      <legend>Mint yourself {token.symbol}</legend>
+    <Fieldset legend={`➕ Mint yourself ${token.symbol}`}>
       <p> your balance: {balance} </p>
       <button onClick={mint}>mint</button>
-    </fieldset>
+    </Fieldset>
   );
 }
