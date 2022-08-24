@@ -1,3 +1,5 @@
+import { Fieldset } from 'components/Fieldset';
+import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import Link from 'next/link';
 import React from 'react';
@@ -26,13 +28,12 @@ export function AssociatedVaults({ strategy }: AssociatedVaultsProps) {
   });
   data?.vaults;
   return (
-    <fieldset>
-      <legend>Associated Vaults</legend>
+    <Fieldset legend="🔐 Associated Vaults">
       {fetching && <Loading />}
       {!fetching && !!data && (
         <Loaded strategy={strategy} vaults={data.vaults} />
       )}
-    </fieldset>
+    </Fieldset>
   );
 }
 
@@ -56,9 +57,8 @@ function Loaded({ strategy, vaults }: LoadedProps) {
         return (
           <li key={v.id}>
             <Link
-              href={`/network/${network}/strategies/${strategy}/${v.id.replace(
-                '0x',
-                '',
+              href={`/network/${network}/in-kind/strategies/${strategy}/vaults/${ethers.BigNumber.from(
+                v.id,
               )}`}>
               <a>
                 {v.id.substring(0, 16)}... ({v.open ? 'open' : 'closed'})

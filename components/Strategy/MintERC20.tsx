@@ -1,3 +1,4 @@
+import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { ERC20Token } from 'lib/strategies';
 import { useCallback, useEffect, useState } from 'react';
@@ -42,13 +43,12 @@ export default function MintERC20({ token }: TokenInfoProps) {
   });
 
   return (
-    <fieldset>
-      <legend>Mint yourself {token.symbol}</legend>
+    <Fieldset legend={`🪙 Mint yourself ${token.symbol}`}>
       <p> your balance: {balance} </p>
       <input
         placeholder={'amount'}
         onChange={(e) => setValue(e.target.value)}></input>
       <button onClick={mint}>mint</button>
-    </fieldset>
+    </Fieldset>
   );
 }

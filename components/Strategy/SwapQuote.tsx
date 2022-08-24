@@ -1,3 +1,4 @@
+import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { SupportedNetwork } from 'lib/config';
@@ -31,13 +32,10 @@ export default function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
     setQuote(
       ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
     );
-  }, [amountIn]);
+  }, [amountIn, fee, jsonRpcProvider, network, tokenIn, tokenOut]);
 
   return (
-    <fieldset>
-      <legend>
-        {tokenIn.symbol} ➡ {tokenOut.symbol}
-      </legend>
+    <Fieldset legend={`💱 ${tokenIn.symbol} ➡ ${tokenOut.symbol}`}>
       <input
         placeholder={`Enter ${tokenIn.symbol} amount`}
         value={amountIn}
@@ -58,6 +56,6 @@ export default function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
           </a>
         </p>
       )}
-    </fieldset>
+    </Fieldset>
   );
 }

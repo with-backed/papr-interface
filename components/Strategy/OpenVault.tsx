@@ -1,3 +1,4 @@
+import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy } from 'lib/strategies';
@@ -76,11 +77,10 @@ export default function OpenVault({ strategy }: BorrowProps) {
 
   useEffect(() => {
     getMaxDebt();
-  }, []);
+  }, [getMaxDebt]);
 
   return (
-    <fieldset>
-      <legend>borrow</legend>
+    <Fieldset legend="🏦 Borrow">
       <p> max debt: {maxDebt}</p>
       <input
         placeholder="collateral token id"
@@ -89,6 +89,6 @@ export default function OpenVault({ strategy }: BorrowProps) {
         placeholder="debt amount"
         onChange={(e) => setDebt(e.target.value)}></input>
       <button onClick={create}> borrow </button>
-    </fieldset>
+    </Fieldset>
   );
 }

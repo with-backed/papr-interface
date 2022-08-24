@@ -1,3 +1,4 @@
+import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { LendingStrategy } from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
@@ -48,8 +49,7 @@ export default function StrategyState({
   });
 
   return (
-    <fieldset>
-      <legend>Strategy State</legend>
+    <Fieldset legend="📈 Strategy State">
       <p>
         {' '}
         Target Exchange Rate: 1 dt = {strategyIndex}{' '}
@@ -73,6 +73,6 @@ export default function StrategyState({
         Strategy&apos;s Target APR:{' '}
         {parseFloat(strategy.targetAnnualGrowth.toString()) / 100} %
       </p>
-    </fieldset>
+    </Fieldset>
   );
 }
