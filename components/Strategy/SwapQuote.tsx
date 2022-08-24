@@ -2,18 +2,30 @@ import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { SupportedNetwork } from 'lib/config';
 import { Quoter } from 'lib/contracts';
-import { ERC20Token } from 'lib/strategies';
+import {
+  computeEffectiveAPR,
+  ERC20Token,
+  LendingStrategy,
+  multiplier,
+} from 'lib/strategies';
 import { useCallback, useState } from 'react';
 
 type QuoteProps = {
+  strategy: LendingStrategy;
   tokenIn: ERC20Token;
   tokenOut: ERC20Token;
   fee: ethers.BigNumber;
 };
 
-export default function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
+export default function SwapQuote({
+  strategy,
+  tokenIn,
+  tokenOut,
+  fee,
+}: QuoteProps) {
   const [amountIn, setAmountIn] = useState<string>('');
   const [quote, setQuote] = useState<string>('');
+  const [effectiveAprAfter, setEffectiveAprAfter] = useState<string>('');
   const { jsonRpcProvider, network } = useConfig();
   const getQuote = useCallback(async () => {
     console.log(amountIn);
@@ -30,6 +42,18 @@ export default function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
 
     setQuote(
       ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
+    );
+
+    const now = ethers.BigNumber.from(Date.now()).div(1000);
+    const mark = ethers.BigNumber.from(1);
+    setEffectiveAprAfter(
+      (
+        await computeEffectiveAPR(
+          now,
+          await strategy.contract.lastUpdated(),
+          await multiplier(strategy, now, mark),
+        )
+      ).toString(),
     );
   }, [amountIn]);
 

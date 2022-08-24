@@ -46,6 +46,8 @@ export type ERC721Token = {
   symbol: string;
 };
 
+const WAD = 1e18;
+
 export async function populateLendingStrategy(
   address: string,
   config: Config,
@@ -84,11 +86,11 @@ export async function populateLendingStrategy(
     .div(ONE.div(10000));
   const lastUpdated = await contract.lastUpdated();
   const now = ethers.BigNumber.from(Date.now()).div(1000);
-  const currentAPRBIPs = (await contract.multiplier())
-    .sub(ONE) // only care about decimals
-    .div(now.sub(lastUpdated)) // how much growth per second
-    .mul(SECONDS_IN_A_YEAR) // annualize
-    .div(ONE.div(10000)); // convert to BIPs
+  const currentAPRBIPs = await computeEffectiveAPR(
+    now,
+    lastUpdated,
+    await contract.multiplier(),
+  );
 
   return {
     name: await contract.name(),
@@ -118,4 +120,44 @@ async function buildToken(token: ERC20): Promise<ERC20Token> {
     symbol: await token.symbol(),
     name: await token.name(),
   };
+}
+
+export async function computeEffectiveAPR(
+  now: ethers.BigNumber,
+  lastUpdated: ethers.BigNumber,
+  multiplier: ethers.BigNumber,
+) {
+  const currentAPRBIPs = multiplier
+    .sub(ONE) // only care about decimals
+    .div(now.sub(lastUpdated)) // how much growth per second
+    .mul(SECONDS_IN_A_YEAR) // annualize
+    .div(ONE.div(10000)); // convert to BIPs
+
+  return currentAPRBIPs;
+}
+
+export async function multiplier(
+  strategy: LendingStrategy,
+  now: ethers.BigNumber,
+  mark: ethers.BigNumber,
+) {
+  const lastUpdated = await strategy.contract.lastUpdated();
+  const PERIOD = ethers.BigNumber.from(4 * 7 * 24 * 60 * 60);
+  const targetGrowthPerPeriod = await strategy.contract.targetGrowthPerPeriod();
+  const index = await strategy.contract.index();
+
+  const period = now.sub(lastUpdated);
+  const periodRatio = period.div(PERIOD);
+  const targetGrowth = targetGrowthPerPeriod.mul(periodRatio).add(WAD);
+  let indexMarkRatio = index.div(mark);
+
+  if (indexMarkRatio.gt(14e17)) {
+    indexMarkRatio = ethers.BigNumber.from(14e17);
+  } else {
+    indexMarkRatio = ethers.BigNumber.from(8e17);
+  }
+
+  const deviationMultiplier = indexMarkRatio.pow(periodRatio);
+
+  return deviationMultiplier.mul(targetGrowth).div(WAD);
 }
