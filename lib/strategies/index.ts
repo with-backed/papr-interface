@@ -46,7 +46,7 @@ export type ERC721Token = {
   symbol: string;
 };
 
-const WAD = 1e18;
+const WAD = ethers.BigNumber.from(1e18);
 
 export async function populateLendingStrategy(
   address: string,
@@ -136,6 +136,7 @@ export async function computeEffectiveAPR(
   return currentAPRBIPs;
 }
 
+// TODO(adamgobes): figure out how to do powWad locally in JS
 export async function multiplier(
   strategy: LendingStrategy,
   now: ethers.BigNumber,
@@ -147,9 +148,9 @@ export async function multiplier(
   const index = await strategy.contract.index();
 
   const period = now.sub(lastUpdated);
-  const periodRatio = period.div(PERIOD);
-  const targetGrowth = targetGrowthPerPeriod.mul(periodRatio).add(WAD);
-  let indexMarkRatio = index.div(mark);
+  const periodRatio = period.mul(WAD).div(PERIOD);
+  const targetGrowth = targetGrowthPerPeriod.mul(periodRatio).div(WAD).add(WAD);
+  let indexMarkRatio = index.mul(WAD).div(mark);
 
   if (indexMarkRatio.gt(14e17)) {
     indexMarkRatio = ethers.BigNumber.from(14e17);

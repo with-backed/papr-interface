@@ -102,7 +102,7 @@ export async function simulateSwap(
   ];
   await provider.send('eth_sendTransaction', transactionParameters);
 
-  //   const TENDERLY_FORK_ACCESS_URL = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/fork/${forkId}`;
+  const TENDERLY_FORK_ACCESS_URL = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/fork/${forkId}`;
 
-  //   await axios.delete(TENDERLY_FORK_ACCESS_URL, opts);
+  await axios.delete(TENDERLY_FORK_ACCESS_URL, opts);
 }

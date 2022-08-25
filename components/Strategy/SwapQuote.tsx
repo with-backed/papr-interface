@@ -25,7 +25,8 @@ export default function SwapQuote({
 }: QuoteProps) {
   const [amountIn, setAmountIn] = useState<string>('');
   const [quote, setQuote] = useState<string>('');
-  const [effectiveAprAfter, setEffectiveAprAfter] = useState<string>('');
+  const [effectiveAprAfter, setEffectiveAprAfter] =
+    useState<string>('coming soon');
   const { jsonRpcProvider, network } = useConfig();
   const getQuote = useCallback(async () => {
     console.log(amountIn);
@@ -42,18 +43,6 @@ export default function SwapQuote({
 
     setQuote(
       ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
-    );
-
-    const now = ethers.BigNumber.from(Date.now()).div(1000);
-    const mark = ethers.BigNumber.from(1);
-    setEffectiveAprAfter(
-      (
-        await computeEffectiveAPR(
-          now,
-          await strategy.contract.lastUpdated(),
-          await multiplier(strategy, now, mark),
-        )
-      ).toString(),
     );
   }, [amountIn]);
 
