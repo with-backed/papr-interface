@@ -25,7 +25,7 @@ export default function SwapQuote({
 }: QuoteProps) {
   const [amountIn, setAmountIn] = useState<string>('');
   const [quote, setQuote] = useState<string>('');
-  const [effectiveAprAfter, setEffectiveAprAfter] =
+  const [internalAPRAfter, setInternalAPRAfter] =
     useState<string>('coming soon');
   const { jsonRpcProvider, network } = useConfig();
   const getQuote = useCallback(async () => {

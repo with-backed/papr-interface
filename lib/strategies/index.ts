@@ -1,7 +1,7 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
 import { Config, SupportedNetwork } from 'lib/config';
-import { SECONDS_IN_A_YEAR } from 'lib/constants';
+import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
 import { makeProvider } from 'lib/contracts';
 import {
   ERC20,
@@ -45,8 +45,6 @@ export type ERC721Token = {
   name: string;
   symbol: string;
 };
-
-const WAD = ethers.BigNumber.from(1e18);
 
 export async function populateLendingStrategy(
   address: string,
@@ -143,14 +141,14 @@ export async function multiplier(
   mark: ethers.BigNumber,
 ) {
   const lastUpdated = await strategy.contract.lastUpdated();
-  const PERIOD = ethers.BigNumber.from(4 * 7 * 24 * 60 * 60);
+  const PERIOD = ethers.BigNumber.from(28 * SECONDS_IN_A_DAY);
   const targetGrowthPerPeriod = await strategy.contract.targetGrowthPerPeriod();
   const index = await strategy.contract.index();
 
   const period = now.sub(lastUpdated);
-  const periodRatio = period.mul(WAD).div(PERIOD);
-  const targetGrowth = targetGrowthPerPeriod.mul(periodRatio).div(WAD).add(WAD);
-  let indexMarkRatio = index.mul(WAD).div(mark);
+  const periodRatio = period.mul(ONE).div(PERIOD);
+  const targetGrowth = targetGrowthPerPeriod.mul(periodRatio).div(ONE).add(ONE);
+  let indexMarkRatio = index.mul(ONE).div(mark);
 
   if (indexMarkRatio.gt(14e17)) {
     indexMarkRatio = ethers.BigNumber.from(14e17);
@@ -160,5 +158,5 @@ export async function multiplier(
 
   const deviationMultiplier = indexMarkRatio.pow(periodRatio);
 
-  return deviationMultiplier.mul(targetGrowth).div(WAD);
+  return deviationMultiplier.mul(targetGrowth).div(ONE);
 }

@@ -19,7 +19,8 @@ export async function simulateSwap(
   const TENDERLY_PROJECT = process.env.NEXT_PUBLIC_TENDERLY_PROJECT as string;
   const TENDERLY_ACCESS_KEY = process.env
     .NEXT_PUBLIC_TENDERLY_ACCESS_KEY as string;
-  const UNIV3_ROUTER_ADDRESS = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
+  const UNIV3_ROUTER_ADDRESS = process.env.NEXT_PUBLIC_ROUTER as string;
+  const CHAIN = (process.env.NEXT_PUBLIC_CHAIN_ID as string).substring(2);
 
   const TENDERLY_FORK_API = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/fork`;
 
@@ -30,7 +31,7 @@ export async function simulateSwap(
   };
 
   const body = {
-    network_id: '4',
+    network_id: CHAIN,
     block_number: block.toNumber(),
   };
 
@@ -58,7 +59,7 @@ export async function simulateSwap(
   const erc20IFace = new ethers.utils.Interface(erc20ABI);
   const approveEncodedData = erc20IFace.encodeFunctionData(
     'approve(address spender, uint256 amount)',
-    [UNIV3_ROUTER_ADDRESS, 1000],
+    [UNIV3_ROUTER_ADDRESS, amountIn],
   );
 
   const approveParams = [
