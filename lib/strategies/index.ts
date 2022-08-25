@@ -113,7 +113,7 @@ export async function populateLendingStrategy(
   };
 }
 
-async function buildToken(token: ERC20): Promise<ERC20Token> {
+export async function buildToken(token: ERC20): Promise<ERC20Token> {
   return {
     contract: token,
     decimals: await token.decimals(),

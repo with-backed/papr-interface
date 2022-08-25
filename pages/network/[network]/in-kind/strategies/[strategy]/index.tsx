@@ -13,6 +13,7 @@ import ProvideLiquidity from 'components/Strategy/ProvideLiquidty';
 import SwapTokens from 'components/Strategy/SwapTokens';
 import styles from './strategy.module.css';
 import { AssociatedVaults } from 'components/Strategy/AssociatedVaults';
+import { testTenderlySimulator } from 'lib/strategies/tenderlySimulator';
 
 export type StrategyPageProps = {
   address: string;
@@ -44,6 +45,7 @@ export default function StrategyPage({ address }: StrategyPageProps) {
 
   useEffect(() => {
     populate();
+    testTenderlySimulator();
   }, [populate]);
 
   return (
@@ -63,11 +65,13 @@ export default function StrategyPage({ address }: StrategyPageProps) {
             <ProvideLiquidity pool={lendingStrategy.pool} />
             <OpenVault strategy={lendingStrategy} />
             <SwapQuote
+              strategy={lendingStrategy}
               tokenIn={lendingStrategy!.token0}
               tokenOut={lendingStrategy!.token1}
               fee={ethers.BigNumber.from(10).pow(4)} // 1% fee tier, should just fetch from pool directly
             />
             <SwapQuote
+              strategy={lendingStrategy}
               tokenIn={lendingStrategy!.token1}
               tokenOut={lendingStrategy!.token0}
               fee={ethers.BigNumber.from(10).pow(4)} // 1% fee tier, should just fetch from pool directly
