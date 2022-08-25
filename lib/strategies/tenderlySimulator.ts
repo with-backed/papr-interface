@@ -1,16 +1,25 @@
 import axios from 'axios';
 import { ethers } from 'ethers';
 import { abi as IUniswapRouterABI } from '@uniswap/v3-periphery/artifacts/contracts/interfaces/ISwapRouter.sol/ISwapRouter.json';
-import { Pool } from '@uniswap/v3-sdk';
-import { ERC20__factory, IUniswapV3Pool__factory } from 'types/generated/abis';
-import { buildToken } from '.';
+import { IUniswapV3Pool__factory } from 'types/generated/abis';
+import { ERC20Token } from '.';
 import { getPool } from './uniswap';
+import { erc20ABI } from 'wagmi';
 
-export async function testTenderlySimulator() {
+export async function simulateSwap(
+  token0: ERC20Token,
+  token1: ERC20Token,
+  amountIn: ethers.BigNumber,
+  block: ethers.BigNumber,
+  blockTimestamp: ethers.BigNumber,
+  from: string,
+  poolAddress: string,
+) {
   const TENDERLY_USER = process.env.NEXT_PUBLIC_TENDERLY_USER as string;
   const TENDERLY_PROJECT = process.env.NEXT_PUBLIC_TENDERLY_PROJECT as string;
   const TENDERLY_ACCESS_KEY = process.env
     .NEXT_PUBLIC_TENDERLY_ACCESS_KEY as string;
+  const UNIV3_ROUTER_ADDRESS = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
 
   const TENDERLY_FORK_API = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/fork`;
 
@@ -22,7 +31,7 @@ export async function testTenderlySimulator() {
 
   const body = {
     network_id: '4',
-    block_number: 11264939,
+    block_number: block.toNumber(),
   };
 
   const forkRes = await axios.post(TENDERLY_FORK_API, body, opts);
@@ -32,54 +41,49 @@ export async function testTenderlySimulator() {
 
   const provider = new ethers.providers.JsonRpcProvider(forkRPC);
   const signer = provider.getSigner();
-  const params = [
-    ['0xe89cb2053a04daf86abaa1f4bc6d50744e57d39e'],
-    ethers.utils.hexValue(100), // hex encoded wei amount
-  ];
+  const params = [[from], ethers.utils.hexValue(100)];
 
   await provider.send('tenderly_addBalance', params);
 
   const routerContract = new ethers.Contract(
-    '0xE592427A0AEce92De3Edee1F18E0157C05861564',
+    UNIV3_ROUTER_ADDRESS,
     IUniswapRouterABI,
     signer,
   );
 
-  const poolContract = IUniswapV3Pool__factory.connect(
-    '0xa5a0ae6fffe6bec302e69165038255558f6bc276',
-    provider,
-  );
-  const token0 = await buildToken(
-    ERC20__factory.connect(
-      '0x3f7a71e5277fB4Adc274217928765578aA1365C3',
-      provider,
-    ),
-  );
-  const token1 = await buildToken(
-    ERC20__factory.connect(
-      '0xe357188e6A0B663bc7dF668abc6D76a4f534F588',
-      provider,
-    ),
-  );
+  const poolContract = IUniswapV3Pool__factory.connect(poolAddress, provider);
 
   let pool = await getPool(poolContract, token0, token1, 4);
-  console.log({
-    liquidity: pool.liquidity.toString(),
-    tick: pool.tickCurrent,
-    token0Price: pool.token0Price.toFixed(),
-  });
+
+  const erc20IFace = new ethers.utils.Interface(erc20ABI);
+  const approveEncodedData = erc20IFace.encodeFunctionData(
+    'approve(address spender, uint256 amount)',
+    [UNIV3_ROUTER_ADDRESS, 1000],
+  );
+
+  const approveParams = [
+    {
+      to: token0.contract.address,
+      from,
+      data: approveEncodedData,
+      gas: ethers.utils.hexValue(3000000),
+      gasPrice: ethers.utils.hexValue(1),
+      value: ethers.utils.hexValue(0),
+    },
+  ];
+  await provider.send('eth_sendTransaction', approveParams);
 
   const iface = new ethers.utils.Interface(IUniswapRouterABI);
   const encodedData = iface.encodeFunctionData(
     'exactInputSingle(tuple(address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96))',
     [
       [
-        '0x3f7a71e5277fB4Adc274217928765578aA1365C3',
-        '0xe357188e6A0B663bc7dF668abc6D76a4f534F588',
+        token0.contract.address,
+        token1.contract.address,
         pool.fee,
-        '0xe89cb2053a04daf86abaa1f4bc6d50744e57d39e',
-        11274942,
-        100,
+        from,
+        blockTimestamp,
+        amountIn,
         0,
         0,
       ],
@@ -89,25 +93,14 @@ export async function testTenderlySimulator() {
   const transactionParameters = [
     {
       to: routerContract.address,
-      from: '0xe89cb2053a04daf86abaa1f4bc6d50744e57d39e',
+      from,
       data: encodedData,
       gas: ethers.utils.hexValue(3000000),
       gasPrice: ethers.utils.hexValue(1),
       value: ethers.utils.hexValue(0),
     },
   ];
-  const txHash = await provider.send(
-    'eth_sendTransaction',
-    transactionParameters,
-  );
-  console.log({ txHash });
-
-  pool = await getPool(poolContract, token0, token1, 4);
-  console.log({
-    liquidity: pool.liquidity.toString(),
-    tick: pool.tickCurrent,
-    token0Price: pool.token0Price.toFixed(),
-  });
+  await provider.send('eth_sendTransaction', transactionParameters);
 
   //   const TENDERLY_FORK_ACCESS_URL = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/fork/${forkId}`;
 

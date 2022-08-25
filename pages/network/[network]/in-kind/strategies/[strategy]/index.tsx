@@ -13,7 +13,6 @@ import ProvideLiquidity from 'components/Strategy/ProvideLiquidty';
 import SwapTokens from 'components/Strategy/SwapTokens';
 import styles from './strategy.module.css';
 import { AssociatedVaults } from 'components/Strategy/AssociatedVaults';
-import { testTenderlySimulator } from 'lib/strategies/tenderlySimulator';
 
 export type StrategyPageProps = {
   address: string;
@@ -45,7 +44,6 @@ export default function StrategyPage({ address }: StrategyPageProps) {
 
   useEffect(() => {
     populate();
-    testTenderlySimulator();
   }, [populate]);
 
   return (
