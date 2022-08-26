@@ -63,11 +63,13 @@ export default function StrategyPage({ address }: StrategyPageProps) {
             <ProvideLiquidity pool={lendingStrategy.pool} />
             <OpenVault strategy={lendingStrategy} />
             <SwapQuote
+              strategy={lendingStrategy}
               tokenIn={lendingStrategy!.token0}
               tokenOut={lendingStrategy!.token1}
               fee={ethers.BigNumber.from(10).pow(4)} // 1% fee tier, should just fetch from pool directly
             />
             <SwapQuote
+              strategy={lendingStrategy}
               tokenIn={lendingStrategy!.token1}
               tokenOut={lendingStrategy!.token0}
               fee={ethers.BigNumber.from(10).pow(4)} // 1% fee tier, should just fetch from pool directly

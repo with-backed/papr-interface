@@ -3,18 +3,31 @@ import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { SupportedNetwork } from 'lib/config';
 import { Quoter } from 'lib/contracts';
-import { ERC20Token } from 'lib/strategies';
+import {
+  computeEffectiveAPR,
+  ERC20Token,
+  LendingStrategy,
+  multiplier,
+} from 'lib/strategies';
 import { useCallback, useState } from 'react';
 
 type QuoteProps = {
+  strategy: LendingStrategy;
   tokenIn: ERC20Token;
   tokenOut: ERC20Token;
   fee: ethers.BigNumber;
 };
 
-export default function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
+export default function SwapQuote({
+  strategy,
+  tokenIn,
+  tokenOut,
+  fee,
+}: QuoteProps) {
   const [amountIn, setAmountIn] = useState<string>('');
   const [quote, setQuote] = useState<string>('');
+  const [internalAPRAfter, setInternalAPRAfter] =
+    useState<string>('coming soon');
   const { jsonRpcProvider, network } = useConfig();
   const getQuote = useCallback(async () => {
     console.log(amountIn);

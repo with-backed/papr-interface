@@ -1,7 +1,7 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
 import { Config, SupportedNetwork } from 'lib/config';
-import { SECONDS_IN_A_YEAR } from 'lib/constants';
+import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
 import { makeProvider } from 'lib/contracts';
 import {
   ERC20,
@@ -84,11 +84,11 @@ export async function populateLendingStrategy(
     .div(ONE.div(10000));
   const lastUpdated = await contract.lastUpdated();
   const now = ethers.BigNumber.from(Date.now()).div(1000);
-  const currentAPRBIPs = (await contract.multiplier())
-    .sub(ONE) // only care about decimals
-    .div(now.sub(lastUpdated)) // how much growth per second
-    .mul(SECONDS_IN_A_YEAR) // annualize
-    .div(ONE.div(10000)); // convert to BIPs
+  const currentAPRBIPs = await computeEffectiveAPR(
+    now,
+    lastUpdated,
+    await contract.multiplier(),
+  );
 
   return {
     name: await contract.name(),
@@ -111,11 +111,52 @@ export async function populateLendingStrategy(
   };
 }
 
-async function buildToken(token: ERC20): Promise<ERC20Token> {
+export async function buildToken(token: ERC20): Promise<ERC20Token> {
   return {
     contract: token,
     decimals: await token.decimals(),
     symbol: await token.symbol(),
     name: await token.name(),
   };
+}
+
+export async function computeEffectiveAPR(
+  now: ethers.BigNumber,
+  lastUpdated: ethers.BigNumber,
+  multiplier: ethers.BigNumber,
+) {
+  const currentAPRBIPs = multiplier
+    .sub(ONE) // only care about decimals
+    .div(now.sub(lastUpdated)) // how much growth per second
+    .mul(SECONDS_IN_A_YEAR) // annualize
+    .div(ONE.div(10000)); // convert to BIPs
+
+  return currentAPRBIPs;
+}
+
+// TODO(adamgobes): figure out how to do powWad locally in JS
+export async function multiplier(
+  strategy: LendingStrategy,
+  now: ethers.BigNumber,
+  mark: ethers.BigNumber,
+) {
+  const lastUpdated = await strategy.contract.lastUpdated();
+  const PERIOD = ethers.BigNumber.from(28 * SECONDS_IN_A_DAY);
+  const targetGrowthPerPeriod = await strategy.contract.targetGrowthPerPeriod();
+  const index = await strategy.contract.index();
+
+  const period = now.sub(lastUpdated);
+  const periodRatio = period.mul(ONE).div(PERIOD);
+  const targetGrowth = targetGrowthPerPeriod.mul(periodRatio).div(ONE).add(ONE);
+  let indexMarkRatio = index.mul(ONE).div(mark);
+
+  if (indexMarkRatio.gt(14e17)) {
+    indexMarkRatio = ethers.BigNumber.from(14e17);
+  } else {
+    indexMarkRatio = ethers.BigNumber.from(8e17);
+  }
+
+  const deviationMultiplier = indexMarkRatio.pow(periodRatio);
+
+  return deviationMultiplier.mul(targetGrowth).div(ONE);
 }
