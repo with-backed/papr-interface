@@ -13,6 +13,7 @@ import ProvideLiquidity from 'components/Strategy/ProvideLiquidty';
 import SwapTokens from 'components/Strategy/SwapTokens';
 import styles from './strategy.module.css';
 import { AssociatedVaults } from 'components/Strategy/AssociatedVaults';
+import { D3Demo } from 'components/Strategy/D3Demo';
 
 export type StrategyPageProps = {
   address: string;
@@ -78,6 +79,7 @@ export default function StrategyPage({ address }: StrategyPageProps) {
           </div>
           <div className={styles.column}>
             <AssociatedVaults strategy={address} />
+            <D3Demo />
           </div>
         </div>
       ) : (
