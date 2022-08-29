@@ -16,6 +16,11 @@ import {
 import { Chain } from 'wagmi';
 import { ONE } from './constants';
 import { getPool } from './uniswap';
+import { lambertW0 } from 'lambert-w-function';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
 
 export type LendingStrategy = {
   name: string;
@@ -159,4 +164,41 @@ export async function multiplier(
   const deviationMultiplier = indexMarkRatio.pow(periodRatio);
 
   return deviationMultiplier.mul(targetGrowth).div(ONE);
+}
+
+export async function computeLiquidationEstimation(
+  debt: ethers.BigNumber,
+  max: ethers.BigNumber,
+  strategy: LendingStrategy,
+) {
+  const debtTaken = debt.toNumber();
+  const maxDebt = max.toNumber();
+
+  const percentage = (debtTaken / maxDebt) * 100;
+
+  const desiredMultiplier = 100 / percentage;
+
+  console.log({ desiredMultiplier });
+
+  const PERIOD = 28 * SECONDS_IN_A_DAY;
+  const targetGrowthPerPeriod = 1.2; // TODO(adamgobes): for some reason doing contract.targetGrowthPerPeriod().div(ONE).toNumber() is returning 0
+
+  const indexMarkRatio = 1.4;
+
+  const productLogInside =
+    (Math.pow(indexMarkRatio, 1 / targetGrowthPerPeriod) *
+      desiredMultiplier *
+      Math.log(indexMarkRatio)) /
+    targetGrowthPerPeriod;
+
+  const periodRatio =
+    (targetGrowthPerPeriod * lambertW0(productLogInside) -
+      Math.log(indexMarkRatio)) /
+    (targetGrowthPerPeriod * Math.log(indexMarkRatio));
+
+  const period = PERIOD * periodRatio;
+
+  const result = dayjs.duration({ seconds: period });
+
+  return result.asDays();
 }

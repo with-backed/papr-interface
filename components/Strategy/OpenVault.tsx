@@ -1,7 +1,7 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
-import { LendingStrategy } from 'lib/strategies';
+import { LendingStrategy, computeLiquidationEstimation } from 'lib/strategies';
 import { useCallback, useEffect, useState } from 'react';
 import { ERC721__factory } from 'types/generated/abis';
 import { OpenVaultRequestStruct } from 'types/generated/abis/Strategy';
@@ -19,6 +19,8 @@ export default function OpenVault({ strategy }: BorrowProps) {
   const [debt, setDebt] = useState<string>('');
   const [maxDebt, setMaxDebt] = useState<string>('');
   const [collateralTokenId, setCollateralTokenId] = useState<string>('');
+  const [liquidationDateEstimation, setLiquidationDateEstimation] =
+    useState<string>('');
   const { network } = useConfig();
 
   const create = useCallback(async () => {
@@ -66,6 +68,28 @@ export default function OpenVault({ strategy }: BorrowProps) {
     });
   }, [address, collateralTokenId, debt, network, signer, strategy]);
 
+  const handleMaxDebtChanged = useCallback(
+    async (value: string) => {
+      setDebt(value);
+
+      if (value === '') {
+        setLiquidationDateEstimation('');
+        return;
+      }
+
+      setLiquidationDateEstimation(
+        await (
+          await computeLiquidationEstimation(
+            ethers.BigNumber.from(value),
+            ethers.BigNumber.from(maxDebt),
+            strategy,
+          )
+        ).toString(),
+      );
+    },
+    [setDebt, maxDebt],
+  );
+
   const getMaxDebt = useCallback(async () => {
     const newNorm = await strategy.contract.newNorm();
     const maxLTV = await strategy.contract.maxLTV();
@@ -87,8 +111,12 @@ export default function OpenVault({ strategy }: BorrowProps) {
         onChange={(e) => setCollateralTokenId(e.target.value)}></input>
       <input
         placeholder="debt amount"
-        onChange={(e) => setDebt(e.target.value)}></input>
+        onChange={(e) => handleMaxDebtChanged(e.target.value)}></input>
       <button onClick={create}> borrow </button>
+      <p>
+        {' '}
+        # days before liquidation (estimation): {liquidationDateEstimation}{' '}
+      </p>
     </Fieldset>
   );
 }
