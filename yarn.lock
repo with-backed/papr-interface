@@ -11707,6 +11707,11 @@ klona@^2.0.4:
   resolved "https://registry.yarnpkg.com/klona/-/klona-2.0.5.tgz#d166574d90076395d9963aa7a928fabb8d76afbc"
   integrity sha512-pJiBpiXMbt7dkzXe8Ghj/u4FfXOOa98fPW+bihOJ4SjnoijweJrNThJfd3ifXpXhREjpoF2mZVH1GfS9LV3kHQ==
 
+lambert-w-function@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/lambert-w-function/-/lambert-w-function-3.0.0.tgz#49527242ffa55695b8e814426c5d32afb952a6f1"
+  integrity sha512-yLAtG8+uM7FrLJR9WN37Fol9uURNW2OUR8PSbVp4kXjTmHMu7TqQgvdTceuUlVOR00qh8Skl2J2KeqCSfgzFyQ==
+
 language-subtag-registry@~0.3.2:
   version "0.3.21"
   resolved "https://registry.yarnpkg.com/language-subtag-registry/-/language-subtag-registry-0.3.21.tgz#04ac218bea46f04cb039084602c6da9e788dd45a"
