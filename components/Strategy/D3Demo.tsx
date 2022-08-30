@@ -6,6 +6,7 @@ import {
   NormFactorUpdatesByStrategyQuery,
 } from 'types/generated/graphql/inKindSubgraph';
 import { ethers } from 'ethers';
+import { computeEffectiveAPR } from 'lib/strategies';
 
 function rand() {
   return Math.random() * 100;
@@ -39,17 +40,19 @@ export function D3Demo({ strategy }: D3DemoProps) {
         (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
       );
 
-      const aprs: string[] = [];
+      const aprs: any[] = [];
       for (let i = 1; i < sorted.length; ++i) {
         const prev = sorted[i - 1];
         const current = sorted[i];
-        const timeDelta = ethers.BigNumber.from(current.timestamp).sub(
-          prev.timestamp,
+        aprs.push(
+          computeEffectiveAPR(
+            ethers.BigNumber.from(current.timestamp),
+            ethers.BigNumber.from(prev.timestamp),
+            ethers.BigNumber.from(current.newNorm).div(current.oldNorm),
+          )
+            .div(100)
+            .toString(),
         );
-        const normDelta = ethers.BigNumber.from(current.newNorm).sub(
-          current.oldNorm,
-        );
-        aprs.push(normDelta.div(timeDelta).toString());
       }
       return aprs;
     }

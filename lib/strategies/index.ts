@@ -118,7 +118,7 @@ export async function buildToken(token: ERC20): Promise<ERC20Token> {
   };
 }
 
-export async function computeEffectiveAPR(
+export function computeEffectiveAPR(
   now: ethers.BigNumber,
   lastUpdated: ethers.BigNumber,
   multiplier: ethers.BigNumber,
