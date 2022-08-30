@@ -179,7 +179,11 @@ export async function computeLiquidationEstimation(
   const desiredMultiplier = 100 / percentage;
 
   const PERIOD = 28 * SECONDS_IN_A_DAY;
-  const targetGrowthPerPeriod = 0.2; // TODO(adamgobes): for some reason doing contract.targetGrowthPerPeriod().div(ONE).toNumber() is returning 0
+
+  const targetGrowthPerPeriod =
+    (await strategy.contract.targetGrowthPerPeriod())
+      .div(ONE.div(10000))
+      .toNumber() * 0.0001;
 
   const indexMarkRatio = 1.4;
 
