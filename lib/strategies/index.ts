@@ -179,7 +179,7 @@ export async function computeLiquidationEstimation(
   const desiredMultiplier = 100 / percentage;
 
   const PERIOD = 28 * SECONDS_IN_A_DAY;
-  const targetGrowthPerPeriod = 1.2; // TODO(adamgobes): for some reason doing contract.targetGrowthPerPeriod().div(ONE).toNumber() is returning 0
+  const targetGrowthPerPeriod = 0.2; // TODO(adamgobes): for some reason doing contract.targetGrowthPerPeriod().div(ONE).toNumber() is returning 0
 
   const indexMarkRatio = 1.4;
 
@@ -190,9 +190,8 @@ export async function computeLiquidationEstimation(
     targetGrowthPerPeriod;
 
   const periodRatio =
-    (targetGrowthPerPeriod * lambertW0(productLogInside) -
-      Math.log(indexMarkRatio)) /
-    (targetGrowthPerPeriod * Math.log(indexMarkRatio));
+    lambertW0(productLogInside) / Math.log(indexMarkRatio) -
+    1 / targetGrowthPerPeriod;
 
   const period = PERIOD * periodRatio;
 
