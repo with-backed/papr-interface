@@ -7,20 +7,7 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { ethers } from 'ethers';
 import { computeEffectiveAPR } from 'lib/strategies';
-
-function rand() {
-  return Math.random() * 100;
-}
-
-const contract: number[] = [];
-const target: number[] = [];
-const realized: number[] = [];
-
-for (let i = 0; i < 35; ++i) {
-  contract.push(rand());
-  target.push(rand());
-  realized.push(rand());
-}
+import { ONE } from 'lib/strategies/constants';
 
 const containerId = '#d3demo';
 const tickLabels = ['<All', '14 Days', '7 Days', '24h'];
@@ -48,7 +35,9 @@ export function D3Demo({ strategy }: D3DemoProps) {
           computeEffectiveAPR(
             ethers.BigNumber.from(current.timestamp),
             ethers.BigNumber.from(prev.timestamp),
-            ethers.BigNumber.from(current.newNorm).div(current.oldNorm),
+            ethers.BigNumber.from(current.newNorm)
+              .mul(ONE)
+              .div(current.oldNorm),
           )
             .div(100)
             .toString(),
@@ -74,10 +63,10 @@ export function D3Demo({ strategy }: D3DemoProps) {
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    const extent = d3.extent([...contract, ...target, ...realized]);
+    const extent = d3.extent(aprs);
 
     // Add X axis --> it is a date format
-    var x = d3.scaleLinear().domain([0, contract.length]).range([0, width]);
+    var x = d3.scaleLinear().domain([0, aprs.length]).range([0, width]);
     svg
       .append('g')
       .attr('transform', 'translate(0,' + height + ')')
@@ -99,7 +88,7 @@ export function D3Demo({ strategy }: D3DemoProps) {
 
     svg
       .append('path')
-      .datum(contract)
+      .datum(aprs)
       .attr('fill', 'none')
       .attr('stroke', '#007155')
       .attr('stroke-width', 1.5)
@@ -112,39 +101,7 @@ export function D3Demo({ strategy }: D3DemoProps) {
           .y((d) => y(d)),
       );
 
-    svg
-      .append('path')
-      .datum(target)
-      .attr('fill', 'none')
-      .attr('stroke', '#000000')
-      .attr('stroke-width', 3)
-      .attr('stroke-dasharray', '1, 10')
-      .attr('stroke-linecap', 'round')
-      .attr(
-        'd',
-        d3
-          .line()
-          .curve(d3.curveBasis)
-          .x((_, i) => x(i))
-          .y((d) => y(d)),
-      );
-
-    svg
-      .append('path')
-      .datum(realized)
-      .attr('fill', 'none')
-      .attr('stroke', '#000000')
-      .attr('stroke-width', 1.5)
-      .attr(
-        'd',
-        d3
-          .line()
-          .curve(d3.curveBasis)
-          .x((_, i) => x(i))
-          .y((d) => y(d)),
-      );
-
     return () => document.querySelector(`${containerId} svg`)?.remove();
-  }, []);
+  }, [aprs]);
   return <div id="d3demo" />;
 }
