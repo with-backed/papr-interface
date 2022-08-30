@@ -1,0 +1,10 @@
+overwrite: true
+schema: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-rinkeby'
+documents: './graphql/uniswap/**/*.graphql'
+generates:
+  types/generated/graphql/uniswapSubgraph.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'urql-introspection'
+      - 'typed-document-node'

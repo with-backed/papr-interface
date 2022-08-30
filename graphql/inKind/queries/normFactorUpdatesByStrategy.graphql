@@ -1,0 +1,8 @@
+query normFactorUpdatesByStrategy($strategy: String) {
+  normFactorUpdates(where: { strategy: $strategy }) {
+    id
+    timestamp
+    oldNorm
+    newNorm
+  }
+}
