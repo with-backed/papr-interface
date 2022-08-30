@@ -79,7 +79,7 @@ export default function StrategyPage({ address }: StrategyPageProps) {
           </div>
           <div className={styles.column}>
             <AssociatedVaults strategy={address} />
-            <D3Demo />
+            <D3Demo strategy={address} />
           </div>
         </div>
       ) : (

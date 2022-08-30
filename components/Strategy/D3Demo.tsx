@@ -1,5 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import * as d3 from 'd3';
+import { useQuery } from 'urql';
+import {
+  NormFactorUpdatesByStrategyDocument,
+  NormFactorUpdatesByStrategyQuery,
+} from 'types/generated/graphql/inKindSubgraph';
+import { ethers } from 'ethers';
 
 function rand() {
   return Math.random() * 100;
@@ -18,7 +24,40 @@ for (let i = 0; i < 35; ++i) {
 const containerId = '#d3demo';
 const tickLabels = ['<All', '14 Days', '7 Days', '24h'];
 
-export function D3Demo() {
+type D3DemoProps = {
+  strategy: string;
+};
+export function D3Demo({ strategy }: D3DemoProps) {
+  const [{ data: normData }] = useQuery<NormFactorUpdatesByStrategyQuery>({
+    query: NormFactorUpdatesByStrategyDocument,
+    variables: { strategy },
+  });
+
+  const aprs = useMemo(() => {
+    if (normData) {
+      const sorted = normData.normFactorUpdates.sort(
+        (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
+      );
+
+      const aprs: string[] = [];
+      for (let i = 1; i < sorted.length; ++i) {
+        const prev = sorted[i - 1];
+        const current = sorted[i];
+        const timeDelta = ethers.BigNumber.from(current.timestamp).sub(
+          prev.timestamp,
+        );
+        const normDelta = ethers.BigNumber.from(current.newNorm).sub(
+          current.oldNorm,
+        );
+        aprs.push(normDelta.div(timeDelta).toString());
+      }
+      return aprs;
+    }
+    return [];
+  }, [normData]);
+
+  console.log({ aprs });
+
   useEffect(() => {
     var margin = { top: 10, right: 30, bottom: 30, left: 60 };
     const width = 500 - margin.left - margin.right;
