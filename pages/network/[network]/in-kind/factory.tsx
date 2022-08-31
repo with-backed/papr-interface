@@ -1,7 +1,9 @@
 import { TransactionButton } from 'components/Button';
 import { Fieldset } from 'components/Fieldset';
+import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { validateNetwork } from 'lib/config';
+import { ONE } from 'lib/strategies/constants';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -42,7 +44,9 @@ function Connected() {
     const tx = await strategy.newStrategy(
       'APE Loans',
       'AP',
-      process.env.NEXT_PUBLIC_MOCK_APE as string,
+      ethers.utils.formatBytes32String('x'),
+      ONE.div(10).mul(2), // 20% APR target
+      ONE.div(10).mul(5), // 50% Max LTV,
       process.env.NEXT_PUBLIC_MOCK_USDC as string,
     );
 

@@ -1,33 +1,7 @@
 {
   "abi": [
     {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "_name",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_symbol",
-          "type": "string"
-        },
-        {
-          "internalType": "contract ERC721",
-          "name": "_collateral",
-          "type": "address"
-        },
-        {
-          "internalType": "contract ERC20",
-          "name": "_underlying",
-          "type": "address"
-        },
-        {
-          "internalType": "contract IOracle",
-          "name": "_oracle",
-          "type": "address"
-        }
-      ],
+      "inputs": [],
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
@@ -36,9 +10,58 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "bytes32",
-          "name": "vaultKey",
-          "type": "bytes32"
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "contract ERC721",
+              "name": "addr",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct ILendingStrategy.Collateral",
+          "name": "collateral",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint128",
+              "name": "price",
+              "type": "uint128"
+            },
+            {
+              "internalType": "enum ILendingStrategy.OracleInfoPeriod",
+              "name": "period",
+              "type": "uint8"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct ILendingStrategy.OracleInfo",
+          "name": "oracleInfo",
+          "type": "tuple"
+        }
+      ],
+      "name": "CollateralAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
         },
         {
           "indexed": false,
@@ -55,9 +78,9 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "bytes32",
-          "name": "vaultKey",
-          "type": "bytes32"
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
         },
         {
           "indexed": false,
@@ -93,14 +116,8 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "bytes32",
-          "name": "vaultKey",
-          "type": "bytes32"
-        },
-        {
-          "indexed": false,
           "internalType": "uint256",
-          "name": "tokenId",
+          "name": "vaultId",
           "type": "uint256"
         }
       ],
@@ -108,43 +125,30 @@
       "type": "event"
     },
     {
-      "anonymous": false,
-      "inputs": [
+      "inputs": [],
+      "name": "PERIOD",
+      "outputs": [
         {
-          "indexed": true,
-          "internalType": "bytes32",
-          "name": "vaultKey",
-          "type": "bytes32"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "mintTo",
-          "type": "address"
-        },
-        {
-          "indexed": false,
           "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount",
+          "name": "",
           "type": "uint256"
         }
       ],
-      "name": "VaultCreated",
-      "type": "event"
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
+        },
+        {
           "components": [
             {
               "internalType": "contract ERC721",
-              "name": "nft",
+              "name": "addr",
               "type": "address"
             },
             {
@@ -153,9 +157,79 @@
               "type": "uint256"
             }
           ],
-          "internalType": "struct Collateral",
+          "internalType": "struct ILendingStrategy.Collateral",
           "name": "collateral",
           "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint128",
+              "name": "price",
+              "type": "uint128"
+            },
+            {
+              "internalType": "enum ILendingStrategy.OracleInfoPeriod",
+              "name": "period",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct ILendingStrategy.OracleInfo",
+          "name": "oracleInfo",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "uint8",
+              "name": "v",
+              "type": "uint8"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "r",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "s",
+              "type": "bytes32"
+            }
+          ],
+          "internalType": "struct ILendingStrategy.Sig",
+          "name": "sig",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "addCollateral",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "allowedCollateralRoot",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
         }
       ],
       "name": "closeVault",
@@ -164,16 +238,34 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "collateral",
-      "outputs": [
+      "inputs": [
         {
-          "internalType": "contract ERC721",
-          "name": "",
-          "type": "address"
+          "components": [
+            {
+              "internalType": "contract ERC721",
+              "name": "addr",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct ILendingStrategy.Collateral",
+          "name": "collateral",
+          "type": "tuple"
         }
       ],
-      "stateMutability": "view",
+      "name": "collateralHash",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
       "type": "function"
     },
     {
@@ -205,14 +297,19 @@
     {
       "inputs": [
         {
-          "internalType": "bytes32",
-          "name": "vaultKey",
-          "type": "bytes32"
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
         },
         {
-          "internalType": "uint128",
+          "internalType": "address",
+          "name": "mintTo",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
           "name": "amount",
-          "type": "uint128"
+          "type": "uint256"
         }
       ],
       "name": "increaseDebt",
@@ -249,9 +346,9 @@
     {
       "inputs": [
         {
-          "internalType": "bytes32",
-          "name": "vaultKey",
-          "type": "bytes32"
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
         }
       ],
       "name": "liquidate",
@@ -262,9 +359,9 @@
     {
       "inputs": [
         {
-          "internalType": "bytes32",
-          "name": "key",
-          "type": "bytes32"
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
         }
       ],
       "name": "liquidationPrice",
@@ -279,14 +376,8 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint32",
-          "name": "period",
-          "type": "uint32"
-        }
-      ],
-      "name": "mark",
+      "inputs": [],
+      "name": "markTwapSinceLastUpdate",
       "outputs": [
         {
           "internalType": "uint256",
@@ -301,7 +392,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "price",
+          "name": "assetPrice",
           "type": "uint256"
         }
       ],
@@ -327,6 +418,58 @@
         }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "int256",
+          "name": "debt",
+          "type": "int256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minOut",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint160",
+          "name": "sqrtPriceLimitX96",
+          "type": "uint160"
+        },
+        {
+          "internalType": "address",
+          "name": "proceedsTo",
+          "type": "address"
+        }
+      ],
+      "name": "mintAndSellDebt",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes[]",
+          "name": "data",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "multicall",
+      "outputs": [
+        {
+          "internalType": "bytes[]",
+          "name": "results",
+          "type": "bytes[]"
+        }
+      ],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -361,7 +504,7 @@
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "newNorm",
+          "name": "",
           "type": "uint256"
         }
       ],
@@ -385,7 +528,7 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "",
+          "name": "from",
           "type": "address"
         },
         {
@@ -418,81 +561,19 @@
     {
       "inputs": [
         {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "mintTo",
-              "type": "address"
-            },
-            {
-              "internalType": "uint128",
-              "name": "debt",
-              "type": "uint128"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "contract ERC721",
-                  "name": "nft",
-                  "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "id",
-                  "type": "uint256"
-                }
-              ],
-              "internalType": "struct Collateral",
-              "name": "collateral",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint128",
-                  "name": "price",
-                  "type": "uint128"
-                },
-                {
-                  "internalType": "enum OracleInfoPeriod",
-                  "name": "period",
-                  "type": "uint8"
-                }
-              ],
-              "internalType": "struct OracleInfo",
-              "name": "oracleInfo",
-              "type": "tuple"
-            },
-            {
-              "components": [
-                {
-                  "internalType": "uint8",
-                  "name": "v",
-                  "type": "uint8"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "r",
-                  "type": "bytes32"
-                },
-                {
-                  "internalType": "bytes32",
-                  "name": "s",
-                  "type": "bytes32"
-                }
-              ],
-              "internalType": "struct Sig",
-              "name": "sig",
-              "type": "tuple"
-            }
-          ],
-          "internalType": "struct OpenVaultRequest",
-          "name": "request",
-          "type": "tuple"
+          "internalType": "address",
+          "name": "mintTo",
+          "type": "address"
         }
       ],
       "name": "openVault",
-      "outputs": [],
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "function"
     },
@@ -513,8 +594,27 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "vaultKey",
+          "name": "",
           "type": "bytes32"
+        }
+      ],
+      "name": "price",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
         },
         {
           "internalType": "uint128",
@@ -542,12 +642,38 @@
     },
     {
       "inputs": [],
+      "name": "targetAPR",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "targetGrowthPerPeriod",
       "outputs": [
         {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "token0IsUnderlying",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
         }
       ],
       "stateMutability": "view",
@@ -567,6 +693,29 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "int256",
+          "name": "amount0Delta",
+          "type": "int256"
+        },
+        {
+          "internalType": "int256",
+          "name": "amount1Delta",
+          "type": "int256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_data",
+          "type": "bytes"
+        }
+      ],
+      "name": "uniswapV3SwapCallback",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "updateNormalization",
       "outputs": [],
@@ -576,9 +725,9 @@
     {
       "inputs": [
         {
-          "internalType": "bytes32",
+          "internalType": "uint256",
           "name": "",
-          "type": "bytes32"
+          "type": "uint256"
         }
       ],
       "name": "vaultInfo",
@@ -595,37 +744,6 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "components": [
-            {
-              "internalType": "contract ERC721",
-              "name": "nft",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct Collateral",
-          "name": "collateral",
-          "type": "tuple"
-        }
-      ],
-      "name": "vaultKey",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "pure",
       "type": "function"
     }
   ]

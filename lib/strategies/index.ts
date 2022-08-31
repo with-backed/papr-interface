@@ -77,7 +77,9 @@ export async function populateLendingStrategy(
 
   const pool = await getPool(poolContract, token0, token1, config.chainId);
 
-  const collateralAddress = await contract.collateral();
+  /// TODO eventually we should index the strategies assets it lends to
+  /// and have an array of assets here
+  const collateralAddress = process.env.NEXT_PUBLIC_MOCK_APE as string;
   const collateral = ERC721__factory.connect(collateralAddress, provider);
 
   const debtVaultAddress = await contract.debtVault();
