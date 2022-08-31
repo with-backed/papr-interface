@@ -4,7 +4,7 @@ import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy, computeLiquidationEstimation } from 'lib/strategies';
 import { useCallback, useEffect, useState } from 'react';
 import { ERC721__factory } from 'types/generated/abis';
-import { OpenVaultRequestStruct } from 'types/generated/abis/Strategy';
+import { ILendingStrategy } from 'types/generated/abis/Strategy';
 import { useAccount, useSigner } from 'wagmi';
 
 type BorrowProps = {
@@ -23,14 +23,66 @@ export default function OpenVault({ strategy }: BorrowProps) {
     useState<string>('');
   const { network } = useConfig();
 
+  interface OnERC721ReceivedArgsStruct {
+    vaultId: ethers.BigNumber;
+    mintVaultTo: string;
+    mintDebtOrProceedsTo: string;
+    minOut: ethers.BigNumber;
+    debt: ethers.BigNumber;
+    sqrtPriceLimitX96: ethers.BigNumber;
+    oracleInfo: ILendingStrategy.OracleInfoStruct;
+    sig: ILendingStrategy.SigStruct;
+  }
+
+  const OnERC721ReceivedArgsEncoderString = `
+    tuple(
+      uint256 vaultId;
+      address mintVaultTo;
+      address mintDebtOrProceedsTo;
+      uint256 minOut;
+      int256 debt;
+      uint160 sqrtPriceLimitX96;
+      tuple(uint128 price, uint8 period) oracleInfo;
+      tuple(uint8 v, bytes32 r, bytes32 s) sig;
+    )
+  `;
+
   const create = useCallback(async () => {
-    const request: OpenVaultRequestStruct = {
-      mintTo: address!,
+    // enum OracleInfoPeriod {
+    //     SevenDays,
+    //     ThirtyDays,
+    //     NinetyDays
+    // }
+
+    // struct OracleInfo {
+    //     uint128 price;
+    //     OracleInfoPeriod period;
+    // }
+
+    // struct Sig {
+    //     uint8 v;
+    //     bytes32 r;
+    //     bytes32 s;
+    // }
+
+    // struct OnERC721ReceivedArgs {
+    // uint256 vaultId;
+    // address mintVaultTo;
+    // address mintDebtOrProceedsTo;
+    // uint256 minOut;
+    // int256 debt;
+    // uint160 sqrtPriceLimitX96;
+    // ILendingStrategy.OracleInfo oracleInfo;
+    // ILendingStrategy.Sig sig;
+    // }
+
+    const request: OnERC721ReceivedArgsStruct = {
+      vaultId: ethers.BigNumber.from(0),
+      mintVaultTo: address!,
+      mintDebtOrProceedsTo: address!,
+      minOut: ethers.BigNumber.from(0),
+      sqrtPriceLimitX96: ethers.BigNumber.from(0),
       debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
-      collateral: {
-        nft: strategy.collateral.contract.address,
-        id: ethers.BigNumber.from(collateralTokenId),
-      },
       oracleInfo: {
         price: ethers.utils.parseUnits(PRICE.toString(), 18),
         period: ethers.BigNumber.from(0),
@@ -47,16 +99,14 @@ export default function OpenVault({ strategy }: BorrowProps) {
       signer!,
     );
 
-    const requestEncodedWithSelector =
-      strategy.contract.interface.encodeFunctionData('openVault', [request]);
-    const requestEncodedWithoutSelector =
-      '0x' + requestEncodedWithSelector.substring(10);
-
     await signerCollateral['safeTransferFrom(address,address,uint256,bytes)'](
       address!,
       strategy.contract.address,
       ethers.BigNumber.from(collateralTokenId),
-      requestEncodedWithoutSelector,
+      ethers.utils.defaultAbiCoder.encode(
+        [OnERC721ReceivedArgsEncoderString],
+        [request],
+      ),
     );
 
     const filter = strategy.debtVault.filters.Transfer(null, address, null);
