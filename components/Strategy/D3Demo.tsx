@@ -10,7 +10,9 @@ import {
 import { ethers } from 'ethers';
 import { computeEffectiveAPR } from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
-import { SECONDS_IN_A_YEAR } from 'lib/constants';
+import { SECONDS_IN_A_DAY } from 'lib/constants';
+
+const PERIOD_SECONDS = SECONDS_IN_A_DAY * 28;
 
 const containerId = '#d3demo';
 const tickLabels = ['<All', '14 Days', '7 Days', '24h'];
@@ -18,8 +20,13 @@ const tickLabels = ['<All', '14 Days', '7 Days', '24h'];
 type D3DemoProps = {
   strategy: string;
   targetAnnualGrowth: ethers.BigNumber;
+  targetGrowthPerPeriod: ethers.BigNumber;
 };
-export function D3Demo({ strategy, targetAnnualGrowth }: D3DemoProps) {
+export function D3Demo({
+  strategy,
+  targetAnnualGrowth,
+  targetGrowthPerPeriod,
+}: D3DemoProps) {
   const [{ data: strategyData }] = useQuery<LendingStrategyByIdQuery>({
     query: LendingStrategyByIdDocument,
     variables: { id: strategy },
@@ -75,19 +82,19 @@ export function D3Demo({ strategy, targetAnnualGrowth }: D3DemoProps) {
           1000,
         );
         const creationTimeSeconds = strategyCreatedAt.div(1000);
-        const periodSeconds = currentTimeSeconds.sub(creationTimeSeconds);
+        const time = currentTimeSeconds.sub(creationTimeSeconds);
 
         aprs.push(
-          currentTimeSeconds
-            .div(periodSeconds)
-            .mul(targetAnnualGrowth.add(ONE))
+          time
+            .div(PERIOD_SECONDS)
+            .mul(targetGrowthPerPeriod.add(ONE))
             .toString(),
         );
       }
       return aprs;
     }
     return [];
-  }, [sortedNormData, strategyCreatedAt, targetAnnualGrowth]);
+  }, [sortedNormData, strategyCreatedAt, targetGrowthPerPeriod]);
 
   console.log({ targets });
 

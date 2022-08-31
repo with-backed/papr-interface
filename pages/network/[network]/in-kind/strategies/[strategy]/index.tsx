@@ -82,6 +82,7 @@ export default function StrategyPage({ address }: StrategyPageProps) {
             <D3Demo
               strategy={address}
               targetAnnualGrowth={lendingStrategy.targetAnnualGrowth}
+              targetGrowthPerPeriod={lendingStrategy.targetGrowthPerPeriod}
             />
           </div>
         </div>

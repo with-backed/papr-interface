@@ -32,6 +32,7 @@ export type LendingStrategy = {
   collateral: ERC721Token;
   maxLTV: ethers.BigNumber;
   targetAnnualGrowth: ethers.BigNumber;
+  targetGrowthPerPeriod: ethers.BigNumber;
   currentAPRBIPs: ethers.BigNumber;
 };
 
@@ -79,10 +80,12 @@ export async function populateLendingStrategy(
   const collateralAddress = process.env.NEXT_PUBLIC_MOCK_APE as string;
   const collateral = ERC721__factory.connect(collateralAddress, provider);
 
+  const debtVaultAddress = await contract.debtVault();
+  const debtVault = ERC721__factory.connect(debtVaultAddress, provider);
+
+  const targetGrowthPerPeriod = await contract.targetGrowthPerPeriod();
   /// TODO expose period from contract so we can not just assume period is 28 days.
-  const targetAnnualGrowth = (await contract.targetGrowthPerPeriod())
-    .mul(12)
-    .div(ONE.div(10000));
+  const targetAnnualGrowth = targetGrowthPerPeriod.mul(12).div(ONE.div(10000));
   const lastUpdated = await contract.lastUpdated();
   const now = ethers.BigNumber.from(Date.now()).div(1000);
   const currentAPRBIPs = await computeEffectiveAPR(
@@ -104,6 +107,7 @@ export async function populateLendingStrategy(
     underlying,
     maxLTV: await contract.maxLTV(),
     targetAnnualGrowth: targetAnnualGrowth,
+    targetGrowthPerPeriod,
     token0IsUnderlying: token0.contract.address == underlying.contract.address,
     currentAPRBIPs: currentAPRBIPs,
   };
