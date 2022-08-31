@@ -116,10 +116,7 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
   const [closePending, setClosePending] = useState(false);
   const closeVault = useCallback(async () => {
     if (vaultInfo && data?.vault) {
-      const tx = await vaultInfo.strategy.contract.closeVault({
-        nft: data.vault.strategy.collateral,
-        id: data.vault.tokenId,
-      });
+      const tx = await vaultInfo.strategy.contract.closeVault(id);
 
       setCloseHash(tx.hash);
       setClosePending(true);
