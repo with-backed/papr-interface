@@ -2,35 +2,53 @@ import { useEffect, useMemo } from 'react';
 import * as d3 from 'd3';
 import { useQuery } from 'urql';
 import {
+  LendingStrategyByIdDocument,
+  LendingStrategyByIdQuery,
   NormFactorUpdatesByStrategyDocument,
   NormFactorUpdatesByStrategyQuery,
 } from 'types/generated/graphql/inKindSubgraph';
 import { ethers } from 'ethers';
 import { computeEffectiveAPR } from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
+import { SECONDS_IN_A_YEAR } from 'lib/constants';
 
 const containerId = '#d3demo';
 const tickLabels = ['<All', '14 Days', '7 Days', '24h'];
 
 type D3DemoProps = {
   strategy: string;
+  targetAnnualGrowth: ethers.BigNumber;
 };
-export function D3Demo({ strategy }: D3DemoProps) {
+export function D3Demo({ strategy, targetAnnualGrowth }: D3DemoProps) {
+  const [{ data: strategyData }] = useQuery<LendingStrategyByIdQuery>({
+    query: LendingStrategyByIdDocument,
+    variables: { id: strategy },
+  });
   const [{ data: normData }] = useQuery<NormFactorUpdatesByStrategyQuery>({
     query: NormFactorUpdatesByStrategyDocument,
     variables: { strategy },
   });
 
-  const aprs = useMemo(() => {
-    if (normData) {
-      const sorted = normData.normFactorUpdates.sort(
-        (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
-      );
+  const strategyCreatedAt = useMemo(() => {
+    if (strategyData?.lendingStrategy) {
+      return ethers.BigNumber.from(strategyData.lendingStrategy.createdAt);
+    }
+  }, [strategyData]);
 
-      const aprs: any[] = [];
-      for (let i = 1; i < sorted.length; ++i) {
-        const prev = sorted[i - 1];
-        const current = sorted[i];
+  const sortedNormData = useMemo(
+    () =>
+      normData?.normFactorUpdates.sort(
+        (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
+      ) || [],
+    [normData],
+  );
+
+  const aprs = useMemo(() => {
+    if (sortedNormData) {
+      const aprs: string[] = [];
+      for (let i = 1; i < sortedNormData.length; ++i) {
+        const prev = sortedNormData[i - 1];
+        const current = sortedNormData[i];
         aprs.push(
           computeEffectiveAPR(
             ethers.BigNumber.from(current.timestamp),
@@ -46,9 +64,27 @@ export function D3Demo({ strategy }: D3DemoProps) {
       return aprs;
     }
     return [];
-  }, [normData]);
+  }, [sortedNormData]);
 
-  console.log({ aprs });
+  const targets = useMemo(() => {
+    if (sortedNormData && strategyCreatedAt) {
+      const aprs: string[] = [];
+      for (let i = 1; i < sortedNormData.length; ++i) {
+        const current = sortedNormData[i];
+        const timeDelta = ethers.BigNumber.from(current.timestamp).sub(
+          strategyCreatedAt,
+        );
+
+        aprs.push(
+          targetAnnualGrowth
+            .mul(timeDelta.mul(1000).div(SECONDS_IN_A_YEAR))
+            .toString(),
+        );
+      }
+      return aprs;
+    }
+    return [];
+  }, [sortedNormData, strategyCreatedAt, targetAnnualGrowth]);
 
   useEffect(() => {
     var margin = { top: 10, right: 30, bottom: 30, left: 60 };
