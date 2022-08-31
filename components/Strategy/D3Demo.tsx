@@ -75,26 +75,27 @@ export function D3Demo({
 
   const targets = useMemo(() => {
     if (sortedNormData && strategyCreatedAt) {
-      const aprs: string[] = [];
+      const aprs: number[] = [];
       for (let i = 1; i < sortedNormData.length; ++i) {
         const current = sortedNormData[i];
-        const currentTimeSeconds = ethers.BigNumber.from(current.timestamp).div(
-          1000,
-        );
-        const creationTimeSeconds = strategyCreatedAt.div(1000);
-        const time = currentTimeSeconds.sub(creationTimeSeconds);
+        const currentTimeSeconds = parseInt(current.timestamp);
+        const creationTimeSeconds = strategyCreatedAt.toNumber();
+        const time = currentTimeSeconds - creationTimeSeconds;
 
-        aprs.push(
-          time
-            .div(PERIOD_SECONDS)
-            .mul(targetGrowthPerPeriod.add(ONE))
-            .toString(),
-        );
+        const result = (time / PERIOD_SECONDS) * (0.2 / 12) + 1;
+        console.log({
+          currentTimeSeconds,
+          creationTimeSeconds,
+          time,
+          result,
+        });
+
+        aprs.push((targetAnnualGrowth.toNumber() / 100) * result);
       }
       return aprs;
     }
     return [];
-  }, [sortedNormData, strategyCreatedAt, targetGrowthPerPeriod]);
+  }, [sortedNormData, strategyCreatedAt, targetAnnualGrowth]);
 
   console.log({ targets });
 
@@ -111,7 +112,7 @@ export function D3Demo({
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    const extent = d3.extent(aprs);
+    const extent = d3.extent([...aprs, ...targets]);
 
     // Add X axis --> it is a date format
     var x = d3.scaleLinear().domain([0, aprs.length]).range([0, width]);
@@ -149,7 +150,22 @@ export function D3Demo({
           .y((d) => y(d)),
       );
 
+    svg
+      .append('path')
+      .datum(targets)
+      .attr('fill', 'none')
+      .attr('stroke', '#000000')
+      .attr('stroke-width', 1.5)
+      .attr(
+        'd',
+        d3
+          .line()
+          .curve(d3.curveBasis)
+          .x((_, i) => x(i))
+          .y((d) => y(d)),
+      );
+
     return () => document.querySelector(`${containerId} svg`)?.remove();
-  }, [aprs]);
+  }, [aprs, targets]);
   return <div id="d3demo" />;
 }
