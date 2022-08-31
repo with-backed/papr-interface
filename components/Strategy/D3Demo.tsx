@@ -71,13 +71,16 @@ export function D3Demo({ strategy, targetAnnualGrowth }: D3DemoProps) {
       const aprs: string[] = [];
       for (let i = 1; i < sortedNormData.length; ++i) {
         const current = sortedNormData[i];
-        const timeDelta = ethers.BigNumber.from(current.timestamp).sub(
-          strategyCreatedAt,
+        const currentTimeSeconds = ethers.BigNumber.from(current.timestamp).div(
+          1000,
         );
+        const creationTimeSeconds = strategyCreatedAt.div(1000);
+        const periodSeconds = currentTimeSeconds.sub(creationTimeSeconds);
 
         aprs.push(
-          targetAnnualGrowth
-            .mul(timeDelta.mul(1000).div(SECONDS_IN_A_YEAR))
+          currentTimeSeconds
+            .div(periodSeconds)
+            .mul(targetAnnualGrowth.add(ONE))
             .toString(),
         );
       }
@@ -85,6 +88,8 @@ export function D3Demo({ strategy, targetAnnualGrowth }: D3DemoProps) {
     }
     return [];
   }, [sortedNormData, strategyCreatedAt, targetAnnualGrowth]);
+
+  console.log({ targets });
 
   useEffect(() => {
     var margin = { top: 10, right: 30, bottom: 30, left: 60 };
