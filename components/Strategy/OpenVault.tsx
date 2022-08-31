@@ -48,34 +48,6 @@ export default function OpenVault({ strategy }: BorrowProps) {
   `;
 
   const create = useCallback(async () => {
-    // enum OracleInfoPeriod {
-    //     SevenDays,
-    //     ThirtyDays,
-    //     NinetyDays
-    // }
-
-    // struct OracleInfo {
-    //     uint128 price;
-    //     OracleInfoPeriod period;
-    // }
-
-    // struct Sig {
-    //     uint8 v;
-    //     bytes32 r;
-    //     bytes32 s;
-    // }
-
-    // struct OnERC721ReceivedArgs {
-    // uint256 vaultId;
-    // address mintVaultTo;
-    // address mintDebtOrProceedsTo;
-    // uint256 minOut;
-    // int256 debt;
-    // uint160 sqrtPriceLimitX96;
-    // ILendingStrategy.OracleInfo oracleInfo;
-    // ILendingStrategy.Sig sig;
-    // }
-
     const request: OnERC721ReceivedArgsStruct = {
       vaultId: ethers.BigNumber.from(0),
       mintVaultTo: address!,
