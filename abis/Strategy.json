@@ -51,7 +51,20 @@
           "type": "tuple"
         }
       ],
-      "name": "CollateralAdded",
+      "name": "AddCollateral",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
+        }
+      ],
+      "name": "CloseVault",
       "type": "event"
     },
     {
@@ -70,7 +83,32 @@
           "type": "uint256"
         }
       ],
-      "name": "DebtAdded",
+      "name": "IncreaseDebt",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "vaultId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "vaultNonce",
+          "type": "uint256"
+        }
+      ],
+      "name": "OpenVault",
       "type": "event"
     },
     {
@@ -89,7 +127,7 @@
           "type": "uint256"
         }
       ],
-      "name": "DebtReduced",
+      "name": "ReduceDebt",
       "type": "event"
     },
     {
@@ -97,31 +135,12 @@
       "inputs": [
         {
           "indexed": false,
-          "internalType": "uint128",
-          "name": "oldNorm",
-          "type": "uint128"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint128",
+          "internalType": "uint256",
           "name": "newNorm",
-          "type": "uint128"
-        }
-      ],
-      "name": "NormalizationFactorUpdated",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "vaultId",
           "type": "uint256"
         }
       ],
-      "name": "VaultClosed",
+      "name": "UpdateNormalization",
       "type": "event"
     },
     {
@@ -230,6 +249,11 @@
           "internalType": "uint256",
           "name": "vaultId",
           "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "vaultNonce",
+          "type": "uint256"
         }
       ],
       "name": "closeVault",
@@ -282,23 +306,15 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "debtVault",
-      "outputs": [
-        {
-          "internalType": "contract DebtVault",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
           "internalType": "uint256",
           "name": "vaultId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "vaultNonce",
           "type": "uint256"
         },
         {
@@ -335,9 +351,9 @@
       "name": "lastUpdated",
       "outputs": [
         {
-          "internalType": "uint128",
+          "internalType": "uint72",
           "name": "",
-          "type": "uint128"
+          "type": "uint72"
         }
       ],
       "stateMutability": "view",
@@ -487,19 +503,6 @@
     },
     {
       "inputs": [],
-      "name": "name",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "newNorm",
       "outputs": [
         {
@@ -629,7 +632,7 @@
     },
     {
       "inputs": [],
-      "name": "symbol",
+      "name": "strategyURI",
       "outputs": [
         {
           "internalType": "string",
@@ -720,6 +723,30 @@
       "name": "updateNormalization",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "nonce",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "vaultIdentifier",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {

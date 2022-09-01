@@ -23,8 +23,6 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 
 export type LendingStrategy = {
-  name: string;
-  symbol: string;
   contract: Strategy;
   pool: Pool;
   token0IsUnderlying: boolean;
@@ -32,7 +30,6 @@ export type LendingStrategy = {
   token1: ERC20Token;
   underlying: ERC20Token;
   collateral: ERC721Token;
-  debtVault: ERC721;
   maxLTV: ethers.BigNumber;
   targetAnnualGrowth: ethers.BigNumber;
   currentAPRBIPs: ethers.BigNumber;
@@ -82,9 +79,6 @@ export async function populateLendingStrategy(
   const collateralAddress = process.env.NEXT_PUBLIC_MOCK_APE as string;
   const collateral = ERC721__factory.connect(collateralAddress, provider);
 
-  const debtVaultAddress = await contract.debtVault();
-  const debtVault = ERC721__factory.connect(debtVaultAddress, provider);
-
   /// TODO expose period from contract so we can not just assume period is 28 days.
   const targetAnnualGrowth = (await contract.targetGrowthPerPeriod())
     .mul(12)
@@ -98,8 +92,6 @@ export async function populateLendingStrategy(
   );
 
   return {
-    name: await contract.name(),
-    symbol: await contract.symbol(),
     contract: contract,
     pool: pool,
     token0: token0,
@@ -110,7 +102,6 @@ export async function populateLendingStrategy(
       symbol: await collateral.symbol(),
     },
     underlying,
-    debtVault: debtVault,
     maxLTV: await contract.maxLTV(),
     targetAnnualGrowth: targetAnnualGrowth,
     token0IsUnderlying: token0.contract.address == underlying.contract.address,

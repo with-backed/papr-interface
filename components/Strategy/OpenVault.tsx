@@ -25,6 +25,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
 
   interface OnERC721ReceivedArgsStruct {
     vaultId: ethers.BigNumber;
+    vaultNonce: ethers.BigNumber;
     mintVaultTo: string;
     mintDebtOrProceedsTo: string;
     minOut: ethers.BigNumber;
@@ -36,20 +37,22 @@ export default function OpenVault({ strategy }: BorrowProps) {
 
   const OnERC721ReceivedArgsEncoderString = `
     tuple(
-      uint256 vaultId;
-      address mintVaultTo;
-      address mintDebtOrProceedsTo;
-      uint256 minOut;
-      int256 debt;
-      uint160 sqrtPriceLimitX96;
-      tuple(uint128 price, uint8 period) oracleInfo;
-      tuple(uint8 v, bytes32 r, bytes32 s) sig;
+      uint256 vaultId,
+      uint256 vaultNonce,
+      address mintVaultTo,
+      address mintDebtOrProceedsTo,
+      uint256 minOut,
+      int256 debt,
+      uint160 sqrtPriceLimitX96,
+      tuple(uint128 price, uint8 period) oracleInfo,
+      tuple(uint8 v, bytes32 r, bytes32 s) sig
     )
   `;
 
   const create = useCallback(async () => {
     const request: OnERC721ReceivedArgsStruct = {
       vaultId: ethers.BigNumber.from(0),
+      vaultNonce: ethers.BigNumber.from(0),
       mintVaultTo: address!,
       mintDebtOrProceedsTo: address!,
       minOut: ethers.BigNumber.from(0),
@@ -81,9 +84,9 @@ export default function OpenVault({ strategy }: BorrowProps) {
       ),
     );
 
-    const filter = strategy.debtVault.filters.Transfer(null, address, null);
+    const filter = strategy.contract.filters.OpenVault(null, address, null);
 
-    strategy.debtVault.once(filter, (from, to, id) => {
+    strategy.contract.once(filter, (id, to, nonce) => {
       window.location.assign(
         `/network/${network}/in-kind/strategies/${strategy.contract.address}/vaults/${id}`,
       );

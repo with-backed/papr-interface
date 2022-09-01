@@ -54,9 +54,6 @@ export default function StrategyPage({ address }: StrategyPageProps) {
         <div className={styles.wrapper}>
           <div className={styles.column}>
             <StrategyState strategy={lendingStrategy} />
-            <p>
-              {lendingStrategy.name} ({lendingStrategy.symbol})
-            </p>
             <PoolState pool={lendingStrategy.pool} />
             <MintERC20 token={lendingStrategy.underlying} />
             <MintCollateral token={lendingStrategy.collateral} />

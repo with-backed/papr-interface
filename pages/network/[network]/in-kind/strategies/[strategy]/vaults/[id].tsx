@@ -116,7 +116,8 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
   const [closePending, setClosePending] = useState(false);
   const closeVault = useCallback(async () => {
     if (vaultInfo && data?.vault) {
-      const tx = await vaultInfo.strategy.contract.closeVault(id);
+      // TODO, get nonce for vault
+      const tx = await vaultInfo.strategy.contract.closeVault(id, 0);
 
       setCloseHash(tx.hash);
       setClosePending(true);
@@ -138,9 +139,6 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
       {!!vaultInfo && (
         <>
           <Fieldset legend="ℹ️ Vault Info">
-            <p>
-              owner: {vaultInfo.owner} {userIsOwner ? '(you)' : '(not you)'}
-            </p>
             <p>debt: {debtAmount}</p>
             {/* TODO should fetch underlying decimals */}
             <p>collateral valuation {collateralVaulation}</p>
