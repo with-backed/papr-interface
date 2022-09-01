@@ -51,7 +51,7 @@ export async function getAccessoryLookup(
 ): Promise<AccessoryLookup> {
   const communityClient = clientFromUrl(communityNFTSubgraph);
   const result = await communityClient
-    .query<AccessoriesQuery>(AccessoriesDocument)
+    .query<AccessoriesQuery>(AccessoriesDocument, {})
     .toPromise();
 
   if (result.error) {
