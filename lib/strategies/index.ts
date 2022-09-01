@@ -85,7 +85,8 @@ export async function populateLendingStrategy(
 
   const targetGrowthPerPeriod = await contract.targetGrowthPerPeriod();
   /// TODO expose period from contract so we can not just assume period is 28 days.
-  const targetAnnualGrowth = targetGrowthPerPeriod.mul(12).div(ONE.div(10000));
+  // 365/28 = 13.035
+  const targetAnnualGrowth = targetGrowthPerPeriod.mul(13).div(ONE.div(10000));
   const lastUpdated = await contract.lastUpdated();
   const now = ethers.BigNumber.from(Date.now()).div(1000);
   const currentAPRBIPs = await computeEffectiveAPR(

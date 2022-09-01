@@ -47,6 +47,8 @@ export default function StrategyPage({ address }: StrategyPageProps) {
     populate();
   }, [populate]);
 
+  console.log({ targetAnnualGrowth: lendingStrategy?.targetAnnualGrowth });
+
   return (
     <div>
       <h3>Strategy</h3>

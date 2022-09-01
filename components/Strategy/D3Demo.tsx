@@ -17,6 +17,8 @@ const PERIOD_SECONDS = SECONDS_IN_A_DAY * 28;
 const containerId = '#d3demo';
 const tickLabels = ['<All', '14 Days', '7 Days', '24h'];
 
+type ChartValue = [number, number];
+
 type D3DemoProps = {
   strategy: string;
   targetAnnualGrowth: ethers.BigNumber;
@@ -52,21 +54,18 @@ export function D3Demo({
 
   const aprs = useMemo(() => {
     if (sortedNormData) {
-      const aprs: string[] = [];
+      const aprs: ChartValue[] = [];
       for (let i = 1; i < sortedNormData.length; ++i) {
         const prev = sortedNormData[i - 1];
         const current = sortedNormData[i];
-        aprs.push(
-          computeEffectiveAPR(
-            ethers.BigNumber.from(current.timestamp),
-            ethers.BigNumber.from(prev.timestamp),
-            ethers.BigNumber.from(current.newNorm)
-              .mul(ONE)
-              .div(current.oldNorm),
-          )
-            .div(100)
-            .toString(),
-        );
+        const apr = computeEffectiveAPR(
+          ethers.BigNumber.from(current.timestamp),
+          ethers.BigNumber.from(prev.timestamp),
+          ethers.BigNumber.from(current.newNorm).mul(ONE).div(current.oldNorm),
+        )
+          .div(100)
+          .toNumber();
+        aprs.push([apr, parseInt(current.timestamp)]);
       }
       return aprs;
     }
@@ -74,30 +73,15 @@ export function D3Demo({
   }, [sortedNormData]);
 
   const targets = useMemo(() => {
-    if (sortedNormData && strategyCreatedAt) {
-      const aprs: number[] = [];
-      for (let i = 1; i < sortedNormData.length; ++i) {
-        const current = sortedNormData[i];
-        const currentTimeSeconds = parseInt(current.timestamp);
-        const creationTimeSeconds = strategyCreatedAt.toNumber();
-        const time = currentTimeSeconds - creationTimeSeconds;
-
-        const result = (time / PERIOD_SECONDS) * (0.2 / 12) + 1;
-        console.log({
-          currentTimeSeconds,
-          creationTimeSeconds,
-          time,
-          result,
-        });
-
-        aprs.push((targetAnnualGrowth.toNumber() / 100) * result);
-      }
-      return aprs;
+    if (sortedNormData) {
+      const target = targetAnnualGrowth.toNumber() / 100;
+      return sortedNormData.map((d) => [
+        target,
+        parseInt(d.timestamp),
+      ]) as ChartValue[];
     }
     return [];
-  }, [sortedNormData, strategyCreatedAt, targetAnnualGrowth]);
-
-  console.log({ targets });
+  }, [sortedNormData, targetAnnualGrowth]);
 
   useEffect(() => {
     var margin = { top: 10, right: 30, bottom: 30, left: 60 };
@@ -112,20 +96,26 @@ export function D3Demo({
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    const extent = d3.extent([...aprs, ...targets]);
+    const datasets = [...aprs, ...targets];
+    const extent = d3.extent(datasets, (d) => d[0]);
+    // have some breathing room on the bottom
+    extent[0] = extent[0]! * 0.85;
+
+    const timestampExtent = d3.extent(datasets, (d) => d[1]);
 
     // Add X axis --> it is a date format
-    var x = d3.scaleLinear().domain([0, aprs.length]).range([0, width]);
+    var x = d3
+      .scaleLinear()
+      .domain(timestampExtent as [number, number])
+      .range([0, width]);
     svg
       .append('g')
       .attr('transform', 'translate(0,' + height + ')')
       .call(
         d3
           .axisBottom(x)
-          .ticks(4)
-          .tickValues([0, 10, 20, 30])
-          .tickFormat((_, i) => tickLabels[i])
-          .tickSize(-400),
+          .ticks(3)
+          .tickFormat((d) => new Date(d.valueOf()).toLocaleTimeString()),
       );
 
     // Add Y axis
@@ -146,8 +136,8 @@ export function D3Demo({
         d3
           .line()
           .curve(d3.curveBasis)
-          .x((_, i) => x(i))
-          .y((d) => y(d)),
+          .x((d) => x(d[1]))
+          .y((d) => y(d[0])),
       );
 
     svg
@@ -161,8 +151,8 @@ export function D3Demo({
         d3
           .line()
           .curve(d3.curveBasis)
-          .x((_, i) => x(i))
-          .y((d) => y(d)),
+          .x((d) => x(d[1]))
+          .y((d) => y(d[0])),
       );
 
     return () => document.querySelector(`${containerId} svg`)?.remove();
