@@ -61,7 +61,12 @@ export function D3Demo({
     }
 
     return poolDayDatas.map((d) => {
-      return new Price(token0, token1, Q192.toString(), d.sqrtPrice).toFixed(8);
+      return new Price(
+        token0,
+        token1,
+        Q192.toString(),
+        ethers.BigNumber.from(d.sqrtPrice).mul(d.sqrtPrice).toString(),
+      ).toFixed(8);
     });
   }, [poolDayDatas, token0, token1]);
 
