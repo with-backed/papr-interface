@@ -5,9 +5,7 @@ import { LendingStrategy, populateLendingStrategy } from '..';
 import { ONE } from '../constants';
 
 export type Vault = {
-  contract: ERC721;
   id: ethers.BigNumber;
-  owner: string;
   debt: ethers.BigNumber;
   price: ethers.BigNumber;
   liquidationPrice: ethers.BigNumber; // liquidated when 1 DT = X underlying
@@ -28,18 +26,13 @@ export async function getVaultInfo(
     signer,
   );
 
-  const vaultContract = strategy.debtVault;
-  const owner = await vaultContract.ownerOf(id);
-
   const maxLTV = strategy.maxLTV;
   const maxUnderlying = price.mul(maxLTV).div(ONE);
   // TODO: how should we represent this when debt is zero?
   const liquidationPrice = debt.eq(0) ? debt : maxUnderlying.div(debt);
 
   return {
-    contract: vaultContract,
     id,
-    owner,
     debt,
     price,
     liquidationPrice,

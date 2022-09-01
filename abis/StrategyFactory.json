@@ -32,9 +32,15 @@
           "internalType": "string",
           "name": "symbol",
           "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "allowedCollateralURI",
+          "type": "string"
         }
       ],
-      "name": "LendingStrategyCreated",
+      "name": "CreateLendingStrategy",
       "type": "event"
     },
     {
@@ -47,6 +53,11 @@
         {
           "internalType": "string",
           "name": "symbol",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "strategyURI",
           "type": "string"
         },
         {
@@ -93,6 +104,11 @@
         {
           "internalType": "string",
           "name": "symbol",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "strategyURI",
           "type": "string"
         },
         {

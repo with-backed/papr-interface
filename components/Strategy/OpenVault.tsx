@@ -81,9 +81,9 @@ export default function OpenVault({ strategy }: BorrowProps) {
       ),
     );
 
-    const filter = strategy.debtVault.filters.Transfer(null, address, null);
+    const filter = strategy.contract.filters.OpenVault(null, address, null);
 
-    strategy.debtVault.once(filter, (from, to, id) => {
+    strategy.contract.once(filter, (id, to, nonce) => {
       window.location.assign(
         `/network/${network}/in-kind/strategies/${strategy.contract.address}/vaults/${id}`,
       );

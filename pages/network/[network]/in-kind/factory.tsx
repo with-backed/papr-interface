@@ -44,13 +44,14 @@ function Connected() {
     const tx = await strategy.newStrategy(
       'APE Loans',
       'AP',
+      'URI',
       ethers.utils.formatBytes32String('x'),
       ONE.div(10).mul(2), // 20% APR target
       ONE.div(10).mul(5), // 50% Max LTV,
       process.env.NEXT_PUBLIC_MOCK_USDC as string,
     );
 
-    const filter = strategy.filters.LendingStrategyCreated(null);
+    const filter = strategy.filters.CreateLendingStrategy(null);
     strategy.once(filter, (address) => {
       push(`/network/${network}/in-kind/strategies/${address}`);
     });
