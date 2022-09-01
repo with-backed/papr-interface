@@ -16,6 +16,7 @@ import {
 } from 'types/generated/graphql/uniswapSubgraph';
 import { Price, Token } from '@uniswap/sdk-core';
 import { useConfig } from 'hooks/useConfig';
+import { SECONDS_IN_A_YEAR } from 'lib/constants';
 
 const Q96 = ethers.BigNumber.from(2).pow(96);
 const Q192 = Q96.pow(2);
@@ -55,33 +56,41 @@ export function D3Demo({
     return new Token(chainId, id, parseInt(decimals), symbol, name);
   }, [chainId, pool]);
 
-  const prices = useMemo(() => {
-    if (!token0 || !token1 || !poolDayDatas) {
-      return null;
-    }
-
-    return poolDayDatas.map((d) => {
-      return new Price(
-        token0,
-        token1,
-        Q192.toString(),
-        ethers.BigNumber.from(d.sqrtPrice).mul(d.sqrtPrice).toString(),
-      ).toFixed(8);
-    });
-  }, [poolDayDatas, token0, token1]);
-
-  console.log({ prices });
-
-  const [{ data: normData }] = useQuery<NormFactorUpdatesByStrategyQuery>({
-    query: NormFactorUpdatesByStrategyDocument,
-    variables: { strategy },
-  });
-
   const strategyCreatedAt = useMemo(() => {
     if (lendingStrategy) {
       return ethers.BigNumber.from(lendingStrategy.createdAt);
     }
   }, [lendingStrategy]);
+
+  const marks: ChartValue[] | null = useMemo(() => {
+    if (!token0 || !token1 || !poolDayDatas || !strategyCreatedAt) {
+      return null;
+    }
+
+    return poolDayDatas.map(({ sqrtPrice, date }) => {
+      const mark = parseFloat(
+        new Price(
+          token0,
+          token1,
+          Q192.toString(),
+          ethers.BigNumber.from(sqrtPrice).mul(sqrtPrice).toString(),
+        )
+          .subtract(1)
+          .divide(ethers.BigNumber.from(date).sub(strategyCreatedAt).toString())
+          .multiply(SECONDS_IN_A_YEAR)
+          .toFixed(8),
+      );
+
+      return [mark, date];
+    });
+  }, [poolDayDatas, strategyCreatedAt, token0, token1]);
+
+  console.log({ marks });
+
+  const [{ data: normData }] = useQuery<NormFactorUpdatesByStrategyQuery>({
+    query: NormFactorUpdatesByStrategyDocument,
+    variables: { strategy },
+  });
 
   const sortedNormData = useMemo(
     () =>
@@ -104,7 +113,7 @@ export function D3Demo({
         )
           .div(100)
           .toNumber();
-        aprs.push([apr, parseInt(current.timestamp)]);
+        aprs.push([apr, parseInt(current.timestamp)] as ChartValue);
       }
       return aprs;
     }
@@ -135,7 +144,7 @@ export function D3Demo({
       .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-    const datasets = [...aprs, ...targets];
+    const datasets = [...aprs, ...targets, ...(marks || [])];
     const extent = d3.extent(datasets, (d) => d[0]);
     // have some breathing room on the bottom
     extent[0] = extent[0]! * 0.85;
@@ -194,10 +203,24 @@ export function D3Demo({
           .y((d) => y(d[0])),
       );
 
+    if (marks) {
+      svg
+        .append('path')
+        .datum(marks)
+        .attr('fill', 'none')
+        .attr('stroke', 'crimson')
+        .attr('stroke-width', 1.5)
+        .attr(
+          'd',
+          d3
+            .line()
+            .curve(d3.curveBasis)
+            .x((d) => x(d[1]))
+            .y((d) => y(d[0])),
+        );
+    }
+
     return () => document.querySelector(`${containerId} svg`)?.remove();
-  }, [aprs, targets]);
+  }, [aprs, marks, targets]);
   return <div id="d3demo" />;
 }
-
-9007199254740991;
-52995426430946045214002866454;
