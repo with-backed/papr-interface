@@ -14,17 +14,16 @@ import SwapTokens from 'components/Strategy/SwapTokens';
 import styles from './strategy.module.css';
 import { AssociatedVaults } from 'components/Strategy/AssociatedVaults';
 import { D3Demo } from 'components/Strategy/D3Demo';
-import { clientFromUrl } from 'lib/urql';
+import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import {
-  LendingStrategyByIdDocument,
-  LendingStrategyByIdQuery,
-} from 'types/generated/graphql/inKindSubgraph';
-import {
-  PoolByIdDocument,
   PoolByIdQuery,
-  SqrtPricesByPoolDocument,
   SqrtPricesByPoolQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
+import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
+import {
+  subgraphUniswapPoolById,
+  subgraphUniswapPriceByPool,
+} from 'lib/uniswapSubgraph';
 
 export type StrategyPageProps = {
   address: string;
@@ -32,57 +31,6 @@ export type StrategyPageProps = {
   poolDayDatas: SqrtPricesByPoolQuery['poolDayDatas'] | null;
   pool: PoolByIdQuery['pool'] | null;
 };
-
-async function subgraphStrategyByAddress(id: string) {
-  // TODO: dynamic client address
-  const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
-  );
-  const { data, error } = await client
-    .query<LendingStrategyByIdQuery>(LendingStrategyByIdDocument, { id })
-    .toPromise();
-
-  if (error) {
-    console.error(error);
-    return null;
-  }
-
-  return data || null;
-}
-
-async function subgraphUniswapPriceByPool(pool: string) {
-  // TODO: dynamic client address
-  const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-rinkeby',
-  );
-  const { data, error } = await client
-    .query<SqrtPricesByPoolQuery>(SqrtPricesByPoolDocument, { pool })
-    .toPromise();
-
-  if (error) {
-    console.error(error);
-    return null;
-  }
-
-  return data || null;
-}
-
-async function subgraphUniswapPoolById(id: string) {
-  // TODO: dynamic client address
-  const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-rinkeby',
-  );
-  const { data, error } = await client
-    .query<PoolByIdQuery>(PoolByIdDocument, { id })
-    .toPromise();
-
-  if (error) {
-    console.error(error);
-    return null;
-  }
-
-  return data || null;
-}
 
 export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
   context,
