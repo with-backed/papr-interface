@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import * as d3 from 'd3';
+import { axisBottom, axisLeft, extent, scaleLinear } from 'd3';
 import { useQuery } from 'urql';
 import {
   LendingStrategyByIdQuery,
@@ -17,6 +17,7 @@ import {
 import { Price, Token } from '@uniswap/sdk-core';
 import { useConfig } from 'hooks/useConfig';
 import { SECONDS_IN_A_YEAR } from 'lib/constants';
+import { attachSVG, drawLine } from 'lib/d3';
 
 const Q96 = ethers.BigNumber.from(2).pow(96);
 const Q192 = Q96.pow(2);
@@ -130,92 +131,58 @@ export function D3Demo({
   }, [sortedNormData, targetAnnualGrowth]);
 
   useEffect(() => {
-    var margin = { top: 10, right: 30, bottom: 30, left: 60 };
+    const margin = { top: 10, right: 30, bottom: 30, left: 60 };
     const width = 500 - margin.left - margin.right;
     const height = 400 - margin.top - margin.bottom;
 
-    const svg = d3
-      .select(containerId)
-      .append('svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    const svg = attachSVG({ containerId, height, margin, width });
 
     const datasets = [...aprs, ...targets, ...(marks || [])];
-    const extent = d3.extent(datasets, (d) => d[0]);
-    // have some breathing room on the bottom
-    extent[0] = extent[0]! * 0.85;
+    const dataExtent = extent(datasets, (d) => d[0]);
+    const timestampExtent = extent(datasets, (d) => d[1]);
 
-    const timestampExtent = d3.extent(datasets, (d) => d[1]);
-
-    // Add X axis --> it is a date format
-    var x = d3
-      .scaleLinear()
+    var xScale = scaleLinear()
       .domain(timestampExtent as [number, number])
       .range([0, width]);
+    var yScale = scaleLinear()
+      .domain(dataExtent as [number, number])
+      .range([height, 0]);
+
+    // Draw scale lines on chart
     svg
       .append('g')
       .attr('transform', 'translate(0,' + height + ')')
       .call(
-        d3
-          .axisBottom(x)
+        axisBottom(xScale)
           .ticks(3)
           .tickFormat((d) => humanizedTimestamp(d.valueOf())),
       );
+    svg.append('g').call(axisLeft(yScale));
 
-    // Add Y axis
-    var y = d3
-      .scaleLinear()
-      .domain(extent as any)
-      .range([height, 0]);
-    svg.append('g').call(d3.axisLeft(y));
+    drawLine({
+      data: aprs,
+      svg: svg as any,
+      stroke: '#007155',
+      xScale,
+      yScale,
+    });
 
-    svg
-      .append('path')
-      .datum(aprs)
-      .attr('fill', 'none')
-      .attr('stroke', '#007155')
-      .attr('stroke-width', 1.5)
-      .attr(
-        'd',
-        d3
-          .line()
-          .curve(d3.curveBasis)
-          .x((d) => x(d[1]))
-          .y((d) => y(d[0])),
-      );
-
-    svg
-      .append('path')
-      .datum(targets)
-      .attr('fill', 'none')
-      .attr('stroke', '#000000')
-      .attr('stroke-width', 1.5)
-      .attr(
-        'd',
-        d3
-          .line()
-          .curve(d3.curveBasis)
-          .x((d) => x(d[1]))
-          .y((d) => y(d[0])),
-      );
+    drawLine({
+      data: targets,
+      svg: svg as any,
+      stroke: '#000000',
+      xScale,
+      yScale,
+    });
 
     if (marks) {
-      svg
-        .append('path')
-        .datum(marks)
-        .attr('fill', 'none')
-        .attr('stroke', 'crimson')
-        .attr('stroke-width', 1.5)
-        .attr(
-          'd',
-          d3
-            .line()
-            .curve(d3.curveBasis)
-            .x((d) => x(d[1]))
-            .y((d) => y(d[0])),
-        );
+      drawLine({
+        data: marks,
+        svg: svg as any,
+        stroke: '#007155',
+        xScale,
+        yScale,
+      });
     }
 
     return () => document.querySelector(`${containerId} svg`)?.remove();
