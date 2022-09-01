@@ -8,12 +8,10 @@ import {
   ERC20__factory,
   ERC721,
   ERC721__factory,
-  IUniswapV3Pool,
   IUniswapV3Pool__factory,
   Strategy,
   Strategy__factory,
 } from 'types/generated/abis';
-import { Chain } from 'wagmi';
 import { ONE } from './constants';
 import { getPool } from './uniswap';
 import { lambertW0 } from 'lambert-w-function';
@@ -79,9 +77,6 @@ export async function populateLendingStrategy(
   /// and have an array of assets here
   const collateralAddress = process.env.NEXT_PUBLIC_MOCK_APE as string;
   const collateral = ERC721__factory.connect(collateralAddress, provider);
-
-  const debtVaultAddress = await contract.debtVault();
-  const debtVault = ERC721__factory.connect(debtVaultAddress, provider);
 
   const targetGrowthPerPeriod = await contract.targetGrowthPerPeriod();
   /// TODO expose period from contract so we can not just assume period is 28 days.
