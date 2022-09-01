@@ -16,7 +16,7 @@ export async function postStrategyIPFS(
   ipfsObj['name'] = name;
   ipfsObj['description'] = description;
   ipfsObj['merkleRoot'] = root;
-  ipfsObj['allowedNFTs'] = nodes;
+  ipfsObj['allowedContractAddresses'] = nodes;
 
   const res = await pinata.pinJSONToIPFS(ipfsObj);
 
