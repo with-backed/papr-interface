@@ -2,7 +2,6 @@ import { useEffect, useMemo } from 'react';
 import * as d3 from 'd3';
 import { useQuery } from 'urql';
 import {
-  LendingStrategyByIdDocument,
   LendingStrategyByIdQuery,
   NormFactorUpdatesByStrategyDocument,
   NormFactorUpdatesByStrategyQuery,
@@ -10,33 +9,19 @@ import {
 import { ethers } from 'ethers';
 import { computeEffectiveAPR } from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
-import { SECONDS_IN_A_DAY } from 'lib/constants';
 import { humanizedTimestamp } from 'lib/duration';
-import { SqrtPricesByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
+import {
+  PoolByIdQuery,
+  SqrtPricesByPoolQuery,
+} from 'types/generated/graphql/uniswapSubgraph';
+import { Price, Token } from '@uniswap/sdk-core';
+import { useConfig } from 'hooks/useConfig';
 
-const PERIOD_SECONDS = SECONDS_IN_A_DAY * 28;
-
+const Q96 = ethers.BigNumber.from(2).pow(96);
+const Q192 = Q96.pow(2);
 const containerId = '#d3demo';
-const tickLabels = ['<All', '14 Days', '7 Days', '24h'];
 
 type ChartValue = [number, number];
-
-function sqrtPriceToPrice(sqrtPrice: string) {
-  const priceBignum = ethers.BigNumber.from(sqrtPrice);
-  const squared = priceBignum.pow(2);
-  const denominator = ethers.BigNumber.from(2).pow(96);
-  const denominatorSquared = denominator.pow(2);
-  const price = squared.div(denominatorSquared);
-  console.log({
-    sqrtPrice,
-    priceBignum,
-    squared,
-    denominator,
-    denominatorSquared,
-    price,
-  });
-  return price.toNumber();
-}
 
 type D3DemoProps = {
   strategy: string;
@@ -44,14 +29,44 @@ type D3DemoProps = {
   targetGrowthPerPeriod: ethers.BigNumber;
   lendingStrategy: LendingStrategyByIdQuery['lendingStrategy'] | null;
   poolDayDatas: SqrtPricesByPoolQuery['poolDayDatas'] | null;
+  pool: PoolByIdQuery['pool'] | null;
 };
 export function D3Demo({
   strategy,
   targetAnnualGrowth,
-  targetGrowthPerPeriod,
   lendingStrategy,
   poolDayDatas,
+  pool,
 }: D3DemoProps) {
+  const { chainId } = useConfig();
+  const token0 = useMemo(() => {
+    if (!pool) {
+      return null;
+    }
+    const { id, decimals, symbol, name } = pool.token0;
+    return new Token(chainId, id, parseInt(decimals), symbol, name);
+  }, [chainId, pool]);
+
+  const token1 = useMemo(() => {
+    if (!pool) {
+      return null;
+    }
+    const { id, decimals, symbol, name } = pool.token1;
+    return new Token(chainId, id, parseInt(decimals), symbol, name);
+  }, [chainId, pool]);
+
+  const prices = useMemo(() => {
+    if (!token0 || !token1 || !poolDayDatas) {
+      return null;
+    }
+
+    return poolDayDatas.map((d) => {
+      return new Price(token0, token1, Q192.toString(), d.sqrtPrice).toFixed(8);
+    });
+  }, [poolDayDatas, token0, token1]);
+
+  console.log({ prices });
+
   const [{ data: normData }] = useQuery<NormFactorUpdatesByStrategyQuery>({
     query: NormFactorUpdatesByStrategyDocument,
     variables: { strategy },
@@ -62,13 +77,6 @@ export function D3Demo({
       return ethers.BigNumber.from(lendingStrategy.createdAt);
     }
   }, [lendingStrategy]);
-
-  console.log({
-    poolDayDatas,
-    sqrtPrices: poolDayDatas?.map(({ sqrtPrice }) =>
-      sqrtPriceToPrice(sqrtPrice),
-    ),
-  });
 
   const sortedNormData = useMemo(
     () =>
@@ -185,3 +193,6 @@ export function D3Demo({
   }, [aprs, targets]);
   return <div id="d3demo" />;
 }
+
+9007199254740991;
+52995426430946045214002866454;

@@ -20,6 +20,8 @@ import {
   LendingStrategyByIdQuery,
 } from 'types/generated/graphql/inKindSubgraph';
 import {
+  PoolByIdDocument,
+  PoolByIdQuery,
   SqrtPricesByPoolDocument,
   SqrtPricesByPoolQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
@@ -28,6 +30,7 @@ export type StrategyPageProps = {
   address: string;
   lendingStrategy: LendingStrategyByIdQuery['lendingStrategy'] | null;
   poolDayDatas: SqrtPricesByPoolQuery['poolDayDatas'] | null;
+  pool: PoolByIdQuery['pool'] | null;
 };
 
 async function subgraphStrategyByAddress(id: string) {
@@ -64,21 +67,41 @@ async function subgraphUniswapPriceByPool(pool: string) {
   return data || null;
 }
 
+async function subgraphUniswapPoolById(id: string) {
+  // TODO: dynamic client address
+  const client = clientFromUrl(
+    'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-rinkeby',
+  );
+  const { data, error } = await client
+    .query<PoolByIdQuery>(PoolByIdDocument, { id })
+    .toPromise();
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  return data || null;
+}
+
 export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
   context,
 ) => {
   const address = context.params?.strategy as string;
 
   const subgraphStrategy = await subgraphStrategyByAddress(address);
-  const subgraphUniswapPrices = await subgraphUniswapPriceByPool(
-    subgraphStrategy?.lendingStrategy?.poolAddress,
-  );
+
+  const [subgraphUniswapPrices, subgraphUniswapPool] = await Promise.all([
+    subgraphUniswapPriceByPool(subgraphStrategy?.lendingStrategy?.poolAddress),
+    subgraphUniswapPoolById(subgraphStrategy?.lendingStrategy?.poolAddress),
+  ]);
 
   return {
     props: {
       address: address,
       lendingStrategy: subgraphStrategy?.lendingStrategy || null,
       poolDayDatas: subgraphUniswapPrices?.poolDayDatas || null,
+      pool: subgraphUniswapPool?.pool || null,
     },
   };
 };
@@ -89,6 +112,7 @@ export default function StrategyPage({
   address,
   lendingStrategy: subgraphLendingStrategy,
   poolDayDatas,
+  pool,
 }: StrategyPageProps) {
   const config = useConfig();
   const [lendingStrategy, setLendingStrategy] =
@@ -141,6 +165,7 @@ export default function StrategyPage({
               targetGrowthPerPeriod={lendingStrategy.targetGrowthPerPeriod}
               lendingStrategy={subgraphLendingStrategy}
               poolDayDatas={poolDayDatas}
+              pool={pool}
             />
           </div>
         </div>
