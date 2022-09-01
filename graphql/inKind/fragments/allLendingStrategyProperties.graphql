@@ -4,6 +4,7 @@ fragment allLendingStrategyProperties on LendingStrategy {
   symbol
   poolAddress
   underlying
-  collateral
-  normFactor
+  allowedCollateralRoot
+  strategyURI
+  norm
 }
