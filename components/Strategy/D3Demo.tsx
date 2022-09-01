@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 import { useQuery } from 'urql';
 import {
   LendingStrategyByIdQuery,
-  NormFactorUpdatesByStrategyDocument,
-  NormFactorUpdatesByStrategyQuery,
+  NormalizationUpdatesByStrategyDocument,
+  NormalizationUpdatesByStrategyQuery,
 } from 'types/generated/graphql/inKindSubgraph';
 import { ethers } from 'ethers';
 import { computeEffectiveAPR } from 'lib/strategies';
@@ -85,16 +85,14 @@ export function D3Demo({
     });
   }, [poolDayDatas, strategyCreatedAt, token0, token1]);
 
-  console.log({ marks });
-
-  const [{ data: normData }] = useQuery<NormFactorUpdatesByStrategyQuery>({
-    query: NormFactorUpdatesByStrategyDocument,
+  const [{ data: normData }] = useQuery<NormalizationUpdatesByStrategyQuery>({
+    query: NormalizationUpdatesByStrategyDocument,
     variables: { strategy },
   });
 
   const sortedNormData = useMemo(
     () =>
-      normData?.normFactorUpdates.sort(
+      normData?.normalizationUpdates.sort(
         (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
       ) || [],
     [normData],

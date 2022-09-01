@@ -3,7 +3,6 @@ import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { validateNetwork } from 'lib/config';
-import { ONE } from 'lib/strategies/constants';
 import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -46,12 +45,13 @@ function Connected() {
       'AP',
       'URI',
       ethers.utils.formatBytes32String('x'),
-      ONE.div(10).mul(2), // 20% APR target
-      ONE.div(10).mul(5), // 50% Max LTV,
-      process.env.NEXT_PUBLIC_MOCK_USDC as string,
+      // TODO: these broke after ABI update -- check on correct way to call this
+      // ONE.div(10).mul(2), // 20% APR target
+      // ONE.div(10).mul(5), // 50% Max LTV,
+      // process.env.NEXT_PUBLIC_MOCK_USDC as string,
     );
 
-    const filter = strategy.filters.CreateLendingStrategy(null);
+    const filter = strategy.filters.LendingStrategyCreated(null);
     strategy.once(filter, (address) => {
       push(`/network/${network}/in-kind/strategies/${address}`);
     });
