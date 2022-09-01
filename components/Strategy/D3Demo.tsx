@@ -11,6 +11,8 @@ import { ethers } from 'ethers';
 import { computeEffectiveAPR } from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
 import { SECONDS_IN_A_DAY } from 'lib/constants';
+import { humanizedTimestamp } from 'lib/duration';
+import { SqrtPricesByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
 
 const PERIOD_SECONDS = SECONDS_IN_A_DAY * 28;
 
@@ -19,30 +21,54 @@ const tickLabels = ['<All', '14 Days', '7 Days', '24h'];
 
 type ChartValue = [number, number];
 
+function sqrtPriceToPrice(sqrtPrice: string) {
+  const priceBignum = ethers.BigNumber.from(sqrtPrice);
+  const squared = priceBignum.pow(2);
+  const denominator = ethers.BigNumber.from(2).pow(96);
+  const denominatorSquared = denominator.pow(2);
+  const price = squared.div(denominatorSquared);
+  console.log({
+    sqrtPrice,
+    priceBignum,
+    squared,
+    denominator,
+    denominatorSquared,
+    price,
+  });
+  return price.toNumber();
+}
+
 type D3DemoProps = {
   strategy: string;
   targetAnnualGrowth: ethers.BigNumber;
   targetGrowthPerPeriod: ethers.BigNumber;
+  lendingStrategy: LendingStrategyByIdQuery['lendingStrategy'] | null;
+  poolDayDatas: SqrtPricesByPoolQuery['poolDayDatas'] | null;
 };
 export function D3Demo({
   strategy,
   targetAnnualGrowth,
   targetGrowthPerPeriod,
+  lendingStrategy,
+  poolDayDatas,
 }: D3DemoProps) {
-  const [{ data: strategyData }] = useQuery<LendingStrategyByIdQuery>({
-    query: LendingStrategyByIdDocument,
-    variables: { id: strategy },
-  });
   const [{ data: normData }] = useQuery<NormFactorUpdatesByStrategyQuery>({
     query: NormFactorUpdatesByStrategyDocument,
     variables: { strategy },
   });
 
   const strategyCreatedAt = useMemo(() => {
-    if (strategyData?.lendingStrategy) {
-      return ethers.BigNumber.from(strategyData.lendingStrategy.createdAt);
+    if (lendingStrategy) {
+      return ethers.BigNumber.from(lendingStrategy.createdAt);
     }
-  }, [strategyData]);
+  }, [lendingStrategy]);
+
+  console.log({
+    poolDayDatas,
+    sqrtPrices: poolDayDatas?.map(({ sqrtPrice }) =>
+      sqrtPriceToPrice(sqrtPrice),
+    ),
+  });
 
   const sortedNormData = useMemo(
     () =>
@@ -115,7 +141,7 @@ export function D3Demo({
         d3
           .axisBottom(x)
           .ticks(3)
-          .tickFormat((d) => new Date(d.valueOf()).toLocaleTimeString()),
+          .tickFormat((d) => humanizedTimestamp(d.valueOf())),
       );
 
     // Add Y axis

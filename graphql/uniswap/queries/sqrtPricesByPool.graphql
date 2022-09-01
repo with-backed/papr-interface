@@ -1,5 +1,6 @@
 query sqrtPricesByPool($pool: String) {
   poolDayDatas(where: { pool: $pool }) {
     sqrtPrice
+    date
   }
 }

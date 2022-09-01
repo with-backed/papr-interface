@@ -14,6 +14,10 @@ export function humanizedDuration(
   return dayjs.duration(duration, unit).humanize();
 }
 
+export function humanizedTimestamp(timestamp: number) {
+  return dayjs(dayjs.unix(timestamp)).fromNow();
+}
+
 export function secondsToDays(seconds: number) {
   return seconds / SECONDS_IN_A_DAY;
 }
