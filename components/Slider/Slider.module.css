@@ -40,10 +40,16 @@
   /*color for the thumb */
   background: var(--greentext);
   /* shape of the thumb: circle */
-  width: 10px;
-  height: 36px;
-  border: thin white solid;
+  width: 8px;
+  height: 46px;
+  margin-top: -5px;
+  border: 2px white solid;
   border-radius: 4px;
   /* remove default outline when selected */
   outline: none;
+}
+
+.thumb:hover {
+  width: 10px;
+  border: 2px black solid;
 }
