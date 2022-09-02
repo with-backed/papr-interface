@@ -93,25 +93,32 @@ export function D3Demo({
 
     poolSwapData.sort((a, b) => parseInt(a.timestamp) - parseInt(b.timestamp));
 
-    const result = poolSwapData.map(({ sqrtPriceX96, timestamp }: Swap) => {
-      const mark = parseFloat(
-        new Price(
-          token0,
-          token1,
-          Q192.toString(),
-          ethers.BigNumber.from(sqrtPriceX96).mul(sqrtPriceX96).toString(),
-        )
-          .subtract(1)
-          .divide(
-            ethers.BigNumber.from(timestamp).sub(strategyCreatedAt).toString(),
+    const result: ChartValue[] = poolSwapData.map(
+      ({ sqrtPriceX96, timestamp }: Swap) => {
+        const mark = parseFloat(
+          new Price(
+            token0,
+            token1,
+            Q192.toString(),
+            ethers.BigNumber.from(sqrtPriceX96).mul(sqrtPriceX96).toString(),
           )
-          .multiply(SECONDS_IN_A_YEAR)
-          .toFixed(8),
-      );
-      return [mark, timestamp];
-    });
-    result.unshift([20, strategyCreatedAt.toString()]);
-    result.push([result[result.length - 1][0], timestamp || Date.now() / 1000]);
+            .subtract(1)
+            .divide(
+              ethers.BigNumber.from(timestamp)
+                .sub(strategyCreatedAt)
+                .toString(),
+            )
+            .multiply(SECONDS_IN_A_YEAR)
+            .toFixed(8),
+        );
+        return [mark, parseInt(timestamp)];
+      },
+    );
+    result.unshift([20, parseInt(strategyCreatedAt.toString())] as ChartValue);
+    result.push([
+      result[result.length - 1][0],
+      timestamp || Date.now() / 1000,
+    ] as ChartValue);
     return result;
   }, [poolSwapData, strategyCreatedAt, token0, token1]);
 
