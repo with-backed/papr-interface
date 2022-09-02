@@ -1,0 +1,6 @@
+query swapsByPool($pool: String) {
+  swaps(where: { pool: $pool }) {
+    sqrtPriceX96
+    timestamp
+  }
+}

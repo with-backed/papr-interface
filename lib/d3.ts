@@ -57,3 +57,26 @@ export function drawLine({
         .y((d) => yScale(d[0])),
     );
 }
+
+export function drawDashedLine({
+  data,
+  svg,
+  stroke,
+  xScale,
+  yScale,
+}: DrawLineParams) {
+  svg
+    .append('path')
+    .datum(data)
+    .style('stroke-dasharray', '3, 3')
+    .attr('fill', 'none')
+    .attr('stroke', stroke)
+    .attr('stroke-width', 1.5)
+    .attr(
+      'd',
+      line()
+        .curve(curveBasis)
+        .x((d) => xScale(d[1]))
+        .y((d) => yScale(d[0])),
+    );
+}
