@@ -38,7 +38,6 @@ export default function OpenVault({ strategy }: BorrowProps) {
     quoteLoading,
     priceImpactLoading,
   } = useQuoteWithSlippage(strategy, swapAmount, true);
-  console.log({ quoteForSwap, priceImpact, quoteLoading, priceImpactLoading });
   const { network } = useConfig();
 
   interface OnERC721ReceivedArgsStruct {
@@ -68,7 +67,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
   `;
 
   const create = useCallback(
-    async (withSwap: boolean, swapAmount: string) => {
+    async (withSwap: boolean) => {
       const tickUpper = strategy.token0IsUnderlying ? 200 : 0;
       const tickLower = strategy.token0IsUnderlying ? -200 : 0;
 
@@ -123,7 +122,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
         );
       });
     },
-    [address, collateralTokenId, debt, network, signer, strategy],
+    [address, collateralTokenId, debt, network, signer, strategy, quoteForSwap],
   );
 
   const handleMaxDebtChanged = useCallback(
@@ -145,7 +144,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
         ).toString(),
       );
     },
-    [setDebt, maxDebt, swapAmount],
+    [setDebt, maxDebt],
   );
 
   const getMaxDebt = useCallback(async () => {
