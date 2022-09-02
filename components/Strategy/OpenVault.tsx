@@ -2,6 +2,7 @@ import { TickMath } from '@uniswap/v3-sdk';
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
+import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
 import { SupportedNetwork } from 'lib/config';
 import { Quoter } from 'lib/contracts';
 import {
@@ -27,14 +28,18 @@ export default function OpenVault({ strategy }: BorrowProps) {
   const [debt, setDebt] = useState<string>('');
   const [maxDebt, setMaxDebt] = useState<string>('');
   const [collateralTokenId, setCollateralTokenId] = useState<string>('');
-  const [quoteForSwap, setQuoteForSwap] = useState<ethers.BigNumber>(
-    ethers.BigNumber.from(0),
-  );
-  const [priceImpact, setPriceImpact] = useState<number>(0.0);
   const [liquidationDateEstimation, setLiquidationDateEstimation] =
     useState<string>('');
   const [swapAmount, setSwapAmount] = useState<string>('');
-  const { network, jsonRpcProvider } = useConfig();
+  const {
+    quoteForSwap,
+    priceImpact,
+    tokenOut,
+    quoteLoading,
+    priceImpactLoading,
+  } = useQuoteWithSlippage(strategy, swapAmount, true);
+  console.log({ quoteForSwap, priceImpact, quoteLoading, priceImpactLoading });
+  const { network } = useConfig();
 
   interface OnERC721ReceivedArgsStruct {
     vaultId: ethers.BigNumber;
@@ -64,10 +69,6 @@ export default function OpenVault({ strategy }: BorrowProps) {
 
   const create = useCallback(
     async (withSwap: boolean, swapAmount: string) => {
-      let q = ethers.BigNumber.from(0);
-      if (withSwap) {
-        q = quoteForSwap;
-      }
       const tickUpper = strategy.token0IsUnderlying ? 200 : 0;
       const tickLower = strategy.token0IsUnderlying ? -200 : 0;
 
@@ -76,7 +77,9 @@ export default function OpenVault({ strategy }: BorrowProps) {
         vaultNonce: ethers.BigNumber.from(0),
         mintVaultTo: address!,
         mintDebtOrProceedsTo: address!,
-        minOut: withSwap ? q : ethers.BigNumber.from(0),
+        minOut: withSwap
+          ? ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals)
+          : ethers.BigNumber.from(0),
         sqrtPriceLimitX96: ethers.BigNumber.from(
           TickMath.getSqrtRatioAtTick(
             strategy.token0IsUnderlying ? tickUpper - 1 : tickLower - 1,
@@ -145,47 +148,6 @@ export default function OpenVault({ strategy }: BorrowProps) {
     [setDebt, maxDebt, swapAmount],
   );
 
-  const handleSwapAmountChanged = useCallback(
-    async (value: string) => {
-      setSwapAmount(value);
-
-      if (value === '') {
-        setPriceImpact(0);
-        return;
-      }
-
-      const quoter = Quoter(jsonRpcProvider, network as SupportedNetwork);
-      const tokenIn = strategy.token0IsUnderlying
-        ? strategy.token1
-        : strategy.token0;
-      const tokenOut = strategy.token0IsUnderlying
-        ? strategy.token0
-        : strategy.token1;
-      const swapAmountBigNumber = ethers.utils.parseUnits(
-        value,
-        tokenIn.decimals,
-      );
-      const q = await getQuoteForSwap(
-        quoter,
-        swapAmountBigNumber,
-        tokenIn,
-        tokenOut,
-      );
-      setQuoteForSwap(q);
-
-      setPriceImpact(
-        await computeSlippageForSwap(
-          q,
-          tokenIn,
-          tokenOut,
-          swapAmountBigNumber,
-          quoter,
-        ),
-      );
-    },
-    [setSwapAmount, swapAmount, jsonRpcProvider, strategy, network],
-  );
-
   const getMaxDebt = useCallback(async () => {
     const newNorm = await strategy.contract.newNorm();
     const maxLTV = await strategy.contract.maxLTV();
@@ -218,20 +180,16 @@ export default function OpenVault({ strategy }: BorrowProps) {
         onChange={(e) => handleMaxDebtChanged(e.target.value)}></input>
       <input
         placeholder="debt to swap"
-        onChange={(e) => handleSwapAmountChanged(e.target.value)}></input>
+        onChange={(e) => setSwapAmount(e.target.value)}></input>
       <button onClick={() => create(true, swapAmount)}> borrow and swap</button>
-      <p>
-        {' '}
-        quote for desired swap{' '}
-        {ethers.utils.formatUnits(
-          quoteForSwap,
-          ethers.BigNumber.from(strategy.token0.decimals),
-        )}{' '}
-        {strategy.token0IsUnderlying
-          ? strategy.token1.symbol
-          : strategy.token0.symbol}{' '}
-      </p>
-      <p>price impact {priceImpact}%</p>
+      {!quoteLoading && (
+        <p>
+          {' '}
+          quote for desired swap {quoteForSwap}
+          {tokenOut.symbol}
+        </p>
+      )}
+      {!priceImpactLoading && <p>price impact {priceImpact}%</p>}
       <p>
         {' '}
         # days before liquidation (estimation): {liquidationDateEstimation}{' '}

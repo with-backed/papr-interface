@@ -88,16 +88,8 @@ export default function StrategyPage({
             <MintCollateral token={lendingStrategy.collateral} />
             <ProvideLiquidity pool={lendingStrategy.pool} />
             <OpenVault strategy={lendingStrategy} />
-            <SwapQuote
-              tokenIn={lendingStrategy!.token0}
-              tokenOut={lendingStrategy!.token1}
-              fee={ethers.BigNumber.from(10).pow(4)} // 1% fee tier, should just fetch from pool directly
-            />
-            <SwapQuote
-              tokenIn={lendingStrategy!.token1}
-              tokenOut={lendingStrategy!.token0}
-              fee={ethers.BigNumber.from(10).pow(4)} // 1% fee tier, should just fetch from pool directly
-            />
+            <SwapQuote strategy={lendingStrategy} swapForUnderlying />
+            <SwapQuote strategy={lendingStrategy} swapForUnderlying={false} />
             <SwapTokens
               tokenOne={lendingStrategy!.token0}
               tokenTwo={lendingStrategy!.token1}
