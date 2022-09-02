@@ -13,9 +13,23 @@ import ProvideLiquidity from 'components/Strategy/ProvideLiquidty';
 import SwapTokens from 'components/Strategy/SwapTokens';
 import styles from './strategy.module.css';
 import { AssociatedVaults } from 'components/Strategy/AssociatedVaults';
+import { D3Demo } from 'components/Strategy/D3Demo';
+import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
+import {
+  PoolByIdQuery,
+  SqrtPricesByPoolQuery,
+} from 'types/generated/graphql/uniswapSubgraph';
+import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
+import {
+  subgraphUniswapPoolById,
+  subgraphUniswapPriceByPool,
+} from 'lib/uniswapSubgraph';
 
 export type StrategyPageProps = {
   address: string;
+  lendingStrategy: LendingStrategyByIdQuery['lendingStrategy'] | null;
+  poolDayDatas: SqrtPricesByPoolQuery['poolDayDatas'] | null;
+  pool: PoolByIdQuery['pool'] | null;
 };
 
 export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
@@ -23,16 +37,31 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
 ) => {
   const address = context.params?.strategy as string;
 
+  const subgraphStrategy = await subgraphStrategyByAddress(address);
+
+  const [subgraphUniswapPrices, subgraphUniswapPool] = await Promise.all([
+    subgraphUniswapPriceByPool(subgraphStrategy?.lendingStrategy?.poolAddress),
+    subgraphUniswapPoolById(subgraphStrategy?.lendingStrategy?.poolAddress),
+  ]);
+
   return {
     props: {
       address: address,
+      lendingStrategy: subgraphStrategy?.lendingStrategy || null,
+      poolDayDatas: subgraphUniswapPrices?.poolDayDatas || null,
+      pool: subgraphUniswapPool?.pool || null,
     },
   };
 };
 
 const PRICE = 20_000;
 
-export default function StrategyPage({ address }: StrategyPageProps) {
+export default function StrategyPage({
+  address,
+  lendingStrategy: subgraphLendingStrategy,
+  poolDayDatas,
+  pool,
+}: StrategyPageProps) {
   const config = useConfig();
   const [lendingStrategy, setLendingStrategy] =
     useState<LendingStrategy | null>(null);
@@ -78,6 +107,14 @@ export default function StrategyPage({ address }: StrategyPageProps) {
           </div>
           <div className={styles.column}>
             <AssociatedVaults strategy={address} />
+            <D3Demo
+              strategy={address}
+              targetAnnualGrowth={lendingStrategy.targetAnnualGrowth}
+              targetGrowthPerPeriod={lendingStrategy.targetGrowthPerPeriod}
+              lendingStrategy={subgraphLendingStrategy}
+              poolDayDatas={poolDayDatas}
+              pool={pool}
+            />
           </div>
         </div>
       ) : (

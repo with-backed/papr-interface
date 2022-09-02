@@ -1,0 +1,16 @@
+query poolById($id: ID!) {
+  pool(id: $id) {
+    token0 {
+      id
+      decimals
+      symbol
+      name
+    }
+    token1 {
+      id
+      decimals
+      symbol
+      name
+    }
+  }
+}

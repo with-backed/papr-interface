@@ -1,5 +1,6 @@
 fragment allLendingStrategyProperties on LendingStrategy {
   id
+  createdAt
   name
   symbol
   poolAddress
