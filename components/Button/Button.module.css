@@ -7,6 +7,12 @@
   font-size: var(--font-large);
 }
 
+.dark {
+  composes: button;
+  background: var(--background-lighter-dark);
+  color: white;
+}
+
 .primary {
   composes: button;
   background: linear-gradient(

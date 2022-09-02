@@ -28,6 +28,7 @@
   --optimistic-red-100: #fe0420;
   --polygon-purple-10: #f8f5ff;
   --polygon-purple-100: #7b3fe4;
+  --greentext: #007155;
 
   /* layout */
   --max-width-header: 1224px;
@@ -45,6 +46,9 @@
   --background-radial-gradient: radial-gradient(#ffffff, #f6f2f0);
   --background-fieldset: rgba(255, 255, 255, 0.8);
   --background-white: #ffffff;
+  --background-dark: #282828;
+  --background-lighter-dark: #383838;
+  --background-faded-green: #f6f9f8;
 
   /* shadows */
   --box-shadow: 0 0 20px 0px rgb(171 155 150 / 20%);

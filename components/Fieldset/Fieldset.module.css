@@ -1,6 +1,5 @@
 .standard-fieldset {
-  border: none;
-  background: var(--background-fieldset);
+  border: thin var(--greentext) solid;
   width: 100%;
   padding: var(--padding-container);
   word-break: normal;
@@ -11,5 +10,6 @@
 .legend {
   line-height: 0;
   font-size: var(--font-large);
-  text-transform: capitalize;
+  text-transform: uppercase;
+  color: var(--greentext);
 }

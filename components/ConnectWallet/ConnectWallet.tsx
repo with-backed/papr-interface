@@ -17,13 +17,14 @@ export const ConnectWallet = () => {
               pirsch('Wallet connection modal opened', {});
               openConnectModal();
             }}
-            type="button">
+            type="button"
+            kind="dark">
             🥕 Connect
           </Button>
         ) : (
           <ButtonLink
             href={`/network/${network}/profile/${account.address}`}
-            kind="secondary">
+            kind="dark">
             <span className={styles.address}>
               🔓 <DisplayAddress address={account.address} />
             </span>
