@@ -1,0 +1,35 @@
+.slider {
+  width: 500px;
+  height: 36px;
+  margin: auto;
+  background: repeating-conic-gradient(
+      var(--greentext) 0% 25%,
+      var(--background-faded-green) 0% 50%
+    )
+    50%/ 6px 6px;
+}
+
+.track {
+  height: 36px;
+}
+
+/* The track comes in 2 parts. This selects everything _but_ the first element
+   with a track classname (i.e., it just selects the second part) and dims it.
+   This allows us to keep a consistent checkerboard background with 2 different
+   colors. */
+.track ~ .track {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.thumb {
+  cursor: pointer;
+  /*color for the thumb */
+  background: var(--greentext);
+  /* shape of the thumb: circle */
+  width: 10px;
+  height: 36px;
+  border: thin white solid;
+  border-radius: 4px;
+  /* remove default outline when selected */
+  outline: none;
+}
