@@ -4,6 +4,7 @@ import { captureException } from '@sentry/nextjs';
 import { SupportedNetwork, validateNetwork } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import capitalize from 'lodash/capitalize';
+import { Slider } from 'components/Slider';
 
 export const getServerSideProps: GetServerSideProps<BorrowProps> = async (
   context,
@@ -33,6 +34,7 @@ export default function Borrow({ network }: BorrowProps) {
     <>
       <OpenGraph title={`Backed | ${capitalize(network)} | Borrow`} />
       <h1>under construction</h1>
+      <Slider />
     </>
   );
 }

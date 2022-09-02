@@ -1,12 +1,26 @@
 .slider {
-  width: 500px;
+  width: 498px;
   height: 36px;
-  margin: auto;
+  margin: 1rem auto;
+}
+
+.slider-squares {
+  composes: slider;
   background: repeating-conic-gradient(
       var(--greentext) 0% 25%,
       var(--background-faded-green) 0% 50%
     )
     50%/ 6px 6px;
+}
+
+.slider-dots {
+  composes: slider;
+  background-image: url('../../public/slider-tile.svg');
+}
+
+.slider-dots-dense {
+  composes: slider;
+  background-image: url('../../public/slider-tile-dense.svg');
 }
 
 .track {
