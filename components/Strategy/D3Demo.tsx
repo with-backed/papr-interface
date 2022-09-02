@@ -108,7 +108,7 @@ export function D3Demo({
         const apr = computeEffectiveAPR(
           ethers.BigNumber.from(current.timestamp),
           ethers.BigNumber.from(prev.timestamp),
-          ethers.BigNumber.from(current.newNorm).mul(ONE).div(current.oldNorm),
+          ethers.BigNumber.from(current.newNorm).mul(ONE).div(prev.newNorm),
         )
           .div(100)
           .toNumber();
