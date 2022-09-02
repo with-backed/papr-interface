@@ -8,6 +8,8 @@ import {
   ERC20__factory,
   ERC721,
   ERC721__factory,
+  IQuoter,
+  IUniswapV3Pool,
   IUniswapV3Pool__factory,
   Strategy,
   Strategy__factory,
@@ -195,4 +197,31 @@ export async function computeLiquidationEstimation(
   const result = dayjs.duration({ seconds: period });
 
   return result.asDays();
+}
+
+export async function computeSlippageForSwap(
+  quoteWithSlippage: ethers.BigNumber,
+  tokenIn: ERC20Token,
+  tokenOut: ERC20Token,
+  amount: ethers.BigNumber,
+  fee: ethers.BigNumber,
+  quoter: IQuoter,
+) {
+  const quoteWithoutSlippage = await quoter.callStatic.quoteExactInputSingle(
+    tokenIn.contract.address,
+    tokenOut.contract.address,
+    fee,
+    ethers.utils.parseUnits('1', tokenIn.decimals),
+    0,
+  );
+
+  const quoteWithoutSlippageScaled = quoteWithoutSlippage.mul(amount);
+
+  const diff = quoteWithoutSlippageScaled.sub(quoteWithSlippage);
+
+  const denominator = quoteWithoutSlippageScaled
+    .add(quoteWithoutSlippage)
+    .div(2);
+
+  const priceImpact = diff.div(denominator);
 }

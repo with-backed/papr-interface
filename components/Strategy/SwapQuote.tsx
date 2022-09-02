@@ -5,6 +5,7 @@ import { SupportedNetwork } from 'lib/config';
 import { Quoter } from 'lib/contracts';
 import {
   computeEffectiveAPR,
+  computeSlippageForSwap,
   ERC20Token,
   LendingStrategy,
   multiplier,
@@ -30,9 +31,7 @@ export default function SwapQuote({
     useState<string>('coming soon');
   const { jsonRpcProvider, network } = useConfig();
   const getQuote = useCallback(async () => {
-    console.log(amountIn);
     const amount = ethers.utils.parseUnits(amountIn, tokenIn.decimals);
-    console.log(amount);
     const quoter = Quoter(jsonRpcProvider, network as SupportedNetwork);
     const q: ethers.BigNumber = await quoter.callStatic.quoteExactInputSingle(
       tokenIn.contract.address,
@@ -45,6 +44,7 @@ export default function SwapQuote({
     setQuote(
       ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
     );
+    computeSlippageForSwap(q, tokenIn, tokenOut, amount, fee, quoter);
   }, [amountIn, fee, jsonRpcProvider, network, tokenIn, tokenOut]);
 
   return (
