@@ -7,44 +7,36 @@ import {
   computeEffectiveAPR,
   computeSlippageForSwap,
   ERC20Token,
+  getQuoteForSwap,
   LendingStrategy,
   multiplier,
 } from 'lib/strategies';
 import { useCallback, useState } from 'react';
 
 type QuoteProps = {
-  strategy: LendingStrategy;
   tokenIn: ERC20Token;
   tokenOut: ERC20Token;
   fee: ethers.BigNumber;
 };
 
-export default function SwapQuote({
-  strategy,
-  tokenIn,
-  tokenOut,
-  fee,
-}: QuoteProps) {
+export default function SwapQuote({ tokenIn, tokenOut, fee }: QuoteProps) {
   const [amountIn, setAmountIn] = useState<string>('');
   const [quote, setQuote] = useState<string>('');
   const [internalAPRAfter, setInternalAPRAfter] =
     useState<string>('coming soon');
+  const [priceImpact, setPriceImpact] = useState<number>(0.0);
   const { jsonRpcProvider, network } = useConfig();
   const getQuote = useCallback(async () => {
     const amount = ethers.utils.parseUnits(amountIn, tokenIn.decimals);
     const quoter = Quoter(jsonRpcProvider, network as SupportedNetwork);
-    const q: ethers.BigNumber = await quoter.callStatic.quoteExactInputSingle(
-      tokenIn.contract.address,
-      tokenOut.contract.address,
-      fee,
-      amount,
-      0,
-    );
+    const q = await getQuoteForSwap(quoter, amount, tokenIn, tokenOut);
 
     setQuote(
       ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
     );
-    computeSlippageForSwap(q, tokenIn, tokenOut, amount, fee, quoter);
+    setPriceImpact(
+      await computeSlippageForSwap(q, tokenIn, tokenOut, amount, quoter),
+    );
   }, [amountIn, fee, jsonRpcProvider, network, tokenIn, tokenOut]);
 
   return (
@@ -55,7 +47,8 @@ export default function SwapQuote({
         onChange={(e) => setAmountIn(e.target.value.trim())}></input>
       <button onClick={getQuote}> get quote </button>
       <p>
-        {quote} {tokenOut.symbol}
+        {quote} {tokenOut.symbol} <br />
+        {!!quote && <span>price impact: {priceImpact}%</span>}
       </p>
       {!!quote && (
         <p>

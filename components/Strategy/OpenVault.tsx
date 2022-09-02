@@ -1,7 +1,15 @@
+import { TickMath } from '@uniswap/v3-sdk';
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
-import { LendingStrategy, computeLiquidationEstimation } from 'lib/strategies';
+import { SupportedNetwork } from 'lib/config';
+import { Quoter } from 'lib/contracts';
+import {
+  LendingStrategy,
+  computeLiquidationEstimation,
+  getQuoteForSwap,
+  computeSlippageForSwap,
+} from 'lib/strategies';
 import { useCallback, useEffect, useState } from 'react';
 import { ERC721__factory } from 'types/generated/abis';
 import { ILendingStrategy } from 'types/generated/abis/Strategy';
@@ -19,9 +27,14 @@ export default function OpenVault({ strategy }: BorrowProps) {
   const [debt, setDebt] = useState<string>('');
   const [maxDebt, setMaxDebt] = useState<string>('');
   const [collateralTokenId, setCollateralTokenId] = useState<string>('');
+  const [quoteForSwap, setQuoteForSwap] = useState<ethers.BigNumber>(
+    ethers.BigNumber.from(0),
+  );
+  const [priceImpact, setPriceImpact] = useState<number>(0.0);
   const [liquidationDateEstimation, setLiquidationDateEstimation] =
     useState<string>('');
-  const { network } = useConfig();
+  const [swapAmount, setSwapAmount] = useState<string>('');
+  const { network, jsonRpcProvider } = useConfig();
 
   interface OnERC721ReceivedArgsStruct {
     vaultId: ethers.BigNumber;
@@ -49,49 +62,66 @@ export default function OpenVault({ strategy }: BorrowProps) {
     )
   `;
 
-  const create = useCallback(async () => {
-    const request: OnERC721ReceivedArgsStruct = {
-      vaultId: ethers.BigNumber.from(0),
-      vaultNonce: ethers.BigNumber.from(0),
-      mintVaultTo: address!,
-      mintDebtOrProceedsTo: address!,
-      minOut: ethers.BigNumber.from(0),
-      sqrtPriceLimitX96: ethers.BigNumber.from(0),
-      debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
-      oracleInfo: {
-        price: ethers.utils.parseUnits(PRICE.toString(), 18),
-        period: ethers.BigNumber.from(0),
-      },
-      sig: {
-        v: ethers.BigNumber.from(1),
-        r: ethers.utils.formatBytes32String('x'),
-        s: ethers.utils.formatBytes32String('y'),
-      },
-    };
+  const create = useCallback(
+    async (withSwap: boolean, swapAmount: string) => {
+      let q = ethers.BigNumber.from(0);
+      if (withSwap) {
+        q = quoteForSwap;
+      }
+      const tickUpper = strategy.token0IsUnderlying ? 200 : 0;
+      const tickLower = strategy.token0IsUnderlying ? -200 : 0;
 
-    const signerCollateral = ERC721__factory.connect(
-      strategy.collateral.contract.address,
-      signer!,
-    );
+      const request: OnERC721ReceivedArgsStruct = {
+        vaultId: ethers.BigNumber.from(0),
+        vaultNonce: ethers.BigNumber.from(0),
+        mintVaultTo: address!,
+        mintDebtOrProceedsTo: address!,
+        minOut: withSwap ? q : ethers.BigNumber.from(0),
+        sqrtPriceLimitX96: ethers.BigNumber.from(
+          TickMath.getSqrtRatioAtTick(
+            strategy.token0IsUnderlying ? tickUpper - 1 : tickLower - 1,
+          ).toString(),
+        ),
+        debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
+        oracleInfo: {
+          price: ethers.utils.parseUnits(PRICE.toString(), 18),
+          period: ethers.BigNumber.from(0),
+        },
+        sig: {
+          v: ethers.BigNumber.from(1),
+          r: ethers.utils.formatBytes32String('x'),
+          s: ethers.utils.formatBytes32String('y'),
+        },
+      };
 
-    await signerCollateral['safeTransferFrom(address,address,uint256,bytes)'](
-      address!,
-      strategy.contract.address,
-      ethers.BigNumber.from(collateralTokenId),
-      ethers.utils.defaultAbiCoder.encode(
-        [OnERC721ReceivedArgsEncoderString],
-        [request],
-      ),
-    );
-
-    const filter = strategy.contract.filters.OpenVault(null, address, null);
-
-    strategy.contract.once(filter, (id, to, nonce) => {
-      window.location.assign(
-        `/network/${network}/in-kind/strategies/${strategy.contract.address}/vaults/${id}`,
+      const signerCollateral = ERC721__factory.connect(
+        strategy.collateral.contract.address,
+        signer!,
       );
-    });
-  }, [address, collateralTokenId, debt, network, signer, strategy]);
+
+      await signerCollateral['safeTransferFrom(address,address,uint256,bytes)'](
+        address!,
+        strategy.contract.address,
+        ethers.BigNumber.from(collateralTokenId),
+        ethers.utils.defaultAbiCoder.encode(
+          [OnERC721ReceivedArgsEncoderString],
+          [request],
+        ),
+        {
+          gasLimit: ethers.utils.hexValue(3000000),
+        },
+      );
+
+      const filter = strategy.contract.filters.OpenVault(null, address, null);
+
+      strategy.contract.once(filter, (id, to, nonce) => {
+        window.location.assign(
+          `/network/${network}/in-kind/strategies/${strategy.contract.address}/vaults/${id}`,
+        );
+      });
+    },
+    [address, collateralTokenId, debt, network, signer, strategy],
+  );
 
   const handleMaxDebtChanged = useCallback(
     async (value: string) => {
@@ -112,7 +142,48 @@ export default function OpenVault({ strategy }: BorrowProps) {
         ).toString(),
       );
     },
-    [setDebt, maxDebt],
+    [setDebt, maxDebt, swapAmount],
+  );
+
+  const handleSwapAmountChanged = useCallback(
+    async (value: string) => {
+      setSwapAmount(value);
+
+      if (value === '') {
+        setPriceImpact(0);
+        return;
+      }
+
+      const quoter = Quoter(jsonRpcProvider, network as SupportedNetwork);
+      const tokenIn = strategy.token0IsUnderlying
+        ? strategy.token1
+        : strategy.token0;
+      const tokenOut = strategy.token0IsUnderlying
+        ? strategy.token0
+        : strategy.token1;
+      const swapAmountBigNumber = ethers.utils.parseUnits(
+        value,
+        tokenIn.decimals,
+      );
+      const q = await getQuoteForSwap(
+        quoter,
+        swapAmountBigNumber,
+        tokenIn,
+        tokenOut,
+      );
+      setQuoteForSwap(q);
+
+      setPriceImpact(
+        await computeSlippageForSwap(
+          q,
+          tokenIn,
+          tokenOut,
+          swapAmountBigNumber,
+          quoter,
+        ),
+      );
+    },
+    [setSwapAmount, swapAmount, jsonRpcProvider, strategy, network],
   );
 
   const getMaxDebt = useCallback(async () => {
@@ -137,7 +208,30 @@ export default function OpenVault({ strategy }: BorrowProps) {
       <input
         placeholder="debt amount"
         onChange={(e) => handleMaxDebtChanged(e.target.value)}></input>
-      <button onClick={create}> borrow </button>
+      <button onClick={() => create(false, '')}> borrow </button>
+      <br />
+      <input
+        placeholder="collateral token id"
+        onChange={(e) => setCollateralTokenId(e.target.value)}></input>
+      <input
+        placeholder="debt amount"
+        onChange={(e) => handleMaxDebtChanged(e.target.value)}></input>
+      <input
+        placeholder="debt to swap"
+        onChange={(e) => handleSwapAmountChanged(e.target.value)}></input>
+      <button onClick={() => create(true, swapAmount)}> borrow and swap</button>
+      <p>
+        {' '}
+        quote for desired swap{' '}
+        {ethers.utils.formatUnits(
+          quoteForSwap,
+          ethers.BigNumber.from(strategy.token0.decimals),
+        )}{' '}
+        {strategy.token0IsUnderlying
+          ? strategy.token1.symbol
+          : strategy.token0.symbol}{' '}
+      </p>
+      <p>price impact {priceImpact}%</p>
       <p>
         {' '}
         # days before liquidation (estimation): {liquidationDateEstimation}{' '}
