@@ -47,9 +47,9 @@
   border-radius: 4px;
   /* remove default outline when selected */
   outline: none;
+  transition: width 0.1s;
 }
 
 .thumb:hover {
   width: 10px;
-  border: 2px black solid;
 }
