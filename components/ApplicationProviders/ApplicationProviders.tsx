@@ -8,7 +8,6 @@ import { CachedRatesProvider } from 'hooks/useCachedRates/useCachedRates';
 import { CommunityGradientProvider } from 'hooks/useCommunityGradient';
 import { useConfig } from 'hooks/useConfig';
 import { GlobalMessagingProvider } from 'hooks/useGlobalMessages';
-import { HasCollapsedHeaderInfoProvider } from 'hooks/useHasCollapsedHeaderInfo';
 import { TimestampProvider } from 'hooks/useTimestamp/useTimestamp';
 import React, { PropsWithChildren, useMemo } from 'react';
 import { WagmiConfig, chain, createClient, configureChains } from 'wagmi';
@@ -94,11 +93,9 @@ export const ApplicationProviders = ({
           }}>
           <TimestampProvider>
             <CachedRatesProvider>
-              <HasCollapsedHeaderInfoProvider>
-                <CommunityGradientProvider>
-                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-                </CommunityGradientProvider>
-              </HasCollapsedHeaderInfoProvider>
+              <CommunityGradientProvider>
+                <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
+              </CommunityGradientProvider>
             </CachedRatesProvider>
           </TimestampProvider>
         </RainbowKitProvider>
