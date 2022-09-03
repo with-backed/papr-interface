@@ -14,10 +14,7 @@ export async function subgraphUniswapPriceByPool(pool: string) {
     'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-rinkeby',
   );
   const { data, error } = await client
-    .query<SqrtPricesByPoolQuery>(SqrtPricesByPoolDocument, {
-      id: pool,
-      pool: pool,
-    })
+    .query<SqrtPricesByPoolQuery>(SqrtPricesByPoolDocument, { pool })
     .toPromise();
 
   if (error) {
