@@ -117,8 +117,10 @@ export function D3Demo({
     result.unshift([20, parseInt(strategyCreatedAt.toString())] as ChartValue);
     result.push([
       result[result.length - 1][0],
-      timestamp || Date.now() / 1000,
+      timestamp || Math.floor(Date.now() / 1000),
     ] as ChartValue);
+    console.log('marks');
+    console.log(result);
     return result;
   }, [poolSwapData, strategyCreatedAt, token0, token1]);
 
@@ -143,7 +145,6 @@ export function D3Demo({
       network as SupportedNetwork,
     );
     const newNorm = await contract.newNorm();
-    /// sub 5 to prevent divide by 0 errors in APRBips func
     sortedData.push({
       newNorm: newNorm.toString(),
       timestamp: (timestamp || Math.floor(Date.now() / 1000)).toString(),
@@ -154,10 +155,6 @@ export function D3Demo({
   const aprs = useMemo(() => {
     if (sortedNormData) {
       const aprs: ChartValue[] = [];
-      if (sortedNormData.length > 0) {
-        aprs.push([20, parseInt(sortedNormData[0].timestamp)]);
-      }
-
       for (let i = 1; i < sortedNormData.length; ++i) {
         const prev = sortedNormData[i - 1];
         const current = sortedNormData[i];
@@ -170,6 +167,8 @@ export function D3Demo({
           .toNumber();
         aprs.push([apr, parseInt(current.timestamp)] as ChartValue);
       }
+      console.log('norms');
+      console.log(aprs);
 
       return aprs;
     }
@@ -190,9 +189,10 @@ export function D3Demo({
   useEffect(() => {
     getSortedNormData();
 
-    const margin = { top: 10, right: 30, bottom: 30, left: 60 };
+    const margin = { top: 10, right: 50, bottom: 30, left: 60 };
     const width = 500 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+    // TODO dynamically adjust height based on extent of y values
+    const height = 600 - margin.top - margin.bottom;
 
     const svg = attachSVG({ containerId, height, margin, width });
 
