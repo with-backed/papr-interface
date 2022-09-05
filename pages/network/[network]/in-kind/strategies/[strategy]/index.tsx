@@ -18,29 +18,31 @@ import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph
 import {
   PoolByIdQuery,
   SqrtPricesByPoolQuery,
+  SwapsByPoolQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
 import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import {
   subgraphUniswapPoolById,
   subgraphUniswapPriceByPool,
+  subgraphUniswapSwapsByPool,
 } from 'lib/uniswapSubgraph';
 
 export type StrategyPageProps = {
   address: string;
   lendingStrategy: LendingStrategyByIdQuery['lendingStrategy'] | null;
-  poolDayDatas: SqrtPricesByPoolQuery['poolDayDatas'] | null;
+  poolSwapData: SwapsByPoolQuery['swaps'] | null;
   pool: PoolByIdQuery['pool'] | null;
 };
 
 export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
   context,
 ) => {
-  const address = context.params?.strategy as string;
+  const address = (context.params?.strategy as string).toLowerCase();
 
   const subgraphStrategy = await subgraphStrategyByAddress(address);
 
   const [subgraphUniswapPrices, subgraphUniswapPool] = await Promise.all([
-    subgraphUniswapPriceByPool(subgraphStrategy?.lendingStrategy?.poolAddress),
+    subgraphUniswapSwapsByPool(subgraphStrategy?.lendingStrategy?.poolAddress),
     subgraphUniswapPoolById(subgraphStrategy?.lendingStrategy?.poolAddress),
   ]);
 
@@ -48,7 +50,7 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
     props: {
       address: address,
       lendingStrategy: subgraphStrategy?.lendingStrategy || null,
-      poolDayDatas: subgraphUniswapPrices?.poolDayDatas || null,
+      poolSwapData: subgraphUniswapPrices?.swaps || null,
       pool: subgraphUniswapPool?.pool || null,
     },
   };
@@ -59,7 +61,7 @@ const PRICE = 20_000;
 export default function StrategyPage({
   address,
   lendingStrategy: subgraphLendingStrategy,
-  poolDayDatas,
+  poolSwapData,
   pool,
 }: StrategyPageProps) {
   const config = useConfig();
@@ -112,7 +114,7 @@ export default function StrategyPage({
               targetAnnualGrowth={lendingStrategy.targetAnnualGrowth}
               targetGrowthPerPeriod={lendingStrategy.targetGrowthPerPeriod}
               lendingStrategy={subgraphLendingStrategy}
-              poolDayDatas={poolDayDatas}
+              poolSwapData={poolSwapData}
               pool={pool}
             />
           </div>

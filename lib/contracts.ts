@@ -148,3 +148,12 @@ export function Quoter(jsonRpcProvider: string, network: SupportedNetwork) {
     provider,
   );
 }
+
+export function strategyContract(
+  address: string,
+  jsonRpcProvider: string,
+  network: SupportedNetwork,
+) {
+  const provider = makeProvider(jsonRpcProvider, network);
+  return Strategy__factory.connect(address, provider);
+}

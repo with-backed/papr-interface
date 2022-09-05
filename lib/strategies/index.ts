@@ -123,9 +123,10 @@ export function computeEffectiveAPR(
   lastUpdated: ethers.BigNumber,
   multiplier: ethers.BigNumber,
 ) {
+  const delta = now.sub(lastUpdated);
   const currentAPRBIPs = multiplier
     .sub(ONE) // only care about decimals
-    .div(now.sub(lastUpdated)) // how much growth per second
+    .div(delta.eq(0) ? 1 : delta) // how much growth per second
     .mul(SECONDS_IN_A_YEAR) // annualize
     .div(ONE.div(10000)); // convert to BIPs
 
