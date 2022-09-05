@@ -169,7 +169,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
       <input
         placeholder="debt amount"
         onChange={(e) => handleMaxDebtChanged(e.target.value)}></input>
-      <button onClick={() => create(false, '')}> borrow </button>
+      <button onClick={() => create(false)}> borrow </button>
       <br />
       <input
         placeholder="collateral token id"
