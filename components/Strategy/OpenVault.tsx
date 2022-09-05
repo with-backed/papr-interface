@@ -180,7 +180,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
       <input
         placeholder="debt to swap"
         onChange={(e) => setSwapAmount(e.target.value)}></input>
-      <button onClick={() => create(true, swapAmount)}> borrow and swap</button>
+      <button onClick={() => create(true)}> borrow and swap</button>
       {!quoteLoading && (
         <p>
           {' '}
