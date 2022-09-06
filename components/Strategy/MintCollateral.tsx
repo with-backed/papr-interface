@@ -14,9 +14,11 @@ export default function MintCollateral({ token }: MintCollateralProps) {
   const { data: signer } = useSigner();
 
   const getBalance = useCallback(async () => {
-    const b = await token.contract.balanceOf(address!);
-    setBalance(b.toString());
-  }, [address]);
+    if (address) {
+      const b = await token.contract.balanceOf(address);
+      setBalance(b.toString());
+    }
+  }, [address, token]);
 
   const mint = useCallback(async () => {
     if (signer == null || address == null) {
@@ -30,7 +32,7 @@ export default function MintCollateral({ token }: MintCollateralProps) {
     const t = await contract.mint(address);
     t.wait();
     getBalance();
-  }, [address, signer]);
+  }, [address, getBalance, token, signer]);
 
   useEffect(() => {
     getBalance();
@@ -38,8 +40,10 @@ export default function MintCollateral({ token }: MintCollateralProps) {
 
   return (
     <Fieldset legend={`➕ Mint yourself ${token.symbol}`}>
-      <p> your balance: {balance} </p>
-      <button onClick={mint}>mint</button>
+      <p> your balance: {balance || 'not connected'} </p>
+      <button disabled={!address} onClick={mint}>
+        mint
+      </button>
     </Fieldset>
   );
 }

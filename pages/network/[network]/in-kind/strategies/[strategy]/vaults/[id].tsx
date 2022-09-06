@@ -2,6 +2,8 @@ import { TransactionButton } from 'components/Button';
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
+import { SupportedNetwork } from 'lib/config';
+import { makeProvider } from 'lib/contracts';
 import { ONE } from 'lib/strategies/constants';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
 import { GetServerSideProps } from 'next';
@@ -38,8 +40,16 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
   const { replace } = useRouter();
   const [{ data }] = useQuery({
     query: VaultByIdDocument,
-    variables: { id: ethers.BigNumber.from(id).toHexString() },
+    variables: { id },
   });
+
+  const jsonRpcProvider = useMemo(() => {
+    return makeProvider(
+      config.jsonRpcProvider,
+      config.network as SupportedNetwork,
+    );
+  }, [config]);
+
   const { address } = useAccount();
 
   const userIsOwner = useMemo(
@@ -48,16 +58,14 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
   );
 
   const fetchVaultInfo = useCallback(async () => {
-    if (signer) {
-      const i = await getVaultInfo(
-        ethers.BigNumber.from(id),
-        strategy,
-        config,
-        signer,
-      );
-      setVaultInfo(i);
-    }
-  }, [config, id, signer, strategy]);
+    const i = await getVaultInfo(
+      ethers.BigNumber.from(id),
+      strategy,
+      config,
+      signer || jsonRpcProvider,
+    );
+    setVaultInfo(i);
+  }, [config, id, jsonRpcProvider, signer, strategy]);
 
   useEffect(() => {
     fetchVaultInfo();
@@ -128,13 +136,12 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     } else {
       console.error('No vault info, cannot close vault');
     }
-  }, [config.network, data?.vault, replace, strategy, vaultInfo]);
+  }, [config.network, data?.vault, id, replace, strategy, vaultInfo]);
 
   return (
     <div className={styles.column}>
       <a href={`/network/${config.network}/in-kind/strategies/${strategy}`}>
-        {' '}
-        ⬅ strategy{' '}
+        ⬅ strategy
       </a>
       {!!vaultInfo && (
         <>
@@ -145,7 +152,6 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
             {/* Should fetch */}
             <p>max LTV: {maxLTVPercent}%</p>
             <p>
-              {' '}
               current LTV:{' '}
               {((parseFloat(debtPrice) * parseFloat(debtAmount)) /
                 parseFloat(collateralVaulation)) *
@@ -157,7 +163,6 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
               {vaultInfo.liquidationPrice.toString()} underlying
             </p>
             <p>
-              {' '}
               current debt token price: {debtPrice}{' '}
               {vaultInfo.strategy.underlying.symbol}
             </p>

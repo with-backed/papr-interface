@@ -20,7 +20,33 @@ type BorrowProps = {
   strategy: LendingStrategy;
 };
 
+interface OnERC721ReceivedArgsStruct {
+  vaultId: ethers.BigNumber;
+  vaultNonce: ethers.BigNumber;
+  mintVaultTo: string;
+  mintDebtOrProceedsTo: string;
+  minOut: ethers.BigNumber;
+  debt: ethers.BigNumber;
+  sqrtPriceLimitX96: ethers.BigNumber;
+  oracleInfo: ILendingStrategy.OracleInfoStruct;
+  sig: ILendingStrategy.SigStruct;
+}
+
 const PRICE = 20_000;
+
+const OnERC721ReceivedArgsEncoderString = `
+  tuple(
+    uint256 vaultId,
+    uint256 vaultNonce,
+    address mintVaultTo,
+    address mintDebtOrProceedsTo,
+    uint256 minOut,
+    int256 debt,
+    uint160 sqrtPriceLimitX96,
+    tuple(uint128 price, uint8 period) oracleInfo,
+    tuple(uint8 v, bytes32 r, bytes32 s) sig
+  )
+`;
 
 export default function OpenVault({ strategy }: BorrowProps) {
   const { address } = useAccount();
@@ -39,32 +65,6 @@ export default function OpenVault({ strategy }: BorrowProps) {
     priceImpactLoading,
   } = useQuoteWithSlippage(strategy, swapAmount, true);
   const { network } = useConfig();
-
-  interface OnERC721ReceivedArgsStruct {
-    vaultId: ethers.BigNumber;
-    vaultNonce: ethers.BigNumber;
-    mintVaultTo: string;
-    mintDebtOrProceedsTo: string;
-    minOut: ethers.BigNumber;
-    debt: ethers.BigNumber;
-    sqrtPriceLimitX96: ethers.BigNumber;
-    oracleInfo: ILendingStrategy.OracleInfoStruct;
-    sig: ILendingStrategy.SigStruct;
-  }
-
-  const OnERC721ReceivedArgsEncoderString = `
-    tuple(
-      uint256 vaultId,
-      uint256 vaultNonce,
-      address mintVaultTo,
-      address mintDebtOrProceedsTo,
-      uint256 minOut,
-      int256 debt,
-      uint160 sqrtPriceLimitX96,
-      tuple(uint128 price, uint8 period) oracleInfo,
-      tuple(uint8 v, bytes32 r, bytes32 s) sig
-    )
-  `;
 
   const create = useCallback(
     async (withSwap: boolean) => {
@@ -144,7 +144,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
         ).toString(),
       );
     },
-    [setDebt, maxDebt],
+    [maxDebt, setDebt, strategy],
   );
 
   const getMaxDebt = useCallback(async () => {
@@ -169,7 +169,9 @@ export default function OpenVault({ strategy }: BorrowProps) {
       <input
         placeholder="debt amount"
         onChange={(e) => handleMaxDebtChanged(e.target.value)}></input>
-      <button onClick={() => create(false)}> borrow </button>
+      <button disabled={!address} onClick={() => create(false)}>
+        borrow
+      </button>
       <br />
       <input
         placeholder="collateral token id"
