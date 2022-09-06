@@ -3,14 +3,7 @@ import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
-import { SupportedNetwork } from 'lib/config';
-import { Quoter } from 'lib/contracts';
-import {
-  LendingStrategy,
-  computeLiquidationEstimation,
-  getQuoteForSwap,
-  computeSlippageForSwap,
-} from 'lib/strategies';
+import { LendingStrategy, computeLiquidationEstimation } from 'lib/strategies';
 import { useCallback, useEffect, useState } from 'react';
 import { ERC721__factory } from 'types/generated/abis';
 import { ILendingStrategy } from 'types/generated/abis/Strategy';
