@@ -1,5 +1,6 @@
 import { TickMath } from '@uniswap/v3-sdk';
 import { Fieldset } from 'components/Fieldset';
+import { Slider } from 'components/Slider';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
@@ -118,7 +119,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
     [address, collateralTokenId, debt, network, signer, strategy, quoteForSwap],
   );
 
-  const handleMaxDebtChanged = useCallback(
+  const handleDebtAmountChanged = useCallback(
     async (value: string) => {
       setDebt(value);
 
@@ -156,6 +157,11 @@ export default function OpenVault({ strategy }: BorrowProps) {
   return (
     <Fieldset legend="🏦 Borrow">
       <p> max debt: {maxDebt}</p>
+      <Slider
+        min={0}
+        max={parseFloat(maxDebt)}
+        onChange={(val, _index) => handleDebtAmountChanged(val.toString())}
+      />
       <input
         placeholder="collateral token id"
         onChange={(e) => setCollateralTokenId(e.target.value)}></input>
@@ -171,7 +177,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
         onChange={(e) => setCollateralTokenId(e.target.value)}></input>
       <input
         placeholder="debt amount"
-        onChange={(e) => handleMaxDebtChanged(e.target.value)}></input>
+        onChange={(e) => handleDebtAmountChanged(e.target.value)}></input>
       <input
         placeholder="debt to swap"
         onChange={(e) => setSwapAmount(e.target.value)}></input>
