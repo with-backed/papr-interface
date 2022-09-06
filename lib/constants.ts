@@ -27,3 +27,6 @@ export const COMMUNITY_NFT_CONTRACT_ADDRESS =
   '0x63a9addF2327A0F4B71BcF9BFa757E333e1B7177';
 export const COMMUNITY_NFT_SUBGRAPH =
   'https://api.thegraph.com/subgraphs/name/with-backed/backed-community-nft';
+
+export const OPENGRAPH_DEFAULT_DESCRIPTION =
+  'Welcome to Backed protocol - NFT Lending. View existing loans, lend against NFTs, or propose loan terms on your own NFTs.';

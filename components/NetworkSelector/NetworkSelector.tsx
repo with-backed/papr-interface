@@ -87,7 +87,7 @@ export const NetworkSelector = ({ isErrorPage }: NetworkSelectorProps) => {
       <Select
         options={options}
         onChange={onChange}
-        color="clickable"
+        color="darker"
         value={defaultValue}
       />
     </div>

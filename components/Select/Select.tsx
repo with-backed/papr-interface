@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import ReactSelect, { components, GroupBase, Props } from 'react-select';
 
-type SelectColor = 'dark' | 'light' | 'clickable';
+type SelectColor = 'dark' | 'light' | 'clickable' | 'darker';
 
 interface SelectProps<
   Option,
@@ -18,6 +18,7 @@ const Input: typeof components.Input = (props) => {
 const backgrounds: { [key in SelectColor]: string } = {
   light: 'linear-gradient(180deg, var(--neutral-10) 5%, var(--neutral-5) 100%)',
   dark: 'var(--highlight-active-10)',
+  darker: 'var(--background-lighter-dark)',
   clickable:
     'linear-gradient( 180deg, var(--highlight-clickable-5) 50%, var(--highlight-clickable-7) 100%)',
 };
@@ -102,9 +103,7 @@ export function Select<
         singleValue: (provided) => ({
           ...provided,
           color:
-            color === 'clickable'
-              ? 'var(--highlight-clickable-100)'
-              : provided.color,
+            color === 'clickable' ? 'var(--highlight-clickable-100)' : 'white',
         }),
       }}
       defaultValue={defaultValue}

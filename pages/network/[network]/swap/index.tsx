@@ -5,7 +5,7 @@ import { SupportedNetwork, validateNetwork } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import capitalize from 'lodash/capitalize';
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async (
+export const getServerSideProps: GetServerSideProps<SwapProps> = async (
   context,
 ) => {
   try {
@@ -25,13 +25,13 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
   }
 };
 
-type HomeProps = {
+type SwapProps = {
   network: SupportedNetwork;
 };
-export default function Home({ network }: HomeProps) {
+export default function Swap({ network }: SwapProps) {
   return (
     <>
-      <OpenGraph title={`Backed | ${capitalize(network)} | Home`} />
+      <OpenGraph title={`Backed | ${capitalize(network)} | Swap`} />
       <h1>under construction</h1>
     </>
   );

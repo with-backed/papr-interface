@@ -1,9 +1,14 @@
 import { useConfig } from 'hooks/useConfig';
+import { SupportedNetwork } from 'lib/config';
+import {
+  BUNNY_IMG_URL_MAP,
+  OPENGRAPH_DEFAULT_DESCRIPTION,
+} from 'lib/constants';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 type OpenGraphProps = {
-  imageUrl: string;
+  imageUrl?: string;
   title: string;
   type?: 'website' | 'profile';
   description?: string;
@@ -13,10 +18,11 @@ export function OpenGraph({
   imageUrl,
   title,
   type = 'website',
-  description,
+  description = OPENGRAPH_DEFAULT_DESCRIPTION,
 }: OpenGraphProps) {
-  const { siteUrl } = useConfig();
+  const { siteUrl, network } = useConfig();
   const { pathname } = useRouter();
+  let img = imageUrl || BUNNY_IMG_URL_MAP[network as SupportedNetwork];
   return (
     <Head>
       <meta property="og:title" content={title} />
@@ -25,8 +31,8 @@ export function OpenGraph({
       <meta property="og:type" content={type} />
       <meta property="og:url" content={siteUrl + pathname} />
       <meta property="twitter:url" content={siteUrl + pathname} />
-      <meta property="og:image" content={imageUrl} />
-      <meta property="twitter:image" content={imageUrl} />
+      <meta property="og:image" content={img} />
+      <meta property="twitter:image" content={img} />
       {!!description && (
         <>
           <meta property="og:description" content={description} />

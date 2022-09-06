@@ -17,14 +17,13 @@ type Page = {
   isNetworkSpecialCase?: boolean;
 };
 const prodPages: Page[] = [
-  { name: 'Lend', route: '' },
-  { name: 'Borrow', route: 'loans/create' },
-  { name: 'About', route: 'about', isNetworkSpecialCase: true },
-];
-
-const stagingPages: Page[] = [
+  { name: 'Borrow', route: 'borrow' },
+  { name: 'Swap', route: 'swap' },
+  { name: 'LP', route: 'lp' },
   { name: 'Community', route: 'community', isNetworkSpecialCase: true },
 ];
+
+const stagingPages: Page[] = [];
 
 function isActiveRoute(activeRoute: string, candidate: string) {
   if (candidate.length === 0) {
