@@ -16,7 +16,7 @@ import {
   NormalizationUpdatesByStrategyQuery,
 } from 'types/generated/graphql/inKindSubgraph';
 import { ethers } from 'ethers';
-import { computeEffectiveAPR } from 'lib/strategies';
+import { computeEffictiveDPR } from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
 import { humanizedTimestamp } from 'lib/duration';
 import {
@@ -26,14 +26,12 @@ import {
 } from 'types/generated/graphql/uniswapSubgraph';
 import { Price, Token } from '@uniswap/sdk-core';
 import { useConfig } from 'hooks/useConfig';
-import { SECONDS_IN_A_YEAR } from 'lib/constants';
+import { Q192, SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
 import { attachSVG, drawLine, drawDashedLine } from 'lib/d3';
 import { strategyContract } from 'lib/contracts';
 import { SupportedNetwork } from 'lib/config';
 import { useTimestamp } from 'hooks/useTimestamp';
 
-const Q96 = ethers.BigNumber.from(2).pow(96);
-const Q192 = Q96.pow(2);
 const containerId = '#d3demo';
 
 type ChartValue = [number, number];
@@ -114,7 +112,13 @@ export function D3Demo({
         return [mark, parseInt(timestamp)];
       },
     );
-    result.unshift([20, parseInt(strategyCreatedAt.toString())] as ChartValue);
+    if (targets.length > 0) {
+      result.unshift([
+        targets[0][0],
+        parseInt(strategyCreatedAt.toString()),
+      ] as ChartValue);
+    }
+
     result.push([
       result[result.length - 1][0],
       timestamp || Math.floor(Date.now() / 1000),
@@ -154,14 +158,14 @@ export function D3Demo({
     if (sortedNormData) {
       const aprs: ChartValue[] = [];
 
-      if (sortedNormData.length > 0) {
-        aprs.push([20, parseInt(sortedNormData[0].timestamp)]);
+      if (sortedNormData.length > 0 && targets.length > 0) {
+        aprs.push([targets[0][0], parseInt(sortedNormData[0].timestamp)]);
       }
 
       for (let i = 1; i < sortedNormData.length; ++i) {
         const prev = sortedNormData[i - 1];
         const current = sortedNormData[i];
-        const apr = computeEffectiveAPR(
+        const apr = computeEffictiveDPR(
           ethers.BigNumber.from(current.timestamp),
           ethers.BigNumber.from(prev.timestamp),
           ethers.BigNumber.from(current.newNorm).mul(ONE).div(prev.newNorm),
@@ -178,7 +182,10 @@ export function D3Demo({
 
   const targets = useMemo(() => {
     if (sortedNormData) {
-      const target = targetAnnualGrowth.toNumber() / 100;
+      const target =
+        targetAnnualGrowth.toNumber() /
+        (SECONDS_IN_A_YEAR / SECONDS_IN_A_DAY) /
+        100;
       return sortedNormData.map((d) => [
         target,
         parseInt(d.timestamp),
@@ -195,7 +202,7 @@ export function D3Demo({
     const margin = { top: 10, right: 50, bottom: 30, left: 60 };
     const width = 500 - margin.left - margin.right;
     // TODO dynamically adjust height based on extent of y values
-    const height = 600 - margin.top - margin.bottom;
+    const height = 1000 - margin.top - margin.bottom;
 
     const svg = attachSVG({ containerId, height, margin, width });
 

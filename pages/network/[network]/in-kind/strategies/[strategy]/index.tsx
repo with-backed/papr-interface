@@ -26,6 +26,7 @@ import {
   subgraphUniswapPriceByPool,
   subgraphUniswapSwapsByPool,
 } from 'lib/uniswapSubgraph';
+import { strategyPricesData } from 'lib/strategies/charts';
 
 export type StrategyPageProps = {
   address: string;
@@ -45,6 +46,16 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
     subgraphUniswapSwapsByPool(subgraphStrategy?.lendingStrategy?.poolAddress),
     subgraphUniswapPoolById(subgraphStrategy?.lendingStrategy?.poolAddress),
   ]);
+  if (
+    subgraphStrategy &&
+    subgraphStrategy.lendingStrategy != undefined &&
+    subgraphUniswapPool
+  ) {
+    const x = await strategyPricesData(
+      subgraphStrategy.lendingStrategy,
+      subgraphUniswapPool.pool,
+    );
+  }
 
   return {
     props: {
@@ -99,14 +110,14 @@ export default function StrategyPage({
           </div>
           <div className={styles.column}>
             <AssociatedVaults strategy={address} />
-            <D3Demo
+            {/* <D3Demo
               strategy={address}
               targetAnnualGrowth={lendingStrategy.targetAnnualGrowth}
               targetGrowthPerPeriod={lendingStrategy.targetGrowthPerPeriod}
               lendingStrategy={subgraphLendingStrategy}
               poolSwapData={poolSwapData}
               pool={pool}
-            />
+            /> */}
           </div>
         </div>
       ) : (

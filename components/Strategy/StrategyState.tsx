@@ -65,14 +65,14 @@ export default function StrategyState({
         Uniswap Exchange Rate: 1 dt = {debtPrice} {strategy.underlying.symbol}
       </p>
       {/* <p>Multiplier: {strategyMultiplier}</p> */}
-      <p>
+      {/* <p>
         Strategy&apos;s Current APR:{' '}
         {parseFloat(strategy.currentAPRBIPs.toString()) / 100} %
       </p>
       <p>
         Strategy&apos;s Target APR:{' '}
         {parseFloat(strategy.targetAnnualGrowth.toString()) / 100} %
-      </p>
+      </p> */}
     </Fieldset>
   );
 }
