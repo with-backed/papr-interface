@@ -8,6 +8,8 @@ import {
   ERC20__factory,
   ERC721,
   ERC721__factory,
+  IQuoter,
+  IUniswapV3Pool,
   IUniswapV3Pool__factory,
   Strategy,
   Strategy__factory,
@@ -160,6 +162,22 @@ export async function multiplier(
   return deviationMultiplier.mul(targetGrowth).div(ONE);
 }
 
+export async function getQuoteForSwap(
+  quoter: IQuoter,
+  amount: ethers.BigNumber,
+  tokenIn: ERC20Token,
+  tokenOut: ERC20Token,
+) {
+  const q = await quoter.callStatic.quoteExactInputSingle(
+    tokenIn.contract.address,
+    tokenOut.contract.address,
+    ethers.BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
+    amount,
+    0,
+  );
+  return q;
+}
+
 export async function computeLiquidationEstimation(
   debt: ethers.BigNumber,
   max: ethers.BigNumber,
@@ -196,4 +214,46 @@ export async function computeLiquidationEstimation(
   const result = dayjs.duration({ seconds: period });
 
   return result.asDays();
+}
+
+export async function computeSlippageForSwap(
+  quoteWithSlippage: ethers.BigNumber,
+  tokenIn: ERC20Token,
+  tokenOut: ERC20Token,
+  amount: ethers.BigNumber,
+  quoter: IQuoter,
+) {
+  const quoteWithoutSlippage = await quoter.callStatic.quoteExactInputSingle(
+    tokenIn.contract.address,
+    tokenOut.contract.address,
+    ethers.BigNumber.from(10).pow(4),
+    ethers.utils.parseUnits('1', tokenIn.decimals),
+    0,
+  );
+
+  const quoteWithSlippageFloat = parseFloat(
+    ethers.utils.formatUnits(
+      quoteWithSlippage,
+      ethers.BigNumber.from(tokenOut.decimals),
+    ),
+  );
+  const quoteWithoutSlippageFloat = parseFloat(
+    ethers.utils.formatUnits(
+      quoteWithoutSlippage,
+      ethers.BigNumber.from(tokenOut.decimals),
+    ),
+  );
+
+  // since quoteWithoutSlippage was 1 unit, scale it up to what it would have been had we tried to quote amount
+  const quoteWithoutSlippageScaled =
+    quoteWithoutSlippageFloat *
+    parseFloat(
+      ethers.utils.formatUnits(amount, ethers.BigNumber.from(tokenIn.decimals)),
+    );
+
+  const priceImpact =
+    (quoteWithoutSlippageScaled - quoteWithSlippageFloat) /
+    ((quoteWithoutSlippageScaled + quoteWithSlippageFloat) / 2);
+
+  return priceImpact * 100;
 }

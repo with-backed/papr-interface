@@ -1,11 +1,14 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
+import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
 import { SupportedNetwork } from 'lib/config';
 import { Quoter } from 'lib/contracts';
 import {
   computeEffectiveAPR,
+  computeSlippageForSwap,
   ERC20Token,
+  getQuoteForSwap,
   LendingStrategy,
   multiplier,
 } from 'lib/strategies';
@@ -13,39 +16,19 @@ import { useCallback, useState } from 'react';
 
 type QuoteProps = {
   strategy: LendingStrategy;
-  tokenIn: ERC20Token;
-  tokenOut: ERC20Token;
-  fee: ethers.BigNumber;
+  swapForUnderlying: boolean;
 };
 
-export default function SwapQuote({
-  strategy,
-  tokenIn,
-  tokenOut,
-  fee,
-}: QuoteProps) {
+export default function SwapQuote({ strategy, swapForUnderlying }: QuoteProps) {
   const [amountIn, setAmountIn] = useState<string>('');
-  const [quote, setQuote] = useState<string>('');
+  const { quoteForSwap, priceImpact, tokenIn, tokenOut } = useQuoteWithSlippage(
+    strategy,
+    amountIn,
+    swapForUnderlying,
+  );
   const [internalAPRAfter, setInternalAPRAfter] =
     useState<string>('coming soon');
   const { jsonRpcProvider, network } = useConfig();
-  const getQuote = useCallback(async () => {
-    console.log(amountIn);
-    const amount = ethers.utils.parseUnits(amountIn, tokenIn.decimals);
-    console.log(amount);
-    const quoter = Quoter(jsonRpcProvider, network as SupportedNetwork);
-    const q: ethers.BigNumber = await quoter.callStatic.quoteExactInputSingle(
-      tokenIn.contract.address,
-      tokenOut.contract.address,
-      fee,
-      amount,
-      0,
-    );
-
-    setQuote(
-      ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
-    );
-  }, [amountIn, fee, jsonRpcProvider, network, tokenIn, tokenOut]);
 
   return (
     <Fieldset legend={`💱 ${tokenIn.symbol} ➡ ${tokenOut.symbol}`}>
@@ -53,11 +36,11 @@ export default function SwapQuote({
         placeholder={`Enter ${tokenIn.symbol} amount`}
         value={amountIn}
         onChange={(e) => setAmountIn(e.target.value.trim())}></input>
-      <button onClick={getQuote}> get quote </button>
       <p>
-        {quote} {tokenOut.symbol}
+        {quoteForSwap} {tokenOut.symbol} <br />
+        {!!quoteForSwap && <span>price impact: {priceImpact}%</span>}
       </p>
-      {!!quote && (
+      {!!quoteForSwap && (
         <p>
           Trade on
           <a
