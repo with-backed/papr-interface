@@ -1,0 +1,39 @@
+.slider {
+  width: 498px;
+  height: 36px;
+  margin: 1rem auto;
+  background-image: url('../../public/slider-tile-dim.svg');
+  cursor: pointer;
+}
+
+.track {
+  height: 36px;
+  background-image: url('../../public/slider-tile-bright.svg');
+}
+
+/* The track comes in 2 parts. This selects everything _but_ the first element
+   with a track classname (i.e., it just selects the second part) and dims it.
+   This allows us to keep a consistent checkerboard background with 2 different
+   colors. */
+.track ~ .track {
+  background-image: none;
+}
+
+.thumb {
+  /*color for the thumb */
+  background: var(--greentext);
+  /* shape of the thumb: circle */
+  width: 8px;
+  height: 46px;
+  margin-top: -5px;
+  border: 2px white solid;
+  border-radius: 4px;
+  /* remove default outline when selected */
+  outline: none;
+  transition: outline 0.1s;
+}
+
+.thumb:hover {
+  outline: 2px solid white;
+  border: 2px var(--greentext) solid;
+}
