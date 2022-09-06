@@ -1,18 +1,9 @@
 import { Fieldset } from 'components/Fieldset';
-import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
-import { SupportedNetwork } from 'lib/config';
-import { Quoter } from 'lib/contracts';
-import {
-  computeEffectiveAPR,
-  computeSlippageForSwap,
-  ERC20Token,
-  getQuoteForSwap,
-  LendingStrategy,
-  multiplier,
-} from 'lib/strategies';
-import { useCallback, useState } from 'react';
+import { LendingStrategy } from 'lib/strategies';
+import { useState } from 'react';
+import { useAccount } from 'wagmi';
 
 type QuoteProps = {
   strategy: LendingStrategy;
@@ -20,6 +11,7 @@ type QuoteProps = {
 };
 
 export default function SwapQuote({ strategy, swapForUnderlying }: QuoteProps) {
+  const { address } = useAccount();
   const [amountIn, setAmountIn] = useState<string>('');
   const { quoteForSwap, priceImpact, tokenIn, tokenOut } = useQuoteWithSlippage(
     strategy,
@@ -28,11 +20,11 @@ export default function SwapQuote({ strategy, swapForUnderlying }: QuoteProps) {
   );
   const [internalAPRAfter, setInternalAPRAfter] =
     useState<string>('coming soon');
-  const { jsonRpcProvider, network } = useConfig();
 
   return (
     <Fieldset legend={`💱 ${tokenIn.symbol} ➡ ${tokenOut.symbol}`}>
       <input
+        disabled={!address}
         placeholder={`Enter ${tokenIn.symbol} amount`}
         value={amountIn}
         onChange={(e) => setAmountIn(e.target.value.trim())}></input>

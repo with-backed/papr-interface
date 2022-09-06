@@ -16,9 +16,11 @@ export default function MintERC20({ token }: TokenInfoProps) {
   const { data: signer } = useSigner();
 
   const getBalance = useCallback(async () => {
-    const b = await token.contract.balanceOf(address!);
-    setBalance(ethers.utils.formatUnits(b, token.decimals));
-  }, [address]);
+    if (address) {
+      const b = await token.contract.balanceOf(address);
+      setBalance(ethers.utils.formatUnits(b, token.decimals));
+    }
+  }, [address, token]);
 
   const mint = useCallback(async () => {
     if (signer == null || address == null) {
@@ -36,7 +38,7 @@ export default function MintERC20({ token }: TokenInfoProps) {
     );
     t.wait();
     getBalance();
-  }, [address, signer, value]);
+  }, [address, getBalance, token, signer, value]);
 
   useEffect(() => {
     getBalance();
@@ -44,11 +46,13 @@ export default function MintERC20({ token }: TokenInfoProps) {
 
   return (
     <Fieldset legend={`🪙 Mint yourself ${token.symbol}`}>
-      <p> your balance: {balance} </p>
+      <p> your balance: {balance || 'not connected'} </p>
       <input
         placeholder={'amount'}
         onChange={(e) => setValue(e.target.value)}></input>
-      <button onClick={mint}>mint</button>
+      <button disabled={!address} onClick={mint}>
+        mint
+      </button>
     </Fieldset>
   );
 }

@@ -16,14 +16,17 @@ export async function getVaultInfo(
   id: ethers.BigNumber,
   strategyAddress: string,
   config: Config,
-  signer: ethers.Signer,
+  signerOrProvider: ethers.Signer | ethers.providers.Provider,
 ): Promise<Vault> {
-  const strategyContract = Strategy__factory.connect(strategyAddress, signer);
+  const strategyContract = Strategy__factory.connect(
+    strategyAddress,
+    signerOrProvider,
+  );
   const { debt, price } = await strategyContract.vaultInfo(id.toHexString());
   const strategy = await populateLendingStrategy(
     strategyAddress,
     config,
-    signer,
+    signerOrProvider,
   );
 
   const maxLTV = strategy.maxLTV;
