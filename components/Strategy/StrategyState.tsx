@@ -1,7 +1,11 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { LendingStrategy } from 'lib/strategies';
 import { StrategyPricesData } from 'lib/strategies/charts';
+import {
+  getDebtTokenMarketPrice,
+  getDebtTokenStrategyPrice,
+  LendingStrategy,
+} from 'lib/strategies';
 import { ONE } from 'lib/strategies/constants';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
@@ -23,7 +27,7 @@ export default function StrategyState({
   }, [strategy]);
 
   const updateStrategyNormalization = useCallback(async () => {
-    const norm = await strategy.contract.newNorm();
+    const norm = await getDebtTokenStrategyPrice(strategy);
     setStrategyNormalization(ethers.utils.formatEther(norm));
   }, [strategy]);
 
@@ -37,12 +41,9 @@ export default function StrategyState({
   }, [strategy]);
 
   const debtPrice = useMemo(() => {
-    if (strategy == null) {
-      return '';
-    }
-    return strategy.token0IsUnderlying
-      ? strategy.pool.token1Price.toFixed()
-      : strategy.pool.token0Price.toFixed();
+    const price = getDebtTokenMarketPrice(strategy);
+    if (!price) return '';
+    return price.toFixed();
   }, [strategy]);
 
   useEffect(() => {

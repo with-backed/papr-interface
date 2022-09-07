@@ -33,6 +33,19 @@
   transition: outline 0.1s;
 }
 
+.thumb > div {
+  color: var(--greentext);
+  position: relative;
+  bottom: 50px;
+  left: -44px;
+  width: 100px;
+}
+
+.thumb > div p {
+  margin: 0;
+  text-align: center;
+}
+
 .thumb:hover {
   outline: 2px solid white;
   border: 2px var(--greentext) solid;

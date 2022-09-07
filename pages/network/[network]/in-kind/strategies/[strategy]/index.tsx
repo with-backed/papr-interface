@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import MintERC20 from 'components/Strategy/MintERC20';
 import MintCollateral from 'components/Strategy/MintCollateral';
-import OpenVault from 'components/Strategy/OpenVault';
+import OpenVault from 'components/Strategy/OpenVault/OpenVault';
 import PoolState from 'components/Strategy/PoolState';
 import SwapQuote from 'components/Strategy/SwapQuote';
 import StrategyState from 'components/Strategy/StrategyState';
