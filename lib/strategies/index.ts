@@ -23,6 +23,8 @@ import { ChartValue } from 'lib/d3';
 
 dayjs.extend(duration);
 
+// TODO this is mostly redudant to the graph info,
+// probably just use the graph is possible
 export type LendingStrategy = {
   contract: Strategy;
   pool: Pool;
@@ -33,12 +35,6 @@ export type LendingStrategy = {
   collateral: ERC721Token;
   maxLTVPercent: number;
   targetAnnualGrowthPercent: number;
-  index: number;
-  mark: number;
-  norm: number;
-  // indexDPRValues: ChartValue[];
-  // markDPRValues: ChartValue[];
-  // normDPRValues: ChartValue[];
 };
 
 export type ERC20Token = {
@@ -111,9 +107,6 @@ export async function populateLendingStrategy(
     maxLTVPercent: convertONEScaledPercent(await contract.maxLTV(), 2),
     targetAnnualGrowthPercent: convertONEScaledPercent(targetAnnualGrowth, 2),
     token0IsUnderlying: token0.contract.address == underlying.contract.address,
-    index: convertOneScaledValue(await contract.index(), 4),
-    mark: convertOneScaledValue(await contract.markTwapSinceLastUpdate(), 4),
-    norm: convertOneScaledValue(await contract.newNorm(), 4),
   };
 }
 
@@ -155,19 +148,19 @@ export function computeEffectiveAPR(
   return currentAPRBIPs;
 }
 
-export function computeEffictiveDPR(
+export function computeEffectiveDPR(
   now: ethers.BigNumber,
   lastUpdated: ethers.BigNumber,
   multiplier: ethers.BigNumber,
+  decimals = 4,
 ) {
   const delta = now.sub(lastUpdated);
-  const currentAPRBIPs = multiplier
+  const dpr = multiplier
     .sub(ONE) // only care about decimals
     .div(delta.eq(0) ? 1 : delta) // how much growth per second
-    .mul(SECONDS_IN_A_DAY) // annualize
-    .div(ONE.div(10000)); // convert to BIPs
+    .mul(SECONDS_IN_A_DAY); // compute for one day
 
-  return currentAPRBIPs;
+  return convertONEScaledPercent(dpr, decimals);
 }
 
 // TODO(adamgobes): figure out how to do powWad locally in JS
