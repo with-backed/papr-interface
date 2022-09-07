@@ -29,7 +29,6 @@ interface OnERC721ReceivedArgsStruct {
   sig: ILendingStrategy.SigStruct;
 }
 
-const PRICE = 20_000;
 const debounce = (func: any, wait: number) => {
   let timeout: any;
 
