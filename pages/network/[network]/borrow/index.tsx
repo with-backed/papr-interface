@@ -34,7 +34,6 @@ export default function Borrow({ network }: BorrowProps) {
     <>
       <OpenGraph title={`Backed | ${capitalize(network)} | Borrow`} />
       <h1>under construction</h1>
-      <Slider />
     </>
   );
 }
