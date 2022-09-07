@@ -83,7 +83,7 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     if (vaultInfo == null) {
       return '';
     }
-    return vaultInfo.strategy.maxLTV.div(ONE.div(100)).toNumber();
+    return vaultInfo.strategy.maxLTVPercent;
   }, [vaultInfo]);
 
   const debtAmount = useMemo(() => {
