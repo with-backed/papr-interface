@@ -74,6 +74,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
   } = useQuoteWithSlippage(strategy, debt, true);
   const { network } = useConfig();
   const [showMath, setShowMath] = useState<boolean>(false);
+  const [hideMaxLabel, setHideMaxLabel] = useState<boolean>(false);
 
   const create = useCallback(
     async (withSwap: boolean) => {
@@ -170,62 +171,78 @@ export default function OpenVault({ strategy }: BorrowProps) {
 
   return (
     <Fieldset legend="🏦 Set Loan Amount">
-      <div className={styles.sliderWrapper}>
-        <Slider
-          min={0}
-          max={parseFloat(maxDebt)}
-          onChange={(val, _index) => handleDebtAmountChanged(val.toString())}
-          renderThumb={(props, state) => (
-            <div {...props}>
-              <div>
-                <p>Loan Amount</p>
-                <p>
-                  {((state.valueNow / parseFloat(maxDebt)) * maxLTV).toFixed(2)}
-                  % LTV
-                </p>
-              </div>
-            </div>
-          )}
-        />
-        <p>Max Loan {maxLTV.toString()}% LTV</p>
-      </div>
+      <div className={styles.borrowComponentWrapper}>
+        <div className={styles.sliderWrapper}>
+          <Slider
+            min={0}
+            max={parseFloat(maxDebt)}
+            onChange={(val, _index) => handleDebtAmountChanged(val.toString())}
+            renderThumb={(props, state) => {
+              const currentLTV =
+                (state.valueNow / parseFloat(maxDebt)) * maxLTV;
 
-      <div className={styles.borrowInput}>
-        <div className={styles.underlyingInput}>
-          <div>{quoteForSwap}</div>
-          <div>{tokenOut.symbol}</div>
-        </div>
-        <div className={styles.showMath} onClick={() => setShowMath(!showMath)}>
-          Show Math
-        </div>
-
-        <div className={styles.borrowButton} onClick={() => create(false)}>
-          Borrow
-        </div>
-      </div>
-
-      <div className={styles.tradeDetails}>
-        <div>{!priceImpactLoading && <p>Price impact: {priceImpact}%</p>}</div>
-        <div>
-          <p>
-            {' '}
-            # days before liquidation (estimation): {liquidationDateEstimation}
+              if (currentLTV >= 38) {
+                setHideMaxLabel(true);
+              } else {
+                setHideMaxLabel(false);
+              }
+              return (
+                <div {...props}>
+                  <div>
+                    <p>Loan Amount</p>
+                    <p>{currentLTV.toFixed(2)}% LTV</p>
+                  </div>
+                </div>
+              );
+            }}
+          />
+          <p className={hideMaxLabel ? styles.hidden : ''}>
+            Max Loan {maxLTV.toString()}% LTV
           </p>
         </div>
-        <input
-          placeholder="collateral token id"
-          onChange={(e) => setCollateralTokenId(e.target.value)}></input>
-      </div>
 
-      <VaultMath
-        strategy={strategy}
-        inputtedLTV={(
-          (parseFloat(debt) / parseFloat(maxDebt)) *
-          maxLTV
-        ).toFixed(2)}
-        quoteForSwap={quoteForSwap}
-        showMath={showMath}
-      />
+        <div className={styles.borrowInput}>
+          <div className={styles.underlyingInput}>
+            <div>{quoteForSwap}</div>
+            <div>{tokenOut.symbol}</div>
+          </div>
+          <div
+            className={styles.showMath}
+            onClick={() => setShowMath(!showMath)}>
+            Show Math
+          </div>
+
+          <div className={styles.borrowButton} onClick={() => create(false)}>
+            Borrow
+          </div>
+        </div>
+
+        <div className={styles.tradeDetails}>
+          <div>
+            {!priceImpactLoading && <p>Price impact: {priceImpact}%</p>}
+          </div>
+          <div>
+            <p>
+              {' '}
+              # days before liquidation (estimation):{' '}
+              {liquidationDateEstimation}
+            </p>
+          </div>
+          <input
+            placeholder="collateral token id"
+            onChange={(e) => setCollateralTokenId(e.target.value)}></input>
+        </div>
+
+        <VaultMath
+          strategy={strategy}
+          inputtedLTV={(
+            (parseFloat(debt) / parseFloat(maxDebt)) *
+            maxLTV
+          ).toFixed(2)}
+          quoteForSwap={quoteForSwap}
+          showMath={showMath}
+        />
+      </div>
     </Fieldset>
   );
 }

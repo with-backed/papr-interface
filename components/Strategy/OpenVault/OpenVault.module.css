@@ -1,5 +1,8 @@
-.sliderWrapper {
+.borrowComponentWrapper {
     padding: 0 var(--padding-container);
+}
+
+.sliderWrapper {
     margin-top: 50px;
 }
 
@@ -88,4 +91,8 @@
 
 .even {
     background-color: white;
+}
+
+.hidden {
+    visibility: hidden;
 }
