@@ -102,13 +102,7 @@ export default function StrategyPage({
           </div>
           <div className={styles.column}>
             <AssociatedVaults strategy={address} />
-            {pricesData == null ? (
-              ''
-            ) : (
-              <div>
-                <D3Demo pricesData={pricesData} />
-              </div>
-            )}
+            <D3Demo pricesData={pricesData} />
           </div>
         </div>
       ) : (
