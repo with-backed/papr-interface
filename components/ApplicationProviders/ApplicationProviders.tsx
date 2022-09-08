@@ -23,7 +23,7 @@ const prodChains = [chain.mainnet, chain.polygon, chain.optimism];
 const CHAINS =
   process.env.NEXT_PUBLIC_ENV === 'production'
     ? prodChains
-    : [...prodChains, chain.rinkeby];
+    : [...prodChains, chain.goerli];
 
 const Disclaimer: DisclaimerComponent = ({ Text, Link }) => (
   <Text>

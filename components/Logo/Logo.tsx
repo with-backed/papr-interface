@@ -21,6 +21,7 @@ const ERROR_LOGOS: ImageDirectory = {
 const NORMAL_LOGOS: ImageDirectory = {
   ethereum: backedBunny,
   rinkeby: backedBunny,
+  goerli: backedBunny,
   optimism: optimismBackedBunny,
   polygon: polygonBackedBunny,
 };

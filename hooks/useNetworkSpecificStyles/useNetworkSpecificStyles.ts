@@ -10,6 +10,7 @@ const BASE_RADIAL: StyleRule = [RADIAL_NAME, RADIAL_DEFAULT];
 export const STYLE_MAP: { [network in SupportedNetwork]: StyleRule[] } = {
   ethereum: [BASE_RADIAL],
   rinkeby: [BASE_RADIAL],
+  goerli: [BASE_RADIAL],
   optimism: [[RADIAL_NAME, 'var(--optimistic-red-10)']],
   polygon: [[RADIAL_NAME, 'var(--polygon-purple-10)']],
 };
