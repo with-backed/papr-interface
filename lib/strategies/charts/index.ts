@@ -41,7 +41,7 @@ export async function strategyPricesData(
   return {
     index: targetDPR,
     mark: marks[marks.length - 1][0],
-    norm: norms[marks.length - 1][0],
+    norm: norms[norms.length - 1][0],
     normalizationDPRValues: norms,
     markDPRValues: marks,
     indexDPRValues: indexValues(targetDPR, createdAt, now),

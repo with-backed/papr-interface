@@ -1,4 +1,4 @@
-import { Token } from '@uniswap/sdk-core';
+import { Price, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { ONE, Q192, SECONDS_IN_A_DAY } from 'lib/constants';
 import { ChartValue } from 'lib/d3';
@@ -8,7 +8,6 @@ import {
   Pool,
   Token as UniSubgraphToken,
 } from 'types/generated/graphql/uniswapSubgraph';
-import { convertONEScaledPercent } from '..';
 
 export async function markValues(
   now: number,
@@ -44,39 +43,27 @@ export async function markValues(
   let dprValues: ChartValue[] = [];
   for (let { sqrtPriceX96, timestamp } of sortedSwaps) {
     const scaledMarkDPR = price(sqrtPriceX96, baseCurrency, quoteCurrency)
-      .sub(ONE)
-      .div(ethers.BigNumber.from(timestamp).sub(strategy.createdAt).toString())
-      .mul(SECONDS_IN_A_DAY);
+      .subtract(1)
+      .divide(timestamp - strategy.createdAt)
+      .multiply(SECONDS_IN_A_DAY);
 
-    const markDPR = convertONEScaledPercent(scaledMarkDPR, 4);
-
-    dprValues.push([markDPR, parseInt(timestamp)]);
+    dprValues.push([parseFloat(scaledMarkDPR.toFixed(8)), parseInt(timestamp)]);
   }
 
   return dprValues;
 }
 
-// TODO Slightly lighter weight than using Uniswap
-// double check this when decimals change, should match
-// new Price(
-//     subgraphTokenToToken(baseCurrency),
-//     subgraphTokenToToken(quoteCurrency),
-//   Q192.toString(),
-//   ethers.BigNumber.from(sqrtPriceX96).mul(sqrtPriceX96).toString(),
-// ).toFixed()
-//
 function price(
   sqrtPriceX96: string,
   baseCurrency: UniSubgraphToken,
   quoteCurrency: UniSubgraphToken,
-): ethers.BigNumber {
-  const p = ethers.BigNumber.from(sqrtPriceX96).pow(2).mul(ONE).div(Q192);
-  const baseScalar = ethers.BigNumber.from(10).pow(baseCurrency.decimals);
-  const quoteScalar = ethers.BigNumber.from(10).pow(quoteCurrency.decimals);
-  // might not want big nums here? Need to make sure we allow for decimals?
-  // maybe easier just to use uniswap :)
-  const scalar = baseScalar.mul(100).div(quoteScalar);
-  return p.mul(scalar).div(100);
+): Price<Token, Token> {
+  return new Price(
+    subgraphTokenToToken(baseCurrency),
+    subgraphTokenToToken(quoteCurrency),
+    Q192.toString(),
+    ethers.BigNumber.from(sqrtPriceX96).mul(sqrtPriceX96).toString(),
+  );
 }
 
 function subgraphTokenToToken(token: UniSubgraphToken): Token {
