@@ -24,7 +24,7 @@ export async function normValues(
   now: number,
   strategy: LendingStrategy,
   network: SupportedNetwork,
-): Promise<ChartValue[]> {
+): Promise<[string[], ChartValue[]]> {
   const result = await subgraphNormalizationUpdatesForStrategy(strategy.id);
 
   const sortedNorms: NormUpdate[] =
@@ -53,7 +53,11 @@ export async function normValues(
     normDPRs.push([dpr, parseInt(current.timestamp)]);
   }
 
-  return normDPRs;
+  const formattedNorms = sortedNorms.map((norm) =>
+    ethers.utils.formatEther(ethers.BigNumber.from(norm.newNorm)),
+  );
+
+  return [formattedNorms, normDPRs];
 }
 
 async function getNewNorm(

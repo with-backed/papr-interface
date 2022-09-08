@@ -12,9 +12,9 @@ export interface StrategyPricesData {
   normalizationDPRValues: ChartValue[];
   markDPRValues: ChartValue[];
   indexDPRValues: ChartValue[];
+  markValues: string[];
+  normalizatoinValues: string[];
   index: number;
-  mark: number;
-  norm: number;
 }
 
 export async function strategyPricesData(
@@ -29,23 +29,28 @@ export async function strategyPricesData(
   );
   const createdAt = parseInt(strategy.createdAt);
 
-  var marks: ChartValue[] = [];
+  var markDPRs: ChartValue[] = [];
+  var marks: string[] = [];
   if (subgraphUniswapPool) {
-    marks = await markValues(now, strategy, subgraphUniswapPool.pool as Pool);
+    [marks, markDPRs] = await markValues(
+      now,
+      strategy,
+      subgraphUniswapPool.pool as Pool,
+    );
   }
 
-  const norms = await normValues(now, strategy, network);
+  const [norms, normDPRs] = await normValues(now, strategy, network);
 
   // add a starting data point all on target
-  marks.unshift([targetDPR, createdAt]);
-  norms.unshift([targetDPR, createdAt]);
+  markDPRs.unshift([targetDPR, createdAt]);
+  normDPRs.unshift([targetDPR, createdAt]);
 
   return {
     index: targetDPR,
-    mark: marks[marks.length - 1][0],
-    norm: norms[norms.length - 1][0],
-    normalizationDPRValues: norms,
-    markDPRValues: marks,
+    normalizationDPRValues: normDPRs,
+    normalizatoinValues: norms,
+    markValues: marks,
+    markDPRValues: markDPRs,
     indexDPRValues: indexValues(targetDPR, createdAt, now),
   };
 }

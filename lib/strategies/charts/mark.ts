@@ -13,7 +13,7 @@ export async function markValues(
   now: number,
   strategy: LendingStrategy,
   pool: Pool,
-): Promise<ChartValue[]> {
+): Promise<[string[], ChartValue[]]> {
   let quoteCurrency;
   let baseCurrency;
   if (strategy.underlying == pool.token0) {
@@ -50,7 +50,15 @@ export async function markValues(
     dprValues.push([parseFloat(scaledMarkDPR.toFixed(8)), parseInt(timestamp)]);
   }
 
-  return dprValues;
+  return [
+    sortedSwaps.map((swap) => {
+      console.log(
+        price(swap.sqrtPriceX96, baseCurrency, quoteCurrency).toFixed(),
+      );
+      return price(swap.sqrtPriceX96, baseCurrency, quoteCurrency).toFixed();
+    }),
+    dprValues,
+  ];
 }
 
 function price(
