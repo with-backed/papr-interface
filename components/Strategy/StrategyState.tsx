@@ -1,8 +1,11 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { LendingStrategy } from 'lib/strategies';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { ONE } from 'lib/strategies/constants';
+import {
+  getDebtTokenMarketPrice,
+  getDebtTokenStrategyPrice,
+  LendingStrategy,
+} from 'lib/strategies';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
 export default function StrategyState({
@@ -23,7 +26,7 @@ export default function StrategyState({
   }, [strategy]);
 
   const updateStrategyNormalization = useCallback(async () => {
-    const norm = await strategy.contract.newNorm();
+    const norm = await getDebtTokenStrategyPrice(strategy);
     setStrategyNormalization(ethers.utils.formatEther(norm));
   }, [strategy]);
 
@@ -37,12 +40,9 @@ export default function StrategyState({
   }, [strategy]);
 
   const debtPrice = useMemo(() => {
-    if (strategy == null) {
-      return '';
-    }
-    return strategy.token0IsUnderlying
-      ? strategy.pool.token1Price.toFixed()
-      : strategy.pool.token0Price.toFixed();
+    const price = getDebtTokenMarketPrice(strategy);
+    if (!price) return '';
+    return price.toFixed();
   }, [strategy]);
 
   useEffect(() => {
@@ -76,8 +76,21 @@ export default function StrategyState({
         %{' '}
       </p>
       <p> Target Daily Percentage Growth {pricesData.index}%</p>
-      <p> Current Contract Daily Percentage Growth {pricesData.norm}%</p>
-      <p> Realized Market Daily Percentage Growth {pricesData.mark}%</p>
+      <p>
+        {' '}
+        Current Contract Daily Percentage Growth{' '}
+        {
+          pricesData.normalizationDPRValues[
+            pricesData.normalizationDPRValues.length - 1
+          ][0]
+        }
+        %
+      </p>
+      <p>
+        {' '}
+        Realized Market Daily Percentage Growth{' '}
+        {pricesData.markDPRValues[pricesData.markDPRValues.length - 1][0]}%
+      </p>
     </Fieldset>
   );
 }

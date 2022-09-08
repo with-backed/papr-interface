@@ -44,11 +44,21 @@ export function useQuoteWithSlippage(
   }, [tokenIn, tokenOut, amount]);
 
   const getQuoteAndPriceImpactForSwap = useCallback(async () => {
-    const q = await getQuoteForSwap(quoter, amountToSwap, tokenIn, tokenOut);
-    setQuoteForSwap(
-      ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
-    );
-    setQuoteLoading(false);
+    let q: ethers.BigNumber;
+    try {
+      q = await getQuoteForSwap(quoter, amountToSwap, tokenIn, tokenOut);
+      setQuoteForSwap(
+        parseFloat(
+          ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
+        ).toFixed(4),
+      );
+      setQuoteLoading(false);
+    } catch (e) {
+      console.error(e);
+      setQuoteLoading(false);
+      setPriceImpactLoading(false);
+      return;
+    }
 
     const priceImpact = await computeSlippageForSwap(
       q,
@@ -57,7 +67,7 @@ export function useQuoteWithSlippage(
       amountToSwap,
       quoter,
     );
-    setPriceImpact(priceImpact.toString());
+    setPriceImpact(priceImpact.toFixed(4));
     setPriceImpactLoading(false);
   }, [amountToSwap, tokenIn, tokenOut, quoter]);
 

@@ -1,0 +1,100 @@
+.sliderWrapper {
+    margin-top: 50px;
+    height: 70px;
+}
+
+.sliderWrapper > p {
+    position: relative;
+    left: 486px;
+    bottom: 102px;
+    width: 100px;
+    text-align: center;
+}
+
+.borrowInput {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.underlyingInput {
+    background-color: white;
+    width: 40%;
+    border-radius: var(--border-radius-large);
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.showMath {
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: -2px;
+}
+
+.borrowButton {
+    cursor: pointer;
+    width: 36%;
+    background-color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 14px;
+    color: var(--greentext);
+    border: 3px solid var(--greentext);
+    border-radius: var(--border-radius-large);
+    margin-left: 20px;
+}
+
+.mathWrapper {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mathRow {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mathRow p {
+    margin: 0px;
+    line-height: 30px;
+}
+
+.formula {
+    text-align: left;
+    width: 25%
+}
+
+.description {
+    text-align: left;
+    width: 50%
+}
+
+.content {
+    width: 25%;
+    text-align: right;
+}
+
+.mathRow div:first-child {
+    padding-left: 12px;
+}
+
+.mathRow div:last-child {
+    padding-right: 12px;
+}
+
+.even {
+    background-color: white;
+}
+
+.hidden {
+    visibility: hidden;
+}

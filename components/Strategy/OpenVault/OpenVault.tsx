@@ -1,16 +1,22 @@
 import { TickMath } from '@uniswap/v3-sdk';
 import { Fieldset } from 'components/Fieldset';
+import { Slider } from 'components/Slider';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
 import { LendingStrategy, computeLiquidationEstimation } from 'lib/strategies';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
+import { ONE, PRICE } from 'lib/strategies/constants';
 import { ERC721__factory } from 'types/generated/abis';
 import { ILendingStrategy } from 'types/generated/abis/Strategy';
 import { useAccount, useSigner } from 'wagmi';
+import styles from './OpenVault.module.css';
+import VaultMath from './VaultMath';
+import { StrategyPricesData } from 'lib/strategies/charts';
 
 type BorrowProps = {
   strategy: LendingStrategy;
+  pricesData: StrategyPricesData;
 };
 
 interface OnERC721ReceivedArgsStruct {
@@ -25,7 +31,19 @@ interface OnERC721ReceivedArgsStruct {
   sig: ILendingStrategy.SigStruct;
 }
 
-const PRICE = 20_000;
+const debounce = (func: any, wait: number) => {
+  let timeout: any;
+
+  return function executedFunction(...args: any[]) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
 const OnERC721ReceivedArgsEncoderString = `
   tuple(
@@ -41,7 +59,7 @@ const OnERC721ReceivedArgsEncoderString = `
   )
 `;
 
-export default function OpenVault({ strategy }: BorrowProps) {
+export default function OpenVault({ strategy, pricesData }: BorrowProps) {
   const { address } = useAccount();
   const { data: signer } = useSigner();
   const [debt, setDebt] = useState<string>('');
@@ -49,21 +67,19 @@ export default function OpenVault({ strategy }: BorrowProps) {
   const [collateralTokenId, setCollateralTokenId] = useState<string>('');
   const [liquidationDateEstimation, setLiquidationDateEstimation] =
     useState<string>('');
-  const [swapAmount, setSwapAmount] = useState<string>('');
   const {
     quoteForSwap,
     priceImpact,
     tokenOut,
     quoteLoading,
     priceImpactLoading,
-  } = useQuoteWithSlippage(strategy, swapAmount, true);
+  } = useQuoteWithSlippage(strategy, debt, true);
   const { network } = useConfig();
+  const [showMath, setShowMath] = useState<boolean>(false);
+  const [hideMaxLabel, setHideMaxLabel] = useState<boolean>(false);
 
   const create = useCallback(
     async (withSwap: boolean) => {
-      const tickUpper = strategy.token0IsUnderlying ? 200 : 0;
-      const tickLower = strategy.token0IsUnderlying ? -200 : 0;
-
       const request: OnERC721ReceivedArgsStruct = {
         vaultId: ethers.BigNumber.from(0),
         vaultNonce: ethers.BigNumber.from(0),
@@ -72,11 +88,9 @@ export default function OpenVault({ strategy }: BorrowProps) {
         minOut: withSwap
           ? ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals)
           : ethers.BigNumber.from(0),
-        sqrtPriceLimitX96: ethers.BigNumber.from(
-          TickMath.getSqrtRatioAtTick(
-            strategy.token0IsUnderlying ? tickUpper - 1 : tickLower - 1,
-          ).toString(),
-        ),
+        sqrtPriceLimitX96: strategy.token0IsUnderlying
+          ? ethers.BigNumber.from(TickMath.MAX_SQRT_RATIO.toString()).sub(1)
+          : ethers.BigNumber.from(TickMath.MIN_SQRT_RATIO.toString()).add(1),
         debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
         oracleInfo: {
           price: ethers.utils.parseUnits(PRICE.toString(), 18),
@@ -118,8 +132,8 @@ export default function OpenVault({ strategy }: BorrowProps) {
     [address, collateralTokenId, debt, network, signer, strategy, quoteForSwap],
   );
 
-  const handleMaxDebtChanged = useCallback(
-    async (value: string) => {
+  const handleDebtAmountChanged = useCallback(
+    debounce(async (value: string) => {
       setDebt(value);
 
       if (value === '') {
@@ -136,8 +150,8 @@ export default function OpenVault({ strategy }: BorrowProps) {
           )
         ).toString(),
       );
-    },
-    [maxDebt, setDebt, strategy],
+    }, 500),
+    [setDebt, maxDebt],
   );
 
   const getMaxDebt = useCallback(async () => {
@@ -149,45 +163,89 @@ export default function OpenVault({ strategy }: BorrowProps) {
     setMaxDebt(maxDebt.toString());
   }, [strategy]);
 
+  const maxLTV = useMemo(() => {
+    return strategy.maxLTVPercent;
+  }, [strategy]);
+
   useEffect(() => {
     getMaxDebt();
   }, [getMaxDebt]);
 
   return (
-    <Fieldset legend="🏦 Borrow">
-      <p> max debt: {maxDebt}</p>
-      <input
-        placeholder="collateral token id"
-        onChange={(e) => setCollateralTokenId(e.target.value)}></input>
-      <input
-        placeholder="debt amount"
-        onChange={(e) => handleMaxDebtChanged(e.target.value)}></input>
-      <button disabled={!address} onClick={() => create(false)}>
-        borrow
-      </button>
-      <br />
-      <input
-        placeholder="collateral token id"
-        onChange={(e) => setCollateralTokenId(e.target.value)}></input>
-      <input
-        placeholder="debt amount"
-        onChange={(e) => handleMaxDebtChanged(e.target.value)}></input>
-      <input
-        placeholder="debt to swap"
-        onChange={(e) => setSwapAmount(e.target.value)}></input>
-      <button onClick={() => create(true)}> borrow and swap</button>
-      {!quoteLoading && (
-        <p>
-          {' '}
-          quote for desired swap {quoteForSwap}
-          {tokenOut.symbol}
-        </p>
-      )}
-      {!priceImpactLoading && <p>price impact {priceImpact}%</p>}
-      <p>
-        {' '}
-        # days before liquidation (estimation): {liquidationDateEstimation}{' '}
-      </p>
+    <Fieldset legend="🏦 Set Loan Amount">
+      <div className={styles.borrowComponentWrapper}>
+        <div className={styles.sliderWrapper}>
+          <Slider
+            min={0}
+            max={parseFloat(maxDebt)}
+            onChange={(val, _index) => handleDebtAmountChanged(val.toString())}
+            renderThumb={(props, state) => {
+              const currentLTV =
+                (state.valueNow / parseFloat(maxDebt)) * maxLTV;
+
+              if (currentLTV >= 38) {
+                setHideMaxLabel(true);
+              } else {
+                setHideMaxLabel(false);
+              }
+              return (
+                <div {...props}>
+                  <div>
+                    <p>Loan Amount</p>
+                    <p>{currentLTV.toFixed(2)}% LTV</p>
+                  </div>
+                </div>
+              );
+            }}
+          />
+          <p className={hideMaxLabel ? styles.hidden : ''}>
+            Max Loan {maxLTV.toString()}% LTV
+          </p>
+        </div>
+
+        <div className={styles.borrowInput}>
+          <div className={styles.underlyingInput}>
+            <div>{quoteForSwap}</div>
+            <div>{tokenOut.symbol}</div>
+          </div>
+          <div
+            className={styles.showMath}
+            onClick={() => setShowMath(!showMath)}>
+            Show Math
+          </div>
+
+          <div className={styles.borrowButton} onClick={() => create(false)}>
+            Borrow
+          </div>
+        </div>
+
+        <div className={styles.tradeDetails}>
+          <div>
+            {!priceImpactLoading && <p>Price impact: {priceImpact}%</p>}
+          </div>
+          <div>
+            <p>
+              {' '}
+              # days before liquidation (estimation):{' '}
+              {liquidationDateEstimation}
+            </p>
+          </div>
+          <input
+            placeholder="collateral token id"
+            onChange={(e) => setCollateralTokenId(e.target.value)}></input>
+        </div>
+
+        <VaultMath
+          strategy={strategy}
+          pricesData={pricesData}
+          inputtedLTV={(
+            (parseFloat(debt) / parseFloat(maxDebt)) *
+            maxLTV
+          ).toFixed(2)}
+          quoteForSwap={quoteForSwap}
+          showMath={showMath}
+        />
+      </div>
     </Fieldset>
   );
 }

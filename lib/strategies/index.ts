@@ -9,17 +9,15 @@ import {
   ERC721,
   ERC721__factory,
   IQuoter,
-  IUniswapV3Pool,
   IUniswapV3Pool__factory,
   Strategy,
   Strategy__factory,
 } from 'types/generated/abis';
-import { ONE } from './constants';
+import { ONE, PRICE } from './constants';
 import { getPool } from './uniswap';
 import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { ChartValue } from 'lib/d3';
 
 dayjs.extend(duration);
 
@@ -287,4 +285,21 @@ export async function computeSlippageForSwap(
     ((quoteWithoutSlippageScaled + quoteWithSlippageFloat) / 2);
 
   return priceImpact * 100;
+}
+
+export function getDebtTokenMarketPrice(strategy: LendingStrategy) {
+  if (strategy == null) {
+    return null;
+  }
+  return strategy.token0IsUnderlying
+    ? strategy.pool.token1Price
+    : strategy.pool.token0Price;
+}
+
+export async function getDebtTokenStrategyPrice(strategy: LendingStrategy) {
+  return await strategy.contract.newNorm();
+}
+
+export async function getOracleValueForStrategy(strategy: LendingStrategy) {
+  return PRICE;
 }

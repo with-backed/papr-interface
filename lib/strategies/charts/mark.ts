@@ -13,9 +13,9 @@ export async function markValues(
   now: number,
   strategy: LendingStrategy,
   pool: Pool,
-): Promise<ChartValue[]> {
-  let quoteCurrency;
-  let baseCurrency;
+): Promise<[string[], ChartValue[]]> {
+  let quoteCurrency: UniSubgraphToken;
+  let baseCurrency: UniSubgraphToken;
   if (strategy.underlying == pool.token0) {
     quoteCurrency = pool.token1;
     baseCurrency = pool.token0;
@@ -27,7 +27,7 @@ export async function markValues(
   const swapsQuery = await subgraphUniswapSwapsByPool(strategy.poolAddress);
   const sortedSwaps =
     swapsQuery?.swaps.sort(
-      (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
+      (a: any, b: any) => parseInt(a.timestamp) - parseInt(b.timestamp),
     ) || [];
 
   // add an artifial data point at the current timestamp
@@ -50,7 +50,12 @@ export async function markValues(
     dprValues.push([parseFloat(scaledMarkDPR.toFixed(8)), parseInt(timestamp)]);
   }
 
-  return dprValues;
+  return [
+    sortedSwaps.map((swap: any) =>
+      price(swap.sqrtPriceX96, baseCurrency, quoteCurrency).toFixed(),
+    ),
+    dprValues,
+  ];
 }
 
 function price(
