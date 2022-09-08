@@ -27,7 +27,6 @@ export async function strategyPricesData(
   );
   const createdAt = parseInt(strategy.createdAt);
 
-  // change token based on which is which
   var marks: ChartValue[] = [];
   if (subgraphUniswapPool) {
     marks = await markValues(now, strategy, subgraphUniswapPool.pool as Pool);
