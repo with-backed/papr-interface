@@ -5,7 +5,7 @@
 
 .sliderWrapper > p {
     position: relative;
-    left: 420px;
+    left: 486px;
     bottom: 102px;
     width: 100px;
     text-align: center;
@@ -61,6 +61,11 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+}
+
+.mathRow p {
+    margin: 0px;
+    line-height: 30px;
 }
 
 .formula {

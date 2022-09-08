@@ -12,9 +12,11 @@ import { ILendingStrategy } from 'types/generated/abis/Strategy';
 import { useAccount, useSigner } from 'wagmi';
 import styles from './OpenVault.module.css';
 import VaultMath from './VaultMath';
+import { StrategyPricesData } from 'lib/strategies/charts';
 
 type BorrowProps = {
   strategy: LendingStrategy;
+  pricesData: StrategyPricesData;
 };
 
 interface OnERC721ReceivedArgsStruct {
@@ -57,7 +59,7 @@ const OnERC721ReceivedArgsEncoderString = `
   )
 `;
 
-export default function OpenVault({ strategy }: BorrowProps) {
+export default function OpenVault({ strategy, pricesData }: BorrowProps) {
   const { address } = useAccount();
   const { data: signer } = useSigner();
   const [debt, setDebt] = useState<string>('');
@@ -162,7 +164,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
   }, [strategy]);
 
   const maxLTV = useMemo(() => {
-    return parseFloat(strategy.maxLTV.div(ONE.div(100)).toString());
+    return strategy.maxLTVPercent;
   }, [strategy]);
 
   useEffect(() => {
@@ -235,6 +237,7 @@ export default function OpenVault({ strategy }: BorrowProps) {
 
         <VaultMath
           strategy={strategy}
+          pricesData={pricesData}
           inputtedLTV={(
             (parseFloat(debt) / parseFloat(maxDebt)) *
             maxLTV

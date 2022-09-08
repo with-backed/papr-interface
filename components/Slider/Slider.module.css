@@ -1,7 +1,7 @@
 .slider {
-  width: 498px;
+  width: 100%;
   height: 36px;
-  margin: 1rem auto;
+  margin: 0 auto;
   background-image: url('../../public/slider-tile-dim.svg');
   cursor: pointer;
 }

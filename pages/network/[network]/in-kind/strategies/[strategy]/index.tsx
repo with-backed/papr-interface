@@ -92,7 +92,7 @@ export default function StrategyPage({
             <MintERC20 token={lendingStrategy.underlying} />
             <MintCollateral token={lendingStrategy.collateral} />
             <ProvideLiquidity pool={lendingStrategy.pool} />
-            <OpenVault strategy={lendingStrategy} />
+            <OpenVault strategy={lendingStrategy} pricesData={pricesData} />
             <SwapQuote strategy={lendingStrategy} swapForUnderlying />
             <SwapQuote strategy={lendingStrategy} swapForUnderlying={false} />
             <SwapTokens
