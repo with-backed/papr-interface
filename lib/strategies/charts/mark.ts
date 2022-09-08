@@ -51,12 +51,9 @@ export async function markValues(
   }
 
   return [
-    sortedSwaps.map((swap) => {
-      console.log(
-        price(swap.sqrtPriceX96, baseCurrency, quoteCurrency).toFixed(),
-      );
-      return price(swap.sqrtPriceX96, baseCurrency, quoteCurrency).toFixed();
-    }),
+    sortedSwaps.map((swap) =>
+      price(swap.sqrtPriceX96, baseCurrency, quoteCurrency).toFixed(),
+    ),
     dprValues,
   ];
 }
