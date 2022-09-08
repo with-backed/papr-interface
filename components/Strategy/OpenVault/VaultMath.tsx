@@ -76,7 +76,7 @@ export default function VaultMath({
   );
   const debtTokenStrategyPrice = useMemo(
     () =>
-      pricesData.normalizatoinValues[pricesData.normalizatoinValues.length - 1],
+      pricesData.normalizationValues[pricesData.normalizationValues.length - 1],
     [pricesData],
   );
 

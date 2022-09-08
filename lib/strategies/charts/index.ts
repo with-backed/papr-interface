@@ -13,7 +13,7 @@ export interface StrategyPricesData {
   markDPRValues: ChartValue[];
   indexDPRValues: ChartValue[];
   markValues: string[];
-  normalizatoinValues: string[];
+  normalizationValues: string[];
   index: number;
 }
 
@@ -48,7 +48,7 @@ export async function strategyPricesData(
   return {
     index: targetDPR,
     normalizationDPRValues: normDPRs,
-    normalizatoinValues: norms,
+    normalizationValues: norms,
     markValues: marks,
     markDPRValues: markDPRs,
     indexDPRValues: indexValues(targetDPR, createdAt, now),

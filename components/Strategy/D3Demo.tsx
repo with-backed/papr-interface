@@ -34,7 +34,7 @@ export function D3Demo({ pricesData }: D3DemoProps) {
       normalizationDPRValues: normValues,
       indexDPRValues: indexValues,
       markValues: pricesData.markValues,
-      normalizatoinValues: pricesData.normalizatoinValues,
+      normalizationValues: pricesData.normalizationValues,
     };
   }
 

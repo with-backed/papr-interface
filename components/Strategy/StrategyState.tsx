@@ -76,8 +76,21 @@ export default function StrategyState({
         %{' '}
       </p>
       <p> Target Daily Percentage Growth {pricesData.index}%</p>
-      <p> Current Contract Daily Percentage Growth {pricesData.normDPR}%</p>
-      <p> Realized Market Daily Percentage Growth {pricesData.markDPR}%</p>
+      <p>
+        {' '}
+        Current Contract Daily Percentage Growth{' '}
+        {
+          pricesData.normalizationDPRValues[
+            pricesData.normalizationDPRValues.length - 1
+          ][0]
+        }
+        %
+      </p>
+      <p>
+        {' '}
+        Realized Market Daily Percentage Growth{' '}
+        {pricesData.markDPRValues[pricesData.markDPRValues.length - 1][0]}%
+      </p>
     </Fieldset>
   );
 }
