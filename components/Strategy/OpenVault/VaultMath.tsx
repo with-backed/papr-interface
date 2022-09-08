@@ -5,7 +5,7 @@ import {
   getDebtTokenStrategyPrice,
   LendingStrategy,
 } from 'lib/strategies';
-import { ONE } from 'lib/strategies/constants';
+import { ONE, PRICE } from 'lib/strategies/constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
 
@@ -38,8 +38,6 @@ function MathRow({ formula, description, content, even }: MathRowProps) {
     </div>
   );
 }
-
-const PRICE = 20_000;
 
 export default function VaultMath({
   strategy,
