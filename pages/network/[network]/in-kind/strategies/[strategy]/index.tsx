@@ -2,7 +2,6 @@ import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useState } from 'react';
-import { ethers } from 'ethers';
 import MintERC20 from 'components/Strategy/MintERC20';
 import MintCollateral from 'components/Strategy/MintCollateral';
 import OpenVault from 'components/Strategy/OpenVault/OpenVault';
@@ -18,18 +17,9 @@ import {
   LendingStrategyByIdQuery,
   LendingStrategy as SubgraphLendingStrategy,
 } from 'types/generated/graphql/inKindSubgraph';
-import {
-  PoolByIdQuery,
-  SqrtPricesByPoolQuery,
-  SwapsByPoolQuery,
-} from 'types/generated/graphql/uniswapSubgraph';
 import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
-import {
-  subgraphUniswapPoolById,
-  subgraphUniswapPriceByPool,
-  subgraphUniswapSwapsByPool,
-} from 'lib/uniswapSubgraph';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
+import { SupportedNetwork } from 'lib/config';
 
 export type StrategyPageProps = {
   address: string;
@@ -41,6 +31,7 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
   context,
 ) => {
   const address = (context.params?.strategy as string).toLowerCase();
+  const network = context.params?.network as SupportedNetwork;
 
   const subgraphStrategy = await subgraphStrategyByAddress(address);
 
@@ -48,6 +39,7 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
   if (subgraphStrategy?.lendingStrategy) {
     pricesData = await strategyPricesData(
       subgraphStrategy.lendingStrategy as SubgraphLendingStrategy,
+      network,
     );
   }
 

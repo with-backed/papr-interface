@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { configs, SupportedNetwork } from 'lib/config';
 import { ONE } from 'lib/constants';
 import { ChartValue } from 'lib/d3';
 import { clientFromUrl } from 'lib/urql';
@@ -22,6 +23,7 @@ interface NormUpdate {
 export async function normValues(
   now: number,
   strategy: LendingStrategy,
+  network: SupportedNetwork,
 ): Promise<ChartValue[]> {
   const result = await subgraphNormalizationUpdatesForStrategy(strategy.id);
 
@@ -33,7 +35,7 @@ export async function normValues(
   // get what norm would be if updated at this moment and add to array
   if (sortedNorms.length > 0) {
     sortedNorms.push({
-      newNorm: await getNewNorm(strategy.id),
+      newNorm: await getNewNorm(strategy.id, network),
       timestamp: now.toString(),
     });
   }
@@ -54,9 +56,12 @@ export async function normValues(
   return normDPRs;
 }
 
-async function getNewNorm(strategyAddress: string): Promise<string> {
+async function getNewNorm(
+  strategyAddress: string,
+  network: SupportedNetwork,
+): Promise<string> {
   const provider = new ethers.providers.JsonRpcProvider(
-    process.env.NEXT_PUBLIC_JSON_RPC_PROVIDER,
+    configs[network].jsonRpcProvider,
   );
   const s = Strategy__factory.connect(strategyAddress, provider);
   return (await s.newNorm()).toString();

@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { SupportedNetwork } from 'lib/config';
 import { ChartValue } from 'lib/d3';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { LendingStrategy } from 'types/generated/graphql/inKindSubgraph';
@@ -18,6 +19,7 @@ export interface StrategyPricesData {
 
 export async function strategyPricesData(
   strategy: LendingStrategy,
+  network: SupportedNetwork,
 ): Promise<StrategyPricesData> {
   const targetDPRScaled = ethers.BigNumber.from(strategy.targetAPR).div(365);
   const targetDPR = convertONEScaledPercent(targetDPRScaled, 4);
@@ -32,7 +34,7 @@ export async function strategyPricesData(
     marks = await markValues(now, strategy, subgraphUniswapPool.pool as Pool);
   }
 
-  const norms = await normValues(now, strategy);
+  const norms = await normValues(now, strategy, network);
 
   // add a starting data point all on target
   marks.unshift([targetDPR, createdAt]);
