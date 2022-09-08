@@ -37,6 +37,7 @@ export const contractDirectory: ContractDirectory = {
   ethereum: baseContracts,
   optimism: baseContracts,
   rinkeby: baseContracts,
+  goerli: baseContracts,
   polygon: polygonContracts,
 };
 
