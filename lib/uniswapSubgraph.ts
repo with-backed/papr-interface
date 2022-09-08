@@ -35,6 +35,7 @@ export async function subgraphUniswapSwapsByPool(pool: string) {
     .toPromise();
 
   if (error) {
+    console.log(error);
     return null;
   }
 
@@ -51,6 +52,7 @@ export async function subgraphUniswapPoolById(id: string) {
     .toPromise();
 
   if (error) {
+    console.log(error);
     return null;
   }
 

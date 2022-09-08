@@ -29,7 +29,7 @@ export async function getVaultInfo(
     signerOrProvider,
   );
 
-  const maxLTV = strategy.maxLTV;
+  const maxLTV = strategy.maxLTVPercent;
   const maxUnderlying = price.mul(maxLTV).div(ONE);
   // TODO: how should we represent this when debt is zero?
   const liquidationPrice = debt.eq(0) ? debt : maxUnderlying.div(debt);

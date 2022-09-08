@@ -8,4 +8,5 @@ fragment allLendingStrategyProperties on LendingStrategy {
   allowedCollateralRoot
   strategyURI
   norm
+  targetAPR
 }

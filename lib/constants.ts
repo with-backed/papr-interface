@@ -1,10 +1,14 @@
 import { ethers } from 'ethers';
 
+export const ONE = ethers.BigNumber.from(10).pow(18);
 export const SECONDS_IN_A_DAY = 60 * 60 * 24;
 export const SECONDS_IN_AN_HOUR = 60 * 60;
 export const SECONDS_IN_A_YEAR = 31_536_000;
 export const INTEREST_RATE_PERCENT_DECIMALS = 3;
 export const MIN_RATE = 1 / 10 ** (INTEREST_RATE_PERCENT_DECIMALS - 2);
+
+export const Q96 = ethers.BigNumber.from(2).pow(96);
+export const Q192 = Q96.pow(2);
 
 export const SCALAR = ethers.BigNumber.from(10).pow(
   INTEREST_RATE_PERCENT_DECIMALS,

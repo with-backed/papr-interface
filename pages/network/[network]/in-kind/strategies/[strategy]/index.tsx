@@ -14,7 +14,10 @@ import SwapTokens from 'components/Strategy/SwapTokens';
 import styles from './strategy.module.css';
 import { AssociatedVaults } from 'components/Strategy/AssociatedVaults';
 import { D3Demo } from 'components/Strategy/D3Demo';
-import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
+import {
+  LendingStrategyByIdQuery,
+  LendingStrategy as SubgraphLendingStrategy,
+} from 'types/generated/graphql/inKindSubgraph';
 import {
   PoolByIdQuery,
   SqrtPricesByPoolQuery,
@@ -26,12 +29,12 @@ import {
   subgraphUniswapPriceByPool,
   subgraphUniswapSwapsByPool,
 } from 'lib/uniswapSubgraph';
+import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 
 export type StrategyPageProps = {
   address: string;
   lendingStrategy: LendingStrategyByIdQuery['lendingStrategy'] | null;
-  poolSwapData: SwapsByPoolQuery['swaps'] | null;
-  pool: PoolByIdQuery['pool'] | null;
+  pricesData: StrategyPricesData | null;
 };
 
 export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
@@ -41,17 +44,18 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
 
   const subgraphStrategy = await subgraphStrategyByAddress(address);
 
-  const [subgraphUniswapPrices, subgraphUniswapPool] = await Promise.all([
-    subgraphUniswapSwapsByPool(subgraphStrategy?.lendingStrategy?.poolAddress),
-    subgraphUniswapPoolById(subgraphStrategy?.lendingStrategy?.poolAddress),
-  ]);
+  var pricesData: StrategyPricesData | null = null;
+  if (subgraphStrategy?.lendingStrategy) {
+    pricesData = await strategyPricesData(
+      subgraphStrategy.lendingStrategy as SubgraphLendingStrategy,
+    );
+  }
 
   return {
     props: {
       address: address,
       lendingStrategy: subgraphStrategy?.lendingStrategy || null,
-      poolSwapData: subgraphUniswapPrices?.swaps || null,
-      pool: subgraphUniswapPool?.pool || null,
+      pricesData: pricesData,
     },
   };
 };
@@ -61,8 +65,7 @@ const PRICE = 20_000;
 export default function StrategyPage({
   address,
   lendingStrategy: subgraphLendingStrategy,
-  poolSwapData,
-  pool,
+  pricesData,
 }: StrategyPageProps) {
   const config = useConfig();
   const [lendingStrategy, setLendingStrategy] =
@@ -81,10 +84,10 @@ export default function StrategyPage({
     <div>
       <h3>Strategy</h3>
       <p>(fake) oracle price: {PRICE} </p>
-      {lendingStrategy != null ? (
+      {lendingStrategy != null && pricesData != null ? (
         <div className={styles.wrapper}>
           <div className={styles.column}>
-            <StrategyState strategy={lendingStrategy} />
+            <StrategyState strategy={lendingStrategy} pricesData={pricesData} />
             <PoolState pool={lendingStrategy.pool} />
             <MintERC20 token={lendingStrategy.underlying} />
             <MintCollateral token={lendingStrategy.collateral} />
@@ -99,14 +102,7 @@ export default function StrategyPage({
           </div>
           <div className={styles.column}>
             <AssociatedVaults strategy={address} />
-            <D3Demo
-              strategy={address}
-              targetAnnualGrowth={lendingStrategy.targetAnnualGrowth}
-              targetGrowthPerPeriod={lendingStrategy.targetGrowthPerPeriod}
-              lendingStrategy={subgraphLendingStrategy}
-              poolSwapData={poolSwapData}
-              pool={pool}
-            />
+            <D3Demo pricesData={pricesData} />
           </div>
         </div>
       ) : (

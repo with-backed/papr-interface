@@ -19,9 +19,12 @@ import { getPool } from './uniswap';
 import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { ChartValue } from 'lib/d3';
 
 dayjs.extend(duration);
 
+// TODO this is mostly redudant to the graph info,
+// probably just use the graph is possible
 export type LendingStrategy = {
   contract: Strategy;
   pool: Pool;
@@ -30,10 +33,8 @@ export type LendingStrategy = {
   token1: ERC20Token;
   underlying: ERC20Token;
   collateral: ERC721Token;
-  maxLTV: ethers.BigNumber;
-  targetAnnualGrowth: ethers.BigNumber;
-  targetGrowthPerPeriod: ethers.BigNumber;
-  currentAPRBIPs: ethers.BigNumber;
+  maxLTVPercent: number;
+  targetAnnualGrowthPercent: number;
 };
 
 export type ERC20Token = {
@@ -106,12 +107,24 @@ export async function populateLendingStrategy(
       symbol: await collateral.symbol(),
     },
     underlying,
-    maxLTV: await contract.maxLTV(),
-    targetAnnualGrowth: targetAnnualGrowth,
-    targetGrowthPerPeriod,
+    maxLTVPercent: convertONEScaledPercent(await contract.maxLTV(), 2),
+    targetAnnualGrowthPercent: convertONEScaledPercent(targetAnnualGrowth, 2),
     token0IsUnderlying: token0.contract.address == underlying.contract.address,
-    currentAPRBIPs: currentAPRBIPs,
   };
+}
+
+export function convertONEScaledPercent(
+  n: ethers.BigNumber,
+  decimals: number,
+): number {
+  return convertOneScaledValue(n, decimals + 2) * 100;
+}
+
+export function convertOneScaledValue(
+  n: ethers.BigNumber,
+  decimals: number,
+): number {
+  return n.div(ONE.div(10 ** decimals)).toNumber() / 10 ** decimals;
 }
 
 export async function buildToken(token: ERC20): Promise<ERC20Token> {
@@ -136,6 +149,21 @@ export function computeEffectiveAPR(
     .div(ONE.div(10000)); // convert to BIPs
 
   return currentAPRBIPs;
+}
+
+export function computeEffectiveDPR(
+  now: ethers.BigNumber,
+  lastUpdated: ethers.BigNumber,
+  multiplier: ethers.BigNumber,
+  decimals = 4,
+) {
+  const delta = now.sub(lastUpdated);
+  const dpr = multiplier
+    .sub(ONE) // only care about decimals
+    .div(delta.eq(0) ? 1 : delta) // how much growth per second
+    .mul(SECONDS_IN_A_DAY); // compute for one day
+
+  return convertONEScaledPercent(dpr, decimals);
 }
 
 // TODO(adamgobes): figure out how to do powWad locally in JS

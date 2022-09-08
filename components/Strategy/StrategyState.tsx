@@ -1,13 +1,16 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { LendingStrategy } from 'lib/strategies';
+import { StrategyPricesData } from 'lib/strategies/charts';
 import { ONE } from 'lib/strategies/constants';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
 export default function StrategyState({
   strategy,
+  pricesData,
 }: {
   strategy: LendingStrategy;
+  pricesData: StrategyPricesData;
 }) {
   const [strategyIndex, setStrategyIndex] = useState<string>('');
   const [strategyMultiplier, setStrategyMultiplier] = useState<string>('');
@@ -64,15 +67,17 @@ export default function StrategyState({
         {' '}
         Uniswap Exchange Rate: 1 dt = {debtPrice} {strategy.underlying.symbol}
       </p>
-      {/* <p>Multiplier: {strategyMultiplier}</p> */}
       <p>
-        Strategy&apos;s Current APR:{' '}
-        {parseFloat(strategy.currentAPRBIPs.toString()) / 100} %
+        Difference: Market vs. Strategy{' '}
+        {Math.floor(
+          (parseFloat(debtPrice) / parseFloat(strategyNormalization) - 1) *
+            10000,
+        ) / 100}
+        %{' '}
       </p>
-      <p>
-        Strategy&apos;s Target APR:{' '}
-        {parseFloat(strategy.targetAnnualGrowth.toString()) / 100} %
-      </p>
+      <p> Target Daily Percentage Growth {pricesData.index}%</p>
+      <p> Current Contract Daily Percentage Growth {pricesData.norm}%</p>
+      <p> Realized Market Daily Percentage Growth {pricesData.mark}%</p>
     </Fieldset>
   );
 }

@@ -91,7 +91,7 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     if (vaultInfo == null) {
       return '';
     }
-    return vaultInfo.strategy.maxLTV.div(ONE.div(100)).toNumber();
+    return vaultInfo.strategy.maxLTVPercent;
   }, [vaultInfo]);
 
   const debtAmount = useMemo(() => {
@@ -165,10 +165,6 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
             <p>
               current debt token price: {debtPrice}{' '}
               {vaultInfo.strategy.underlying.symbol}
-            </p>
-            <p>
-              Strategy&apos;s Current APR:{' '}
-              {parseFloat(vaultInfo.strategy.currentAPRBIPs.toString()) / 100}%
             </p>
           </Fieldset>
           <Fieldset legend="🎬 Vault Actions">

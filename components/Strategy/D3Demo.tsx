@@ -1,207 +1,65 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  axisBottom,
-  axisLeft,
-  axisRight,
-  extent,
-  scaleLinear,
-  sort,
-  max,
-  min,
-} from 'd3';
-import { useQuery } from 'urql';
-import {
-  LendingStrategyByIdQuery,
-  NormalizationUpdatesByStrategyDocument,
-  NormalizationUpdatesByStrategyQuery,
-} from 'types/generated/graphql/inKindSubgraph';
-import { ethers } from 'ethers';
-import { computeEffectiveAPR } from 'lib/strategies';
-import { ONE } from 'lib/strategies/constants';
+import { useEffect, useState } from 'react';
+import { axisBottom, axisRight, extent, scaleLinear, min, max } from 'd3';
 import { humanizedTimestamp } from 'lib/duration';
-import {
-  PoolByIdQuery,
-  SqrtPricesByPoolQuery,
-  SwapsByPoolQuery,
-} from 'types/generated/graphql/uniswapSubgraph';
-import { Price, Token } from '@uniswap/sdk-core';
-import { useConfig } from 'hooks/useConfig';
-import { SECONDS_IN_A_YEAR } from 'lib/constants';
 import { attachSVG, drawLine, drawDashedLine } from 'lib/d3';
-import { strategyContract } from 'lib/contracts';
-import { SupportedNetwork } from 'lib/config';
-import { useTimestamp } from 'hooks/useTimestamp';
+import { StrategyPricesData } from 'lib/strategies/charts';
 
-const Q96 = ethers.BigNumber.from(2).pow(96);
-const Q192 = Q96.pow(2);
 const containerId = '#d3demo';
 
 type ChartValue = [number, number];
 
 type D3DemoProps = {
-  strategy: string;
-  targetAnnualGrowth: ethers.BigNumber;
-  targetGrowthPerPeriod: ethers.BigNumber;
-  lendingStrategy: LendingStrategyByIdQuery['lendingStrategy'] | null;
-  poolSwapData: SwapsByPoolQuery['swaps'] | null;
-  pool: PoolByIdQuery['pool'] | null;
+  pricesData: StrategyPricesData;
 };
-export function D3Demo({
-  strategy,
-  targetAnnualGrowth,
-  lendingStrategy,
-  poolSwapData,
-  pool,
-}: D3DemoProps) {
-  const { jsonRpcProvider, network, chainId } = useConfig();
-  const timestamp = useTimestamp();
-  const token0 = useMemo(() => {
-    if (!pool) {
-      return null;
-    }
-    const { id, decimals, symbol, name } = pool.token0;
-    return new Token(chainId, id, parseInt(decimals), symbol, name);
-  }, [chainId, pool]);
 
-  const token1 = useMemo(() => {
-    if (!pool) {
-      return null;
-    }
-    const { id, decimals, symbol, name } = pool.token1;
-    return new Token(chainId, id, parseInt(decimals), symbol, name);
-  }, [chainId, pool]);
+export function D3Demo({ pricesData }: D3DemoProps) {
+  const [annualize, setAnnualize] = useState(false);
 
-  const strategyCreatedAt = useMemo(() => {
-    if (lendingStrategy) {
-      return ethers.BigNumber.from(lendingStrategy.createdAt);
-    }
-  }, [lendingStrategy]);
-
-  const [sortedNormData, setSortedNormData] = useState<
-    NormUpdate[] | undefined
-  >();
-
-  interface Swap {
-    sqrtPriceX96: string;
-    timestamp: string;
-  }
-
-  const marks: ChartValue[] | null = useMemo(() => {
-    if (!token0 || !token1 || !poolSwapData || !strategyCreatedAt) {
-      return null;
-    }
-
-    poolSwapData.sort((a, b) => parseInt(a.timestamp) - parseInt(b.timestamp));
-
-    const result: ChartValue[] = poolSwapData.map(
-      ({ sqrtPriceX96, timestamp }: Swap) => {
-        const mark = parseFloat(
-          new Price(
-            token0,
-            token1,
-            Q192.toString(),
-            ethers.BigNumber.from(sqrtPriceX96).mul(sqrtPriceX96).toString(),
-          )
-            .subtract(1)
-            .divide(
-              ethers.BigNumber.from(timestamp)
-                .sub(strategyCreatedAt)
-                .toString(),
-            )
-            .multiply(SECONDS_IN_A_YEAR)
-            .toFixed(8),
-        );
-        return [mark, parseInt(timestamp)];
-      },
-    );
-    result.unshift([20, parseInt(strategyCreatedAt.toString())] as ChartValue);
-    result.push([
-      result[result.length - 1][0],
-      timestamp || Math.floor(Date.now() / 1000),
-    ] as ChartValue);
-    return result;
-  }, [poolSwapData, strategyCreatedAt, token0, token1]);
-
-  const [{ data: normData }] = useQuery<NormalizationUpdatesByStrategyQuery>({
-    query: NormalizationUpdatesByStrategyDocument,
-    variables: { strategy },
-  });
-
-  interface NormUpdate {
-    timestamp: string;
-    newNorm: string;
-  }
-
-  const getSortedNormData = useCallback(async () => {
-    const sortedData: NormUpdate[] =
-      normData?.normalizationUpdates.sort(
-        (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
-      ) || [];
-    const contract = strategyContract(
-      strategy,
-      jsonRpcProvider,
-      network as SupportedNetwork,
-    );
-    const newNorm = await contract.newNorm();
-    sortedData.push({
-      newNorm: newNorm.toString(),
-      timestamp: (timestamp || Math.floor(Date.now() / 1000)).toString(),
+  // leaving this because would be nice to have, but not working right now
+  // I think the annual values got too big to plot on my example
+  function transformToAnnual(pData: StrategyPricesData): StrategyPricesData {
+    const markValues: ChartValue[] = pData.markDPRValues.map((v) => {
+      return [v[0] * 365, v[1]];
     });
-    setSortedNormData(sortedData);
-  }, [normData]);
+    const normValues: ChartValue[] = pData.normalizationDPRValues.map((v) => {
+      return [v[0] * 365, v[1]];
+    });
+    const indexValues: ChartValue[] = pData.indexDPRValues.map((v) => {
+      return [v[0] * 365, v[1]];
+    });
 
-  const aprs = useMemo(() => {
-    if (sortedNormData) {
-      const aprs: ChartValue[] = [];
-
-      if (sortedNormData.length > 0) {
-        aprs.push([20, parseInt(sortedNormData[0].timestamp)]);
-      }
-
-      for (let i = 1; i < sortedNormData.length; ++i) {
-        const prev = sortedNormData[i - 1];
-        const current = sortedNormData[i];
-        const apr = computeEffectiveAPR(
-          ethers.BigNumber.from(current.timestamp),
-          ethers.BigNumber.from(prev.timestamp),
-          ethers.BigNumber.from(current.newNorm).mul(ONE).div(prev.newNorm),
-        )
-          .div(100)
-          .toNumber();
-        aprs.push([apr, parseInt(current.timestamp)] as ChartValue);
-      }
-
-      return aprs;
-    }
-    return [];
-  }, [sortedNormData]);
-
-  const targets = useMemo(() => {
-    if (sortedNormData) {
-      const target = targetAnnualGrowth.toNumber() / 100;
-      return sortedNormData.map((d) => [
-        target,
-        parseInt(d.timestamp),
-      ]) as ChartValue[];
-    }
-    return [];
-  }, [sortedNormData, targetAnnualGrowth]);
+    return {
+      index: pricesData.index,
+      mark: pricesData.mark,
+      norm: pricesData.norm,
+      markDPRValues: markValues,
+      normalizationDPRValues: normValues,
+      indexDPRValues: indexValues,
+    };
+  }
 
   useEffect(() => {
-    getSortedNormData();
-  }, [normData]);
-
-  useEffect(() => {
+    var data = pricesData;
+    if (annualize) {
+      data = transformToAnnual(pricesData);
+      console.log(pricesData);
+      console.log(data);
+    }
     const margin = { top: 10, right: 50, bottom: 30, left: 60 };
     const width = 500 - margin.left - margin.right;
     // TODO dynamically adjust height based on extent of y values
-    const height = 600 - margin.top - margin.bottom;
+    const height = 400 - margin.top - margin.bottom;
 
     const svg = attachSVG({ containerId, height, margin, width });
 
-    const datasets = [...aprs, ...targets, ...(marks || [])];
+    const datasets = [
+      ...data.normalizationDPRValues,
+      ...data.indexDPRValues,
+      ...data.markDPRValues,
+    ];
     const yValues: number[] = datasets.map((r) => r[0]);
-    const maxY = (max(yValues) as number) * 1.2;
+    var maxY = max(yValues) as number;
+    var maxY = max([maxY, 5]) as number;
     var minY = min(yValues) as number;
     // give minY some padding
     if (minY < 0) {
@@ -242,7 +100,7 @@ export function D3Demo({
     //   .call(axisLeft(yScale));
 
     drawLine({
-      data: aprs,
+      data: data.normalizationDPRValues,
       svg: svg as any,
       stroke: '#007155',
       xScale,
@@ -250,24 +108,22 @@ export function D3Demo({
     });
 
     drawDashedLine({
-      data: targets,
+      data: data.indexDPRValues,
       svg: svg as any,
       stroke: '#000000',
       xScale,
       yScale,
     });
 
-    if (marks) {
-      drawLine({
-        data: marks,
-        svg: svg as any,
-        stroke: '#000000',
-        xScale,
-        yScale,
-      });
-    }
+    drawLine({
+      data: data.markDPRValues,
+      svg: svg as any,
+      stroke: '#000000',
+      xScale,
+      yScale,
+    });
 
     return () => document.querySelector(`${containerId} svg`)?.remove();
-  }, [aprs, marks, targets]);
+  }, [pricesData]);
   return <div id="d3demo" />;
 }
