@@ -71,11 +71,11 @@ export default function VaultMath({
   }, []);
 
   const debtTokenMarketPrice = useMemo(
-    () => pricesData.mark.toFixed(),
+    () => pricesData.mark.toFixed(4),
     [pricesData],
   );
   const debtTokenStrategyPrice = useMemo(
-    () => pricesData.norm.toFixed(),
+    () => pricesData.norm.toFixed(4),
     [pricesData],
   );
 
