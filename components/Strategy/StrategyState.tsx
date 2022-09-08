@@ -6,7 +6,6 @@ import {
   getDebtTokenStrategyPrice,
   LendingStrategy,
 } from 'lib/strategies';
-import { ONE } from 'lib/strategies/constants';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
 export default function StrategyState({

@@ -5,12 +5,14 @@ import {
   getDebtTokenStrategyPrice,
   LendingStrategy,
 } from 'lib/strategies';
+import { StrategyPricesData } from 'lib/strategies/charts';
 import { ONE, PRICE } from 'lib/strategies/constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
 
 type VaultMathProps = {
   strategy: LendingStrategy;
+  pricesData: StrategyPricesData;
   quoteForSwap: string;
   inputtedLTV: string;
   showMath: boolean;
@@ -41,22 +43,13 @@ function MathRow({ formula, description, content, even }: MathRowProps) {
 
 export default function VaultMath({
   strategy,
+  pricesData,
   quoteForSwap,
   inputtedLTV,
   showMath,
 }: VaultMathProps) {
-  const [debtTokenMarketPrice, setDebtTokenMarketPrice] = useState<
-    string | undefined
-  >(getDebtTokenMarketPrice(strategy)?.toFixed());
-  const [debtTokenStrategyPrice, setDebtTokenStrategyPrice] =
-    useState<string>('');
   const [oracleValue, setOracleValue] = useState<string>('');
   const [maxDebt, setMaxDebt] = useState<string>('');
-
-  const updateUnderlyingStrategyPrice = useCallback(async () => {
-    const price = await getDebtTokenStrategyPrice(strategy);
-    setDebtTokenStrategyPrice(ethers.utils.formatEther(price));
-  }, [strategy]);
 
   const updateOracleValue = useCallback(async () => {
     const value = await getOracleValueForStrategy(strategy);
@@ -73,10 +66,18 @@ export default function VaultMath({
   }, [strategy]);
 
   useEffect(() => {
-    updateUnderlyingStrategyPrice();
     updateOracleValue();
     updateMaxDebt();
   }, []);
+
+  const debtTokenMarketPrice = useMemo(
+    () => pricesData.mark.toFixed(),
+    [pricesData],
+  );
+  const debtTokenStrategyPrice = useMemo(
+    () => pricesData.norm.toFixed(),
+    [pricesData],
+  );
 
   const priceDifference = useMemo(() => {
     if (!debtTokenMarketPrice) return 0;
@@ -94,7 +95,7 @@ export default function VaultMath({
   }, [priceDifference, oracleValue]);
 
   const maxLTV = useMemo(() => {
-    return parseFloat(strategy.maxLTV.div(ONE.div(100)).toString());
+    return strategy.maxLTVPercent;
   }, [strategy]);
 
   if (!showMath) return <></>;

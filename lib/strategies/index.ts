@@ -9,7 +9,6 @@ import {
   ERC721,
   ERC721__factory,
   IQuoter,
-  IUniswapV3Pool,
   IUniswapV3Pool__factory,
   Strategy,
   Strategy__factory,
@@ -19,8 +18,6 @@ import { getPool } from './uniswap';
 import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { ChartValue } from 'lib/d3';
-import { Price } from '@uniswap/sdk-core';
 
 dayjs.extend(duration);
 
