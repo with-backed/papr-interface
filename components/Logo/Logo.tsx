@@ -13,6 +13,7 @@ type ImageDirectory = {
 };
 const ERROR_LOGOS: ImageDirectory = {
   ethereum: borkedBunny,
+  goerli: borkedBunny,
   rinkeby: borkedBunny,
   optimism: borkedBunny,
   polygon: borkedBunny,
