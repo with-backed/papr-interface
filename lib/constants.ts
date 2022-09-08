@@ -23,6 +23,7 @@ export const FAQ_URL =
 export const BUNNY_IMG_URL_MAP = {
   ethereum: '/logos/backed-bunny.png',
   rinkeby: '/logos/backed-bunny.png',
+  goerli: '/logos/backed-bunny.png',
   optimism: '/logos/opbunny.png',
   polygon: '/logos/pbunny.png',
 };

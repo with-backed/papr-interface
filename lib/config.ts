@@ -16,6 +16,26 @@ export type SupportedNetwork = keyof typeof configs;
 // Limited Alchemy API key for use on localdev only. Prod ones can only be used from our prod site's location.
 const developmentAlchemyKey = 'BtHbvji7nhBOC943JJB2XoXMSJAh64g-';
 
+const goerli: Config = {
+  ...baseConfig,
+  centerNetwork: 'ethereum-goerli',
+  chainId: 5,
+  nftBackedLoansSubgraph:
+    'https://api.thegraph.com/subgraphs/name/with-backed/backed-protocol-rinkeby',
+  jsonRpcProvider:
+    'https://eth-goerli.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
+  alchemyId: developmentAlchemyKey,
+  eip721Subgraph:
+    'https://api.thegraph.com/subgraphs/name/sunguru98/erc721-rinkeby-subgraph',
+  openSeaUrl: 'https://testnets.opensea.io',
+  etherscanUrl: 'https://goerli.etherscan.io',
+  nftSalesSubgraph: null,
+  siteUrl: 'https://staging.withbacked.xyz',
+  network: 'goerli',
+  emailSubjectPrefix: '[Testnet]:',
+  facilitatorStartBlock: 10550059,
+};
+
 const rinkeby: Config = {
   ...baseConfig,
   centerNetwork: 'ethereum-rinkeby',
@@ -111,13 +131,14 @@ const polygon: Config = {
 export const configs = {
   ethereum,
   rinkeby,
+  goerli,
   optimism,
   polygon,
 };
 
 export const prodConfigs = [ethereum, optimism, polygon];
 
-export const devConfigs = [rinkeby];
+export const devConfigs = [rinkeby, goerli];
 
 const SUPPORTED_NETWORKS = new Set(Object.keys(configs));
 
