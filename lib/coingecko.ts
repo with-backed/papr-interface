@@ -5,6 +5,7 @@ import { SupportedNetwork } from './config';
 const networkMap = {
   optimism: 'optimistic-ethereum',
   ethereum: 'ethereum',
+  goerli: 'goerli',
   polygon: 'polygon-pos',
 };
 
