@@ -64,7 +64,7 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
   const { data: signer } = useSigner();
   const [debt, setDebt] = useState<string>('');
   const [maxDebt, setMaxDebt] = useState<string>('');
-  const [collateralTokenId, setCollateralTokenId] = useState<string>('');
+  const [collateralTokenId, setCollateralTokenId] = useState<string>('1');
   const [liquidationDateEstimation, setLiquidationDateEstimation] =
     useState<string>('');
   const {
@@ -190,7 +190,10 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
               }
               return (
                 <div {...props}>
-                  <div className={styles.sliderLabel}>
+                  <div
+                    className={`${styles.sliderLabel} ${
+                      currentLTV < 5 ? styles.sliderLabelPushed : ''
+                    }`}>
                     <p>Loan Amount</p>
                     <p>{currentLTV.toFixed(2)}% LTV</p>
                   </div>
@@ -212,7 +215,7 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
               <p>Price Impact</p>
             </div>
             <div>
-              <p>{priceImpact}</p>
+              <p>{priceImpact}%</p>
             </div>
           </div>
           <div className={styles.mathRow}>

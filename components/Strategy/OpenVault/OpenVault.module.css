@@ -8,6 +8,10 @@
     line-height: 20px;
 }
 
+.sliderLabelPushed {
+    left: -14px !important;
+}
+
 .sliderWrapper > p {
     position: relative;
     left: 486px;
