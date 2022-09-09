@@ -148,7 +148,7 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
             ethers.BigNumber.from(maxDebt),
             strategy,
           )
-        ).toString(),
+        ).toFixed(0),
       );
     }, 500),
     [setDebt, maxDebt],
@@ -183,14 +183,14 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
               const currentLTV =
                 (state.valueNow / parseFloat(maxDebt)) * maxLTV;
 
-              if (currentLTV >= 38) {
+              if (maxLTV - currentLTV <= 12) {
                 setHideMaxLabel(true);
               } else {
                 setHideMaxLabel(false);
               }
               return (
                 <div {...props}>
-                  <div>
+                  <div className={styles.sliderLabel}>
                     <p>Loan Amount</p>
                     <p>{currentLTV.toFixed(2)}% LTV</p>
                   </div>
@@ -198,9 +198,31 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
               );
             }}
           />
-          <p className={hideMaxLabel ? styles.hidden : ''}>
+          <p
+            className={`${hideMaxLabel ? styles.hidden : ''} ${
+              styles.sliderLabel
+            }`}>
             Max Loan {maxLTV.toString()}% LTV
           </p>
+        </div>
+
+        <div className={styles.mathWrapper}>
+          <div className={`${styles.mathRow} ${styles.even}`}>
+            <div>
+              <p>Price Impact</p>
+            </div>
+            <div>
+              <p>{priceImpact}</p>
+            </div>
+          </div>
+          <div className={styles.mathRow}>
+            <div>
+              <p>Estimated days before liquidation</p>
+            </div>
+            <div>
+              <p>{liquidationDateEstimation}</p>
+            </div>
+          </div>
         </div>
 
         <div className={styles.borrowInput}>
@@ -217,22 +239,6 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
           <div className={styles.borrowButton} onClick={() => create(false)}>
             Borrow
           </div>
-        </div>
-
-        <div className={styles.tradeDetails}>
-          <div>
-            {!priceImpactLoading && <p>Price impact: {priceImpact}%</p>}
-          </div>
-          <div>
-            <p>
-              {' '}
-              # days before liquidation (estimation):{' '}
-              {liquidationDateEstimation}
-            </p>
-          </div>
-          <input
-            placeholder="collateral token id"
-            onChange={(e) => setCollateralTokenId(e.target.value)}></input>
         </div>
 
         <VaultMath
