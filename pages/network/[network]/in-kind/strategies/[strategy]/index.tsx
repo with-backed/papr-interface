@@ -20,6 +20,7 @@ import {
 import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { SupportedNetwork } from 'lib/config';
+import AccountNFTs from 'components/Strategy/AccountNFTs/AccountNFTs';
 
 export type StrategyPageProps = {
   address: string;
@@ -96,6 +97,7 @@ export default function StrategyPage({
             <AssociatedVaults strategy={address} />
             <D3Demo pricesData={pricesData} />
           </div>
+          <AccountNFTs strategy={lendingStrategy} />
         </div>
       ) : (
         ''
