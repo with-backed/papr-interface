@@ -103,6 +103,7 @@ export default function VaultMath({
 
   return (
     <div className={styles.mathWrapper}>
+      <p className={styles.underlyingSymbol}>{strategy.underlying.symbol}</p>
       <MathRow
         formula="M"
         description="Market $pAPR price"
@@ -129,7 +130,7 @@ export default function VaultMath({
       />
       <MathRow
         formula="R = D * C"
-        description="Effective value from this strategy"
+        description="Strategy valuation of collateral"
         content={effectiveOracleValue.toFixed(4)}
         even
       />
