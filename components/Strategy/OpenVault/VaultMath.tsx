@@ -103,7 +103,7 @@ export default function VaultMath({
 
   return (
     <div className={styles.mathWrapper}>
-      <p className={styles.usdc}>{strategy.underlying.symbol}</p>
+      <p className={styles.underlyingSymbol}>{strategy.underlying.symbol}</p>
       <MathRow
         formula="M"
         description="Market $pAPR price"
