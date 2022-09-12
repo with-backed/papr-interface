@@ -21,7 +21,7 @@ export const useRenderNFTs = (
       `https://api.center.dev/v1/${config.centerNetwork}/account/${address}/assets-owned`,
       {
         headers: {
-          'X-API-Key': 'key-43ed0f00c03c-4cf3908a1526',
+          'X-API-Key': process.env.NEXT_PUBLIC_CENTER_KEY!,
         },
       },
     );
