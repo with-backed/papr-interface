@@ -30,7 +30,8 @@ export async function getUnitPriceForCoin(
   toCurrency: string,
   network?: SupportedNetwork,
 ): Promise<number | undefined> {
-  if (network === 'rinkeby') {
+  // TODO: does coingecko support goerli?
+  if (network === 'goerli') {
     return 1.01;
   }
 

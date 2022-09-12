@@ -14,14 +14,12 @@ type ImageDirectory = {
 const ERROR_LOGOS: ImageDirectory = {
   ethereum: borkedBunny,
   goerli: borkedBunny,
-  rinkeby: borkedBunny,
   optimism: borkedBunny,
   polygon: borkedBunny,
 };
 
 const NORMAL_LOGOS: ImageDirectory = {
   ethereum: backedBunny,
-  rinkeby: backedBunny,
   goerli: backedBunny,
   optimism: optimismBackedBunny,
   polygon: polygonBackedBunny,

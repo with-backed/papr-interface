@@ -30,8 +30,8 @@ describe('account utilities', () => {
       const value = await getAccountLoanAssetAllowance(
         '0xaccount',
         '0xcontract',
-        configs.rinkeby.jsonRpcProvider,
-        'rinkeby',
+        configs.goerli.jsonRpcProvider,
+        'goerli',
       );
       expect(value).toEqual(10000000000);
     });
@@ -41,7 +41,7 @@ describe('account utilities', () => {
     it('returns the value the provider resolves', async () => {
       const value = await resolveEns(
         '0xaddress',
-        configs.rinkeby.jsonRpcProvider,
+        configs.goerli.jsonRpcProvider,
       );
       expect(value).toEqual('address.eth');
     });

@@ -36,26 +36,6 @@ const goerli: Config = {
   facilitatorStartBlock: 10550059,
 };
 
-const rinkeby: Config = {
-  ...baseConfig,
-  centerNetwork: 'ethereum-rinkeby',
-  chainId: 4,
-  nftBackedLoansSubgraph:
-    'https://api.thegraph.com/subgraphs/name/with-backed/backed-protocol-rinkeby',
-  jsonRpcProvider:
-    'https://eth-rinkeby.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
-  alchemyId: developmentAlchemyKey,
-  eip721Subgraph:
-    'https://api.thegraph.com/subgraphs/name/sunguru98/erc721-rinkeby-subgraph',
-  openSeaUrl: 'https://testnets.opensea.io',
-  etherscanUrl: 'https://rinkeby.etherscan.io',
-  nftSalesSubgraph: null,
-  siteUrl: 'https://staging.withbacked.xyz',
-  network: 'rinkeby',
-  emailSubjectPrefix: '[Testnet]:',
-  facilitatorStartBlock: 10550059,
-};
-
 const ethereum = {
   ...baseConfig,
   centerNetwork: 'ethereum-mainnet',
@@ -130,7 +110,6 @@ const polygon: Config = {
 
 export const configs = {
   ethereum,
-  rinkeby,
   goerli,
   optimism,
   polygon,
@@ -138,7 +117,7 @@ export const configs = {
 
 export const prodConfigs = [ethereum, optimism, polygon];
 
-export const devConfigs = [rinkeby, goerli];
+export const devConfigs = [goerli];
 
 const SUPPORTED_NETWORKS = new Set(Object.keys(configs));
 
