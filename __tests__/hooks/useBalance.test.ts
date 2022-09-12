@@ -61,8 +61,8 @@ describe('useBalance', () => {
     expect(result.current).toEqual(1.5);
     expect(mockJsonRpcERC20Contract).toHaveBeenCalledWith(
       '0xcontract',
-      configs.rinkeby.jsonRpcProvider,
-      'rinkeby',
+      configs.goerli.jsonRpcProvider,
+      'goerli',
     );
   });
 });

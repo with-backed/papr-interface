@@ -8,7 +8,6 @@ import { Banner, BannerKind } from '../Banner';
 
 const BANNER_CLASS_MAP: { [network in SupportedNetwork]: BannerKind } = {
   ethereum: 'error',
-  rinkeby: 'error',
   goerli: 'error',
   optimism: 'optimism',
   polygon: 'polygon',

@@ -22,7 +22,8 @@ export async function getCollectionStats(
       return collectionStatsOptimism(contractAddress);
     case 'polygon':
       return nullCollectionStats;
-    case 'rinkeby':
+    // TODO: do we need to special-case this for goerli?
+    case 'goerli':
       return collectionStatsRinkeby();
     default:
       return nullCollectionStats;
