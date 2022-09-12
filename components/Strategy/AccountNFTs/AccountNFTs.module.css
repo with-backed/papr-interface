@@ -1,0 +1,48 @@
+.wrapper {
+    padding: var(--padding-container);
+}
+
+.nfts {
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6px;
+}
+
+.imageTokenId {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 20%;
+}
+
+.imageTokenId div {
+    margin: 0 10px;
+}
+
+.oracleCheckBox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 40%;
+}
+
+.oracleCheckBox > div {
+    width: 50%;
+    text-align: center;
+}
+
+.row img {
+    width: 30px;
+}
+
+.even {
+    background-color: white;
+}

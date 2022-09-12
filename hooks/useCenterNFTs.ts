@@ -1,3 +1,4 @@
+import { getAddress } from 'ethers/lib/utils';
 import { Config } from 'lib/config';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -25,14 +26,14 @@ export const useRenderNFTs = (
       },
     );
     const json = await response.json();
-    console.log({ json });
     setAllUserNFTs(json.items);
     setNFTsLoading(false);
   }, [address, config]);
 
   const userCollectionNFTs = useMemo(() => {
-    console.log({ allUserNFTs });
-    return allUserNFTs.filter((nft) => nft.address === collection);
+    return allUserNFTs.filter(
+      (nft) => getAddress(nft.address) === getAddress(collection),
+    );
   }, [allUserNFTs]);
 
   useEffect(() => {
