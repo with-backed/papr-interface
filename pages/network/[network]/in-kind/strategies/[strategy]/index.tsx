@@ -11,7 +11,7 @@ import ProvideLiquidity from 'components/Strategy/ProvideLiquidty';
 import SwapTokens from 'components/Strategy/SwapTokens';
 import styles from './strategy.module.css';
 import { AssociatedVaults } from 'components/Strategy/AssociatedVaults';
-import { D3Demo } from 'components/Strategy/D3Demo';
+import { Chart } from 'components/Strategy/Chart';
 import {
   LendingStrategyByIdQuery,
   LendingStrategy as SubgraphLendingStrategy,
@@ -92,7 +92,7 @@ export default function StrategyPage({
           </div>
           <div className={styles.column}>
             <AssociatedVaults strategy={address} />
-            <D3Demo pricesData={pricesData} />
+            <Chart pricesData={pricesData} />
           </div>
         </div>
       ) : (

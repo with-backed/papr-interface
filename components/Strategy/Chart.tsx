@@ -4,15 +4,15 @@ import { humanizedTimestamp } from 'lib/duration';
 import { attachSVG, drawLine, drawDashedLine } from 'lib/d3';
 import { StrategyPricesData } from 'lib/strategies/charts';
 
-const containerId = '#d3demo';
+const containerId = '#strategy-d3-chart';
 
 type ChartValue = [number, number];
 
-type D3DemoProps = {
+type ChartProps = {
   pricesData: StrategyPricesData;
 };
 
-export function D3Demo({ pricesData }: D3DemoProps) {
+export function Chart({ pricesData }: ChartProps) {
   const [annualize, setAnnualize] = useState(false);
 
   // leaving this because would be nice to have, but not working right now
@@ -126,5 +126,5 @@ export function D3Demo({ pricesData }: D3DemoProps) {
 
     return () => document.querySelector(`${containerId} svg`)?.remove();
   }, [pricesData]);
-  return <div id="d3demo" />;
+  return <div id="strategy-d3-chart" />;
 }
