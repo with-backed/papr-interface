@@ -13,7 +13,7 @@ export type AccountNFTsProps = {
 };
 
 const getUniqueNFTId = (address: string, tokenId: string): string =>
-  `${address}-${tokenId}`;
+  `${getAddress(address)}-${tokenId}`;
 
 export default function AccountNFTs({ strategy }: AccountNFTsProps) {
   const { address } = useAccount();
@@ -26,6 +26,9 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
   );
   const [nftSelected, setNFTSelected] = useState<string[]>([]);
   const [nftsApproved, setNFTsApproved] = useState<string[]>([]);
+  const [approvalsLoading, setApprovalsLoading] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const collateralContract = useMemo(() => {
     return erc721Contract(strategy.collateral.contract.address, signer!);
@@ -89,12 +92,26 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
 
   const approveNFT = useCallback(
     async (tokenId: string) => {
+      setApprovalsLoading((prevApprovalsLoading) => ({
+        ...prevApprovalsLoading,
+        [getUniqueNFTId(collateralContract.address, tokenId)]: true,
+      }));
       const t = await collateralContract.approve(
         strategy.contract.address,
         tokenId,
       );
+      t.wait().then(() => {
+        setApprovalsLoading((prevApprovalsLoading) => ({
+          ...prevApprovalsLoading,
+          [getUniqueNFTId(collateralContract.address, tokenId)]: false,
+        }));
+        setNFTsApproved((prevNFTsApproved) => [
+          ...prevNFTsApproved,
+          getUniqueNFTId(collateralContract.address, tokenId),
+        ]);
+      });
     },
-    [strategy],
+    [strategy, collateralContract, setApprovalsLoading],
   );
 
   const performApproveAll = useCallback(async () => {
@@ -153,11 +170,20 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
                       }
                     />
                   ) : (
-                    <p
-                      className={styles.approve}
-                      onClick={() => approveNFT(nft.tokenId)}>
-                      Approve
-                    </p>
+                    <>
+                      {!approvalsLoading[
+                        getUniqueNFTId(nft.address, nft.tokenId)
+                      ] && (
+                        <p
+                          className={styles.approve}
+                          onClick={() => approveNFT(nft.tokenId)}>
+                          Approve
+                        </p>
+                      )}
+                      {approvalsLoading[
+                        getUniqueNFTId(nft.address, nft.tokenId)
+                      ] && <p>...</p>}
+                    </>
                   )}
                 </div>
               </div>
