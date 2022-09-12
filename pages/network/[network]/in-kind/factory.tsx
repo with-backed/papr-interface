@@ -23,7 +23,9 @@ export default function Factory() {
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
   try {
     validateNetwork(context.params!);
-  } catch (e) {}
+  } catch (e) {
+    return { notFound: true };
+  }
 
   return { props: {} };
 };
