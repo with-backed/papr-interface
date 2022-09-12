@@ -8,7 +8,7 @@ export type Vault = {
   id: ethers.BigNumber;
   debt: ethers.BigNumber;
   price: ethers.BigNumber;
-  liquidationPrice: ethers.BigNumber; // liquidated when 1 DT = X underlying
+  liquidationPrice: ethers.BigNumber | null; // liquidated when 1 DT = X underlying
   strategy: LendingStrategy;
 };
 
@@ -31,8 +31,7 @@ export async function getVaultInfo(
 
   const maxLTV = strategy.maxLTVPercent;
   const maxUnderlying = price.mul(maxLTV).div(ONE);
-  // TODO: how should we represent this when debt is zero?
-  const liquidationPrice = debt.eq(0) ? debt : maxUnderlying.div(debt);
+  const liquidationPrice = debt.eq(0) ? null : maxUnderlying.div(debt);
 
   return {
     id,
