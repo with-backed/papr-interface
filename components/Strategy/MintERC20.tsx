@@ -36,13 +36,13 @@ export default function MintERC20({ token }: TokenInfoProps) {
       address,
       ethers.utils.parseUnits(value, token.decimals),
     );
-    t.wait();
+    await t.wait();
     getBalance();
   }, [address, getBalance, token, signer, value]);
 
   useEffect(() => {
     getBalance();
-  });
+  }, [getBalance]);
 
   return (
     <Fieldset legend={`🪙 Mint yourself ${token.symbol}`}>

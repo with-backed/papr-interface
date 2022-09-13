@@ -1,17 +1,19 @@
 import { Pool } from '@uniswap/v3-sdk';
 import { Fieldset } from 'components/Fieldset';
+import { useConfig } from 'hooks/useConfig';
 
 type PoolStateProps = {
   pool: Pool;
 };
 
 export default function PoolState({ pool }: PoolStateProps) {
+  const { network } = useConfig();
   return (
     <Fieldset legend="🏊 Pool State">
       <a
         target="_blank"
         rel="noreferrer"
-        href={`https://app.uniswap.org/#/add/${pool?.token0.address}/${pool?.token1.address}/10000?chain=rinkeby`}>
+        href={`https://app.uniswap.org/#/add/${pool?.token0.address}/${pool?.token1.address}/10000?chain=${network}`}>
         {' '}
         see it on app.uniswap.org{' '}
       </a>
