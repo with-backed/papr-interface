@@ -4,7 +4,6 @@ import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { SupportedNetwork } from 'lib/config';
 import { makeProvider } from 'lib/contracts';
-import { ONE } from 'lib/strategies/constants';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -158,10 +157,15 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
                 100}
               %
             </p>
-            <p>
-              liquidation price: when 1 DT ={' '}
-              {vaultInfo.liquidationPrice.toString()} underlying
-            </p>
+            {vaultInfo.liquidationPrice === null && (
+              <p>liquidation price: N/A</p>
+            )}
+            {!!vaultInfo.liquidationPrice && (
+              <p>
+                liquidation price: when 1 DT ={' '}
+                {vaultInfo.liquidationPrice.toString()} underlying
+              </p>
+            )}
             <p>
               current debt token price: {debtPrice}{' '}
               {vaultInfo.strategy.underlying.symbol}
