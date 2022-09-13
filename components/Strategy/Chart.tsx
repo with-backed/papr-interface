@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { axisBottom, axisRight, extent, scaleLinear, min, max } from 'd3';
+import { useCallback, useEffect, useState } from 'react';
+import { axisBottom, extent, scaleLinear, min, max } from 'd3';
 import { humanizedTimestamp } from 'lib/duration';
 import { attachSVG, drawLine, drawDashedLine } from 'lib/d3';
 import { StrategyPricesData } from 'lib/strategies/charts';
@@ -17,27 +17,30 @@ export function Chart({ pricesData }: ChartProps) {
 
   // leaving this because would be nice to have, but not working right now
   // I think the annual values got too big to plot on my example
-  function transformToAnnual(pData: StrategyPricesData): StrategyPricesData {
-    const markValues: ChartValue[] = pData.markDPRValues.map((v) => {
-      return [v[0] * 365, v[1]];
-    });
-    const normValues: ChartValue[] = pData.normalizationDPRValues.map((v) => {
-      return [v[0] * 365, v[1]];
-    });
-    const indexValues: ChartValue[] = pData.indexDPRValues.map((v) => {
-      return [v[0] * 365, v[1]];
-    });
+  const transformToAnnual = useCallback(
+    (pData: StrategyPricesData): StrategyPricesData => {
+      const markValues: ChartValue[] = pData.markDPRValues.map((v) => {
+        return [v[0] * 365, v[1]];
+      });
+      const normValues: ChartValue[] = pData.normalizationDPRValues.map((v) => {
+        return [v[0] * 365, v[1]];
+      });
+      const indexValues: ChartValue[] = pData.indexDPRValues.map((v) => {
+        return [v[0] * 365, v[1]];
+      });
 
-    return {
-      indexDPR: pricesData.indexDPR,
-      index: pricesData.index,
-      markDPRValues: markValues,
-      normalizationDPRValues: normValues,
-      indexDPRValues: indexValues,
-      markValues: pricesData.markValues,
-      normalizationValues: pricesData.normalizationValues,
-    };
-  }
+      return {
+        indexDPR: pricesData.indexDPR,
+        index: pricesData.index,
+        markDPRValues: markValues,
+        normalizationDPRValues: normValues,
+        indexDPRValues: indexValues,
+        markValues: pricesData.markValues,
+        normalizationValues: pricesData.normalizationValues,
+      };
+    },
+    [pricesData],
+  );
 
   useEffect(() => {
     var data = pricesData;
@@ -103,17 +106,6 @@ export function Chart({ pricesData }: ChartProps) {
       .style('text-transform', 'uppercase')
       .style('color', 'var(--greentext)')
       .attr('dy', '1.5em');
-
-    // y axis on right
-    // svg
-    //   .append('g')
-    //   .attr('transform', `translate(${width}, 0)`)
-    //   .call(axisRight(yScale));
-
-    // y axis on left
-    // svg
-    //   .append('g')
-    //   .call(axisLeft(yScale));
 
     drawLine({
       data: data.normalizationDPRValues,
