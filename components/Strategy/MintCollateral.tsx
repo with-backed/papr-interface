@@ -30,13 +30,13 @@ export default function MintCollateral({ token }: MintCollateralProps) {
       signer,
     );
     const t = await contract.mint(address);
-    t.wait();
+    await t.wait();
     getBalance();
   }, [address, getBalance, token, signer]);
 
   useEffect(() => {
     getBalance();
-  });
+  }, [getBalance]);
 
   return (
     <Fieldset legend={`➕ Mint yourself ${token.symbol}`}>
