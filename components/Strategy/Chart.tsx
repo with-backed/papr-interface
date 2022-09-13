@@ -46,12 +46,17 @@ export function Chart({ pricesData }: ChartProps) {
       console.log(pricesData);
       console.log(data);
     }
-    const margin = { top: 10, right: 50, bottom: 30, left: 60 };
-    const width = 500 - margin.left - margin.right;
+    const margin = { top: 0, right: 0, bottom: 20, left: 0 };
+    const width = 580 - margin.left - margin.right;
     // TODO dynamically adjust height based on extent of y values
-    const height = 400 - margin.top - margin.bottom;
+    const height = 270 - margin.top - margin.bottom;
 
     const svg = attachSVG({ containerId, height, margin, width });
+    svg
+      .append('rect')
+      .attr('width', width)
+      .attr('height', height)
+      .style('fill', 'white');
 
     const datasets = [
       ...data.normalizationDPRValues,
@@ -81,19 +86,29 @@ export function Chart({ pricesData }: ChartProps) {
       .range([height, minY]);
 
     // Draw scale lines on chart
-    svg
+    const xAxis = svg
       .append('g')
-      .attr('transform', 'translate(0,' + height + ')')
-      .call(
-        axisBottom(xScale)
-          .ticks(3)
-          .tickFormat((d) => humanizedTimestamp(d.valueOf())),
-      );
+      .attr('transform', 'translate(0,' + height + ')');
+    xAxis.call(
+      axisBottom(xScale)
+        .ticks(3)
+        .tickSize(-height)
+        .tickFormat((d) => humanizedTimestamp(d.valueOf())),
+    );
+    xAxis.selectAll('.domain').remove();
+    xAxis.selectAll('.tick>line').style('stroke', '#CEECE4');
+    xAxis
+      .selectAll('.tick>text')
+      .style('font-family', 'var(--mono)')
+      .style('text-transform', 'uppercase')
+      .style('color', 'var(--greentext)')
+      .attr('dy', '1.5em');
+
     // y axis on right
-    svg
-      .append('g')
-      .attr('transform', `translate(${width}, 0)`)
-      .call(axisRight(yScale));
+    // svg
+    //   .append('g')
+    //   .attr('transform', `translate(${width}, 0)`)
+    //   .call(axisRight(yScale));
 
     // y axis on left
     // svg
@@ -125,6 +140,6 @@ export function Chart({ pricesData }: ChartProps) {
     });
 
     return () => document.querySelector(`${containerId} svg`)?.remove();
-  }, [pricesData]);
+  }, [annualize, pricesData, transformToAnnual]);
   return <div id="strategy-d3-chart" />;
 }

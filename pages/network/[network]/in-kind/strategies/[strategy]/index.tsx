@@ -19,6 +19,7 @@ import {
 import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { SupportedNetwork } from 'lib/config';
+import { Fieldset } from 'components/Fieldset';
 
 export type StrategyPageProps = {
   address: string;
@@ -92,7 +93,9 @@ export default function StrategyPage({
           </div>
           <div className={styles.column}>
             <AssociatedVaults strategy={address} />
-            <Chart pricesData={pricesData} />
+            <Fieldset legend="💸 Performance">
+              <Chart pricesData={pricesData} />
+            </Fieldset>
           </div>
         </div>
       ) : (
