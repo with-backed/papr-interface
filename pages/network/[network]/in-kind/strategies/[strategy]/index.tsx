@@ -94,6 +94,7 @@ export default function StrategyPage({
           <div className={styles.column}>
             <AssociatedVaults strategy={address} />
             <Fieldset legend="💸 Performance">
+              <h3>Rate of Growth</h3>
               <Chart pricesData={pricesData} />
             </Fieldset>
           </div>
