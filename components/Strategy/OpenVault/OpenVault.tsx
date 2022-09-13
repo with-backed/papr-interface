@@ -62,7 +62,12 @@ const OnERC721ReceivedArgsEncoderString = `
 export default function OpenVault({ strategy, pricesData }: BorrowProps) {
   const { address } = useAccount();
   const { data: signer } = useSigner();
+  // TODO: looks like we're doing a lot of parsing on these values -- probably
+  // makes sense to store them as numbers or BigNumbers and only format as
+  // string when they're rendered.
   const [debt, setDebt] = useState<string>('');
+  // TODO: this one in particular parses as NaN before being fed into Slider,
+  // producing an error in the console.
   const [maxDebt, setMaxDebt] = useState<string>('');
   const [collateralTokenId, setCollateralTokenId] = useState<string>('1');
   const [liquidationDateEstimation, setLiquidationDateEstimation] =
@@ -129,9 +134,21 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
         );
       });
     },
-    [address, collateralTokenId, debt, network, signer, strategy, quoteForSwap],
+    [
+      address,
+      collateralTokenId,
+      debt,
+      network,
+      signer,
+      strategy,
+      quoteForSwap,
+      tokenOut.decimals,
+    ],
   );
 
+  // TODO: I think useCallback may not be able to introspect the debounced
+  // function this produces. May need to either manually handle debounce with
+  // timeouts or do something else.
   const handleDebtAmountChanged = useCallback(
     debounce(async (value: string) => {
       setDebt(value);
