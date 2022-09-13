@@ -72,3 +72,7 @@
     color: var(--highlight-clickable-100);
     text-align: right;
 }
+
+.selectAll p {
+    margin: 0;
+}

@@ -8,7 +8,7 @@ type RenderUserNFTsResponse = {
   tokenId: string;
 };
 
-export const useRenderNFTs = (
+export const useCenterNFTs = (
   address: string | undefined,
   collection: string,
   config: Config,
@@ -17,17 +17,22 @@ export const useRenderNFTs = (
   const [nftsLoading, setNFTsLoading] = useState<boolean>(true);
 
   const getAllUserNFTs = useCallback(async () => {
-    const response = await fetch(
-      `https://api.center.dev/v1/${config.centerNetwork}/account/${address}/assets-owned`,
-      {
-        headers: {
-          'X-API-Key': process.env.NEXT_PUBLIC_CENTER_KEY!,
+    try {
+      const response = await fetch(
+        `https://api.center.dev/v1/${config.centerNetwork}/account/${address}/assets-owned`,
+        {
+          headers: {
+            'X-API-Key': process.env.NEXT_PUBLIC_CENTER_KEY!,
+          },
         },
-      },
-    );
-    const json = await response.json();
-    setAllUserNFTs(json.items);
-    setNFTsLoading(false);
+      );
+      const json = await response.json();
+      setAllUserNFTs(json.items);
+      setNFTsLoading(false);
+    } catch (e) {
+      console.error(e);
+      setNFTsLoading(false);
+    }
   }, [address, config]);
 
   const userCollectionNFTs = useMemo(() => {

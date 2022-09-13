@@ -1,6 +1,6 @@
 import { Fieldset } from 'components/Fieldset';
 import { getAddress } from 'ethers/lib/utils';
-import { useRenderNFTs } from 'hooks/useCenterNFTs';
+import { useCenterNFTs } from 'hooks/useCenterNFTs';
 import { useConfig } from 'hooks/useConfig';
 import { erc721Contract } from 'lib/contracts';
 import { LendingStrategy } from 'lib/strategies';
@@ -19,12 +19,12 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
   const { address } = useAccount();
   const config = useConfig();
   const { data: signer } = useSigner();
-  const { userCollectionNFTs, nftsLoading } = useRenderNFTs(
+  const { userCollectionNFTs, nftsLoading } = useCenterNFTs(
     address,
     strategy.collateral.contract.address,
     config,
   );
-  const [nftSelected, setNFTSelected] = useState<string[]>([]);
+  const [nftsSelected, setNFTsSelected] = useState<string[]>([]);
   const [nftsApproved, setNFTsApproved] = useState<string[]>([]);
   const [approvalsLoading, setApprovalsLoading] = useState<{
     [key: string]: boolean;
@@ -57,7 +57,7 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
       }),
     );
     setNFTsApproved(nftApprovals.filter((id) => !!id));
-    setNFTSelected(nftsApproved);
+    setNFTsSelected(nftsApproved);
   }, [userCollectionNFTs, isNFTApproved]);
 
   useEffect(() => {
@@ -67,29 +67,29 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
 
   const handleNFTSelected = useCallback(
     (address: string, tokenId: string, checked: boolean) => {
-      setNFTSelected((prevNFTSelected) => {
+      setNFTsSelected((prevNFTSelected) => {
         const uniqueNFTId = getUniqueNFTId(address, tokenId);
         return checked
           ? [...prevNFTSelected, uniqueNFTId]
           : prevNFTSelected.filter((s) => s !== uniqueNFTId);
       });
     },
-    [setNFTSelected],
+    [setNFTsSelected],
   );
 
   const noneSelected = useMemo(() => {
-    return nftSelected.length === 0;
-  }, [nftSelected]);
+    return nftsSelected.length === 0;
+  }, [nftsSelected]);
 
   const performSelectAll = useCallback(() => {
-    setNFTSelected(
+    setNFTsSelected(
       userCollectionNFTs.map((nft) => getUniqueNFTId(nft.address, nft.tokenId)),
     );
-  }, [userCollectionNFTs, setNFTSelected]);
+  }, [userCollectionNFTs, setNFTsSelected]);
 
   const performUnselectAll = useCallback(() => {
-    setNFTSelected([]);
-  }, [setNFTSelected]);
+    setNFTsSelected([]);
+  }, [setNFTsSelected]);
 
   const approveNFT = useCallback(
     async (tokenId: string) => {
@@ -120,7 +120,7 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
       strategy.contract.address,
       true,
     );
-  }, [collateralContract]);
+  }, [collateralContract, strategy]);
 
   if (nftsLoading) return <></>;
 
@@ -128,70 +128,71 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
     <Fieldset legend="🖼️ Vault">
       <div className={styles.wrapper}>
         <div className={styles.nfts}>
-          <div className={`${styles.row} ${styles.columnLabels}`}>
-            <div className={styles.imageTokenId}></div>
-            <div className={styles.oracleCheckBox}>
-              <div>
-                <p>oracle</p>
-              </div>
-              <div>
-                <p>deposit</p>
-              </div>
-            </div>
-          </div>
-          {userCollectionNFTs.map((nft, i) => (
-            <div
-              className={`${styles.row} ${i % 2 === 0 ? styles.even : ''}`}
-              key={`${nft.address}-${nft.tokenId}`}>
-              <div className={styles.imageTokenId}>
-                <div>
-                  <img src={nft.smallPreviewImageUrl} />
-                </div>
-                <div>#{nft.tokenId}</div>
-              </div>
+          <ol>
+            <li className={`${styles.row} ${styles.columnLabels}`}>
+              <div className={styles.imageTokenId}></div>
               <div className={styles.oracleCheckBox}>
                 <div>
-                  <p>$72,188</p>
+                  <p>oracle</p>
                 </div>
                 <div>
-                  {nftsApproved.includes(
-                    getUniqueNFTId(nft.address, nft.tokenId),
-                  ) ? (
-                    <input
-                      type="checkbox"
-                      checked={nftSelected.includes(
-                        getUniqueNFTId(nft.address, nft.tokenId),
-                      )}
-                      onChange={(e) =>
-                        handleNFTSelected(
-                          nft.address,
-                          nft.tokenId,
-                          e.target.checked,
-                        )
-                      }
-                    />
-                  ) : (
-                    <>
-                      {!approvalsLoading[
-                        getUniqueNFTId(nft.address, nft.tokenId)
-                      ] && (
-                        <p
-                          className={styles.approve}
-                          onClick={() => approveNFT(nft.tokenId)}>
-                          Approve
-                        </p>
-                      )}
-                      {approvalsLoading[
-                        getUniqueNFTId(nft.address, nft.tokenId)
-                      ] && <p>...</p>}
-                    </>
-                  )}
+                  <p>deposit</p>
                 </div>
               </div>
-            </div>
-          ))}
+            </li>
+            {userCollectionNFTs.map((nft, i) => (
+              <li
+                className={`${styles.row} ${i % 2 === 0 ? styles.even : ''}`}
+                key={`${nft.address}-${nft.tokenId}`}>
+                <div className={styles.imageTokenId}>
+                  <div>
+                    <img src={nft.smallPreviewImageUrl} />
+                  </div>
+                  <div>#{nft.tokenId}</div>
+                </div>
+                <div className={styles.oracleCheckBox}>
+                  <div>
+                    <p>$72,188</p>
+                  </div>
+                  <div>
+                    {nftsApproved.includes(
+                      getUniqueNFTId(nft.address, nft.tokenId),
+                    ) ? (
+                      <input
+                        type="checkbox"
+                        checked={nftsSelected.includes(
+                          getUniqueNFTId(nft.address, nft.tokenId),
+                        )}
+                        onChange={(e) =>
+                          handleNFTSelected(
+                            nft.address,
+                            nft.tokenId,
+                            e.target.checked,
+                          )
+                        }
+                      />
+                    ) : (
+                      <>
+                        {!approvalsLoading[
+                          getUniqueNFTId(nft.address, nft.tokenId)
+                        ] && (
+                          <p
+                            className={styles.approve}
+                            onClick={() => approveNFT(nft.tokenId)}>
+                            Approve
+                          </p>
+                        )}
+                        {approvalsLoading[
+                          getUniqueNFTId(nft.address, nft.tokenId)
+                        ] && <p>...</p>}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
-
         <div className={styles.selectAll}>
           {nftsApproved.length > 0 && (
             <>
