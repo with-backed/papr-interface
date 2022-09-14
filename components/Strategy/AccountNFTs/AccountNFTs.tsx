@@ -75,7 +75,7 @@ export default function AccountNFTs({
       }),
     );
     setNFTsApproved(nftApprovals.filter((id) => !!id));
-    setNFTsSelected(nftApprovals);
+    setNFTsSelected(nftApprovals.filter((id) => !!id));
   }, [userCollectionNFTs, isNFTApproved]);
 
   useEffect(() => {

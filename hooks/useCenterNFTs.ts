@@ -13,13 +13,19 @@ export const useCenterNFTs = (
   collection: string | undefined,
   config: Config,
 ) => {
-  const [allUserNFTs, setAllUserNFTs] = useState<RenderUserNFTsResponse[]>([]);
+  const [userCollectionNFTs, setUserCollectionNFTs] = useState<
+    RenderUserNFTsResponse[]
+  >([]);
   const [nftsLoading, setNFTsLoading] = useState<boolean>(true);
 
   const getAllUserNFTs = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://api.center.dev/v1/${config.centerNetwork}/account/${address}/assets-owned`,
+        `https://api.center.dev/v1/${
+          config.centerNetwork
+        }/account/${address}/assets-owned?limit=100&collection=${getAddress(
+          collection!,
+        )}`,
         {
           headers: {
             'X-API-Key': process.env.NEXT_PUBLIC_CENTER_KEY!,
@@ -27,20 +33,13 @@ export const useCenterNFTs = (
         },
       );
       const json = await response.json();
-      setAllUserNFTs(json.items);
+      setUserCollectionNFTs(json.items);
       setNFTsLoading(false);
     } catch (e) {
       console.error(e);
       setNFTsLoading(false);
     }
-  }, [address, config]);
-
-  const userCollectionNFTs = useMemo(() => {
-    if (!collection) return [];
-    return allUserNFTs.filter(
-      (nft) => getAddress(nft.address) === getAddress(collection),
-    );
-  }, [allUserNFTs, collection]);
+  }, [address, collection, config]);
 
   useEffect(() => {
     if (!address || !collection) return;

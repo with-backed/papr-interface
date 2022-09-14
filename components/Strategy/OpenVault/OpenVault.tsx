@@ -58,6 +58,18 @@ interface AddCollateralArgsStruct {
   sig: ILendingStrategy.SigStruct;
 }
 
+const MintAndSwapEncoderString =
+  'mintAndSellDebt(uint256 vaultId, uint256 vaultNonce, int256 debt, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo)';
+
+interface MintAndSwapArgsStruct {
+  vaultId: ethers.BigNumber;
+  vaultNonce: ethers.BigNumber;
+  debt: ethers.BigNumber;
+  minOut: ethers.BigNumber;
+  sqrtPriceLimitX96: ethers.BigNumber;
+  proceedsTo: string;
+}
+
 const MulticallEncoderString = `
     tuple(
       address target,
@@ -136,12 +148,6 @@ export default function OpenVault({
       },
     }));
 
-    // console.log(
-    //   await strategy.contract.collateralFrozenOraclePrice(
-    //     '0x626c756500000000000000000000000000000000000000000000000000000000',
-    //   ),
-    // );
-
     const lendingStrategyIFace = new ethers.utils.Interface(
       LendingStrategyABI.abi,
     );
@@ -155,24 +161,30 @@ export default function OpenVault({
       ]),
     );
 
-    await strategy.contract
-      .connect(signer!)
-      .addCollateral(
-        0,
-        addCollateralArgs[0].collateral!,
-        addCollateralArgs[0].oracleInfo!,
-        addCollateralArgs[0].sig!,
-        {
-          gasLimit: ethers.utils.hexValue(3000000),
-        },
-      );
+    const mintAndSellDebtArgs: MintAndSwapArgsStruct = {
+      vaultId: ethers.BigNumber.from(0),
+      vaultNonce: ethers.BigNumber.from(0),
+      debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
+      minOut: ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals),
+      proceedsTo: address!,
+      sqrtPriceLimitX96: strategy.token0IsUnderlying
+        ? ethers.BigNumber.from(TickMath.MAX_SQRT_RATIO.toString()).sub(1)
+        : ethers.BigNumber.from(TickMath.MIN_SQRT_RATIO.toString()).add(1),
+    };
 
-    // const t = await strategy.contract.connect(signer!).multicall(calldata, {
-    //   gasLimit: ethers.utils.hexValue(3000000),
-    // });
-    // t.wait()
-    //   .then(() => console.log('success'))
-    //   .catch((e) => console.log({ e }));
+    const calldataWithSwap = [
+      ...calldata,
+      lendingStrategyIFace.encodeFunctionData(MintAndSwapEncoderString, []),
+    ];
+
+    const t = await strategy.contract
+      .connect(signer!)
+      .multicall(calldataWithSwap, {
+        gasLimit: ethers.utils.hexValue(3000000),
+      });
+    t.wait()
+      .then(() => console.log('success'))
+      .catch((e) => console.log({ e }));
   }, [
     address,
     nftsSelected,
@@ -183,63 +195,6 @@ export default function OpenVault({
     quoteForSwap,
     tokenOut.decimals,
   ]);
-
-  const create = useCallback(
-    async (withSwap: boolean) => {
-      const request: OnERC721ReceivedArgsStruct = {
-        vaultId: ethers.BigNumber.from(0),
-        vaultNonce: ethers.BigNumber.from(0),
-        mintVaultTo: address!,
-        mintDebtOrProceedsTo: address!,
-        minOut: withSwap
-          ? ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals)
-          : ethers.BigNumber.from(0),
-        sqrtPriceLimitX96: strategy.token0IsUnderlying
-          ? ethers.BigNumber.from(TickMath.MAX_SQRT_RATIO.toString()).sub(1)
-          : ethers.BigNumber.from(TickMath.MIN_SQRT_RATIO.toString()).add(1),
-        debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
-        oracleInfo: {
-          price: ethers.utils.parseUnits(PRICE.toString(), 18),
-          period: ethers.BigNumber.from(0),
-        },
-        sig: {
-          v: ethers.BigNumber.from(1),
-          r: ethers.utils.formatBytes32String('x'),
-          s: ethers.utils.formatBytes32String('y'),
-        },
-      };
-
-      const signerCollateral = ERC721__factory.connect(
-        strategy.collateral.contract.address,
-        signer!,
-      );
-
-      await signerCollateral['safeTransferFrom(address,address,uint256,bytes)'](
-        address!,
-        strategy.contract.address,
-        ethers.BigNumber.from(collateralTokenId),
-        ethers.utils.defaultAbiCoder.encode(
-          [OnERC721ReceivedArgsEncoderString],
-          [request],
-        ),
-        {
-          gasLimit: ethers.utils.hexValue(3000000),
-        },
-      );
-
-      // TODO(adamgobes): redirect to vault page after implementing addCollateral
-    },
-    [
-      address,
-      collateralTokenId,
-      debt,
-      network,
-      signer,
-      strategy,
-      quoteForSwap,
-      tokenOut.decimals,
-    ],
-  );
 
   // TODO: I think useCallback may not be able to introspect the debounced
   // function this produces. May need to either manually handle debounce with
