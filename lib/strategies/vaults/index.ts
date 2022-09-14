@@ -22,7 +22,9 @@ export async function getVaultInfo(
     strategyAddress,
     signerOrProvider,
   );
-  const { debt, price } = await strategyContract.vaultInfo(id.toHexString());
+  const { debt, collateralValue } = await strategyContract.vaultInfo(
+    id.toHexString(),
+  );
   const strategy = await populateLendingStrategy(
     strategyAddress,
     config,
@@ -30,13 +32,13 @@ export async function getVaultInfo(
   );
 
   const maxLTV = strategy.maxLTVPercent;
-  const maxUnderlying = price.mul(maxLTV).div(ONE);
+  const maxUnderlying = collateralValue.mul(maxLTV).div(ONE);
   const liquidationPrice = debt.eq(0) ? null : maxUnderlying.div(debt);
 
   return {
     id,
     debt,
-    price,
+    price: collateralValue,
     liquidationPrice,
     strategy,
   };

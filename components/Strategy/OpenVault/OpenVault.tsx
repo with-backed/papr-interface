@@ -126,13 +126,7 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
         },
       );
 
-      const filter = strategy.contract.filters.OpenVault(null, address, null);
-
-      strategy.contract.once(filter, (id, to, nonce) => {
-        window.location.assign(
-          `/network/${network}/in-kind/strategies/${strategy.contract.address}/vaults/${id}`,
-        );
-      });
+      // TODO(adamgobes): redirect to vault page after implementing addCollateral
     },
     [
       address,
