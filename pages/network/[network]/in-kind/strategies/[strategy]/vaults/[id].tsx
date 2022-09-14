@@ -119,23 +119,7 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     }
   }, [id, fetchVaultInfo, vaultInfo]);
 
-  const [closeHash, setCloseHash] = useState('');
-  const [closePending, setClosePending] = useState(false);
-  const closeVault = useCallback(async () => {
-    if (vaultInfo && data?.vault) {
-      // TODO, get nonce for vault
-      const tx = await vaultInfo.strategy.contract.closeVault(id, 0);
-
-      setCloseHash(tx.hash);
-      setClosePending(true);
-
-      await tx.wait();
-      setClosePending(false);
-      replace(`/network/${config.network}/in-kind/strategies/${strategy}`);
-    } else {
-      console.error('No vault info, cannot close vault');
-    }
-  }, [config.network, data?.vault, id, replace, strategy, vaultInfo]);
+  // TODO: use removeCollateral instead of closeVault
 
   return (
     <div className={styles.column}>
@@ -181,13 +165,6 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
             />
             <br />
             <br />
-            <TransactionButton
-              text="Close Vault"
-              onClick={closeVault}
-              txHash={closeHash}
-              isPending={closePending}
-              disabled={!userIsOwner || vaultInfo.debt.gt(0)}
-            />
           </Fieldset>
         </>
       )}
