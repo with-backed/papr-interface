@@ -27,17 +27,18 @@
       "type": "error"
     },
     {
-      "inputs": [],
-      "name": "OnlyVaultOwner",
-      "type": "error"
-    },
-    {
       "anonymous": false,
       "inputs": [
         {
           "indexed": true,
           "internalType": "uint256",
           "name": "vaultId",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "vaultNonce",
           "type": "uint256"
         },
         {
@@ -78,19 +79,6 @@
         }
       ],
       "name": "AddCollateral",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
-        }
-      ],
-      "name": "CloseVault",
       "type": "event"
     },
     {
@@ -198,7 +186,7 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "vaultId",
+          "name": "vaultNonce",
           "type": "uint256"
         },
         {
@@ -267,8 +255,13 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "vaultId",
+          "name": "vaultNonce",
           "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "vaultOwner",
+          "type": "address"
         },
         {
           "components": [
@@ -348,24 +341,6 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "vaultNonce",
-          "type": "uint256"
-        }
-      ],
-      "name": "closeVault",
-      "outputs": [],
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -451,11 +426,6 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
-        },
         {
           "internalType": "uint256",
           "name": "vaultNonce",
@@ -589,11 +559,6 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
-        },
         {
           "internalType": "uint256",
           "name": "vaultNonce",
