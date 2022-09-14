@@ -4,7 +4,6 @@ import { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useState } from 'react';
 import MintERC20 from 'components/Strategy/MintERC20';
 import MintCollateral from 'components/Strategy/MintCollateral';
-import OpenVault from 'components/Strategy/OpenVault/OpenVault';
 import PoolState from 'components/Strategy/PoolState';
 import SwapQuote from 'components/Strategy/SwapQuote';
 import StrategyState from 'components/Strategy/StrategyState';
@@ -20,7 +19,6 @@ import {
 import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { SupportedNetwork } from 'lib/config';
-import AccountNFTs from 'components/Strategy/AccountNFTs/AccountNFTs';
 
 export type StrategyPageProps = {
   address: string;
@@ -85,7 +83,6 @@ export default function StrategyPage({
             <MintERC20 token={lendingStrategy.underlying} />
             <MintCollateral token={lendingStrategy.collateral} />
             <ProvideLiquidity pool={lendingStrategy.pool} />
-            <OpenVault strategy={lendingStrategy} pricesData={pricesData} />
             <SwapQuote strategy={lendingStrategy} swapForUnderlying />
             <SwapQuote strategy={lendingStrategy} swapForUnderlying={false} />
             <SwapTokens
@@ -97,7 +94,6 @@ export default function StrategyPage({
             <AssociatedVaults strategy={address} />
             <D3Demo pricesData={pricesData} />
           </div>
-          <AccountNFTs strategy={lendingStrategy} />
         </div>
       ) : (
         ''

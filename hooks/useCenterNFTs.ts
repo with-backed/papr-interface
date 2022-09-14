@@ -2,7 +2,7 @@ import { getAddress } from 'ethers/lib/utils';
 import { Config } from 'lib/config';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-type RenderUserNFTsResponse = {
+export type RenderUserNFTsResponse = {
   address: string;
   smallPreviewImageUrl: string;
   tokenId: string;
@@ -10,7 +10,7 @@ type RenderUserNFTsResponse = {
 
 export const useCenterNFTs = (
   address: string | undefined,
-  collection: string,
+  collection: string | undefined,
   config: Config,
 ) => {
   const [allUserNFTs, setAllUserNFTs] = useState<RenderUserNFTsResponse[]>([]);
@@ -36,15 +36,16 @@ export const useCenterNFTs = (
   }, [address, config]);
 
   const userCollectionNFTs = useMemo(() => {
+    if (!collection) return [];
     return allUserNFTs.filter(
       (nft) => getAddress(nft.address) === getAddress(collection),
     );
-  }, [allUserNFTs]);
+  }, [allUserNFTs, collection]);
 
   useEffect(() => {
-    if (!address) return;
+    if (!address || !collection) return;
     getAllUserNFTs();
-  }, [address]);
+  }, [address, collection]);
 
   return { userCollectionNFTs, nftsLoading };
 };
