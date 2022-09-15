@@ -4,6 +4,7 @@ import { captureException } from '@sentry/nextjs';
 import { SupportedNetwork, validateNetwork } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import capitalize from 'lodash/capitalize';
+import { LandingPageContent } from 'components/LandingPageContent';
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async (
   context,
@@ -32,7 +33,7 @@ export default function Home({ network }: HomeProps) {
   return (
     <>
       <OpenGraph title={`Backed | ${capitalize(network)} | Home`} />
-      <h1>under construction</h1>
+      <LandingPageContent />
     </>
   );
 }
