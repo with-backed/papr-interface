@@ -29,7 +29,7 @@ export function D3Demo({ pricesData }: D3DemoProps) {
     });
 
     return {
-      index: pricesData.index,
+      indexDPR: pricesData.indexDPR,
       markDPRValues: markValues,
       normalizationDPRValues: normValues,
       indexDPRValues: indexValues,

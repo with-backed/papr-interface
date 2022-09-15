@@ -1,7 +1,9 @@
 import { ethers } from 'ethers';
-import { SupportedNetwork } from 'lib/config';
+import { configs, SupportedNetwork } from 'lib/config';
+import { makeProvider } from 'lib/contracts';
 import { ChartValue } from 'lib/d3';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
+import { Strategy__factory } from 'types/generated/abis';
 import { LendingStrategy } from 'types/generated/graphql/inKindSubgraph';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
 import { convertONEScaledPercent, convertOneScaledValue } from '..';
@@ -15,6 +17,7 @@ export interface StrategyPricesData {
   markValues: string[];
   normalizationValues: string[];
   index: number;
+  indexDPR: number;
 }
 
 export async function strategyPricesData(
@@ -28,6 +31,11 @@ export async function strategyPricesData(
     strategy.poolAddress,
   );
   const createdAt = parseInt(strategy.createdAt);
+
+  const index = await Strategy__factory.connect(
+    strategy.id,
+    makeProvider(configs[network].jsonRpcProvider, network as SupportedNetwork),
+  ).index();
 
   var markDPRs: ChartValue[] = [];
   var marks: string[] = [];
@@ -46,7 +54,8 @@ export async function strategyPricesData(
   normDPRs.unshift([targetDPR, createdAt]);
 
   return {
-    index: targetDPR,
+    indexDPR: targetDPR,
+    index: parseFloat(ethers.utils.formatEther(index)),
     normalizationDPRValues: normDPRs,
     normalizationValues: norms,
     markValues: marks,

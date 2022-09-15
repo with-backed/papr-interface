@@ -1,4 +1,6 @@
 import {
+  LendingStrategiesDocument,
+  LendingStrategiesQuery,
   LendingStrategyByIdDocument,
   LendingStrategyByIdQuery,
   VaultsByOwnerDocument,
@@ -8,6 +10,7 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { LendingStrategy } from './strategies';
 import { clientFromUrl } from './urql';
+import { LendingStrategy as SubgraphLendingStrategy } from 'types/generated/graphql/inKindSubgraph';
 
 export async function subgraphStrategyByAddress(id: string) {
   // TODO: dynamic client address
@@ -48,4 +51,20 @@ export async function getNextVaultNonceForUser(
   if (data?.vaults.length === 0) return 0;
 
   return data || null;
+}
+
+export async function getAllStrategies() {
+  const client = clientFromUrl(
+    'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+  );
+  const { data, error } = await client
+    .query<LendingStrategiesQuery>(LendingStrategiesDocument, {})
+    .toPromise();
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data?.lendingStrategies || [];
 }

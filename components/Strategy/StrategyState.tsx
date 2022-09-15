@@ -75,7 +75,7 @@ export default function StrategyState({
         ) / 100}
         %{' '}
       </p>
-      <p> Target Daily Percentage Growth {pricesData.index}%</p>
+      <p> Target Daily Percentage Growth {pricesData.indexDPR}%</p>
       <p>
         {' '}
         Current Contract Daily Percentage Growth{' '}
