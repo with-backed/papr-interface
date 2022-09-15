@@ -3,7 +3,11 @@ import { getAddress } from 'ethers/lib/utils';
 import { CenterUserNFTsResponse, useCenterNFTs } from 'hooks/useCenterNFTs';
 import { useConfig } from 'hooks/useConfig';
 import { erc721Contract } from 'lib/contracts';
-import { LendingStrategy } from 'lib/strategies';
+import {
+  deconstructFromId,
+  getUniqueNFTId,
+  LendingStrategy,
+} from 'lib/strategies';
 import {
   Dispatch,
   SetStateAction,
@@ -21,16 +25,6 @@ export type AccountNFTsProps = {
   nftsLoading: boolean;
   nftsSelected: string[];
   setNFTsSelected: Dispatch<SetStateAction<string[]>>;
-};
-
-const getUniqueNFTId = (address: string, tokenId: string): string =>
-  `${getAddress(address)}-${tokenId}`;
-
-export const deconstructFromId = (id: string): [string, string] => {
-  const indexOfDash = id.indexOf('-');
-  const address = id.substring(0, indexOfDash);
-  const tokenId = id.substring(indexOfDash + 1);
-  return [address, tokenId];
 };
 
 export default function AccountNFTs({

@@ -4,7 +4,11 @@ import { Slider } from 'components/Slider';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
-import { LendingStrategy, computeLiquidationEstimation } from 'lib/strategies';
+import {
+  LendingStrategy,
+  computeLiquidationEstimation,
+  deconstructFromId,
+} from 'lib/strategies';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { PRICE } from 'lib/strategies/constants';
 import LendingStrategyABI from 'abis/Strategy.json';
@@ -13,7 +17,6 @@ import { useAccount, useSigner } from 'wagmi';
 import styles from './OpenVault.module.css';
 import VaultMath from './VaultMath';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { deconstructFromId } from '../AccountNFTs/AccountNFTs';
 import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
 
 type BorrowProps = {
@@ -83,7 +86,6 @@ export default function OpenVault({
   } = useQuoteWithSlippage(strategy, debt, true);
   const { network } = useConfig();
   const [showMath, setShowMath] = useState<boolean>(false);
-  const [hideMaxLabel, setHideMaxLabel] = useState<boolean>(false);
 
   const addCollateralAndSwap = useCallback(async () => {
     const tokenIds = nftsSelected.map((id) => deconstructFromId(id)[1]);
@@ -225,17 +227,18 @@ export default function OpenVault({
                 currentLTV = (state.valueNow / parseFloat(maxDebt)) * maxLTV;
               }
 
-              if (maxLTV - currentLTV <= 12) {
-                setHideMaxLabel(true);
+              let pushedClassName: string;
+              if (currentLTV < 5) {
+                pushedClassName = styles.sliderLabelPushedRight;
+              } else if (currentLTV > maxLTV - 5) {
+                pushedClassName = styles.sliderLabelPushedLeft;
               } else {
-                setHideMaxLabel(false);
+                pushedClassName = '';
               }
+
               return (
                 <div {...props}>
-                  <div
-                    className={`${styles.sliderLabel} ${
-                      currentLTV < 5 ? styles.sliderLabelPushed : ''
-                    }`}>
+                  <div className={`${styles.sliderLabel} ${pushedClassName}`}>
                     <p>Loan Amount</p>
                     <p>{currentLTV.toFixed(2)}% LTV</p>
                   </div>
@@ -243,10 +246,7 @@ export default function OpenVault({
               );
             }}
           />
-          <p
-            className={`${hideMaxLabel ? styles.hidden : ''} ${
-              styles.sliderLabel
-            }`}>
+          <p className={styles.sliderLabel}>
             Max Loan {maxLTV.toString()}% LTV
           </p>
         </div>

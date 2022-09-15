@@ -3,6 +3,11 @@
     flex-direction: column;
 }
 
+.nfts ol {
+    margin: 0px;
+    padding: 0px;
+}
+
 .columnLabels p {
     color: var(--greentext);
     text-transform: uppercase;
@@ -71,6 +76,7 @@
     width: 100%;
     color: var(--highlight-clickable-100);
     text-align: right;
+    margin-top: 10px;
 }
 
 .selectAll p {
