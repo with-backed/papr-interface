@@ -8,8 +8,12 @@
     line-height: 20px;
 }
 
-.sliderLabelPushed {
+.sliderLabelPushedRight {
     left: -14px !important;
+}
+
+.sliderLabelPushedLeft {
+    left: -90px !important;
 }
 
 .sliderWrapper > p {
@@ -60,7 +64,7 @@
 }
 
 .mathWrapper {
-    margin-top: 20px;
+    margin-top: 80px;
     display: flex;
     flex-direction: column;
 }

@@ -1,30 +1,42 @@
 import { Fieldset } from 'components/Fieldset';
 import { getAddress } from 'ethers/lib/utils';
-import { useCenterNFTs } from 'hooks/useCenterNFTs';
+import { CenterUserNFTsResponse, useCenterNFTs } from 'hooks/useCenterNFTs';
 import { useConfig } from 'hooks/useConfig';
 import { erc721Contract } from 'lib/contracts';
-import { LendingStrategy } from 'lib/strategies';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  deconstructFromId,
+  getUniqueNFTId,
+  LendingStrategy,
+} from 'lib/strategies';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useAccount, useSigner } from 'wagmi';
 import styles from './AccountNFTs.module.css';
 
 export type AccountNFTsProps = {
   strategy: LendingStrategy;
+  userCollectionNFTs: CenterUserNFTsResponse[];
+  nftsLoading: boolean;
+  nftsSelected: string[];
+  setNFTsSelected: Dispatch<SetStateAction<string[]>>;
 };
 
-const getUniqueNFTId = (address: string, tokenId: string): string =>
-  `${getAddress(address)}-${tokenId}`;
-
-export default function AccountNFTs({ strategy }: AccountNFTsProps) {
+export default function AccountNFTs({
+  strategy,
+  userCollectionNFTs,
+  nftsLoading,
+  nftsSelected,
+  setNFTsSelected,
+}: AccountNFTsProps) {
   const { address } = useAccount();
-  const config = useConfig();
   const { data: signer } = useSigner();
-  const { userCollectionNFTs, nftsLoading } = useCenterNFTs(
-    address,
-    strategy.collateral.contract.address,
-    config,
-  );
-  const [nftsSelected, setNFTsSelected] = useState<string[]>([]);
+
   const [nftsApproved, setNFTsApproved] = useState<string[]>([]);
   const [approvalsLoading, setApprovalsLoading] = useState<{
     [key: string]: boolean;
@@ -57,13 +69,13 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
       }),
     );
     setNFTsApproved(nftApprovals.filter((id) => !!id));
-    setNFTsSelected(nftsApproved);
+    setNFTsSelected(nftApprovals.filter((id) => !!id));
   }, [userCollectionNFTs, isNFTApproved]);
 
   useEffect(() => {
     if (nftsLoading) return;
     initializeNFTsApproved();
-  }, [, nftsLoading]);
+  }, [nftsLoading]);
 
   const handleNFTSelected = useCallback(
     (address: string, tokenId: string, checked: boolean) => {
@@ -112,20 +124,32 @@ export default function AccountNFTs({ strategy }: AccountNFTsProps) {
         ]);
       });
     },
-    [strategy, collateralContract, setApprovalsLoading],
+    [strategy, collateralContract, setApprovalsLoading, setNFTsApproved],
   );
 
   const performApproveAll = useCallback(async () => {
-    const t = await collateralContract.setApprovalForAll(
-      strategy.contract.address,
-      true,
-    );
+    userCollectionNFTs
+      .map((nft) => getUniqueNFTId(nft.address, nft.tokenId))
+      .filter((id) => !nftsApproved.includes(id))
+      .map((id) => deconstructFromId(id)[1])
+      .forEach((tokenId) => {
+        setApprovalsLoading((prevApprovalsLoading) => ({
+          ...prevApprovalsLoading,
+          [getUniqueNFTId(collateralContract.address, tokenId)]: true,
+        }));
+      });
+
+    await collateralContract
+      .setApprovalForAll(strategy.contract.address, true)
+      .then(() => {
+        setApprovalsLoading({});
+      });
   }, [collateralContract, strategy]);
 
   if (nftsLoading) return <></>;
 
   return (
-    <Fieldset legend="🖼️ Vault">
+    <Fieldset legend="🖼️ collateral">
       <div className={styles.wrapper}>
         <div className={styles.nfts}>
           <ol>

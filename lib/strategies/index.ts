@@ -18,6 +18,7 @@ import { getPool } from './uniswap';
 import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { getAddress } from 'ethers/lib/utils';
 
 dayjs.extend(duration);
 
@@ -303,3 +304,13 @@ export async function getDebtTokenStrategyPrice(strategy: LendingStrategy) {
 export async function getOracleValueForStrategy(strategy: LendingStrategy) {
   return PRICE;
 }
+
+export const getUniqueNFTId = (address: string, tokenId: string): string =>
+  `${getAddress(address)}-${tokenId}`;
+
+export const deconstructFromId = (id: string): [string, string] => {
+  const indexOfDash = id.indexOf('-');
+  const address = id.substring(0, indexOfDash);
+  const tokenId = id.substring(indexOfDash + 1);
+  return [address, tokenId];
+};

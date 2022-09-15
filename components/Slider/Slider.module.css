@@ -36,7 +36,7 @@
 .thumb > div {
   color: var(--greentext);
   position: relative;
-  bottom: 50px;
+  bottom: -46px;
   left: -44px;
   width: 100px;
   transition: 300ms;

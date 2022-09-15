@@ -4,31 +4,46 @@ import { Slider } from 'components/Slider';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
-import { LendingStrategy, computeLiquidationEstimation } from 'lib/strategies';
+import {
+  LendingStrategy,
+  computeLiquidationEstimation,
+  deconstructFromId,
+} from 'lib/strategies';
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { ONE, PRICE } from 'lib/strategies/constants';
-import { ERC721__factory } from 'types/generated/abis';
+import { PRICE } from 'lib/strategies/constants';
+import LendingStrategyABI from 'abis/Strategy.json';
 import { ILendingStrategy } from 'types/generated/abis/Strategy';
 import { useAccount, useSigner } from 'wagmi';
 import styles from './OpenVault.module.css';
 import VaultMath from './VaultMath';
 import { StrategyPricesData } from 'lib/strategies/charts';
+import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
 
 type BorrowProps = {
   strategy: LendingStrategy;
+  nftsSelected: string[];
   pricesData: StrategyPricesData;
 };
 
-interface OnERC721ReceivedArgsStruct {
-  vaultId: ethers.BigNumber;
+const AddCollateralEncoderString =
+  'addCollateral(uint256 vaultNonce, tuple(address addr, uint256 id) collateral, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)';
+
+interface AddCollateralArgsStruct {
   vaultNonce: ethers.BigNumber;
-  mintVaultTo: string;
-  mintDebtOrProceedsTo: string;
-  minOut: ethers.BigNumber;
-  debt: ethers.BigNumber;
-  sqrtPriceLimitX96: ethers.BigNumber;
+  collateral: ILendingStrategy.CollateralStruct;
   oracleInfo: ILendingStrategy.OracleInfoStruct;
   sig: ILendingStrategy.SigStruct;
+}
+
+const MintAndSwapEncoderString =
+  'mintAndSellDebt(uint256 vaultNonce, int256 debt, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo)';
+
+interface MintAndSwapArgsStruct {
+  vaultNonce: ethers.BigNumber;
+  debt: ethers.BigNumber;
+  minOut: ethers.BigNumber;
+  sqrtPriceLimitX96: ethers.BigNumber;
+  proceedsTo: string;
 }
 
 const debounce = (func: any, wait: number) => {
@@ -45,21 +60,11 @@ const debounce = (func: any, wait: number) => {
   };
 };
 
-const OnERC721ReceivedArgsEncoderString = `
-  tuple(
-    uint256 vaultId,
-    uint256 vaultNonce,
-    address mintVaultTo,
-    address mintDebtOrProceedsTo,
-    uint256 minOut,
-    int256 debt,
-    uint160 sqrtPriceLimitX96,
-    tuple(uint128 price, uint8 period) oracleInfo,
-    tuple(uint8 v, bytes32 r, bytes32 s) sig
-  )
-`;
-
-export default function OpenVault({ strategy, pricesData }: BorrowProps) {
+export default function OpenVault({
+  strategy,
+  nftsSelected,
+  pricesData,
+}: BorrowProps) {
   const { address } = useAccount();
   const { data: signer } = useSigner();
   // TODO: looks like we're doing a lot of parsing on these values -- probably
@@ -81,64 +86,85 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
   } = useQuoteWithSlippage(strategy, debt, true);
   const { network } = useConfig();
   const [showMath, setShowMath] = useState<boolean>(false);
-  const [hideMaxLabel, setHideMaxLabel] = useState<boolean>(false);
 
-  const create = useCallback(
-    async (withSwap: boolean) => {
-      const request: OnERC721ReceivedArgsStruct = {
-        vaultId: ethers.BigNumber.from(0),
-        vaultNonce: ethers.BigNumber.from(0),
-        mintVaultTo: address!,
-        mintDebtOrProceedsTo: address!,
-        minOut: withSwap
-          ? ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals)
-          : ethers.BigNumber.from(0),
-        sqrtPriceLimitX96: strategy.token0IsUnderlying
-          ? ethers.BigNumber.from(TickMath.MAX_SQRT_RATIO.toString()).sub(1)
-          : ethers.BigNumber.from(TickMath.MIN_SQRT_RATIO.toString()).add(1),
-        debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
-        oracleInfo: {
-          price: ethers.utils.parseUnits(PRICE.toString(), 18),
-          period: ethers.BigNumber.from(0),
-        },
-        sig: {
-          v: ethers.BigNumber.from(1),
-          r: ethers.utils.formatBytes32String('x'),
-          s: ethers.utils.formatBytes32String('y'),
-        },
-      };
+  const addCollateralAndSwap = useCallback(async () => {
+    const tokenIds = nftsSelected.map((id) => deconstructFromId(id)[1]);
 
-      const signerCollateral = ERC721__factory.connect(
-        strategy.collateral.contract.address,
-        signer!,
-      );
+    const nextNonce = await getNextVaultNonceForUser(strategy, address!);
 
-      await signerCollateral['safeTransferFrom(address,address,uint256,bytes)'](
-        address!,
-        strategy.contract.address,
-        ethers.BigNumber.from(collateralTokenId),
-        ethers.utils.defaultAbiCoder.encode(
-          [OnERC721ReceivedArgsEncoderString],
-          [request],
-        ),
-        {
-          gasLimit: ethers.utils.hexValue(3000000),
-        },
-      );
+    const baseRequest: Partial<AddCollateralArgsStruct> = {
+      vaultNonce: ethers.BigNumber.from(nextNonce),
+      oracleInfo: {
+        price: ethers.utils.parseUnits(PRICE.toString(), 18),
+        period: ethers.BigNumber.from(0),
+      },
+      sig: {
+        v: ethers.BigNumber.from(1),
+        r: ethers.utils.formatBytes32String('x'),
+        s: ethers.utils.formatBytes32String('y'),
+      },
+    };
 
-      // TODO(adamgobes): redirect to vault page after implementing addCollateral
-    },
-    [
-      address,
-      collateralTokenId,
-      debt,
-      network,
-      signer,
-      strategy,
-      quoteForSwap,
-      tokenOut.decimals,
-    ],
-  );
+    const addCollateralArgs = tokenIds.map((tokenId) => ({
+      ...baseRequest,
+      collateral: {
+        addr: strategy.collateral.contract.address,
+        id: ethers.BigNumber.from(tokenId),
+      },
+    }));
+
+    const lendingStrategyIFace = new ethers.utils.Interface(
+      LendingStrategyABI.abi,
+    );
+
+    const calldata = addCollateralArgs.map((args) =>
+      lendingStrategyIFace.encodeFunctionData(AddCollateralEncoderString, [
+        args.vaultNonce,
+        args.collateral,
+        args.oracleInfo,
+        args.sig,
+      ]),
+    );
+
+    const mintAndSellDebtArgs: MintAndSwapArgsStruct = {
+      vaultNonce: ethers.BigNumber.from(nextNonce),
+      debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
+      minOut: ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals),
+      proceedsTo: address!,
+      sqrtPriceLimitX96: strategy.token0IsUnderlying
+        ? ethers.BigNumber.from(TickMath.MAX_SQRT_RATIO.toString()).sub(1)
+        : ethers.BigNumber.from(TickMath.MIN_SQRT_RATIO.toString()).add(1),
+    };
+
+    const calldataWithSwap = [
+      ...calldata,
+      lendingStrategyIFace.encodeFunctionData(MintAndSwapEncoderString, [
+        mintAndSellDebtArgs.vaultNonce,
+        mintAndSellDebtArgs.debt,
+        mintAndSellDebtArgs.minOut,
+        mintAndSellDebtArgs.sqrtPriceLimitX96,
+        mintAndSellDebtArgs.proceedsTo,
+      ]),
+    ];
+
+    const t = await strategy.contract
+      .connect(signer!)
+      .multicall(calldataWithSwap, {
+        gasLimit: ethers.utils.hexValue(3000000),
+      });
+    t.wait()
+      .then(() => console.log('success')) // TODO(adamgobes): redirect to vault page once thats fleshed out
+      .catch((e) => console.log({ e }));
+  }, [
+    address,
+    nftsSelected,
+    debt,
+    network,
+    signer,
+    strategy,
+    quoteForSwap,
+    tokenOut.decimals,
+  ]);
 
   // TODO: I think useCallback may not be able to introspect the debounced
   // function this produces. May need to either manually handle debounce with
@@ -169,10 +195,13 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
     const newNorm = await strategy.contract.newNorm();
     const maxLTV = await strategy.contract.maxLTV();
 
-    const maxDebt = maxLTV.mul(ethers.BigNumber.from(PRICE)).div(newNorm);
+    const maxDebt = maxLTV
+      .mul(ethers.BigNumber.from(PRICE))
+      .div(newNorm)
+      .mul(ethers.BigNumber.from(nftsSelected.length));
 
     setMaxDebt(maxDebt.toString());
-  }, [strategy]);
+  }, [strategy, nftsSelected]);
 
   const maxLTV = useMemo(() => {
     return strategy.maxLTVPercent;
@@ -191,20 +220,25 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
             max={parseFloat(maxDebt)}
             onChange={(val, _index) => handleDebtAmountChanged(val.toString())}
             renderThumb={(props, state) => {
-              const currentLTV =
-                (state.valueNow / parseFloat(maxDebt)) * maxLTV;
-
-              if (maxLTV - currentLTV <= 12) {
-                setHideMaxLabel(true);
+              let currentLTV: number;
+              if (maxDebt === '0') {
+                currentLTV = 0;
               } else {
-                setHideMaxLabel(false);
+                currentLTV = (state.valueNow / parseFloat(maxDebt)) * maxLTV;
               }
+
+              let pushedClassName: string;
+              if (currentLTV < 5) {
+                pushedClassName = styles.sliderLabelPushedRight;
+              } else if (currentLTV > maxLTV - 5) {
+                pushedClassName = styles.sliderLabelPushedLeft;
+              } else {
+                pushedClassName = '';
+              }
+
               return (
                 <div {...props}>
-                  <div
-                    className={`${styles.sliderLabel} ${
-                      currentLTV < 5 ? styles.sliderLabelPushed : ''
-                    }`}>
+                  <div className={`${styles.sliderLabel} ${pushedClassName}`}>
                     <p>Loan Amount</p>
                     <p>{currentLTV.toFixed(2)}% LTV</p>
                   </div>
@@ -212,10 +246,7 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
               );
             }}
           />
-          <p
-            className={`${hideMaxLabel ? styles.hidden : ''} ${
-              styles.sliderLabel
-            }`}>
+          <p className={styles.sliderLabel}>
             Max Loan {maxLTV.toString()}% LTV
           </p>
         </div>
@@ -250,7 +281,7 @@ export default function OpenVault({ strategy, pricesData }: BorrowProps) {
             Show Math
           </div>
 
-          <div className={styles.borrowButton} onClick={() => create(false)}>
+          <div className={styles.borrowButton} onClick={addCollateralAndSwap}>
             Borrow
           </div>
         </div>
