@@ -30,6 +30,7 @@ export function D3Demo({ pricesData }: D3DemoProps) {
 
     return {
       indexDPR: pricesData.indexDPR,
+      index: pricesData.index,
       markDPRValues: markValues,
       normalizationDPRValues: normValues,
       indexDPRValues: indexValues,
