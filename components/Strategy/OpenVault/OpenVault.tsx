@@ -23,7 +23,8 @@ type BorrowProps = {
   pricesData: StrategyPricesData;
 };
 
-const AddCollateralEncoderString = `addCollateral(uint256 vaultNonce, tuple(address addr, uint256 id) collateral, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)`;
+const AddCollateralEncoderString =
+  'addCollateral(uint256 vaultNonce, tuple(address addr, uint256 id) collateral, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)';
 
 interface AddCollateralArgsStruct {
   vaultNonce: ethers.BigNumber;
@@ -151,7 +152,7 @@ export default function OpenVault({
         gasLimit: ethers.utils.hexValue(3000000),
       });
     t.wait()
-      .then(() => console.log('success'))
+      .then(() => console.log('success')) // TODO(adamgobes): redirect to vault page once thats fleshed out
       .catch((e) => console.log({ e }));
   }, [
     address,

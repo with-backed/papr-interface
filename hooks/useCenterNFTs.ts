@@ -3,7 +3,7 @@ import { Config } from 'lib/config';
 import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-export type RenderUserNFTsResponse = {
+export type CenterUserNFTsResponse = {
   address: string;
   smallPreviewImageUrl: string;
   tokenId: string;
@@ -15,7 +15,7 @@ export const useCenterNFTs = (
   config: Config,
 ) => {
   const [userCollectionNFTs, setUserCollectionNFTs] = useState<
-    RenderUserNFTsResponse[]
+    CenterUserNFTsResponse[]
   >([]);
   const [nftsLoading, setNFTsLoading] = useState<boolean>(true);
 

@@ -1,6 +1,6 @@
 import { Fieldset } from 'components/Fieldset';
 import { getAddress } from 'ethers/lib/utils';
-import { RenderUserNFTsResponse, useCenterNFTs } from 'hooks/useCenterNFTs';
+import { CenterUserNFTsResponse, useCenterNFTs } from 'hooks/useCenterNFTs';
 import { useConfig } from 'hooks/useConfig';
 import { erc721Contract } from 'lib/contracts';
 import { LendingStrategy } from 'lib/strategies';
@@ -17,7 +17,7 @@ import styles from './AccountNFTs.module.css';
 
 export type AccountNFTsProps = {
   strategy: LendingStrategy;
-  userCollectionNFTs: RenderUserNFTsResponse[];
+  userCollectionNFTs: CenterUserNFTsResponse[];
   nftsLoading: boolean;
   nftsSelected: string[];
   setNFTsSelected: Dispatch<SetStateAction<string[]>>;
