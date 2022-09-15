@@ -6,7 +6,7 @@ import { useConfig } from 'hooks/useConfig';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
 import { LendingStrategy, computeLiquidationEstimation } from 'lib/strategies';
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { MULTI_CALL_ADDRESS, ONE, PRICE } from 'lib/strategies/constants';
+import { ONE, PRICE } from 'lib/strategies/constants';
 import LendingStrategyABI from 'abis/Strategy.json';
 import { ERC721__factory } from 'types/generated/abis';
 import { ILendingStrategy } from 'types/generated/abis/Strategy';
