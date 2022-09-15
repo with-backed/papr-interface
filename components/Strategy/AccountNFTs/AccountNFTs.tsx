@@ -130,20 +130,32 @@ export default function AccountNFTs({
         ]);
       });
     },
-    [strategy, collateralContract, setApprovalsLoading],
+    [strategy, collateralContract, setApprovalsLoading, setNFTsApproved],
   );
 
   const performApproveAll = useCallback(async () => {
-    const t = await collateralContract.setApprovalForAll(
-      strategy.contract.address,
-      true,
-    );
+    userCollectionNFTs
+      .map((nft) => getUniqueNFTId(nft.address, nft.tokenId))
+      .filter((id) => !nftsApproved.includes(id))
+      .map((id) => deconstructFromId(id)[1])
+      .forEach((tokenId) => {
+        setApprovalsLoading((prevApprovalsLoading) => ({
+          ...prevApprovalsLoading,
+          [getUniqueNFTId(collateralContract.address, tokenId)]: true,
+        }));
+      });
+
+    await collateralContract
+      .setApprovalForAll(strategy.contract.address, true)
+      .then(() => {
+        setApprovalsLoading({});
+      });
   }, [collateralContract, strategy]);
 
   if (nftsLoading) return <></>;
 
   return (
-    <Fieldset legend="🖼️ Vault">
+    <Fieldset legend="🖼️ collateral">
       <div className={styles.wrapper}>
         <div className={styles.nfts}>
           <ol>

@@ -4,7 +4,8 @@ import { SupportedNetwork } from 'lib/config';
 import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { strategyPricesData, StrategyPricesData } from 'lib/strategies/charts';
-import styles from './strategy.module.css';
+import strategyStyles from './strategy.module.css';
+import borrowStyles from './borrow.module.css';
 import { LendingStrategy as SubgraphLendingStrategy } from 'types/generated/graphql/inKindSubgraph';
 import { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useState } from 'react';
@@ -69,20 +70,22 @@ export default function Borrow({
   if (!lendingStrategy || !pricesData) return <></>;
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.column}>
-        <AccountNFTs
-          strategy={lendingStrategy}
-          userCollectionNFTs={userCollectionNFTs}
-          nftsSelected={nftsSelected}
-          nftsLoading={nftsLoading}
-          setNFTsSelected={setNFTsSelected}
-        />
-        <OpenVault
-          strategy={lendingStrategy}
-          pricesData={pricesData}
-          nftsSelected={nftsSelected}
-        />
+    <div className={strategyStyles.wrapper}>
+      <div className={borrowStyles.borrowWrapper}>
+        <div className={strategyStyles.column}>
+          <AccountNFTs
+            strategy={lendingStrategy}
+            userCollectionNFTs={userCollectionNFTs}
+            nftsSelected={nftsSelected}
+            nftsLoading={nftsLoading}
+            setNFTsSelected={setNFTsSelected}
+          />
+          <OpenVault
+            strategy={lendingStrategy}
+            pricesData={pricesData}
+            nftsSelected={nftsSelected}
+          />
+        </div>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ import VaultMath from './VaultMath';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { Multicall__factory } from 'types/generated/abis/factories/Multicall__factory';
 import { deconstructFromId } from '../AccountNFTs/AccountNFTs';
+import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
 
 type BorrowProps = {
   strategy: LendingStrategy;
@@ -49,20 +50,19 @@ interface OnERC721ReceivedArgsStruct {
   sig: ILendingStrategy.SigStruct;
 }
 
-const AddCollateralEncoderString = `addCollateral(uint256 vaultId, tuple(address addr, uint256 id) collateral, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)`;
+const AddCollateralEncoderString = `addCollateral(uint256 vaultNonce, tuple(address addr, uint256 id) collateral, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)`;
 
 interface AddCollateralArgsStruct {
-  vaultId: ethers.BigNumber;
+  vaultNonce: ethers.BigNumber;
   collateral: ILendingStrategy.CollateralStruct;
   oracleInfo: ILendingStrategy.OracleInfoStruct;
   sig: ILendingStrategy.SigStruct;
 }
 
 const MintAndSwapEncoderString =
-  'mintAndSellDebt(uint256 vaultId, uint256 vaultNonce, int256 debt, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo)';
+  'mintAndSellDebt(uint256 vaultNonce, int256 debt, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo)';
 
 interface MintAndSwapArgsStruct {
-  vaultId: ethers.BigNumber;
   vaultNonce: ethers.BigNumber;
   debt: ethers.BigNumber;
   minOut: ethers.BigNumber;
@@ -127,8 +127,10 @@ export default function OpenVault({
   const addCollateralAndSwap = useCallback(async () => {
     const tokenIds = nftsSelected.map((id) => deconstructFromId(id)[1]);
 
+    const nextNonce = await getNextVaultNonceForUser(strategy, address!);
+
     const baseRequest: Partial<AddCollateralArgsStruct> = {
-      vaultId: ethers.BigNumber.from(0),
+      vaultNonce: ethers.BigNumber.from(nextNonce),
       oracleInfo: {
         price: ethers.utils.parseUnits(PRICE.toString(), 18),
         period: ethers.BigNumber.from(0),
@@ -154,7 +156,7 @@ export default function OpenVault({
 
     const calldata = addCollateralArgs.map((args) =>
       lendingStrategyIFace.encodeFunctionData(AddCollateralEncoderString, [
-        args.vaultId,
+        args.vaultNonce,
         args.collateral,
         args.oracleInfo,
         args.sig,
@@ -162,8 +164,7 @@ export default function OpenVault({
     );
 
     const mintAndSellDebtArgs: MintAndSwapArgsStruct = {
-      vaultId: ethers.BigNumber.from(0),
-      vaultNonce: ethers.BigNumber.from(0),
+      vaultNonce: ethers.BigNumber.from(nextNonce),
       debt: ethers.utils.parseUnits(debt, strategy.underlying.decimals),
       minOut: ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals),
       proceedsTo: address!,
@@ -174,7 +175,13 @@ export default function OpenVault({
 
     const calldataWithSwap = [
       ...calldata,
-      lendingStrategyIFace.encodeFunctionData(MintAndSwapEncoderString, []),
+      lendingStrategyIFace.encodeFunctionData(MintAndSwapEncoderString, [
+        mintAndSellDebtArgs.vaultNonce,
+        mintAndSellDebtArgs.debt,
+        mintAndSellDebtArgs.minOut,
+        mintAndSellDebtArgs.sqrtPriceLimitX96,
+        mintAndSellDebtArgs.proceedsTo,
+      ]),
     ];
 
     const t = await strategy.contract
@@ -225,10 +232,13 @@ export default function OpenVault({
     const newNorm = await strategy.contract.newNorm();
     const maxLTV = await strategy.contract.maxLTV();
 
-    const maxDebt = maxLTV.mul(ethers.BigNumber.from(PRICE)).div(newNorm);
+    const maxDebt = maxLTV
+      .mul(ethers.BigNumber.from(PRICE))
+      .div(newNorm)
+      .mul(ethers.BigNumber.from(nftsSelected.length));
 
     setMaxDebt(maxDebt.toString());
-  }, [strategy]);
+  }, [strategy, nftsSelected]);
 
   const maxLTV = useMemo(() => {
     return strategy.maxLTVPercent;
@@ -247,8 +257,12 @@ export default function OpenVault({
             max={parseFloat(maxDebt)}
             onChange={(val, _index) => handleDebtAmountChanged(val.toString())}
             renderThumb={(props, state) => {
-              const currentLTV =
-                (state.valueNow / parseFloat(maxDebt)) * maxLTV;
+              let currentLTV: number;
+              if (maxDebt === '0') {
+                currentLTV = 0;
+              } else {
+                currentLTV = (state.valueNow / parseFloat(maxDebt)) * maxLTV;
+              }
 
               if (maxLTV - currentLTV <= 12) {
                 setHideMaxLabel(true);

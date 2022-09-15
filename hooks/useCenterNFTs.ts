@@ -1,5 +1,6 @@
 import { getAddress } from 'ethers/lib/utils';
 import { Config } from 'lib/config';
+import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export type RenderUserNFTsResponse = {
