@@ -14,7 +14,6 @@ import { useAccount, useSigner } from 'wagmi';
 import styles from './OpenVault.module.css';
 import VaultMath from './VaultMath';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { Multicall__factory } from 'types/generated/abis/factories/Multicall__factory';
 import { deconstructFromId } from '../AccountNFTs/AccountNFTs';
 import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
 
