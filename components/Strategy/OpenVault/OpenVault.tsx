@@ -23,32 +23,6 @@ type BorrowProps = {
   pricesData: StrategyPricesData;
 };
 
-const OnERC721ReceivedArgsEncoderString = `
-  tuple(
-    uint256 vaultId,
-    uint256 vaultNonce,
-    address mintVaultTo,
-    address mintDebtOrProceedsTo,
-    uint256 minOut,
-    int256 debt,
-    uint160 sqrtPriceLimitX96,
-    tuple(uint128 price, uint8 period) oracleInfo,
-    tuple(uint8 v, bytes32 r, bytes32 s) sig
-  )
-`;
-
-interface OnERC721ReceivedArgsStruct {
-  vaultId: ethers.BigNumber;
-  vaultNonce: ethers.BigNumber;
-  mintVaultTo: string;
-  mintDebtOrProceedsTo: string;
-  minOut: ethers.BigNumber;
-  debt: ethers.BigNumber;
-  sqrtPriceLimitX96: ethers.BigNumber;
-  oracleInfo: ILendingStrategy.OracleInfoStruct;
-  sig: ILendingStrategy.SigStruct;
-}
-
 const AddCollateralEncoderString = `addCollateral(uint256 vaultNonce, tuple(address addr, uint256 id) collateral, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)`;
 
 interface AddCollateralArgsStruct {
@@ -67,18 +41,6 @@ interface MintAndSwapArgsStruct {
   minOut: ethers.BigNumber;
   sqrtPriceLimitX96: ethers.BigNumber;
   proceedsTo: string;
-}
-
-const MulticallEncoderString = `
-    tuple(
-      address target,
-      bytes calldata
-    )[]
-`;
-
-interface MulticallArgsStruct {
-  address: string;
-  calldata: string;
 }
 
 const debounce = (func: any, wait: number) => {
