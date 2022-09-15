@@ -2,6 +2,7 @@ import React from 'react';
 import { UpAndToTheRight } from './landing-page-images/UpAndToTheRight';
 import styles from './LandingPageContent.module.css';
 import { landingPageStrings } from './strings';
+import Zoom from 'react-reveal/Zoom';
 
 export function LandingPageContent() {
   return (
@@ -42,7 +43,11 @@ const Entry: React.FunctionComponent<EntryProps> = ({
   illustration: Illustration,
 }) => (
   <div id={id} className={styles.entry}>
-    {!!Illustration && <Illustration />}
+    {!!Illustration && (
+      <Zoom>
+        <Illustration />
+      </Zoom>
+    )}
     {!Illustration && <div />}
     <div className={styles['entry-content']}>{children}</div>
   </div>
