@@ -18,7 +18,6 @@ import {
   createClient as createUrqlClient,
   Provider as UrqlProvider,
 } from 'urql';
-import { ParallaxProvider } from 'react-scroll-parallax';
 
 const prodChains = [chain.mainnet, chain.polygon, chain.optimism];
 const CHAINS =
@@ -95,9 +94,7 @@ export const ApplicationProviders = ({
           <TimestampProvider>
             <CachedRatesProvider>
               <CommunityGradientProvider>
-                <ParallaxProvider>
-                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-                </ParallaxProvider>
+                <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
               </CommunityGradientProvider>
             </CachedRatesProvider>
           </TimestampProvider>

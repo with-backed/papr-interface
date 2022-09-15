@@ -13,13 +13,13 @@ export function LandingPageContent() {
         {landingPageStrings.map(({ content, id, image }) => {
           if (typeof content === 'string') {
             return (
-              <Entry id={id} key={id} Image={image}>
+              <Entry id={id} key={id} illustration={image}>
                 <p>{content}</p>
               </Entry>
             );
           } else {
             return (
-              <Entry id={id} key={id} Image={image}>
+              <Entry id={id} key={id} illustration={image}>
                 {content.map((c) => (
                   <p key={c}>{c}</p>
                 ))}
@@ -34,16 +34,16 @@ export function LandingPageContent() {
 
 type EntryProps = {
   id?: string;
-  Image?: () => JSX.Element;
+  illustration?: () => JSX.Element;
 };
 const Entry: React.FunctionComponent<EntryProps> = ({
   children,
   id,
-  Image,
+  illustration: Illustration,
 }) => (
   <div id={id} className={styles.entry}>
-    {!!Image && <Image />}
-    {!Image && <div />}
+    {!!Illustration && <Illustration />}
+    {!Illustration && <div />}
     <div className={styles['entry-content']}>{children}</div>
   </div>
 );
