@@ -63,13 +63,12 @@ export async function populateLendingStrategy(
     signerOrProvider || provider,
   );
 
-  const [poolAddress, targetGrowthPerPeriod, lastUpdated, multiplier, maxLTV] =
+  const [poolAddress, targetGrowthPerPeriod, maxLTV, underlyingAddress] =
     await Promise.all([
       contract.pool(),
       contract.targetGrowthPerPeriod(),
-      contract.lastUpdated(),
-      contract.multiplier(),
       contract.maxLTV(),
+      contract.underlying(),
     ]);
 
   const poolContract = IUniswapV3Pool__factory.connect(poolAddress, provider);
@@ -79,10 +78,9 @@ export async function populateLendingStrategy(
     poolContract.token1(),
   ]);
 
-  const [token0, token1, underlyingAddress] = await Promise.all([
+  const [token0, token1] = await Promise.all([
     buildToken(ERC20__factory.connect(token0Address, provider)),
     buildToken(ERC20__factory.connect(token1Address, provider)),
-    contract.underlying(),
   ]);
 
   const underlying = underlyingAddress == token0Address ? token0 : token1;
