@@ -34,7 +34,7 @@ export default function InKindTest({ strategyAddress }: TestProps) {
   const populate = useCallback(async () => {
     const s = await populateLendingStrategy(strategyAddress, config);
     setLendingStrategy(s);
-  }, [address, config]);
+  }, [strategyAddress, config]);
 
   useEffect(() => {
     populate();
