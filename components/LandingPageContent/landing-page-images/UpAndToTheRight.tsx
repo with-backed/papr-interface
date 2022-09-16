@@ -8,7 +8,7 @@ const calculateOffsets = () => {
   const center = viewportWidth / 2;
   return {
     // TODO: mobile?
-    top: 275,
+    top: 235,
     bottom: 0,
     left: center - WIDTH + 48,
     right: 0,
