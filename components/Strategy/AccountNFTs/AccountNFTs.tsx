@@ -93,7 +93,7 @@ export default function AccountNFTs({
     return nftsSelected.length === 0;
   }, [nftsSelected]);
 
-  const performSelectAll = useCallback(async () => {
+  const performSelectAll = useCallback(() => {
     setNFTsSelected(
       userCollectionNFTs.map((nft) => getUniqueNFTId(nft.address, nft.tokenId)),
     );
