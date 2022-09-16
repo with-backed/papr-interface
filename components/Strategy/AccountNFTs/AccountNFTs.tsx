@@ -143,8 +143,14 @@ export default function AccountNFTs({
       .setApprovalForAll(strategy.contract.address, true)
       .then(() => {
         setApprovalsLoading({});
+        userCollectionNFTs.forEach((nft) => {
+          setNFTsApproved((prevNFTsApproved) => [
+            ...prevNFTsApproved,
+            getUniqueNFTId(collateralContract.address, nft.tokenId),
+          ]);
+        });
       });
-  }, [collateralContract, strategy]);
+  }, [collateralContract, strategy, userCollectionNFTs, nftsApproved]);
 
   if (nftsLoading) return <></>;
 

@@ -50,7 +50,11 @@ export async function getNextVaultNonceForUser(
 
   if (data?.vaults.length === 0) return 0;
 
-  return data || null;
+  const mostRecentVault = data?.vaults.sort(
+    (a, b) => b.openedAt - a.openedAt,
+  )[0];
+
+  return mostRecentVault?.nonce || 0;
 }
 
 export async function getAllStrategies() {
