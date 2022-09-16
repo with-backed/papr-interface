@@ -50,21 +50,25 @@ export default function StrategiesToBorrowFrom({
   const [debtTokenSuppliesLoading, setDebtTokenSuppliesLoading] =
     useState<boolean>(true);
 
-  const initDebtTokenMarketCap = useCallback(async () => {
-    for (let i = 0; i < strategies.length; i++) {
-      const strategyDebtTokenMarketCap = await strategies[
-        i
-      ].underlying.contract.totalSupply();
+  const initDebtTokenSupplies = useCallback(async () => {
+    const totalSupplies = await Promise.all(
+      strategies.map((strategy) =>
+        strategy.token0IsUnderlying
+          ? strategy.token1.contract.totalSupply()
+          : strategy.token0.contract.totalSupply(),
+      ),
+    );
+    for (let i = 0; i < totalSupplies.length; i++) {
       setDebtTokenSupplies((prev) => ({
         ...prev,
-        [strategies[i].contract.address]: strategyDebtTokenMarketCap,
+        [strategies[i].contract.address]: totalSupplies[i],
       }));
     }
     setDebtTokenSuppliesLoading(false);
   }, [strategies]);
 
   useEffect(() => {
-    initDebtTokenMarketCap();
+    initDebtTokenSupplies();
   }, [strategies]);
 
   if (debtTokenSuppliesLoading) return <></>;
