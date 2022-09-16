@@ -93,11 +93,15 @@ export default function AccountNFTs({
     return nftsSelected.length === 0;
   }, [nftsSelected]);
 
-  const performSelectAll = useCallback(() => {
-    setNFTsSelected(
-      userCollectionNFTs.map((nft) => getUniqueNFTId(nft.address, nft.tokenId)),
+  const performSelectAll = useCallback(async () => {
+    await collateralContract.setApprovalForAll(
+      strategy.contract.address,
+      false,
     );
-  }, [userCollectionNFTs, setNFTsSelected]);
+    // setNFTsSelected(
+    //   userCollectionNFTs.map((nft) => getUniqueNFTId(nft.address, nft.tokenId)),
+    // );
+  }, [collateralContract, strategy]);
 
   const performUnselectAll = useCallback(() => {
     setNFTsSelected([]);
@@ -143,8 +147,14 @@ export default function AccountNFTs({
       .setApprovalForAll(strategy.contract.address, true)
       .then(() => {
         setApprovalsLoading({});
+        userCollectionNFTs.forEach((nft) => {
+          setNFTsApproved((prevNFTsApproved) => [
+            ...prevNFTsApproved,
+            getUniqueNFTId(collateralContract.address, nft.tokenId),
+          ]);
+        });
       });
-  }, [collateralContract, strategy]);
+  }, [collateralContract, strategy, userCollectionNFTs, nftsApproved]);
 
   if (nftsLoading) return <></>;
 
