@@ -69,7 +69,7 @@ export default function StrategiesToBorrowFrom({
 
   useEffect(() => {
     initDebtTokenSupplies();
-  }, [strategies]);
+  }, [initDebtTokenSupplies]);
 
   if (debtTokenSuppliesLoading) return <></>;
 

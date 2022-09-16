@@ -54,7 +54,7 @@ export default function Borrow({
   const populate = useCallback(async () => {
     const s = await populateLendingStrategy(strategyAddress, config);
     setLendingStrategy(s);
-  }, [address, config]);
+  }, [config, strategyAddress]);
 
   useEffect(() => {
     populate();

@@ -1,7 +1,6 @@
 import { Fieldset } from 'components/Fieldset';
 import { getAddress } from 'ethers/lib/utils';
-import { CenterUserNFTsResponse, useCenterNFTs } from 'hooks/useCenterNFTs';
-import { useConfig } from 'hooks/useConfig';
+import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
 import { erc721Contract } from 'lib/contracts';
 import {
   deconstructFromId,
@@ -70,12 +69,12 @@ export default function AccountNFTs({
     );
     setNFTsApproved(nftApprovals.filter((id) => !!id));
     setNFTsSelected(nftApprovals.filter((id) => !!id));
-  }, [userCollectionNFTs, isNFTApproved]);
+  }, [userCollectionNFTs, isNFTApproved, setNFTsSelected]);
 
   useEffect(() => {
     if (nftsLoading) return;
     initializeNFTsApproved();
-  }, [nftsLoading]);
+  }, [initializeNFTsApproved, nftsLoading]);
 
   const handleNFTSelected = useCallback(
     (address: string, tokenId: string, checked: boolean) => {

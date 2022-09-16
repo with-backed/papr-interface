@@ -68,7 +68,7 @@ export default function VaultMath({
   useEffect(() => {
     updateOracleValue();
     updateMaxDebt();
-  }, []);
+  }, [updateMaxDebt, updateOracleValue]);
 
   const debtTokenMarketPrice = useMemo(
     () => pricesData.markValues[pricesData.markValues.length - 1] || '1.0000',
