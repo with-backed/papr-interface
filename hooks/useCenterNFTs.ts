@@ -20,14 +20,14 @@ export const useCenterNFTs = (
   const [nftsLoading, setNFTsLoading] = useState<boolean>(true);
 
   const getAllUserNFTs = useCallback(
-    async (collection: string) => {
+    async (address: string, collection: string) => {
       try {
         const response = await fetch(
           `https://api.center.dev/v1/${
             config.centerNetwork
-          }/account/${address}/assets-owned?limit=100&collection=${getAddress(
-            collection,
-          )}`,
+          }/account/${getAddress(
+            address,
+          )}/assets-owned?limit=100&collection=${getAddress(collection)}`,
           {
             headers: {
               'X-API-Key': process.env.NEXT_PUBLIC_CENTER_KEY!,
@@ -47,7 +47,7 @@ export const useCenterNFTs = (
 
   useEffect(() => {
     if (!address || !collection) return;
-    getAllUserNFTs(collection);
+    getAllUserNFTs(address, collection);
   }, [address, collection]);
 
   return { userCollectionNFTs, nftsLoading };
