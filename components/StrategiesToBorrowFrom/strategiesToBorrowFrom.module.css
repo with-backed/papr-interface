@@ -1,0 +1,51 @@
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    color: var(--greentext);
+    text-transform: uppercase;
+    font-size: 12px;
+    font-family: var(--sans);
+    letter-spacing: .12rem;
+    text-align: center;
+    font-weight: inherit;
+}
+
+.table th:first-child {
+    text-align: left !important;
+    padding-left: 12px;
+}
+
+.table th p {
+    margin: 0;
+}
+
+.table td {
+    text-align: center;
+    padding: 0;
+}
+
+.table td:first-child p {
+    text-align: left;
+    padding-left: 12px;
+}
+
+.table td p {
+    margin: 0;
+    line-height: 30px;
+    text-align: center;
+}
+
+.rate {
+    letter-spacing: 0.1em;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.even {
+    background-color: white;
+}
