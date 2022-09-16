@@ -72,113 +72,110 @@ export default function StrategiesToBorrowFrom({
   return (
     <Fieldset legend="🎮 strategies">
       <div className={styles.strategies}>
-        <ol>
-          <li className={`${styles.row} ${styles.columnLabels}`}>
-            <div className={styles.token}>
-              <p>Token</p>
-            </div>
-            <div className={styles.mathColumn}>
-              <div>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th colSpan={6}>
+                <p>token</p>
+              </th>
+              <th colSpan={5}>
                 <p>target</p>
-              </div>
-            </div>
-            <div className={styles.mathColumn}>
-              <div>
+              </th>
+              <th colSpan={5}>
                 <p>NFT/CAP</p>
-              </div>
-            </div>
-            <div className={styles.mathColumn}>
-              <div>
+              </th>
+              <th colSpan={5}>
                 <p>MKT/CTR</p>
-              </div>
-            </div>
-            <div className={styles.rate}>
-              <div>
-                <p>Rate</p>
-              </div>
-            </div>
-          </li>
-          {strategies.map((strategy, i) => {
-            const pricesDataForStrategy = pricesData[strategy.contract.address];
-            const index = pricesDataForStrategy.index;
-            const targetYearlyGrowth = pricesDataForStrategy.indexDPR * 365;
+              </th>
+              <th colSpan={6}>
+                <p>RATE</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {strategies.map((strategy, i) => {
+              const pricesDataForStrategy =
+                pricesData[strategy.contract.address];
+              const index = pricesDataForStrategy.index;
+              const targetYearlyGrowth = pricesDataForStrategy.indexDPR * 365;
 
-            const mark = parseFloat(
-              pricesDataForStrategy.markValues[
-                pricesDataForStrategy.markValues.length - 1
-              ],
-            );
-            const norm = parseFloat(
-              pricesDataForStrategy.normalizationValues[
-                pricesDataForStrategy.normalizationValues.length - 1
-              ],
-            );
-            const markOverNorm = mark / norm;
+              const mark = parseFloat(
+                pricesDataForStrategy.markValues[
+                  pricesDataForStrategy.markValues.length - 1
+                ],
+              );
+              const norm = parseFloat(
+                pricesDataForStrategy.normalizationValues[
+                  pricesDataForStrategy.normalizationValues.length - 1
+                ],
+              );
+              const markOverNorm = mark / norm;
 
-            const indexVersusMark = percentDiff(index, mark);
-            const indexVersusNorm = percentDiff(index, norm);
+              const indexVersusMark = percentDiff(index, mark);
+              const indexVersusNorm = percentDiff(index, norm);
 
-            let markPosition = diffToPosition(indexVersusMark, index, mark);
-            let normPosition = diffToPosition(indexVersusNorm, index, norm);
+              let markPosition = diffToPosition(indexVersusMark, index, mark);
+              let normPosition = diffToPosition(indexVersusNorm, index, norm);
 
-            if (markPosition === normPosition) {
-              markPosition++;
-            }
+              if (markPosition === normPosition) {
+                markPosition++;
+              }
 
-            const fakeNFTValue = 300000;
-            const debtTokenMarketCap =
-              parseFloat(
-                ethers.utils.formatEther(
-                  debtTokenSupplies[strategy.contract.address],
-                ),
-              ) * mark;
+              const fakeNFTValue = 300000;
+              const debtTokenMarketCap =
+                parseFloat(
+                  ethers.utils.formatEther(
+                    debtTokenSupplies[strategy.contract.address],
+                  ),
+                ) * mark;
 
-            const nftOverCap = fakeNFTValue / debtTokenMarketCap;
+              const nftOverCap = fakeNFTValue / debtTokenMarketCap;
 
-            return (
-              <li
-                className={`${styles.row} ${i % 2 === 0 ? styles.even : ''} ${
-                  styles.clickable
-                }`}
-                onClick={() =>
-                  router.push(
-                    `/network/goerli/in-kind/strategies/${strategy.contract.address}/borrow`,
-                  )
-                }
-                key={strategy.contract.address}>
-                <div className={styles.token}>
-                  <p>
-                    $papr{strategy.underlying.symbol}_
-                    {strategy.collateral.symbol}
-                    {strategy.maxLTVPercent}
-                  </p>
-                </div>
-                <div className={styles.mathColumn}>
-                  <p>{targetYearlyGrowth.toFixed(0)}% APR</p>
-                </div>
-                <div className={styles.mathColumn}>
-                  <p>{nftOverCap.toFixed(2)}</p>
-                </div>
-                <div className={styles.mathColumn}>
-                  <p>{markOverNorm.toFixed(2)}</p>
-                </div>
-                <div className={styles.rate}>
-                  {['-', '-', '-', '-', '|', '-', '-', '-', '-'].map(
-                    (char, i) => (
-                      <>
-                        {markPosition === i && <>R</>}
-                        {normPosition === i && <>C</>}
-                        {markPosition !== i && normPosition !== i && (
-                          <>{char}</>
-                        )}
-                      </>
-                    ),
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
+              return (
+                <tr
+                  onClick={() =>
+                    router.push(
+                      `/network/goerli/in-kind/strategies/${strategy.contract.address}/borrow`,
+                    )
+                  }
+                  className={`${i % 2 === 0 ? styles.even : ''} ${
+                    styles.clickable
+                  }`}
+                  key={strategy.contract.address}>
+                  <td colSpan={6}>
+                    <p>
+                      $papr{strategy.underlying.symbol}_
+                      {strategy.collateral.symbol}
+                      {strategy.maxLTVPercent}
+                    </p>
+                  </td>
+                  <td colSpan={4}>
+                    <p>{targetYearlyGrowth.toFixed(0)}% APR</p>
+                  </td>
+                  <td colSpan={4}>
+                    <p>{nftOverCap.toFixed(2)}</p>
+                  </td>
+                  <td colSpan={4}>
+                    <p>{markOverNorm.toFixed(2)}</p>
+                  </td>
+                  <td colSpan={6}>
+                    {['-', '-', '-', '-', '|', '-', '-', '-', '-'].map(
+                      (char, i) => (
+                        <>
+                          {markPosition === i && <>R</>}
+                          {normPosition === i && <>C</>}
+                          {markPosition !== i && normPosition !== i && (
+                            <>{char}</>
+                          )}
+                        </>
+                      ),
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </Fieldset>
   );
