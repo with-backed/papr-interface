@@ -12,4 +12,5 @@
   font-size: var(--font-large);
   text-transform: uppercase;
   color: var(--greentext);
+  padding: 0 4px;
 }

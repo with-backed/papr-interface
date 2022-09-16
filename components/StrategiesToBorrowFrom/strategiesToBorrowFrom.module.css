@@ -38,6 +38,10 @@
     text-align: center;
 }
 
+.rate {
+    letter-spacing: 0.1em;
+}
+
 .clickable {
     cursor: pointer;
 }

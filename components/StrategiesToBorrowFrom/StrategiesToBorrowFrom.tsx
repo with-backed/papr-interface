@@ -162,7 +162,7 @@ export default function StrategiesToBorrowFrom({
                   <td colSpan={4}>
                     <p>{markOverNorm.toFixed(2)}</p>
                   </td>
-                  <td colSpan={6}>
+                  <td colSpan={6} className={styles.rate}>
                     {['-', '-', '-', '-', '|', '-', '-', '-', '-'].map(
                       (char, i) => (
                         <>
