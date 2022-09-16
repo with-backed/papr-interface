@@ -62,18 +62,27 @@ export async function populateLendingStrategy(
     address,
     signerOrProvider || provider,
   );
-  const poolAddress = await contract.pool();
+
+  const [poolAddress, targetGrowthPerPeriod, maxLTV, underlyingAddress] =
+    await Promise.all([
+      contract.pool(),
+      contract.targetGrowthPerPeriod(),
+      contract.maxLTV(),
+      contract.underlying(),
+    ]);
+
   const poolContract = IUniswapV3Pool__factory.connect(poolAddress, provider);
 
-  const token0Address = await poolContract.token0();
-  const token1Address = await poolContract.token1();
-  const token0 = await buildToken(
-    ERC20__factory.connect(token0Address, provider),
-  );
-  const token1 = await buildToken(
-    ERC20__factory.connect(token1Address, provider),
-  );
-  const underlyingAddress = await contract.underlying();
+  const [token0Address, token1Address] = await Promise.all([
+    poolContract.token0(),
+    poolContract.token1(),
+  ]);
+
+  const [token0, token1] = await Promise.all([
+    buildToken(ERC20__factory.connect(token0Address, provider)),
+    buildToken(ERC20__factory.connect(token1Address, provider)),
+  ]);
+
   const underlying = underlyingAddress == token0Address ? token0 : token1;
 
   const pool = await getPool(poolContract, token0, token1, config.chainId);
@@ -82,18 +91,12 @@ export async function populateLendingStrategy(
   /// and have an array of assets here
   const collateralAddress = process.env.NEXT_PUBLIC_MOCK_APE as string;
   const collateral = ERC721__factory.connect(collateralAddress, provider);
+  const [name, symbol] = await Promise.all([
+    collateral.name(),
+    collateral.symbol(),
+  ]);
 
-  const targetGrowthPerPeriod = await contract.targetGrowthPerPeriod();
-  /// TODO expose period from contract so we can not just assume period is 28 days.
-  // 365/28 = 13.035
   const targetAnnualGrowth = targetGrowthPerPeriod.mul(13).div(ONE.div(10000));
-  const lastUpdated = await contract.lastUpdated();
-  const now = ethers.BigNumber.from(Date.now()).div(1000);
-  const currentAPRBIPs = await computeEffectiveAPR(
-    now,
-    lastUpdated,
-    await contract.multiplier(),
-  );
 
   return {
     contract: contract,
@@ -102,11 +105,11 @@ export async function populateLendingStrategy(
     token1: token1,
     collateral: {
       contract: collateral,
-      name: await collateral.name(),
-      symbol: await collateral.symbol(),
+      name,
+      symbol,
     },
     underlying,
-    maxLTVPercent: convertONEScaledPercent(await contract.maxLTV(), 2),
+    maxLTVPercent: convertONEScaledPercent(maxLTV, 2),
     targetAnnualGrowthPercent: convertONEScaledPercent(targetAnnualGrowth, 2),
     token0IsUnderlying: token0.contract.address == underlying.contract.address,
   };
