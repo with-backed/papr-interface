@@ -94,14 +94,10 @@ export default function AccountNFTs({
   }, [nftsSelected]);
 
   const performSelectAll = useCallback(async () => {
-    await collateralContract.setApprovalForAll(
-      strategy.contract.address,
-      false,
+    setNFTsSelected(
+      userCollectionNFTs.map((nft) => getUniqueNFTId(nft.address, nft.tokenId)),
     );
-    // setNFTsSelected(
-    //   userCollectionNFTs.map((nft) => getUniqueNFTId(nft.address, nft.tokenId)),
-    // );
-  }, [collateralContract, strategy]);
+  }, [userCollectionNFTs, setNFTsSelected]);
 
   const performUnselectAll = useCallback(() => {
     setNFTsSelected([]);
