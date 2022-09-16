@@ -48,10 +48,10 @@ export const landingPageStrings = [
   },
   {
     content: [
-      'To borrow, NFT collectors deposit collateral from an approved collection and mint pAPR which is swapped for USDC.',
+      'So if the market price of pAPR is too low, the contract increases its internal exchange rate to encourage borrowers to repay and shrink the supply of pAPR.',
       'Borrowers are pressured to repay by a higher exchange rate because it is used by the contract to calculate a loan’s LTV (loan-to-value, the amount owed in principal and interest compared to the value of the collateral). Once a loan reaches a strategy’s predefined “Max LTV,” it must repay or else the collateral will be auctioned off to pay the debt. ',
     ],
-    id: 'high-price',
+    id: 'low-price',
     image: PaprGoesUp,
   },
   {
@@ -59,7 +59,7 @@ export const landingPageStrings = [
       'Conversely, if the market price of pAPR is higher than what the target growth requires, the contract decreases its internal exchange rate.',
       'This lower rate means the contract values pAPR more cheaply, minting more to borrowers in exchange for depositing their collateral. The supply increases with the goal of lowering the market price, bringing it back into line with the target growth rate.',
     ],
-    id: 'low-price',
+    id: 'high-price',
     image: PaprGoesDown,
   },
   {
