@@ -8,7 +8,7 @@ const calculateOffsets = () => {
   const center = viewportWidth / 2;
   return {
     // TODO: mobile?
-    top: 130,
+    top: 275,
     bottom: 0,
     left: center - WIDTH + 48,
     right: 0,
@@ -22,14 +22,21 @@ export const UpAndToTheRight = () => {
     left: 0,
     right: 0,
   });
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     setOffsets(calculateOffsets());
     const handleResize = () => setOffsets(calculateOffsets());
     window.addEventListener('resize', handleResize);
+    setLoaded(true);
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  if (!loaded) {
+    return null;
+  }
+
   return (
     <svg
       width={WIDTH}

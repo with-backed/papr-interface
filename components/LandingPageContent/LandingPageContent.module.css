@@ -17,7 +17,7 @@
 .wrapper h2 {
   text-align: center;
   color: var(--greentext);
-  margin: 0;
+  margin: 40px 0;
 }
 
 .wrapper h1 {
@@ -28,6 +28,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  margin-top: 200px;
 }
 
 .entry {
@@ -35,9 +36,14 @@
   grid-template-columns: 1fr 1fr;
   align-items: center;
   justify-items: center;
-  margin-bottom: 200px;
+  margin-bottom: 50px;
   margin-right: 95px;
   width: 100%;
+  gap: 50px;
+}
+
+.entry div:nth-child(2) {
+  justify-self: start;
 }
 
 .entry p {
@@ -45,8 +51,4 @@
   color: var(--greentext);
   line-height: 30px;
   max-width: 440px;
-}
-
-.parallaxes {
-  position: absolute;
 }
