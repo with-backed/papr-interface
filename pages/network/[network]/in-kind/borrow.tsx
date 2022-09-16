@@ -43,7 +43,6 @@ export default function SelectStrategyBorrowPage({
   pricesData,
 }: SelectStrategyBorrowPageProps) {
   const config = useConfig();
-  const { address } = useAccount();
   const [lendingStrategies, setLendingStrategies] = useState<LendingStrategy[]>(
     [],
   );
@@ -57,7 +56,7 @@ export default function SelectStrategyBorrowPage({
     );
     setLendingStrategies(populatedStrategies);
     setStrategiesLoading(false);
-  }, [address, config]);
+  }, [config, strategyAddresses]);
 
   useEffect(() => {
     populate();

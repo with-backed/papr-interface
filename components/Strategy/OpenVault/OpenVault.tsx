@@ -84,7 +84,6 @@ export default function OpenVault({
     quoteLoading,
     priceImpactLoading,
   } = useQuoteWithSlippage(strategy, debt, true);
-  const { network } = useConfig();
   const [showMath, setShowMath] = useState<boolean>(false);
 
   const addCollateralAndSwap = useCallback(async () => {
@@ -159,7 +158,6 @@ export default function OpenVault({
     address,
     nftsSelected,
     debt,
-    network,
     signer,
     strategy,
     quoteForSwap,
@@ -169,27 +167,24 @@ export default function OpenVault({
   // TODO: I think useCallback may not be able to introspect the debounced
   // function this produces. May need to either manually handle debounce with
   // timeouts or do something else.
-  const handleDebtAmountChanged = useCallback(
-    debounce(async (value: string) => {
-      setDebt(value);
+  const handleDebtAmountChanged = debounce(async (value: string) => {
+    setDebt(value);
 
-      if (value === '') {
-        setLiquidationDateEstimation('');
-        return;
-      }
+    if (value === '') {
+      setLiquidationDateEstimation('');
+      return;
+    }
 
-      setLiquidationDateEstimation(
-        await (
-          await computeLiquidationEstimation(
-            ethers.BigNumber.from(value),
-            ethers.BigNumber.from(maxDebt),
-            strategy,
-          )
-        ).toFixed(0),
-      );
-    }, 500),
-    [setDebt, maxDebt],
-  );
+    setLiquidationDateEstimation(
+      await (
+        await computeLiquidationEstimation(
+          ethers.BigNumber.from(value),
+          ethers.BigNumber.from(maxDebt),
+          strategy,
+        )
+      ).toFixed(0),
+    );
+  }, 500);
 
   const getMaxDebt = useCallback(async () => {
     const newNorm = await strategy.contract.newNorm();
