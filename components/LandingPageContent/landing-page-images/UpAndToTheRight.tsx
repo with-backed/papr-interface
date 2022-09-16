@@ -22,14 +22,21 @@ export const UpAndToTheRight = () => {
     left: 0,
     right: 0,
   });
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     setOffsets(calculateOffsets());
     const handleResize = () => setOffsets(calculateOffsets());
     window.addEventListener('resize', handleResize);
+    setLoaded(true);
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  if (!loaded) {
+    return null;
+  }
+
   return (
     <svg
       width={WIDTH}
