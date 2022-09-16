@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { axisBottom, extent, scaleLinear, min, max } from 'd3';
 import { humanizedTimestamp } from 'lib/duration';
 import { attachSVG, drawLine, drawDashedLine } from 'lib/d3';
@@ -6,49 +6,13 @@ import { StrategyPricesData } from 'lib/strategies/charts';
 
 const containerId = '#strategy-d3-chart';
 
-type ChartValue = [number, number];
-
 type ChartProps = {
   pricesData: StrategyPricesData;
 };
 
 export function Chart({ pricesData }: ChartProps) {
-  const [annualize, setAnnualize] = useState(false);
-
-  // leaving this because would be nice to have, but not working right now
-  // I think the annual values got too big to plot on my example
-  const transformToAnnual = useCallback(
-    (pData: StrategyPricesData): StrategyPricesData => {
-      const markValues: ChartValue[] = pData.markDPRValues.map((v) => {
-        return [v[0] * 365, v[1]];
-      });
-      const normValues: ChartValue[] = pData.normalizationDPRValues.map((v) => {
-        return [v[0] * 365, v[1]];
-      });
-      const indexValues: ChartValue[] = pData.indexDPRValues.map((v) => {
-        return [v[0] * 365, v[1]];
-      });
-
-      return {
-        indexDPR: pricesData.indexDPR,
-        index: pricesData.index,
-        markDPRValues: markValues,
-        normalizationDPRValues: normValues,
-        indexDPRValues: indexValues,
-        markValues: pricesData.markValues,
-        normalizationValues: pricesData.normalizationValues,
-      };
-    },
-    [pricesData],
-  );
-
   useEffect(() => {
     var data = pricesData;
-    if (annualize) {
-      data = transformToAnnual(pricesData);
-      console.log(pricesData);
-      console.log(data);
-    }
     const margin = { top: 0, right: 0, bottom: 20, left: 0 };
     const width = 580 - margin.left - margin.right;
     // TODO dynamically adjust height based on extent of y values
@@ -132,6 +96,6 @@ export function Chart({ pricesData }: ChartProps) {
     });
 
     return () => document.querySelector(`${containerId} svg`)?.remove();
-  }, [annualize, pricesData, transformToAnnual]);
+  }, [pricesData]);
   return <div id="strategy-d3-chart" />;
 }
