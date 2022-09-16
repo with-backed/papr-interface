@@ -9,7 +9,7 @@ import { Uniswap } from './landing-page-images/Uniswap';
 export const landingPageStrings = [
   {
     content: [
-      'The value of pAPR algorithmically adjusts to target a steady rate of growth.',
+      'The value of pAPR auto-calibrates to target a steady rate of growth.',
       '(It’s perpetually trying to grow at a predetermined annual rate.)',
     ],
     id: 'value',
@@ -34,7 +34,7 @@ export const landingPageStrings = [
   },
   {
     content: [
-      'To borrow, NFT collectors deposit collateral from an approved collection and are minted pAPR which is swapped for USDC.',
+      'To borrow, NFT collectors deposit collateral from an approved collection and mint pAPR which is swapped for USDC.',
       'When borrowers repay a loan, thier NFT is released to them and the pAPR used to repay the loan is burned.',
     ],
     id: 'deposit-repay',
@@ -47,22 +47,28 @@ export const landingPageStrings = [
     image: Math,
   },
   {
-    content:
+    content: [
       'So if the market price of pAPR is too low, the contract increases its internal exchange rate to encourage borrowers to repay and shrink the supply of pAPR.',
-    id: 'high-price',
+      'Borrowers are pressured to repay by a higher exchange rate because it is used by the contract to calculate a loan’s LTV (loan-to-value, the amount owed in principal and interest compared to the value of the collateral). Once a loan reaches a strategy’s predefined “Max LTV,” it must repay or else the collateral will be auctioned off to pay the debt. ',
+    ],
+    id: 'low-price',
     image: PaprGoesUp,
   },
   {
-    content:
-      'If the market price of pAPR is too high, the contract decreases its rate, encouraging borrowers to deposit collateral and mint pAPR.',
-    id: 'low-price',
+    content: [
+      'Conversely, if the market price of pAPR is higher than what the target growth requires, the contract decreases its internal exchange rate.',
+      'This lower rate means the contract values pAPR more cheaply, minting more to borrowers in exchange for depositing their collateral. The supply increases with the goal of lowering the market price, bringing it back into line with the target growth rate.',
+    ],
+    id: 'high-price',
     image: PaprGoesDown,
   },
   {
     content: [
-      'Borrowers get instant USDC loans at an interest rate determined by the market.',
-      'Lenders earn interest by holding the pAPR token as it appreciates.',
+      'The goal of the contract is the match the target growth rate, respond to changes in the market, and offer every participant unique value not met by other lending protocols.',
+      'Borrowers get instant loans at a fair interest rate determined by the market. Their risk is lower than other lending protocols because changes in floor price don’t effect liquidation.',
+      'Lenders earn interest by holding the pAPR token as it appreciates. With no management or oversight, they can benefit from a lending strategy with a single trade on Uniswap.',
       'Liquidity providers on Uniswap hold both tokens and earn fees as they facilitate the exchange.',
+      'As market conditions change, the pressure from these different actors weighs on the value of pAPR tokens. As perpetual tokens, the can be continuously calibrated to achieve equilibrium.',
     ],
     id: 'uniswap',
     image: Uniswap,
