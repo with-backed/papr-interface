@@ -8,6 +8,7 @@ import { useAccount } from 'wagmi';
 import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { useCenterNFTs } from 'hooks/useCenterNFTs';
 import styles from './BorrowPageContent.module.css';
+import StrategiesToBorrowFrom from 'components/StrategiesToBorrowFrom/StrategiesToBorrowFrom';
 
 export type BorrowPageProps = {
   strategyAddress: string;
@@ -45,6 +46,12 @@ export function BorrowPageContent({
     <div className={strategyStyles.wrapper}>
       <div className={styles.borrowWrapper}>
         <div className={strategyStyles.column}>
+          <StrategiesToBorrowFrom
+            legend={`Borrow: $papr${lendingStrategy.underlying.symbol}_${lendingStrategy.collateral.symbol}${lendingStrategy.maxLTVPercent}`}
+            strategies={[lendingStrategy]}
+            pricesData={{ [lendingStrategy.contract.address]: pricesData }}
+            includeDetails
+          />
           <AccountNFTs
             strategy={lendingStrategy}
             userCollectionNFTs={userCollectionNFTs}

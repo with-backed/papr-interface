@@ -1,7 +1,9 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
+import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy } from 'lib/strategies';
 import { StrategyPricesData } from 'lib/strategies/charts';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -37,12 +39,17 @@ const diffToPosition = (diff: number, index: number, val: number) => {
 export type StrategiesToBorrowFromProps = {
   strategies: LendingStrategy[];
   pricesData: { [key: string]: StrategyPricesData };
+  includeDetails: boolean;
+  legend: string;
 };
 
 export default function StrategiesToBorrowFrom({
   strategies,
   pricesData,
+  includeDetails,
+  legend,
 }: StrategiesToBorrowFromProps) {
+  const config = useConfig();
   const router = useRouter();
   const [debtTokenSupplies, setDebtTokenSupplies] = useState<{
     [key: string]: ethers.BigNumber;
@@ -74,26 +81,29 @@ export default function StrategiesToBorrowFrom({
   if (debtTokenSuppliesLoading) return <></>;
 
   return (
-    <Fieldset legend="🎮 strategies">
+    <Fieldset legend={legend}>
       <div className={styles.strategies}>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th colSpan={6}>
-                <p>token</p>
-              </th>
-              <th colSpan={5}>
+              {!includeDetails && (
+                <th className={styles.tokenName}>
+                  <p>token</p>
+                </th>
+              )}
+              <th className={styles.stat}>
                 <p>target</p>
               </th>
-              <th colSpan={5}>
+              <th className={styles.stat}>
                 <p>NFT/CAP</p>
               </th>
-              <th colSpan={5}>
+              <th className={styles.stat}>
                 <p>MKT/CTR</p>
               </th>
-              <th colSpan={6}>
+              <th className={styles.rate}>
                 <p>RATE</p>
               </th>
+              {includeDetails && <th colSpan={6}></th>}
             </tr>
           </thead>
           <tbody>
@@ -146,23 +156,25 @@ export default function StrategiesToBorrowFrom({
                     styles.clickable
                   }`}
                   key={strategy.contract.address}>
-                  <td colSpan={6}>
-                    <p>
-                      $papr{strategy.underlying.symbol}_
-                      {strategy.collateral.symbol}
-                      {strategy.maxLTVPercent}
-                    </p>
-                  </td>
-                  <td colSpan={4}>
+                  {!includeDetails && (
+                    <td className={styles.tokenName}>
+                      <p>
+                        $papr{strategy.underlying.symbol}_
+                        {strategy.collateral.symbol}
+                        {strategy.maxLTVPercent}
+                      </p>
+                    </td>
+                  )}
+                  <td className={styles.stat}>
                     <p>{targetYearlyGrowth.toFixed(0)}% APR</p>
                   </td>
-                  <td colSpan={4}>
+                  <td className={styles.stat}>
                     <p>{nftOverCap.toFixed(2)}</p>
                   </td>
-                  <td colSpan={4}>
+                  <td className={styles.stat}>
                     <p>{markOverNorm.toFixed(2)}</p>
                   </td>
-                  <td colSpan={6} className={styles.rate}>
+                  <td className={styles.rate}>
                     {['-', '-', '-', '-', '|', '-', '-', '-', '-'].map(
                       (char, i) => (
                         <>
@@ -175,6 +187,14 @@ export default function StrategiesToBorrowFrom({
                       ),
                     )}
                   </td>
+                  {includeDetails && (
+                    <td colSpan={6}>
+                      <Link
+                        href={`/network/${config.network}/in-kind/strategies/${strategy.contract.address}`}>
+                        <a>Details ↗</a>
+                      </Link>
+                    </td>
+                  )}
                 </tr>
               );
             })}

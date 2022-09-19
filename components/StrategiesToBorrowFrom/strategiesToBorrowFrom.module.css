@@ -18,6 +18,14 @@
     padding-left: 12px;
 }
 
+.tokenName {
+    width: 30%;
+}
+
+.stat {
+    width: 16.6%;
+}
+
 .table th p {
     margin: 0;
 }
@@ -40,6 +48,7 @@
 
 .rate {
     letter-spacing: 0.1em;
+    width: 20%;
 }
 
 .clickable {
