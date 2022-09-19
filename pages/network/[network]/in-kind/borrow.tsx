@@ -6,8 +6,8 @@ import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { GetServerSideProps } from 'next';
 import { LendingStrategy as SubgraphLendingStrategy } from 'types/generated/graphql/inKindSubgraph';
 import { useCallback, useEffect, useState } from 'react';
-import strategyStyles from './strategies/[strategy]/strategy.module.css';
-import styles from 'components/Strategy/strategy.module.css';
+import strategyStyles from 'components/Strategy/Strategy.module.css';
+import styles from './strategiesBorrow.module.css';
 import { SupportedNetwork } from 'lib/config';
 
 export type SelectStrategyBorrowPageProps = {
