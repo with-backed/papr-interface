@@ -1,13 +1,8 @@
-import MintCollateral from 'components/Strategy/MintCollateral';
-import MintERC20 from 'components/Strategy/MintERC20';
+import { TestPageContent } from 'components/Strategy/TestPageContent';
 import { useConfig } from 'hooks/useConfig';
-import { SupportedNetwork } from 'lib/config';
 import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
-import strategyStyles from './strategy.module.css';
-import styles from './test.module.css';
 
 export type TestProps = {
   strategyAddress: string;
@@ -27,7 +22,6 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
 
 export default function InKindTest({ strategyAddress }: TestProps) {
   const config = useConfig();
-  const { address } = useAccount();
   const [lendingStrategy, setLendingStrategy] =
     useState<LendingStrategy | null>(null);
 
@@ -42,14 +36,5 @@ export default function InKindTest({ strategyAddress }: TestProps) {
 
   if (!lendingStrategy) return <></>;
 
-  return (
-    <div className={strategyStyles.wrapper}>
-      <div className={styles.wrapper}>
-        <div className={strategyStyles.column}>
-          <MintERC20 token={lendingStrategy.underlying} />
-          <MintCollateral token={lendingStrategy.collateral} />
-        </div>
-      </div>
-    </div>
-  );
+  return <TestPageContent strategyAddress={strategyAddress} />;
 }

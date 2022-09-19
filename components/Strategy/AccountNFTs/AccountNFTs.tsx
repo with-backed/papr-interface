@@ -26,7 +26,7 @@ export type AccountNFTsProps = {
   setNFTsSelected: Dispatch<SetStateAction<string[]>>;
 };
 
-export default function AccountNFTs({
+export function AccountNFTs({
   strategy,
   userCollectionNFTs,
   nftsLoading,

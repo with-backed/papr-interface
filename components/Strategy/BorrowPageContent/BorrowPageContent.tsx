@@ -1,48 +1,20 @@
-import AccountNFTs from 'components/Strategy/AccountNFTs/AccountNFTs';
-import OpenVault from 'components/Strategy/OpenVault/OpenVault';
-import { SupportedNetwork } from 'lib/config';
-import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
-import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
-import { strategyPricesData, StrategyPricesData } from 'lib/strategies/charts';
-import strategyStyles from './strategy.module.css';
-import borrowStyles from './borrow.module.css';
-import { LendingStrategy as SubgraphLendingStrategy } from 'types/generated/graphql/inKindSubgraph';
-import { GetServerSideProps } from 'next';
-import { useCallback, useEffect, useState } from 'react';
+import { StrategyPricesData } from 'lib/strategies/charts';
+import React, { useCallback, useEffect, useState } from 'react';
+import strategyStyles from 'components/Strategy/Strategy.module.css';
+import { AccountNFTs } from 'components/Strategy/AccountNFTs';
+import { OpenVault } from 'components/Strategy/OpenVault';
 import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
+import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { useCenterNFTs } from 'hooks/useCenterNFTs';
+import styles from './BorrowPageContent.module.css';
 
 export type BorrowPageProps = {
   strategyAddress: string;
   pricesData: StrategyPricesData | null;
 };
 
-export const getServerSideProps: GetServerSideProps<BorrowPageProps> = async (
-  context,
-) => {
-  const address = (context.params?.strategy as string).toLowerCase();
-  const network = context.params?.network as SupportedNetwork;
-
-  const subgraphStrategy = await subgraphStrategyByAddress(address);
-
-  let pricesData: StrategyPricesData | null = null;
-  if (subgraphStrategy?.lendingStrategy) {
-    pricesData = await strategyPricesData(
-      subgraphStrategy.lendingStrategy as SubgraphLendingStrategy,
-      network,
-    );
-  }
-
-  return {
-    props: {
-      strategyAddress: address,
-      pricesData: pricesData,
-    },
-  };
-};
-
-export default function Borrow({
+export function BorrowPageContent({
   strategyAddress,
   pricesData,
 }: BorrowPageProps) {
@@ -71,7 +43,7 @@ export default function Borrow({
 
   return (
     <div className={strategyStyles.wrapper}>
-      <div className={borrowStyles.borrowWrapper}>
+      <div className={styles.borrowWrapper}>
         <div className={strategyStyles.column}>
           <AccountNFTs
             strategy={lendingStrategy}

@@ -12,7 +12,7 @@ import { StrategyFactory__factory } from 'types/generated/abis';
 import { LendingStrategiesDocument } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 import { useSigner } from 'wagmi';
-import styles from './strategies/[strategy]/strategy.module.css';
+import styles from 'components/Strategy/Strategy.module.css';
 
 export default function Factory() {
   const { data: signer } = useSigner();
