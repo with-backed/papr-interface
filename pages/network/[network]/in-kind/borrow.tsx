@@ -67,8 +67,10 @@ export default function SelectStrategyBorrowPage({
       <div className={styles.selectStrategyWrapper}>
         <div className={strategyStyles.column}>
           <StrategiesToBorrowFrom
+            legend="🎮 strategies"
             strategies={lendingStrategies}
             pricesData={pricesData}
+            includeDetails={false}
           />
         </div>
       </div>
