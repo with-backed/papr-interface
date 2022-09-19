@@ -45,7 +45,7 @@ export function StrategyOverviewContent({
     <div>
       <h3>Strategy</h3>
       <p>(fake) oracle price: {PRICE} </p>
-      {lendingStrategy != null && pricesData != null ? (
+      {!!lendingStrategy && !!pricesData && (
         <div className={styles.wrapper}>
           <div className={styles.column}>
             <StrategyState strategy={lendingStrategy} pricesData={pricesData} />
@@ -65,8 +65,6 @@ export function StrategyOverviewContent({
             <StrategyCharts pricesData={pricesData} />
           </div>
         </div>
-      ) : (
-        ''
       )}
     </div>
   );
