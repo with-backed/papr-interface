@@ -60,11 +60,7 @@ const debounce = (func: any, wait: number) => {
   };
 };
 
-export default function OpenVault({
-  strategy,
-  nftsSelected,
-  pricesData,
-}: BorrowProps) {
+export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
   const { address } = useAccount();
   const { data: signer } = useSigner();
   // TODO: looks like we're doing a lot of parsing on these values -- probably
