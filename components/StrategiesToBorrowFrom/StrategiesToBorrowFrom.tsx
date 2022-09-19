@@ -87,20 +87,20 @@ export default function StrategiesToBorrowFrom({
           <thead>
             <tr>
               {!includeDetails && (
-                <th colSpan={6}>
+                <th className={styles.tokenName}>
                   <p>token</p>
                 </th>
               )}
-              <th colSpan={5}>
+              <th className={styles.stat}>
                 <p>target</p>
               </th>
-              <th colSpan={5}>
+              <th className={styles.stat}>
                 <p>NFT/CAP</p>
               </th>
-              <th colSpan={5}>
+              <th className={styles.stat}>
                 <p>MKT/CTR</p>
               </th>
-              <th colSpan={6}>
+              <th className={styles.rate}>
                 <p>RATE</p>
               </th>
               {includeDetails && <th colSpan={6}></th>}
@@ -157,7 +157,7 @@ export default function StrategiesToBorrowFrom({
                   }`}
                   key={strategy.contract.address}>
                   {!includeDetails && (
-                    <td colSpan={6}>
+                    <td className={styles.tokenName}>
                       <p>
                         $papr{strategy.underlying.symbol}_
                         {strategy.collateral.symbol}
@@ -165,16 +165,16 @@ export default function StrategiesToBorrowFrom({
                       </p>
                     </td>
                   )}
-                  <td colSpan={4}>
+                  <td className={styles.stat}>
                     <p>{targetYearlyGrowth.toFixed(0)}% APR</p>
                   </td>
-                  <td colSpan={4}>
+                  <td className={styles.stat}>
                     <p>{nftOverCap.toFixed(2)}</p>
                   </td>
-                  <td colSpan={4}>
+                  <td className={styles.stat}>
                     <p>{markOverNorm.toFixed(2)}</p>
                   </td>
-                  <td colSpan={6} className={styles.rate}>
+                  <td className={styles.rate}>
                     {['-', '-', '-', '-', '|', '-', '-', '-', '-'].map(
                       (char, i) => (
                         <>
