@@ -39,7 +39,7 @@ export function useQuoteWithSlippage(
   }, [strategy]);
 
   const amountToSwap = useMemo(() => {
-    if (!amount) return ethers.BigNumber.from(0);
+    if (!parseInt(amount)) return ethers.BigNumber.from(0);
     return ethers.utils.parseUnits(amount, tokenIn.decimals);
   }, [tokenIn, tokenOut, amount]);
 
@@ -72,7 +72,7 @@ export function useQuoteWithSlippage(
   }, [amountToSwap, tokenIn, tokenOut, quoter]);
 
   useEffect(() => {
-    if (!amount) return;
+    if (!parseInt(amount)) return;
     getQuoteAndPriceImpactForSwap();
   }, [amount]);
 
