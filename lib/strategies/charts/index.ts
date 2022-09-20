@@ -6,7 +6,7 @@ import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { Strategy__factory } from 'types/generated/abis';
 import { LendingStrategy } from 'types/generated/graphql/inKindSubgraph';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
-import { convertONEScaledPercent, convertOneScaledValue } from '..';
+import { convertONEScaledPercent } from '..';
 import { markValues } from './mark';
 import { normValues } from './norm';
 
@@ -53,6 +53,15 @@ export async function strategyPricesData(
   markDPRs.unshift([targetDPR, createdAt]);
   normDPRs.unshift([targetDPR, createdAt]);
 
+  // each unique timestamp from the datasets, sorted ascending. Use this to
+  // make sure we have an index entry for each other value
+  const timestamps = Array.from(
+    new Set([
+      ...markDPRs.map(([_, timestamp]) => timestamp),
+      ...normDPRs.map(([_, timestamp]) => timestamp),
+    ]),
+  ).sort((a, b) => a - b);
+
   return {
     indexDPR: targetDPR,
     index: parseFloat(ethers.utils.formatEther(index)),
@@ -60,17 +69,10 @@ export async function strategyPricesData(
     normalizationValues: norms,
     markValues: marks,
     markDPRValues: markDPRs,
-    indexDPRValues: indexValues(targetDPR, createdAt, now),
+    indexDPRValues: indexValues(targetDPR, timestamps),
   };
 }
 
-function indexValues(
-  targetDPR: number,
-  start: number,
-  now: number,
-): ChartValue[] {
-  return [
-    [targetDPR, start],
-    [targetDPR, now],
-  ];
+function indexValues(targetDPR: number, timestamps: number[]): ChartValue[] {
+  return timestamps.map((t) => [targetDPR, t]);
 }
