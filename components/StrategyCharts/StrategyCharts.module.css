@@ -1,3 +1,8 @@
 .header {
   color: var(--greentext);
 }
+
+.chart-label > tspan {
+  fill: var(--greentext);
+  font-family: var(--sans) !important;
+}
