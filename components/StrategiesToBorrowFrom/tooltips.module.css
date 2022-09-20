@@ -1,0 +1,60 @@
+.tooltip {
+    background-color: #282828;
+    color: white;
+    padding: 20px;
+    border-radius: var(--border-radius-large);
+    max-width: 500px;
+    line-height: 22px;
+}
+
+.nftCapTooltip {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.nftCapTooltip .value {
+    width: 30%;
+}
+
+.nftCapTooltip .description {
+    width: 70%;
+}
+
+.mktCtrTooltip {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.mktCtrTooltip .grid {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.mktCtrTooltip .grid div:nth-child(n + 1) {
+    width: 60%;
+}
+
+.mktCtrTooltip .grid div:nth-child(2n) {
+    width: 40%;
+}
+
+.rateTooltip {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.rateTooltip div:nth-child(n + 1) {
+    width: 60%;
+}
+
+.rateTooltip div:nth-child(2n) {
+    width: 40%;
+}

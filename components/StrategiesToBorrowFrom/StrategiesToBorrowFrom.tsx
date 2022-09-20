@@ -6,8 +6,16 @@ import { StrategyPricesData } from 'lib/strategies/charts';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
+import { Tooltip, TooltipReference, useTooltipState } from 'reakit';
 
 import styles from './strategiesToBorrowFrom.module.css';
+import {
+  APRTooltip,
+  MktCtrTooltip,
+  NFTCapTooltip,
+  RateTooltip,
+  TokenTooltip,
+} from './Tooltips';
 
 const percentDiff = (a: number, b: number): number =>
   Math.abs(((b - a) / a) * 100);
@@ -77,6 +85,12 @@ export default function StrategiesToBorrowFrom({
   useEffect(() => {
     initDebtTokenSupplies();
   }, [initDebtTokenSupplies]);
+
+  const tokenTooltip = useTooltipState({ placement: 'bottom-start' });
+  const aprTooltip = useTooltipState({ placement: 'bottom-start' });
+  const nftCapTooltip = useTooltipState({ placement: 'bottom-start' });
+  const mktCtrTooltip = useTooltipState({ placement: 'bottom-start' });
+  const rateTooltip = useTooltipState({ placement: 'bottom-start' });
 
   if (debtTokenSuppliesLoading) return <></>;
 
@@ -158,34 +172,68 @@ export default function StrategiesToBorrowFrom({
                   key={strategy.contract.address}>
                   {!includeDetails && (
                     <td className={styles.tokenName}>
-                      <p>
-                        $papr{strategy.underlying.symbol}_
-                        {strategy.collateral.symbol}
-                        {strategy.maxLTVPercent}
-                      </p>
+                      <TooltipReference {...tokenTooltip}>
+                        <p>
+                          $papr{strategy.underlying.symbol}_
+                          {strategy.collateral.symbol}
+                          {strategy.maxLTVPercent}
+                        </p>
+                      </TooltipReference>
+                      <TokenTooltip
+                        strategy={strategy}
+                        tooltip={tokenTooltip}
+                      />
                     </td>
                   )}
+
                   <td className={styles.stat}>
-                    <p>{targetYearlyGrowth.toFixed(0)}% APR</p>
+                    <TooltipReference {...aprTooltip}>
+                      <p>{targetYearlyGrowth.toFixed(0)}% APR</p>
+                    </TooltipReference>
+                    <APRTooltip strategy={strategy} tooltip={aprTooltip} />
+                  </td>
+
+                  <td className={styles.stat}>
+                    <TooltipReference {...nftCapTooltip}>
+                      <p>{nftOverCap.toFixed(2)}</p>
+                    </TooltipReference>
+                    <NFTCapTooltip
+                      strategy={strategy}
+                      tooltip={nftCapTooltip}
+                      nftMarketCap={fakeNFTValue}
+                      debtTokenMarketCap={debtTokenMarketCap}
+                    />
                   </td>
                   <td className={styles.stat}>
-                    <p>{nftOverCap.toFixed(2)}</p>
-                  </td>
-                  <td className={styles.stat}>
-                    <p>{markOverNorm.toFixed(2)}</p>
+                    <TooltipReference {...mktCtrTooltip}>
+                      <p>{markOverNorm.toFixed(2)}</p>
+                    </TooltipReference>
+                    <MktCtrTooltip
+                      strategy={strategy}
+                      tooltip={mktCtrTooltip}
+                      mark={mark}
+                      norm={norm}
+                    />
                   </td>
                   <td className={styles.rate}>
-                    {['-', '-', '-', '-', '|', '-', '-', '-', '-'].map(
-                      (char, i) => (
-                        <>
-                          {markPosition === i && <>R</>}
-                          {normPosition === i && <>C</>}
-                          {markPosition !== i && normPosition !== i && (
-                            <>{char}</>
-                          )}
-                        </>
-                      ),
-                    )}
+                    <TooltipReference {...rateTooltip}>
+                      {['-', '-', '-', '-', '|', '-', '-', '-', '-'].map(
+                        (char, i) => (
+                          <>
+                            {markPosition === i && <>R</>}
+                            {normPosition === i && <>C</>}
+                            {markPosition !== i && normPosition !== i && (
+                              <>{char}</>
+                            )}
+                          </>
+                        ),
+                      )}
+                    </TooltipReference>
+                    <RateTooltip
+                      strategy={strategy}
+                      tooltip={rateTooltip}
+                      pricesData={pricesDataForStrategy}
+                    />
                   </td>
                   {includeDetails && (
                     <td colSpan={6}>
