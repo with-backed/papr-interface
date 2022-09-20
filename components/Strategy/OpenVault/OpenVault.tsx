@@ -22,9 +22,11 @@ import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
 import { erc721Contract } from 'lib/contracts';
 import { getAddress } from 'ethers/lib/utils';
 import { ERC721__factory } from 'types/generated/abis';
+import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
 
 type BorrowProps = {
   strategy: LendingStrategy;
+  userCollectionNFTs: CenterUserNFTsResponse[];
   nftsSelected: string[];
   pricesData: StrategyPricesData;
 };
@@ -78,7 +80,12 @@ const debounce = (func: any, wait: number) => {
   };
 };
 
-export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
+export function OpenVault({
+  strategy,
+  userCollectionNFTs,
+  nftsSelected,
+  pricesData,
+}: BorrowProps) {
   const { address } = useAccount();
   const { data: signer } = useSigner();
 
@@ -98,6 +105,7 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
   } = useQuoteWithSlippage(strategy, debt.toString(), true);
   const [showMath, setShowMath] = useState<boolean>(false);
   const [nftsApproved, setNFTsApproved] = useState<string[]>([]);
+  const [approvalsLoading, setApprovalsLoading] = useState<boolean>(false);
 
   const collateralContract = useMemo(() => {
     return erc721Contract(strategy.collateral.contract.address, signer!);
@@ -273,15 +281,14 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
 
   const initializeNFTsApproved = useCallback(async () => {
     const nftApprovals = await Promise.all(
-      nftsSelected.map(async (id) => {
-        const [address, tokenId] = deconstructFromId(id);
-        return (await isNFTApproved(tokenId))
-          ? getUniqueNFTId(address, tokenId)
+      userCollectionNFTs.map(async (nft) => {
+        return (await isNFTApproved(nft.tokenId))
+          ? getUniqueNFTId(nft.address, nft.tokenId)
           : '';
       }),
     );
     setNFTsApproved(nftApprovals.filter((id) => !!id));
-  }, [isNFTApproved, nftsSelected]);
+  }, [isNFTApproved, userCollectionNFTs]);
 
   useEffect(() => {
     initializeNFTsApproved();
@@ -289,22 +296,32 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
   }, [initializeNFTsApproved, getMaxDebt]);
 
   const performApproveAll = useCallback(async () => {
+    setApprovalsLoading(true);
     await collateralContract
       .setApprovalForAll(strategy.contract.address, true)
-      .then(() => {});
-  }, [collateralContract, strategy]);
-
-  const approveDisabled = useMemo(() => {
-    return (
-      nftsSelected.sort() !== nftsApproved.sort() || nftsSelected.length === 0
-    );
-  }, [nftsSelected, nftsApproved]);
+      .then(() => {
+        setApprovalsLoading(false);
+        setNFTsApproved(
+          userCollectionNFTs.map((nft) =>
+            getUniqueNFTId(nft.address, nft.tokenId),
+          ),
+        );
+      });
+  }, [collateralContract, userCollectionNFTs, strategy]);
 
   const borrowDisabled = useMemo(() => {
+    const allSelectedAreApproved =
+      nftsSelected.filter((val) => nftsApproved.includes(val)).length ===
+      nftsSelected.length;
     return (
-      nftsSelected.sort() === nftsApproved.sort() || nftsSelected.length === 0
+      (!allSelectedAreApproved && nftsSelected.length !== 1) ||
+      nftsSelected.length === 0
     );
   }, [nftsSelected, nftsApproved]);
+
+  const approveDisabled = useMemo(() => {
+    return !borrowDisabled || nftsSelected.length < 2;
+  }, [nftsSelected, borrowDisabled]);
 
   return (
     <Fieldset legend="🏦 Set Loan Amount">
@@ -405,12 +422,12 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
           className={`${styles.approveAndBorrowButtons} ${
             !showMath && styles.noDisplay
           }`}>
-          <button
-            className={styles.button}
-            onClick={performApproveAll}
-            disabled={approveDisabled}>
-            Approve NFTS
-          </button>
+          {!approveDisabled && (
+            <button className={styles.button} onClick={performApproveAll}>
+              {approvalsLoading && '...'}
+              {!approvalsLoading && 'Approve NFTs'}
+            </button>
+          )}
           <button
             className={styles.button}
             onClick={addCollateralAndSwap}
