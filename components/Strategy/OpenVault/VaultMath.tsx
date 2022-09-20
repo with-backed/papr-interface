@@ -141,19 +141,19 @@ export default function VaultMath({
         even={false}
       />
       <MathRow
-        formula=""
+        formula="X = R*K"
         description="Max Borrowable"
         content={(effectiveOracleValue * (maxLTV / 100)).toFixed(4)}
         even
       />
       <MathRow
-        formula=""
+        formula="Y"
         description="Your loan amount"
         content={quoteForSwap}
         even={false}
       />
       <MathRow
-        formula=""
+        formula="Z = Y/X"
         description="Your LTV"
         content={`${inputtedLTV}%`}
         even
