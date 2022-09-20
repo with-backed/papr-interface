@@ -2,9 +2,9 @@ import { Fieldset } from 'components/Fieldset';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useMemo } from 'react';
 import styles from './StrategyCharts.module.css';
-
 import dynamic from 'next/dynamic';
 
+// apexcharts uses `window`, so will break if we SSR
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 type StrategyChartsProps = {
