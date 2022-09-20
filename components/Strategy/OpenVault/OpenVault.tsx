@@ -319,8 +319,10 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
               if (maxDebt.isZero()) {
                 currentLTV = 0;
               } else {
-                currentLTV =
-                  (state.valueNow / parseFloat(maxDebt.toString())) * maxLTV;
+                currentLTV = Math.min(
+                  (state.valueNow / parseFloat(maxDebt.toString())) * maxLTV,
+                  maxLTV,
+                );
               }
 
               let pushedClassName: string;
