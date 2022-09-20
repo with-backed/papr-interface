@@ -99,6 +99,10 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
   const [showMath, setShowMath] = useState<boolean>(false);
   const [nftsApproved, setNFTsApproved] = useState<string[]>([]);
 
+  const collateralContract = useMemo(() => {
+    return erc721Contract(strategy.collateral.contract.address, signer!);
+  }, [strategy, signer]);
+
   const addCollateralAndSwap = useCallback(async () => {
     const tokenIds = nftsSelected.map((id) => deconstructFromId(id)[1]);
 
@@ -133,8 +137,6 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
         oracleInfo,
         sig,
       };
-
-      console.log({ erc721ReceivedArgs });
 
       await collateralContract[
         'safeTransferFrom(address,address,uint256,bytes)'
@@ -208,6 +210,7 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
     }
   }, [
     address,
+    collateralContract,
     nftsSelected,
     debt,
     signer,
@@ -254,10 +257,6 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
     return strategy.maxLTVPercent;
   }, [strategy]);
 
-  const collateralContract = useMemo(() => {
-    return erc721Contract(strategy.collateral.contract.address, signer!);
-  }, [strategy, signer]);
-
   const isNFTApproved = useCallback(
     async (tokenId: string) => {
       const approved =
@@ -282,7 +281,7 @@ export function OpenVault({ strategy, nftsSelected, pricesData }: BorrowProps) {
       }),
     );
     setNFTsApproved(nftApprovals.filter((id) => !!id));
-  }, [isNFTApproved]);
+  }, [isNFTApproved, nftsSelected]);
 
   useEffect(() => {
     initializeNFTsApproved();
