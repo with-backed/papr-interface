@@ -62,6 +62,7 @@ export function BorrowPageContent({
           <OpenVault
             strategy={lendingStrategy}
             pricesData={pricesData}
+            userCollectionNFTs={userCollectionNFTs}
             nftsSelected={nftsSelected}
           />
         </div>

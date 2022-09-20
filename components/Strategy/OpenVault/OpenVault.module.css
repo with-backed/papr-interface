@@ -50,7 +50,7 @@
     margin-left: -2px;
 }
 
-.borrowButton {
+.button {
     cursor: pointer;
     width: 36%;
     background-color: white;
@@ -60,13 +60,25 @@
     color: var(--greentext);
     border: 3px solid var(--greentext);
     border-radius: var(--border-radius-large);
+    margin: 0px;
+}
+
+.button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+.reviewButton {
     margin-left: 20px;
 }
 
 .mathWrapper {
-    margin-top: 80px;
     display: flex;
     flex-direction: column;
+}
+
+.priceImpactWrapper {
+    margin-top: 80px;
 }
 
 .mathRow {
@@ -120,4 +132,21 @@
     font-size: 12px;
     font-family: var(--sans);
     letter-spacing: .12rem;
+}
+
+.approveAndBorrowButtons {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.approveAndBorrowButtons button {
+    margin: 10px 0;
+}
+
+.noDisplay {
+    display: none;
 }
