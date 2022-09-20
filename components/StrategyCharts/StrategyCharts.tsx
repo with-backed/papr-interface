@@ -114,6 +114,7 @@ function PriceInUSDC({
   pricesData: {
     normalizationDPRValues,
     normalizationValues,
+    indexDPRValues,
     index,
     markDPRValues,
     markValues,
@@ -122,19 +123,6 @@ function PriceInUSDC({
   const options = {
     ...baseOptions,
   };
-
-  // each unique timestamp from the datasets, sorted ascending. Use this to
-  // make sure we have an index entry for each other value
-  const timestamps = useMemo(
-    () =>
-      Array.from(
-        new Set([
-          ...markDPRValues.map(([_, timestamp]) => timestamp),
-          ...normalizationDPRValues.map(([_, timestamp]) => timestamp),
-        ]),
-      ).sort((a, b) => a - b),
-    [markDPRValues, normalizationDPRValues],
-  );
 
   const series = useMemo(
     () => [
@@ -147,7 +135,7 @@ function PriceInUSDC({
       },
       {
         name: 'Target',
-        data: timestamps.map((timestamp) => ({
+        data: indexDPRValues.map(([_, timestamp]) => ({
           x: timestamp,
           y: index,
         })),
@@ -162,11 +150,11 @@ function PriceInUSDC({
     ],
     [
       index,
+      indexDPRValues,
       markDPRValues,
       markValues,
       normalizationDPRValues,
       normalizationValues,
-      timestamps,
     ],
   );
 
