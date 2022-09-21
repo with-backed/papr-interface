@@ -6,6 +6,4 @@ fragment allVaultProperties on Vault {
   tokenId
   nonce
   debt
-  open
-  openedAt
 }
