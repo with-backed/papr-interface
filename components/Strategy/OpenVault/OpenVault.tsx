@@ -115,7 +115,7 @@ export function OpenVault({
     const tokenIds = nftsSelected.map((id) => deconstructFromId(id)[1]);
 
     const nextNonce = await getNextVaultNonceForUser(strategy, address!);
-    const vaultNonce = ethers.BigNumber.from(nextNonce);
+    const vaultNonce = ethers.BigNumber.from(nextNonce).add(1);
     const minOut = ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals);
     const sqrtPriceLimitX96 = strategy.token0IsUnderlying
       ? ethers.BigNumber.from(TickMath.MAX_SQRT_RATIO.toString()).sub(1)
