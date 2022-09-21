@@ -28,7 +28,7 @@ export function Loans({ strategy }: LoansProps) {
   });
   data?.vaults;
   return (
-    <Fieldset legend="🔐 Associated Vaults">
+    <Fieldset legend="💸 Loans">
       {fetching && <Loading />}
       {!fetching && !!data && (
         <Loaded strategy={strategy} vaults={data.vaults} />
