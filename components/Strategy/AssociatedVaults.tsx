@@ -11,7 +11,6 @@ type Vault = {
   id: string;
   tokenId: any;
   debt: any;
-  open: boolean;
   owner: {
     __typename?: 'Account' | undefined;
     id: string;
