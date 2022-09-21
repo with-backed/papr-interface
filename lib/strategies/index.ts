@@ -96,7 +96,7 @@ export async function populateLendingStrategy(
     collateral.symbol(),
   ]);
 
-  const targetAnnualGrowth = targetGrowthPerPeriod.mul(13).div(ONE.div(10000));
+  const targetAnnualGrowth = await contract.targetAPR();
 
   return {
     contract: contract,
