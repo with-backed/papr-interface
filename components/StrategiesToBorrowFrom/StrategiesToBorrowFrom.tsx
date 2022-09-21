@@ -238,7 +238,7 @@ export default function StrategiesToBorrowFrom({
                   {includeDetails && (
                     <td colSpan={6}>
                       <Link
-                        href={`/network/${config.network}/strategies/${strategy.contract.address}`}>
+                        href={`/network/${config.network}/strategy/${strategy.contract.address}`}>
                         <a>Details ↗</a>
                       </Link>
                     </td>
