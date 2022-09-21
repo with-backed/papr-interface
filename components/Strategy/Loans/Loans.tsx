@@ -18,10 +18,10 @@ type Vault = {
   };
 };
 
-type AssociatedVaultsProps = {
+type LoansProps = {
   strategy: string;
 };
-export function AssociatedVaults({ strategy }: AssociatedVaultsProps) {
+export function Loans({ strategy }: LoansProps) {
   const [{ data, fetching }] = useQuery({
     query: VaultsByStrategyDocument,
     variables: { strategy },
