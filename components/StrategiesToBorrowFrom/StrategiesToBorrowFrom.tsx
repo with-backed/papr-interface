@@ -163,7 +163,7 @@ export default function StrategiesToBorrowFrom({
                 <tr
                   onClick={() =>
                     router.push(
-                      `/network/goerli/in-kind/strategies/${strategy.contract.address}/borrow`,
+                      `/network/goerli/strategy/${strategy.contract.address}/borrow`,
                     )
                   }
                   className={`${i % 2 === 0 ? styles.even : ''} ${
@@ -238,7 +238,7 @@ export default function StrategiesToBorrowFrom({
                   {includeDetails && (
                     <td colSpan={6}>
                       <Link
-                        href={`/network/${config.network}/in-kind/strategies/${strategy.contract.address}`}>
+                        href={`/network/${config.network}/strategies/${strategy.contract.address}`}>
                         <a>Details ↗</a>
                       </Link>
                     </td>
