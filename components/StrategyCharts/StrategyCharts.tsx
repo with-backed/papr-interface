@@ -8,10 +8,16 @@ import dynamic from 'next/dynamic';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 type StrategyChartsProps = {
-  pricesData: StrategyPricesData;
+  pricesData: StrategyPricesData | null;
 };
 
 export function StrategyCharts({ pricesData }: StrategyChartsProps) {
+  if (!pricesData) {
+    return (
+      <Fieldset legend="💸 Performance">No price data available...</Fieldset>
+    );
+  }
+
   return (
     <Fieldset legend="💸 Performance">
       <h3 className={styles.header}>Price in USDC</h3>
@@ -61,7 +67,9 @@ const percentFormatter = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 2,
 });
 
-type RateOfGrowthProps = StrategyChartsProps;
+type RateOfGrowthProps = {
+  pricesData: StrategyPricesData;
+};
 function RateOfGrowth({
   pricesData: { normalizationDPRValues, indexDPRValues, markDPRValues },
 }: RateOfGrowthProps) {
@@ -109,7 +117,9 @@ function RateOfGrowth({
   );
 }
 
-type PriceInUSDCProps = StrategyChartsProps;
+type PriceInUSDCProps = {
+  pricesData: StrategyPricesData;
+};
 function PriceInUSDC({
   pricesData: {
     normalizationDPRValues,

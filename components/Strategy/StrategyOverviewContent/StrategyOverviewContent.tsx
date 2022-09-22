@@ -16,7 +16,9 @@ import { StrategyCharts } from 'components/StrategyCharts';
 
 export type StrategyPageProps = {
   address: string;
-  subgraphLendingStrategy: LendingStrategyByIdQuery['lendingStrategy'] | null;
+  subgraphLendingStrategy: NonNullable<
+    LendingStrategyByIdQuery['lendingStrategy']
+  >;
   pricesData: StrategyPricesData | null;
 };
 
@@ -42,30 +44,9 @@ export function StrategyOverviewContent({
   }, [populate]);
 
   return (
-    <div>
-      <h3>Strategy</h3>
-      <p>(fake) oracle price: {PRICE} </p>
-      {!!lendingStrategy && !!pricesData && (
-        <div className={styles.wrapper}>
-          <div className={styles.column}>
-            <StrategyState strategy={lendingStrategy} pricesData={pricesData} />
-            <PoolState pool={lendingStrategy.pool} />
-            <MintERC20 token={lendingStrategy.underlying} />
-            <MintCollateral token={lendingStrategy.collateral} />
-            <ProvideLiquidity pool={lendingStrategy.pool} />
-            <SwapQuote strategy={lendingStrategy} swapForUnderlying />
-            <SwapQuote strategy={lendingStrategy} swapForUnderlying={false} />
-            <SwapTokens
-              tokenOne={lendingStrategy!.token0}
-              tokenTwo={lendingStrategy!.token1}
-            />
-          </div>
-          <div className={styles.column}>
-            <AssociatedVaults strategy={address} />
-            <StrategyCharts pricesData={pricesData} />
-          </div>
-        </div>
-      )}
+    <div className={styles.wrapper}>
+      <AssociatedVaults strategy={address} />
+      <StrategyCharts pricesData={pricesData} />
     </div>
   );
 }

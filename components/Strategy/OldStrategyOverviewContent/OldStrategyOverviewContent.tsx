@@ -60,10 +60,6 @@ export function OldStrategyOverviewContent({
               tokenTwo={lendingStrategy!.token1}
             />
           </div>
-          <div className={styles.column}>
-            <AssociatedVaults strategy={address} />
-            <StrategyCharts pricesData={pricesData} />
-          </div>
         </div>
       )}
     </div>
