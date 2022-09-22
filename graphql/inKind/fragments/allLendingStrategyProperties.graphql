@@ -5,8 +5,6 @@ fragment allLendingStrategyProperties on LendingStrategy {
   symbol
   poolAddress
   underlying
-  allowedCollateralRoot
-  strategyURI
   norm
   targetAPR
 }
