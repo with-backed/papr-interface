@@ -4,11 +4,11 @@ import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
-import StrategyState from '../StrategyState';
-import PoolState from '../PoolState';
-import ProvideLiquidity from '../ProvideLiquidty';
-import SwapQuote from '../SwapQuote';
-import SwapTokens from '../SwapTokens';
+import StrategyState from './StrategyState';
+import PoolState from './PoolState';
+import ProvideLiquidity from './ProvideLiquidty';
+import SwapQuote from './SwapQuote';
+import SwapTokens from './SwapTokens';
 
 export type OldStrategyPageProps = {
   address: string;
