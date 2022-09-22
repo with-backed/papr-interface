@@ -39,21 +39,21 @@ export function OldStrategyOverviewContent({
 
   return (
     <div>
-      <h3>Strategy</h3>
-      <p>(fake) oracle price: {PRICE} </p>
       {!!lendingStrategy && !!pricesData && (
         <div className={styles.wrapper}>
-          <div className={styles.column}>
-            <StrategyState strategy={lendingStrategy} pricesData={pricesData} />
-            <PoolState pool={lendingStrategy.pool} />
-            <ProvideLiquidity pool={lendingStrategy.pool} />
-            <SwapQuote strategy={lendingStrategy} swapForUnderlying />
-            <SwapQuote strategy={lendingStrategy} swapForUnderlying={false} />
-            <SwapTokens
-              tokenOne={lendingStrategy!.token0}
-              tokenTwo={lendingStrategy!.token1}
-            />
+          <div>
+            <h3>Strategy</h3>
+            <p>(fake) oracle price: {PRICE} </p>
           </div>
+          <StrategyState strategy={lendingStrategy} pricesData={pricesData} />
+          <PoolState pool={lendingStrategy.pool} />
+          <ProvideLiquidity pool={lendingStrategy.pool} />
+          <SwapQuote strategy={lendingStrategy} swapForUnderlying />
+          <SwapQuote strategy={lendingStrategy} swapForUnderlying={false} />
+          <SwapTokens
+            tokenOne={lendingStrategy!.token0}
+            tokenTwo={lendingStrategy!.token1}
+          />
         </div>
       )}
     </div>

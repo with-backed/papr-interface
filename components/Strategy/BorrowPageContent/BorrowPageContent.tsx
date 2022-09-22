@@ -44,29 +44,25 @@ export function BorrowPageContent({
 
   return (
     <div className={strategyStyles.wrapper}>
-      <div className={styles.borrowWrapper}>
-        <div className={strategyStyles.column}>
-          <StrategiesToBorrowFrom
-            legend={`Borrow: $papr${lendingStrategy.underlying.symbol}_${lendingStrategy.collateral.symbol}${lendingStrategy.maxLTVPercent}`}
-            strategies={[lendingStrategy]}
-            pricesData={{ [lendingStrategy.contract.address]: pricesData }}
-            includeDetails
-          />
-          <AccountNFTs
-            strategy={lendingStrategy}
-            userCollectionNFTs={userCollectionNFTs}
-            nftsSelected={nftsSelected}
-            nftsLoading={nftsLoading}
-            setNFTsSelected={setNFTsSelected}
-          />
-          <OpenVault
-            strategy={lendingStrategy}
-            pricesData={pricesData}
-            userCollectionNFTs={userCollectionNFTs}
-            nftsSelected={nftsSelected}
-          />
-        </div>
-      </div>
+      <StrategiesToBorrowFrom
+        legend={`Borrow: $papr${lendingStrategy.underlying.symbol}_${lendingStrategy.collateral.symbol}${lendingStrategy.maxLTVPercent}`}
+        strategies={[lendingStrategy]}
+        pricesData={{ [lendingStrategy.contract.address]: pricesData }}
+        includeDetails
+      />
+      <AccountNFTs
+        strategy={lendingStrategy}
+        userCollectionNFTs={userCollectionNFTs}
+        nftsSelected={nftsSelected}
+        nftsLoading={nftsLoading}
+        setNFTsSelected={setNFTsSelected}
+      />
+      <OpenVault
+        strategy={lendingStrategy}
+        pricesData={pricesData}
+        userCollectionNFTs={userCollectionNFTs}
+        nftsSelected={nftsSelected}
+      />
     </div>
   );
 }
