@@ -46,7 +46,6 @@ function Connected() {
     const tx = await strategy.newStrategy(
       'APE Loans',
       'AP',
-      'URI',
       ethers.utils.formatBytes32String('x'),
       ONE.div(10).mul(2), // 20% APR target
       ONE.div(10).mul(5), // 50% Max LTV,
