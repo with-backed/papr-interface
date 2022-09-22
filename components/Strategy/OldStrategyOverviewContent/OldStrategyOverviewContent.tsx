@@ -11,8 +11,6 @@ import MintCollateral from '../MintCollateral';
 import ProvideLiquidity from '../ProvideLiquidty';
 import SwapQuote from '../SwapQuote';
 import SwapTokens from '../SwapTokens';
-import { AssociatedVaults } from '../AssociatedVaults';
-import { StrategyCharts } from 'components/StrategyCharts';
 
 export type OldStrategyPageProps = {
   address: string;

@@ -4,15 +4,8 @@ import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
-import StrategyState from '../StrategyState';
-import PoolState from '../PoolState';
-import MintERC20 from '../MintERC20';
-import MintCollateral from '../MintCollateral';
-import ProvideLiquidity from '../ProvideLiquidty';
-import SwapQuote from '../SwapQuote';
-import SwapTokens from '../SwapTokens';
 import { AssociatedVaults } from '../AssociatedVaults';
-import { StrategyCharts } from 'components/StrategyCharts';
+import { StrategyCharts } from 'components/Strategy/Charts';
 
 export type StrategyPageProps = {
   address: string;
