@@ -1,17 +1,17 @@
 import { Fieldset } from 'components/Fieldset';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useMemo } from 'react';
-import styles from './StrategyCharts.module.css';
+import styles from './Charts.module.css';
 import dynamic from 'next/dynamic';
 
 // apexcharts uses `window`, so will break if we SSR
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-type StrategyChartsProps = {
+type ChartsProps = {
   pricesData: StrategyPricesData | null;
 };
 
-export function StrategyCharts({ pricesData }: StrategyChartsProps) {
+export function Charts({ pricesData }: ChartsProps) {
   if (!pricesData) {
     return (
       <Fieldset legend="💸 Performance">No price data available...</Fieldset>

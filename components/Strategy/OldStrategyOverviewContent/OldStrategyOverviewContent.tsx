@@ -6,8 +6,6 @@ import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import StrategyState from '../StrategyState';
 import PoolState from '../PoolState';
-import MintERC20 from '../MintERC20';
-import MintCollateral from '../MintCollateral';
 import ProvideLiquidity from '../ProvideLiquidty';
 import SwapQuote from '../SwapQuote';
 import SwapTokens from '../SwapTokens';
@@ -48,8 +46,6 @@ export function OldStrategyOverviewContent({
           <div className={styles.column}>
             <StrategyState strategy={lendingStrategy} pricesData={pricesData} />
             <PoolState pool={lendingStrategy.pool} />
-            <MintERC20 token={lendingStrategy.underlying} />
-            <MintCollateral token={lendingStrategy.collateral} />
             <ProvideLiquidity pool={lendingStrategy.pool} />
             <SwapQuote strategy={lendingStrategy} swapForUnderlying />
             <SwapQuote strategy={lendingStrategy} swapForUnderlying={false} />

@@ -1,1 +1,1 @@
-export { StrategyCharts } from './StrategyCharts';
+export { Charts } from './Charts';
