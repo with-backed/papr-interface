@@ -16,13 +16,16 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
 
   const subgraphStrategy = await subgraphStrategyByAddress(address);
 
-  var pricesData: StrategyPricesData | null = null;
-  if (subgraphStrategy?.lendingStrategy) {
-    pricesData = await strategyPricesData(
-      subgraphStrategy.lendingStrategy as SubgraphLendingStrategy,
-      network,
-    );
+  if (!subgraphStrategy?.lendingStrategy) {
+    return {
+      notFound: true,
+    };
   }
+
+  const pricesData = await strategyPricesData(
+    subgraphStrategy.lendingStrategy,
+    network,
+  );
 
   return {
     props: {

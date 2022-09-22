@@ -3,13 +3,9 @@ import { configs, SupportedNetwork } from 'lib/config';
 import { ONE } from 'lib/constants';
 import { ChartValue } from 'lib/d3';
 import { clientFromUrl } from 'lib/urql';
+import { Strategy__factory } from 'types/generated/abis';
 import {
-  StrategyFactory__factory,
-  Strategy__factory,
-} from 'types/generated/abis';
-import {
-  LendingStrategy,
-  Maybe,
+  LendingStrategyByIdQuery,
   NormalizationUpdatesByStrategyDocument,
   NormalizationUpdatesByStrategyQuery,
 } from 'types/generated/graphql/inKindSubgraph';
@@ -22,7 +18,7 @@ interface NormUpdate {
 
 export async function normValues(
   now: number,
-  strategy: LendingStrategy,
+  strategy: NonNullable<LendingStrategyByIdQuery['lendingStrategy']>,
   network: SupportedNetwork,
 ): Promise<[string[], ChartValue[]]> {
   const result = await subgraphNormalizationUpdatesForStrategy(strategy.id);
