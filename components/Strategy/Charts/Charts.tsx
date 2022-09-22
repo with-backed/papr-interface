@@ -1,17 +1,23 @@
 import { Fieldset } from 'components/Fieldset';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useMemo } from 'react';
-import styles from './StrategyCharts.module.css';
+import styles from './Charts.module.css';
 import dynamic from 'next/dynamic';
 
 // apexcharts uses `window`, so will break if we SSR
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-type StrategyChartsProps = {
-  pricesData: StrategyPricesData;
+type ChartsProps = {
+  pricesData: StrategyPricesData | null;
 };
 
-export function StrategyCharts({ pricesData }: StrategyChartsProps) {
+export function Charts({ pricesData }: ChartsProps) {
+  if (!pricesData) {
+    return (
+      <Fieldset legend="💸 Performance">No price data available...</Fieldset>
+    );
+  }
+
   return (
     <Fieldset legend="💸 Performance">
       <h3 className={styles.header}>Price in USDC</h3>
@@ -61,7 +67,9 @@ const percentFormatter = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 2,
 });
 
-type RateOfGrowthProps = StrategyChartsProps;
+type RateOfGrowthProps = {
+  pricesData: StrategyPricesData;
+};
 function RateOfGrowth({
   pricesData: { normalizationDPRValues, indexDPRValues, markDPRValues },
 }: RateOfGrowthProps) {
@@ -109,7 +117,9 @@ function RateOfGrowth({
   );
 }
 
-type PriceInUSDCProps = StrategyChartsProps;
+type PriceInUSDCProps = {
+  pricesData: StrategyPricesData;
+};
 function PriceInUSDC({
   pricesData: {
     normalizationDPRValues,

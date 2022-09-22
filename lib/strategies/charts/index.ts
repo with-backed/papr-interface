@@ -4,7 +4,7 @@ import { makeProvider } from 'lib/contracts';
 import { ChartValue } from 'lib/d3';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { Strategy__factory } from 'types/generated/abis';
-import { LendingStrategy } from 'types/generated/graphql/inKindSubgraph';
+import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
 import { convertONEScaledPercent } from '..';
 import { markValues } from './mark';
@@ -21,7 +21,7 @@ export interface StrategyPricesData {
 }
 
 export async function strategyPricesData(
-  strategy: LendingStrategy,
+  strategy: NonNullable<LendingStrategyByIdQuery['lendingStrategy']>,
   network: SupportedNetwork,
 ): Promise<StrategyPricesData> {
   const targetDPRScaled = ethers.BigNumber.from(strategy.targetAPR).div(365);

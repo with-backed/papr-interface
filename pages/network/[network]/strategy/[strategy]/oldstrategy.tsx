@@ -4,28 +4,32 @@ import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { SupportedNetwork } from 'lib/config';
 import {
-  StrategyOverviewContent,
-  StrategyPageProps,
-} from 'components/Strategy/StrategyOverviewContent';
+  OldStrategyOverviewContent,
+  OldStrategyPageProps,
+} from 'components/Strategy/OldStrategyOverviewContent';
 
-export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
-  context,
-) => {
+export const getServerSideProps: GetServerSideProps<
+  OldStrategyPageProps
+> = async (context) => {
   const address = (context.params?.strategy as string).toLowerCase();
   const network = context.params?.network as SupportedNetwork;
 
-  const subgraphStrategy = await subgraphStrategyByAddress(address);
-
-  if (!subgraphStrategy?.lendingStrategy) {
+  // This page should only ever function on testnet
+  if (network !== 'goerli') {
     return {
       notFound: true,
     };
   }
 
-  const pricesData = await strategyPricesData(
-    subgraphStrategy.lendingStrategy,
-    network,
-  );
+  const subgraphStrategy = await subgraphStrategyByAddress(address);
+
+  var pricesData: StrategyPricesData | null = null;
+  if (subgraphStrategy?.lendingStrategy) {
+    pricesData = await strategyPricesData(
+      subgraphStrategy.lendingStrategy as SubgraphLendingStrategy,
+      network,
+    );
+  }
 
   return {
     props: {
@@ -36,13 +40,13 @@ export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
   };
 };
 
-export default function StrategyPage({
+export default function OldStrategyPage({
   address,
   subgraphLendingStrategy,
   pricesData,
-}: StrategyPageProps) {
+}: OldStrategyPageProps) {
   return (
-    <StrategyOverviewContent
+    <OldStrategyOverviewContent
       address={address}
       subgraphLendingStrategy={subgraphLendingStrategy}
       pricesData={pricesData}

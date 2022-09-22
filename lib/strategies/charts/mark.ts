@@ -1,9 +1,9 @@
 import { Price, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
-import { ONE, Q192, SECONDS_IN_A_DAY } from 'lib/constants';
+import { Q192, SECONDS_IN_A_DAY } from 'lib/constants';
 import { ChartValue } from 'lib/d3';
 import { subgraphUniswapSwapsByPool } from 'lib/uniswapSubgraph';
-import { LendingStrategy } from 'types/generated/graphql/inKindSubgraph';
+import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import {
   Pool,
   Token as UniSubgraphToken,
@@ -11,7 +11,7 @@ import {
 
 export async function markValues(
   now: number,
-  strategy: LendingStrategy,
+  strategy: NonNullable<LendingStrategyByIdQuery['lendingStrategy']>,
   pool: Pool,
 ): Promise<[string[], ChartValue[]]> {
   let quoteCurrency: UniSubgraphToken;
