@@ -14,6 +14,13 @@ export const getServerSideProps: GetServerSideProps<
   const address = (context.params?.strategy as string).toLowerCase();
   const network = context.params?.network as SupportedNetwork;
 
+  // This page should only ever function on testnet
+  if (network !== 'goerli') {
+    return {
+      notFound: true,
+    };
+  }
+
   const subgraphStrategy = await subgraphStrategyByAddress(address);
 
   var pricesData: StrategyPricesData | null = null;
