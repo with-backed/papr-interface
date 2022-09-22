@@ -4,13 +4,13 @@ import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { SupportedNetwork } from 'lib/config';
 import {
-  StrategyOverviewContent,
-  StrategyPageProps,
-} from 'components/Strategy/StrategyOverviewContent';
+  OldStrategyOverviewContent,
+  OldStrategyPageProps,
+} from 'components/Strategy/OldStrategyOverviewContent';
 
-export const getServerSideProps: GetServerSideProps<StrategyPageProps> = async (
-  context,
-) => {
+export const getServerSideProps: GetServerSideProps<
+  OldStrategyPageProps
+> = async (context) => {
   const address = (context.params?.strategy as string).toLowerCase();
   const network = context.params?.network as SupportedNetwork;
 
@@ -37,9 +37,9 @@ export default function OldStrategyPage({
   address,
   subgraphLendingStrategy,
   pricesData,
-}: StrategyPageProps) {
+}: OldStrategyPageProps) {
   return (
-    <StrategyOverviewContent
+    <OldStrategyOverviewContent
       address={address}
       subgraphLendingStrategy={subgraphLendingStrategy}
       pricesData={pricesData}
