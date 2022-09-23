@@ -3,7 +3,7 @@ import { Fieldset } from 'components/Fieldset';
 import { useConfig } from 'hooks/useConfig';
 
 type PoolStateProps = {
-  pool: Pool;
+  pool: Pool | null;
 };
 
 export default function PoolState({ pool }: PoolStateProps) {

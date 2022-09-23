@@ -3,14 +3,11 @@ import {
   LendingStrategiesQuery,
   LendingStrategyByIdDocument,
   LendingStrategyByIdQuery,
-  VaultsByOwnerDocument,
   VaultsByOwnerForStrategyDocument,
   VaultsByOwnerForStrategyQuery,
-  VaultsByOwnerQuery,
 } from 'types/generated/graphql/inKindSubgraph';
-import { LendingStrategy } from './strategies';
+import { LendingStrategy, SubgraphStrategy } from './LendingStrategy';
 import { clientFromUrl } from './urql';
-import { LendingStrategy as SubgraphLendingStrategy } from 'types/generated/graphql/inKindSubgraph';
 
 export async function subgraphStrategyByAddress(id: string) {
   // TODO: dynamic client address
@@ -39,7 +36,7 @@ export async function getNextVaultNonceForUser(
   const { data, error } = await client
     .query<VaultsByOwnerForStrategyQuery>(VaultsByOwnerForStrategyDocument, {
       owner: owner.toLowerCase(),
-      strategy: strategy.contract.address.toLowerCase(),
+      strategy: strategy.id.toLowerCase(),
     })
     .toPromise();
 
@@ -55,7 +52,7 @@ export async function getNextVaultNonceForUser(
   return largestNonceVault?.nonce || 0;
 }
 
-export async function getAllStrategies() {
+export async function getAllStrategies(): Promise<SubgraphStrategy[]> {
   const client = clientFromUrl(
     'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
   );

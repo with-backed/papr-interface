@@ -2,16 +2,12 @@ import { Fieldset } from 'components/Fieldset';
 import { getAddress } from 'ethers/lib/utils';
 import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
 import { erc721Contract } from 'lib/contracts';
-import {
-  deconstructFromId,
-  getUniqueNFTId,
-  LendingStrategy,
-} from 'lib/strategies';
+import { getUniqueNFTId } from 'lib/strategies';
+import { LendingStrategy } from 'lib/LendingStrategy';
 import {
   Dispatch,
   SetStateAction,
   useCallback,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -41,18 +37,15 @@ export function AccountNFTs({
   }>({});
 
   const collateralContract = useMemo(() => {
-    return erc721Contract(strategy.collateral.contract.address, signer!);
+    return erc721Contract(strategy.collateralAddress, signer!);
   }, [strategy, signer]);
 
   const isNFTApproved = useCallback(
     async (tokenId: string) => {
       const approved =
         getAddress(await collateralContract.getApproved(tokenId)) ===
-          getAddress(strategy.contract.address) ||
-        (await collateralContract.isApprovedForAll(
-          address!,
-          strategy.contract.address,
-        ));
+          getAddress(strategy.id) ||
+        (await collateralContract.isApprovedForAll(address!, strategy.id));
       return approved;
     },
     [strategy, collateralContract, address],

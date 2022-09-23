@@ -1,11 +1,8 @@
 import { ethers } from 'ethers';
 import { SupportedNetwork } from 'lib/config';
 import { Quoter } from 'lib/contracts';
-import {
-  computeSlippageForSwap,
-  getQuoteForSwap,
-  LendingStrategy,
-} from 'lib/strategies';
+import { computeSlippageForSwap, getQuoteForSwap } from 'lib/strategies';
+import { LendingStrategy } from 'lib/LendingStrategy';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useConfig } from './useConfig';
 
@@ -25,28 +22,36 @@ export function useQuoteWithSlippage(
 
   const tokenOut = useMemo(() => {
     if (swapForUnderlying) {
-      return strategy.token0IsUnderlying ? strategy.token0 : strategy.token1;
+      return strategy.token0IsUnderlying
+        ? strategy.subgraphPool.token0
+        : strategy.subgraphPool.token1;
     } else {
-      return strategy.token0IsUnderlying ? strategy.token1 : strategy.token0;
+      return strategy.token0IsUnderlying
+        ? strategy.subgraphPool.token1
+        : strategy.subgraphPool.token0;
     }
-  }, [strategy]);
+  }, [strategy, swapForUnderlying]);
   const tokenIn = useMemo(() => {
     if (swapForUnderlying) {
-      return strategy.token0IsUnderlying ? strategy.token1 : strategy.token0;
+      return strategy.token0IsUnderlying
+        ? strategy.subgraphPool.token1
+        : strategy.subgraphPool.token0;
     } else {
-      return strategy.token0IsUnderlying ? strategy.token0 : strategy.token1;
+      return strategy.token0IsUnderlying
+        ? strategy.subgraphPool.token0
+        : strategy.subgraphPool.token1;
     }
-  }, [strategy]);
+  }, [strategy, swapForUnderlying]);
 
   const amountToSwap = useMemo(() => {
     if (!parseInt(amount)) return ethers.BigNumber.from(0);
     return ethers.utils.parseUnits(amount, tokenIn.decimals);
-  }, [tokenIn, tokenOut, amount]);
+  }, [tokenIn, amount]);
 
   const getQuoteAndPriceImpactForSwap = useCallback(async () => {
     let q: ethers.BigNumber;
     try {
-      q = await getQuoteForSwap(quoter, amountToSwap, tokenIn, tokenOut);
+      q = await getQuoteForSwap(quoter, amountToSwap, tokenIn.id, tokenOut.id);
       setQuoteForSwap(
         parseFloat(
           ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
@@ -74,7 +79,7 @@ export function useQuoteWithSlippage(
   useEffect(() => {
     if (!parseInt(amount)) return;
     getQuoteAndPriceImpactForSwap();
-  }, [amount]);
+  }, [amount, getQuoteAndPriceImpactForSwap]);
 
   return {
     quoteForSwap,

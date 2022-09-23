@@ -4,9 +4,9 @@ import { StrategyPricesData } from 'lib/strategies/charts';
 import {
   getDebtTokenMarketPrice,
   getDebtTokenStrategyPrice,
-  LendingStrategy,
 } from 'lib/strategies';
 import { useState, useCallback, useEffect, useMemo } from 'react';
+import { LendingStrategy } from 'lib/LendingStrategy';
 
 export default function StrategyState({
   strategy,
@@ -21,7 +21,7 @@ export default function StrategyState({
     useState<string>('');
 
   const updateStrategyIndex = useCallback(async () => {
-    const index = await strategy.contract.index();
+    const index = await strategy.index();
     setStrategyIndex(ethers.utils.formatEther(index));
   }, [strategy]);
 
@@ -32,7 +32,7 @@ export default function StrategyState({
 
   const updateStrategyMultiplier = useCallback(async () => {
     try {
-      const multiplier = await strategy.contract.multiplier();
+      const multiplier = await strategy.multiplier();
       setStrategyMultiplier(ethers.utils.formatEther(multiplier));
     } catch {
       // this is erroring on first load. i think some liquidity issue
@@ -42,14 +42,18 @@ export default function StrategyState({
   const debtPrice = useMemo(() => {
     const price = getDebtTokenMarketPrice(strategy);
     if (!price) return '';
-    return price.toFixed();
+    return (1).toFixed(2);
   }, [strategy]);
 
   useEffect(() => {
     updateStrategyIndex();
     updateStrategyMultiplier();
     updateStrategyNormalization();
-  });
+  }, [
+    updateStrategyIndex,
+    updateStrategyMultiplier,
+    updateStrategyNormalization,
+  ]);
 
   return (
     <Fieldset legend="📈 Strategy State">

@@ -2,10 +2,10 @@ import { ethers } from 'ethers';
 import { configs, SupportedNetwork } from 'lib/config';
 import { ONE } from 'lib/constants';
 import { ChartValue } from 'lib/d3';
+import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { clientFromUrl } from 'lib/urql';
 import { Strategy__factory } from 'types/generated/abis';
 import {
-  LendingStrategyByIdQuery,
   NormalizationUpdatesByStrategyDocument,
   NormalizationUpdatesByStrategyQuery,
 } from 'types/generated/graphql/inKindSubgraph';
@@ -18,7 +18,7 @@ interface NormUpdate {
 
 export async function normValues(
   now: number,
-  strategy: NonNullable<LendingStrategyByIdQuery['lendingStrategy']>,
+  strategy: LendingStrategy | SubgraphStrategy,
   network: SupportedNetwork,
 ): Promise<[string[], ChartValue[]]> {
   const result = await subgraphNormalizationUpdatesForStrategy(strategy.id);

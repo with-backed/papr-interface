@@ -1,14 +1,11 @@
 import { ethers } from 'ethers';
-import {
-  getOracleValueForStrategy,
-  getDebtTokenMarketPrice,
-  getDebtTokenStrategyPrice,
-  LendingStrategy,
-} from 'lib/strategies';
+import { getOracleValueForStrategy } from 'lib/strategies';
+import { LendingStrategy } from 'lib/LendingStrategy';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { ONE, PRICE } from 'lib/strategies/constants';
+import { PRICE } from 'lib/strategies/constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 
 type VaultMathProps = {
   strategy: LendingStrategy;
@@ -57,8 +54,8 @@ export default function VaultMath({
   }, [strategy]);
 
   const updateMaxDebt = useCallback(async () => {
-    const newNorm = await strategy.contract.newNorm();
-    const maxLTV = await strategy.contract.maxLTV();
+    const newNorm = await strategy.newNorm();
+    const maxLTV = await strategy.maxLTV();
 
     const maxDebt = maxLTV.mul(ethers.BigNumber.from(PRICE)).div(newNorm);
 
@@ -95,9 +92,7 @@ export default function VaultMath({
     return (1 - Math.abs(priceDifference / 100)) * parseFloat(oracleValue);
   }, [priceDifference, oracleValue]);
 
-  const maxLTV = useMemo(() => {
-    return strategy.maxLTVPercent;
-  }, [strategy]);
+  const maxLTV = useAsyncValue(() => strategy.maxLTVPercent(), [strategy]);
 
   if (!showMath) return <></>;
 
@@ -137,13 +132,13 @@ export default function VaultMath({
       <MathRow
         formula="K"
         description="Max LTV"
-        content={`${maxLTV.toFixed(4)}%`}
+        content={`${(maxLTV || 0).toFixed(4)}%`}
         even={false}
       />
       <MathRow
         formula="X = R*K"
         description="Max Borrowable"
-        content={(effectiveOracleValue * (maxLTV / 100)).toFixed(4)}
+        content={(effectiveOracleValue * ((maxLTV || 0) / 100)).toFixed(4)}
         even
       />
       <MathRow

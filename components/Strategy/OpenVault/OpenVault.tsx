@@ -2,10 +2,8 @@ import { TickMath } from '@uniswap/v3-sdk';
 import { Fieldset } from 'components/Fieldset';
 import { Slider } from 'components/Slider';
 import { ethers } from 'ethers';
-import { useConfig } from 'hooks/useConfig';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
 import {
-  LendingStrategy,
   computeLiquidationEstimation,
   deconstructFromId,
   getUniqueNFTId,
@@ -21,8 +19,9 @@ import { StrategyPricesData } from 'lib/strategies/charts';
 import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
 import { erc721Contract } from 'lib/contracts';
 import { getAddress } from 'ethers/lib/utils';
-import { ERC721__factory } from 'types/generated/abis';
 import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
+import { LendingStrategy } from 'lib/LendingStrategy';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 
 type BorrowProps = {
   strategy: LendingStrategy;
@@ -108,7 +107,7 @@ export function OpenVault({
   const [approvalsLoading, setApprovalsLoading] = useState<boolean>(false);
 
   const collateralContract = useMemo(() => {
-    return erc721Contract(strategy.collateral.contract.address, signer!);
+    return erc721Contract(strategy.collateralAddress, signer!);
   }, [strategy, signer]);
 
   const addCollateralAndSwap = useCallback(async () => {
@@ -150,7 +149,7 @@ export function OpenVault({
         'safeTransferFrom(address,address,uint256,bytes)'
       ](
         address!,
-        strategy.contract.address,
+        strategy.id,
         ethers.BigNumber.from(tokenIds[0]),
         ethers.utils.defaultAbiCoder.encode(
           [OnERC721ReceivedArgsEncoderString],
@@ -170,7 +169,7 @@ export function OpenVault({
       const addCollateralArgs = tokenIds.map((tokenId) => ({
         ...baseAddCollateralRequest,
         collateral: {
-          addr: strategy.collateral.contract.address,
+          addr: strategy.collateralAddress,
           id: ethers.BigNumber.from(tokenId),
         },
       }));
@@ -207,11 +206,9 @@ export function OpenVault({
         ]),
       ];
 
-      const t = await strategy.contract
-        .connect(signer!)
-        .multicall(calldataWithSwap, {
-          gasLimit: ethers.utils.hexValue(3000000),
-        });
+      const t = await strategy.multicall(calldataWithSwap, {
+        gasLimit: ethers.utils.hexValue(3000000),
+      });
       t.wait()
         .then(() => console.log('success')) // TODO(adamgobes): redirect to vault page once thats fleshed out
         .catch((e) => console.log({ e }));
@@ -221,7 +218,6 @@ export function OpenVault({
     collateralContract,
     nftsSelected,
     debt,
-    signer,
     strategy,
     quoteForSwap,
     tokenOut.decimals,
@@ -250,8 +246,8 @@ export function OpenVault({
   }, 500);
 
   const getMaxDebt = useCallback(async () => {
-    const newNorm = await strategy.contract.newNorm();
-    const maxLTV = await strategy.contract.maxLTV();
+    const newNorm = await strategy.newNorm();
+    const maxLTV = await strategy.maxLTV();
 
     const maxDebt = maxLTV
       .mul(ethers.BigNumber.from(PRICE))
@@ -261,19 +257,14 @@ export function OpenVault({
     setMaxDebt(maxDebt);
   }, [strategy, nftsSelected]);
 
-  const maxLTV = useMemo(() => {
-    return strategy.maxLTVPercent;
-  }, [strategy]);
+  const maxLTV = useAsyncValue(() => strategy.maxLTVPercent(), [strategy]);
 
   const isNFTApproved = useCallback(
     async (tokenId: string) => {
       const approved =
         getAddress(await collateralContract.getApproved(tokenId)) ===
-          getAddress(strategy.contract.address) ||
-        (await collateralContract.isApprovedForAll(
-          address!,
-          strategy.contract.address,
-        ));
+          getAddress(strategy.id) ||
+        (await collateralContract.isApprovedForAll(address!, strategy.id));
       return approved;
     },
     [strategy, collateralContract, address],
@@ -297,16 +288,14 @@ export function OpenVault({
 
   const performApproveAll = useCallback(async () => {
     setApprovalsLoading(true);
-    await collateralContract
-      .setApprovalForAll(strategy.contract.address, true)
-      .then(() => {
-        setApprovalsLoading(false);
-        setNFTsApproved(
-          userCollectionNFTs.map((nft) =>
-            getUniqueNFTId(nft.address, nft.tokenId),
-          ),
-        );
-      });
+    await collateralContract.setApprovalForAll(strategy.id, true).then(() => {
+      setApprovalsLoading(false);
+      setNFTsApproved(
+        userCollectionNFTs.map((nft) =>
+          getUniqueNFTId(nft.address, nft.tokenId),
+        ),
+      );
+    });
   }, [collateralContract, userCollectionNFTs, strategy]);
 
   const borrowDisabled = useMemo(() => {
@@ -332,6 +321,9 @@ export function OpenVault({
             max={parseFloat(maxDebt.toString())}
             onChange={(val, _index) => handleDebtAmountChanged(val.toString())}
             renderThumb={(props, state) => {
+              if (!maxLTV) {
+                return null;
+              }
               let currentLTV: number;
               if (maxDebt.isZero()) {
                 currentLTV = 0;
@@ -362,7 +354,7 @@ export function OpenVault({
             }}
           />
           <p className={styles.sliderLabel}>
-            Max Loan {maxLTV.toString()}% LTV
+            Max Loan {!!maxLTV && maxLTV.toString()}% LTV
           </p>
         </div>
 
@@ -407,7 +399,7 @@ export function OpenVault({
           strategy={strategy}
           pricesData={pricesData}
           inputtedLTV={
-            maxDebt.isZero()
+            maxDebt.isZero() || !maxLTV
               ? '0.00'
               : (
                   (parseFloat(debt.toString()) /

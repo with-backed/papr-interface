@@ -1,54 +1,87 @@
 import { GetServerSideProps } from 'next';
-import { LendingStrategy as SubgraphLendingStrategy } from 'types/generated/graphql/inKindSubgraph';
 import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
-import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { SupportedNetwork } from 'lib/config';
 import {
   OldStrategyOverviewContent,
   OldStrategyPageProps,
 } from 'components/Strategy/OldStrategyOverviewContent';
+import {
+  makeLendingStrategy,
+  SubgraphPool,
+  SubgraphStrategy,
+} from 'lib/LendingStrategy';
+import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
+import { useConfig } from 'hooks/useConfig';
+import { useSigner } from 'wagmi';
+import { useEffect, useMemo, useState } from 'react';
+import { strategyPricesData, StrategyPricesData } from 'lib/strategies/charts';
 
-export const getServerSideProps: GetServerSideProps<
-  OldStrategyPageProps
-> = async (context) => {
+type ServerSideProps = Omit<
+  OldStrategyPageProps,
+  'lendingStrategy' | 'pricesData'
+> & {
+  subgraphStrategy: SubgraphStrategy;
+  subgraphPool: SubgraphPool;
+};
+
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
+  context,
+) => {
   const address = (context.params?.strategy as string).toLowerCase();
   const network = context.params?.network as SupportedNetwork;
 
-  // This page should only ever function on testnet
-  if (network !== 'goerli') {
+  const subgraphStrategy = await subgraphStrategyByAddress(address);
+
+  if (!subgraphStrategy?.lendingStrategy) {
     return {
       notFound: true,
     };
   }
 
-  const subgraphStrategy = await subgraphStrategyByAddress(address);
+  const subgraphPool = await subgraphUniswapPoolById(
+    subgraphStrategy.lendingStrategy.poolAddress,
+  );
 
-  var pricesData: StrategyPricesData | null = null;
-  if (subgraphStrategy?.lendingStrategy) {
-    pricesData = await strategyPricesData(
-      subgraphStrategy.lendingStrategy as SubgraphLendingStrategy,
-      network,
-    );
+  if (!subgraphPool?.pool) {
+    return {
+      notFound: true,
+    };
   }
 
   return {
     props: {
       address: address,
-      subgraphLendingStrategy: subgraphStrategy?.lendingStrategy || null,
-      pricesData: pricesData,
+      subgraphStrategy: subgraphStrategy.lendingStrategy,
+      subgraphPool: subgraphPool.pool,
     },
   };
 };
 
 export default function OldStrategyPage({
   address,
-  subgraphLendingStrategy,
-  pricesData,
-}: OldStrategyPageProps) {
+  subgraphStrategy,
+  subgraphPool,
+}: ServerSideProps) {
+  const config = useConfig();
+  const { data: signer } = useSigner();
+
+  const lendingStrategy = useMemo(() => {
+    return makeLendingStrategy(subgraphStrategy, subgraphPool, signer!, config);
+  }, [config, signer, subgraphPool, subgraphStrategy]);
+
+  const [pricesData, setPricesData] = useState<StrategyPricesData | null>(null);
+
+  useEffect(() => {
+    strategyPricesData(
+      lendingStrategy,
+      config.network as SupportedNetwork,
+    ).then(setPricesData);
+  }, [lendingStrategy, config]);
+
   return (
     <OldStrategyOverviewContent
       address={address}
-      subgraphLendingStrategy={subgraphLendingStrategy}
+      lendingStrategy={lendingStrategy}
       pricesData={pricesData}
     />
   );

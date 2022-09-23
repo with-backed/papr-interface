@@ -1,4 +1,5 @@
-import { LendingStrategy } from 'lib/strategies';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { LendingStrategy } from 'lib/LendingStrategy';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { PRICE } from 'lib/strategies/constants';
 import { Tooltip, TooltipStateReturn } from 'reakit';
@@ -10,26 +11,33 @@ export type ToolkitProps = {
 };
 
 export function TokenTooltip({ strategy, tooltip }: ToolkitProps) {
+  const maxLTVPercent = useAsyncValue(
+    () => strategy.maxLTVPercent(),
+    [strategy],
+  );
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
         This lending strategy lends to Cryptopunks, lending up to{' '}
-        {strategy.maxLTVPercent}% of the value of the Punks floor. The oracle
-        price for Cryptopunks is ${PRICE}. The max loan value is{' '}
-        {strategy.maxLTVPercent}% of that: $
-        {((PRICE * strategy.maxLTVPercent) / 100).toFixed(2)}
+        {maxLTVPercent}% of the value of the Punks floor. The oracle price for
+        Cryptopunks is ${PRICE}. The max loan value is {maxLTVPercent}% of that:
+        ${((PRICE * (maxLTVPercent || 0)) / 100).toFixed(2)}
       </div>
     </Tooltip>
   );
 }
 
 export function APRTooltip({ strategy, tooltip }: ToolkitProps) {
+  const targetAnnualGrowthPercent = useAsyncValue(
+    () => strategy.targetAnnualGrowthPercent(),
+    [strategy],
+  );
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
         The strategy contract adjusts the (C) contract rate for minting and
-        liquidation, targeting steady growth of{' '}
-        {strategy.targetAnnualGrowthPercent}% per year.
+        liquidation, targeting steady growth of {targetAnnualGrowthPercent}% per
+        year.
       </div>
     </Tooltip>
   );
@@ -77,7 +85,10 @@ export function MktCtrTooltip({
   const diff = markOverNorm > 1 ? markOverNorm - 1 : 1 - markOverNorm;
   const lowerHigherText = markOverNorm > 1 ? 'higher' : 'lower';
   const speedText = markOverNorm > 1 ? 'slow' : 'accelerate';
-
+  const targetAnnualGrowthPercent = useAsyncValue(
+    () => strategy.targetAnnualGrowthPercent(),
+    [strategy],
+  );
   return (
     <Tooltip {...tooltip}>
       <div className={`${styles.tooltip} ${styles.mktCtrTooltip}`}>
@@ -109,8 +120,7 @@ export function MktCtrTooltip({
           <p>
             The market price is {(diff * 100).toFixed(0)}% {lowerHigherText}{' '}
             than the price used by the contract, which is aiming to {speedText}{' '}
-            the growth rate (target is {strategy.targetAnnualGrowthPercent}%
-            APR).
+            the growth rate (target is {targetAnnualGrowthPercent}% APR).
           </p>
         </div>
       </div>

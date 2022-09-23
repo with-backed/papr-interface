@@ -1,11 +1,19 @@
 import { TestPageContent } from 'components/Strategy/TestPageContent';
 import { useConfig } from 'hooks/useConfig';
-import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
+import {
+  makeLendingStrategy,
+  SubgraphPool,
+  SubgraphStrategy,
+} from 'lib/LendingStrategy';
+import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
+import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { GetServerSideProps } from 'next';
-import { useCallback, useEffect, useState } from 'react';
+import { useMemo } from 'react';
+import { useSigner } from 'wagmi';
 
 export type TestProps = {
-  strategyAddress: string;
+  subgraphStrategy: SubgraphStrategy;
+  subgraphPool: SubgraphPool;
 };
 
 export const getServerSideProps: GetServerSideProps<TestProps> = async (
@@ -13,28 +21,42 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
 ) => {
   const address = (context.params?.strategy as string).toLowerCase();
 
+  const subgraphStrategy = await subgraphStrategyByAddress(address);
+
+  if (!subgraphStrategy?.lendingStrategy) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const subgraphPool = await subgraphUniswapPoolById(
+    subgraphStrategy.lendingStrategy.poolAddress,
+  );
+
+  if (!subgraphPool?.pool) {
+    return {
+      notFound: true,
+    };
+  }
+
   return {
     props: {
-      strategyAddress: address,
+      subgraphStrategy: subgraphStrategy.lendingStrategy,
+      subgraphPool: subgraphPool.pool,
     },
   };
 };
 
-export default function InKindTest({ strategyAddress }: TestProps) {
+export default function InKindTest({
+  subgraphPool,
+  subgraphStrategy,
+}: TestProps) {
   const config = useConfig();
-  const [lendingStrategy, setLendingStrategy] =
-    useState<LendingStrategy | null>(null);
+  const { data: signer } = useSigner();
 
-  const populate = useCallback(async () => {
-    const s = await populateLendingStrategy(strategyAddress, config);
-    setLendingStrategy(s);
-  }, [strategyAddress, config]);
+  const lendingStrategy = useMemo(() => {
+    return makeLendingStrategy(subgraphStrategy, subgraphPool, signer!, config);
+  }, [config, signer, subgraphPool, subgraphStrategy]);
 
-  useEffect(() => {
-    populate();
-  }, [populate]);
-
-  if (!lendingStrategy) return <></>;
-
-  return <TestPageContent strategyAddress={strategyAddress} />;
+  return <TestPageContent lendingStrategy={lendingStrategy} />;
 }

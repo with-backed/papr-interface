@@ -1,7 +1,7 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
-import { LendingStrategy } from 'lib/strategies';
+import { LendingStrategy } from 'lib/LendingStrategy';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -69,14 +69,14 @@ export default function StrategiesToBorrowFrom({
     const totalSupplies = await Promise.all(
       strategies.map((strategy) =>
         strategy.token0IsUnderlying
-          ? strategy.token1.contract.totalSupply()
-          : strategy.token0.contract.totalSupply(),
+          ? strategy.token1.totalSupply()
+          : strategy.token0.totalSupply(),
       ),
     );
     for (let i = 0; i < totalSupplies.length; i++) {
       setDebtTokenSupplies((prev) => ({
         ...prev,
-        [strategies[i].contract.address]: totalSupplies[i],
+        [strategies[i].id]: totalSupplies[i],
       }));
     }
     setDebtTokenSuppliesLoading(false);
@@ -122,8 +122,7 @@ export default function StrategiesToBorrowFrom({
           </thead>
           <tbody>
             {strategies.map((strategy, i) => {
-              const pricesDataForStrategy =
-                pricesData[strategy.contract.address];
+              const pricesDataForStrategy = pricesData[strategy.id];
               const index = pricesDataForStrategy.index;
               const targetYearlyGrowth = pricesDataForStrategy.indexDPR * 365;
 
@@ -152,9 +151,7 @@ export default function StrategiesToBorrowFrom({
               const fakeNFTValue = 300000;
               const debtTokenMarketCap =
                 parseFloat(
-                  ethers.utils.formatEther(
-                    debtTokenSupplies[strategy.contract.address],
-                  ),
+                  ethers.utils.formatEther(debtTokenSupplies[strategy.id]),
                 ) * mark;
 
               const nftOverCap = fakeNFTValue / debtTokenMarketCap;
@@ -163,19 +160,19 @@ export default function StrategiesToBorrowFrom({
                 <tr
                   onClick={() =>
                     router.push(
-                      `/network/goerli/strategy/${strategy.contract.address}/borrow`,
+                      `/network/goerli/strategy/${strategy.id}/borrow`,
                     )
                   }
                   className={`${i % 2 === 0 ? styles.even : ''} ${
                     styles.clickable
                   }`}
-                  key={strategy.contract.address}>
+                  key={strategy.id}>
                   {!includeDetails && (
                     <td className={styles.tokenName}>
                       <TooltipReference {...tokenTooltip}>
                         <p>
                           $papr{strategy.underlying.symbol}_
-                          {strategy.collateral.symbol}
+                          {strategy.collateralSymbol}
                           {strategy.maxLTVPercent}
                         </p>
                       </TooltipReference>
@@ -238,7 +235,7 @@ export default function StrategiesToBorrowFrom({
                   {includeDetails && (
                     <td colSpan={6}>
                       <Link
-                        href={`/network/${config.network}/strategy/${strategy.contract.address}`}>
+                        href={`/network/${config.network}/strategy/${strategy.id}`}>
                         <a>Details ↗</a>
                       </Link>
                     </td>

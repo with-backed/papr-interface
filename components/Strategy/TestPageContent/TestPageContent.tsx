@@ -1,37 +1,28 @@
-import { useConfig } from 'hooks/useConfig';
-import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import strategyStyles from 'components/Strategy/Strategy.module.css';
 import styles from './TestPageContent.module.css';
 import MintERC20 from './MintERC20';
 import MintCollateral from './MintCollateral';
+import { LendingStrategy } from 'lib/LendingStrategy';
+import { erc721Contract } from 'lib/contracts';
+import { useSigner } from 'wagmi';
 
 type TestPageContentProps = {
-  strategyAddress: string;
+  lendingStrategy: LendingStrategy;
 };
 
-export function TestPageContent({ strategyAddress }: TestPageContentProps) {
-  const config = useConfig();
-  const [lendingStrategy, setLendingStrategy] =
-    useState<LendingStrategy | null>(null);
-
-  const populate = useCallback(async () => {
-    const s = await populateLendingStrategy(strategyAddress, config);
-    setLendingStrategy(s);
-  }, [strategyAddress, config]);
-
-  useEffect(() => {
-    populate();
-  }, [populate]);
-
-  if (!lendingStrategy) return <></>;
-
+export function TestPageContent({ lendingStrategy }: TestPageContentProps) {
+  const { data: signer } = useSigner();
+  const collateral = useMemo(
+    () => erc721Contract(lendingStrategy.collateralAddress, signer!),
+    [lendingStrategy, signer],
+  );
   return (
     <div className={strategyStyles.wrapper}>
       <div className={styles.wrapper}>
         <div className={strategyStyles.column}>
           <MintERC20 token={lendingStrategy.underlying} />
-          <MintCollateral token={lendingStrategy.collateral} />
+          <MintCollateral token={collateral} />
         </div>
       </div>
     </div>

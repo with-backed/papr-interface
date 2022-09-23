@@ -16,21 +16,19 @@ export default function MintERC20({ token }: TokenInfoProps) {
   const { data: signer } = useSigner();
 
   const getBalance = useCallback(async () => {
-    if (address) {
-      const b = await token.contract.balanceOf(address);
+    if (address && signer) {
+      const contract = MockUnderlying__factory.connect(token.id, signer);
+      const b = await contract.balanceOf(address);
       setBalance(ethers.utils.formatUnits(b, token.decimals));
     }
-  }, [address, token]);
+  }, [address, signer, token]);
 
   const mint = useCallback(async () => {
     if (signer == null || address == null) {
       console.log('address or sigenr null');
       return;
     }
-    const contract = MockUnderlying__factory.connect(
-      token.contract.address,
-      signer,
-    );
+    const contract = MockUnderlying__factory.connect(token.id, signer);
     ethers.utils.parseUnits(value, token.decimals);
     const t = await contract.mint(
       address,
