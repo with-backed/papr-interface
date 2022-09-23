@@ -6,7 +6,7 @@ import {
   VaultsByOwnerForStrategyDocument,
   VaultsByOwnerForStrategyQuery,
 } from 'types/generated/graphql/inKindSubgraph';
-import { LendingStrategy } from './LendingStrategy';
+import { LendingStrategy, SubgraphStrategy } from './LendingStrategy';
 import { clientFromUrl } from './urql';
 
 export async function subgraphStrategyByAddress(id: string) {
@@ -52,7 +52,7 @@ export async function getNextVaultNonceForUser(
   return largestNonceVault?.nonce || 0;
 }
 
-export async function getAllStrategies() {
+export async function getAllStrategies(): Promise<SubgraphStrategy[]> {
   const client = clientFromUrl(
     'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
   );

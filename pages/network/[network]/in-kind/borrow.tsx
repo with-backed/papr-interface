@@ -1,64 +1,67 @@
 import StrategiesToBorrowFrom from 'components/StrategiesToBorrowFrom/StrategiesToBorrowFrom';
-import { useConfig } from 'hooks/useConfig';
 import { getAllStrategies } from 'lib/pAPRSubgraph';
-import { populateLendingStrategy } from 'lib/strategies';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { GetServerSideProps } from 'next';
-import { LendingStrategy as SubgraphLendingStrategy } from 'types/generated/graphql/inKindSubgraph';
-import { useCallback, useEffect, useState } from 'react';
 import strategyStyles from 'components/Strategy/Strategy.module.css';
 import styles from './strategiesBorrow.module.css';
 import { SupportedNetwork } from 'lib/config';
+import {
+  makeLendingStrategy,
+  SubgraphPool,
+  SubgraphStrategy,
+} from 'lib/LendingStrategy';
+import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
+import { useConfig } from 'hooks/useConfig';
+import { useSigner } from 'wagmi';
+import { useMemo } from 'react';
 
 export type SelectStrategyBorrowPageProps = {
-  strategyAddresses: string[];
+  subgraphStrategies: SubgraphStrategy[];
   pricesData: { [key: string]: StrategyPricesData };
+  pools: (SubgraphPool | null)[];
 };
 
 export const getServerSideProps: GetServerSideProps<
   SelectStrategyBorrowPageProps
 > = async (context) => {
   const network = context.params?.network as SupportedNetwork;
-  const strategies = await getAllStrategies();
+  const subgraphStrategies = await getAllStrategies();
+  const pools = await (
+    await Promise.all(
+      subgraphStrategies.map((s) => subgraphUniswapPoolById(s.poolAddress)),
+    )
+  ).map((value) => value?.pool || null);
   const pricesData: { [key: string]: StrategyPricesData } = {};
-  for (let i = 0; i < strategies.length; i++) {
-    pricesData[strategies[i].id] = await strategyPricesData(
-      strategies[i] as SubgraphLendingStrategy,
-      network as SupportedNetwork,
-    );
-  }
+  const prices = await Promise.all(
+    subgraphStrategies.map((strategy) => strategyPricesData(strategy, network)),
+  );
+  subgraphStrategies.forEach((s, i) => (pricesData[s.id] = prices[i]));
 
   return {
     props: {
-      strategyAddresses: strategies.map((s) => s.id),
+      subgraphStrategies,
       pricesData,
+      pools,
     },
   };
 };
 
 export default function SelectStrategyBorrowPage({
-  strategyAddresses,
+  subgraphStrategies,
   pricesData,
+  pools,
 }: SelectStrategyBorrowPageProps) {
   const config = useConfig();
-  const [lendingStrategies, setLendingStrategies] = useState<any[]>([]);
-  const [strategiesLoading, setStrategiesLoading] = useState<boolean>(true);
+  const { data: signer } = useSigner();
 
-  const populate = useCallback(async () => {
-    const populatedStrategies = await Promise.all(
-      strategyAddresses.map((strategyAddress) =>
-        populateLendingStrategy(strategyAddress, config),
+  const lendingStrategies = useMemo(
+    () =>
+      subgraphStrategies.map((s, i) =>
+        makeLendingStrategy(s, pools[i]!, signer!, config),
       ),
-    );
-    setLendingStrategies(populatedStrategies);
-    setStrategiesLoading(false);
-  }, [config, strategyAddresses]);
 
-  useEffect(() => {
-    populate();
-  }, [populate]);
-
-  if (strategiesLoading) return <></>;
+    [config, pools, signer, subgraphStrategies],
+  );
 
   return (
     <div className={strategyStyles.wrapper}>
