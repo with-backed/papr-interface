@@ -20,6 +20,19 @@ export type SubgraphStrategy = NonNullable<
 export type SubgraphPool = NonNullable<PoolByIdQuery['pool']>;
 type SignerOrProvider = ethers.Signer | ethers.providers.Provider;
 
+/**
+ * LendingStrategy factory function, merges the class definition with
+ * properties from subgraph. This is more convenient than adding these
+ * properties to the class statically (auto-updates when subgraph query
+ * changes), and allows us to assert a type that includes those dynamic
+ * properties.
+ *
+ * @param subgraphStrategy the strategy info from our subgraph
+ * @param subgraphPool the associated pool info from Uniswap subgraph
+ * @param signerOrProvider should be signer for contract ops, but provider is ok for logged-out
+ * @param config network-specific config
+ * @returns LendingStrategy
+ */
 export function makeLendingStrategy(
   subgraphStrategy: SubgraphStrategy,
   subgraphPool: SubgraphPool,
@@ -35,6 +48,8 @@ export function makeLendingStrategy(
 
   Object.entries(subgraphStrategy).forEach(([k, v]) => {
     const key = k === 'underlying' ? 'underlyingAddress' : k;
+    // TypeScript doesn't automatically pick up additions through `defineProperty`
+    // which is why we cast the return at then end.
     Object.defineProperty(instance, key, {
       enumerable: true,
       get() {
@@ -46,6 +61,14 @@ export function makeLendingStrategy(
   return instance as LendingStrategy;
 }
 
+/**
+ * Mega-object to orchestrate all parts of lending strategy, including Uniswap
+ * pool info and method calls. Should not be exported, use the factory function.
+ *
+ * Instead of exposing contract we write wrapper methods for the contract
+ * functions we want to use. Strictly speaking this conforms to the Law of Demeter
+ * but if it gets too tedious we can come up with another way.
+ */
 class LendingStrategyInternal {
   private _config: Config;
   private _contract: Strategy;
