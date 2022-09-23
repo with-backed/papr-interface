@@ -46,20 +46,20 @@ export function makeLendingStrategy(
 }
 
 class LendingStrategyInternal {
-  private _subgraphStrategy: SubgraphStrategy;
-  private _contract: Strategy;
   private _config: Config;
+  private _contract: Strategy;
   private _pool?: Pool;
   private _signerOrProvider: SignerOrProvider;
+  private _subgraphStrategy: SubgraphStrategy;
 
   // TODO: make real
   collateralAddress = process.env.NEXT_PUBLIC_MOCK_APE as string;
   collateralSymbol = 'FAPE';
 
+  multicall: Strategy['multicall'];
   subgraphPool: SubgraphPool;
   token0: ERC20;
   token1: ERC20;
-  multicall: Strategy['multicall'];
 
   constructor(
     subgraphStrategy: SubgraphStrategy,
@@ -86,16 +86,21 @@ class LendingStrategyInternal {
     this.multicall = this._contract.multicall;
   }
 
+  index() {
+    return this._contract.index();
+  }
+
   lastUpdated() {
     return this._contract.lastUpdated();
   }
 
-  targetGrowthPerPeriod() {
-    return this._contract.targetGrowthPerPeriod();
+  maxLTV() {
+    return this._contract.maxLTV();
   }
 
-  index() {
-    return this._contract.index();
+  async maxLTVPercent() {
+    const maxLTV = await this._contract.maxLTV();
+    return convertONEScaledPercent(maxLTV, 2);
   }
 
   newNorm() {
@@ -129,13 +134,8 @@ class LendingStrategyInternal {
     return pool;
   }
 
-  maxLTV() {
-    return this._contract.maxLTV();
-  }
-
-  async maxLTVPercent() {
-    const maxLTV = await this._contract.maxLTV();
-    return convertONEScaledPercent(maxLTV, 2);
+  async reduceDebt(vaultId: ethers.BigNumberish, amount: ethers.BigNumberish) {
+    return this._contract.reduceDebt(vaultId, amount);
   }
 
   async targetAnnualGrowthPercent() {
@@ -143,8 +143,8 @@ class LendingStrategyInternal {
     return convertONEScaledPercent(targetAnnualGrowth, 2);
   }
 
-  async reduceDebt(vaultId: ethers.BigNumberish, amount: ethers.BigNumberish) {
-    return this._contract.reduceDebt(vaultId, amount);
+  targetGrowthPerPeriod() {
+    return this._contract.targetGrowthPerPeriod();
   }
 
   get token0IsUnderlying() {
