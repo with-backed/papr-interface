@@ -1,18 +1,7 @@
 import { ethers } from 'ethers';
-import { Config, SupportedNetwork } from 'lib/config';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
-import { makeProvider } from 'lib/contracts';
-import {
-  ERC20,
-  ERC20__factory,
-  ERC721,
-  ERC721__factory,
-  IQuoter,
-  IUniswapV3Pool__factory,
-  Strategy__factory,
-} from 'types/generated/abis';
+import { ERC20, ERC721, IQuoter } from 'types/generated/abis';
 import { ONE, PRICE } from './constants';
-import { getPool } from './uniswap';
 import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -33,72 +22,6 @@ export type ERC721Token = {
   name: string;
   symbol: string;
 };
-
-export async function populateLendingStrategy(
-  address: string,
-  config: Config,
-  signerOrProvider?: ethers.Signer | ethers.providers.Provider,
-) {
-  const provider = makeProvider(
-    config.jsonRpcProvider,
-    config.network as SupportedNetwork,
-  );
-  const contract = Strategy__factory.connect(
-    address,
-    signerOrProvider || provider,
-  );
-
-  const [poolAddress, targetGrowthPerPeriod, maxLTV, underlyingAddress] =
-    await Promise.all([
-      contract.pool(),
-      contract.targetGrowthPerPeriod(),
-      contract.maxLTV(),
-      contract.underlying(),
-    ]);
-
-  const poolContract = IUniswapV3Pool__factory.connect(poolAddress, provider);
-
-  const [token0Address, token1Address] = await Promise.all([
-    poolContract.token0(),
-    poolContract.token1(),
-  ]);
-
-  const [token0, token1] = await Promise.all([
-    buildToken(ERC20__factory.connect(token0Address, provider)),
-    buildToken(ERC20__factory.connect(token1Address, provider)),
-  ]);
-
-  const underlying = underlyingAddress == token0Address ? token0 : token1;
-
-  const pool = await getPool(poolContract, token0, token1, config.chainId);
-
-  /// TODO eventually we should index the strategies assets it lends to
-  /// and have an array of assets here
-  const collateralAddress = process.env.NEXT_PUBLIC_MOCK_APE as string;
-  const collateral = ERC721__factory.connect(collateralAddress, provider);
-  const [name, symbol] = await Promise.all([
-    collateral.name(),
-    collateral.symbol(),
-  ]);
-
-  const targetAnnualGrowth = await contract.targetAPR();
-
-  return {
-    contract: contract,
-    pool: pool,
-    token0: token0,
-    token1: token1,
-    collateral: {
-      contract: collateral,
-      name,
-      symbol,
-    },
-    underlying,
-    maxLTVPercent: convertONEScaledPercent(maxLTV, 2),
-    targetAnnualGrowthPercent: convertONEScaledPercent(targetAnnualGrowth, 2),
-    token0IsUnderlying: token0.id == underlying.id,
-  };
-}
 
 export function convertONEScaledPercent(
   n: ethers.BigNumber,
