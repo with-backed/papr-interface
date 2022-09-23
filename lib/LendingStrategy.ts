@@ -86,19 +86,19 @@ class LendingStrategyInternal {
     this.multicall = this._contract.multicall;
   }
 
-  async lastUpdated() {
+  lastUpdated() {
     return this._contract.lastUpdated();
   }
 
-  async targetGrowthPerPeriod() {
+  targetGrowthPerPeriod() {
     return this._contract.targetGrowthPerPeriod();
   }
 
-  async index() {
+  index() {
     return this._contract.index();
   }
 
-  async newNorm() {
+  newNorm() {
     return this._contract.newNorm();
   }
 
@@ -129,7 +129,7 @@ class LendingStrategyInternal {
     return pool;
   }
 
-  async maxLTV() {
+  maxLTV() {
     return this._contract.maxLTV();
   }
 
@@ -141,6 +141,10 @@ class LendingStrategyInternal {
   async targetAnnualGrowthPercent() {
     const targetAnnualGrowth = await this._contract.targetAPR();
     return convertONEScaledPercent(targetAnnualGrowth, 2);
+  }
+
+  async reduceDebt(vaultId: ethers.BigNumberish, amount: ethers.BigNumberish) {
+    return this._contract.reduceDebt(vaultId, amount);
   }
 
   get token0IsUnderlying() {

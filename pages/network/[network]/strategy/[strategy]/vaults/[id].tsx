@@ -1,10 +1,18 @@
 import { TransactionButton } from 'components/Button';
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { SupportedNetwork } from 'lib/config';
 import { makeProvider } from 'lib/contracts';
+import {
+  makeLendingStrategy,
+  SubgraphPool,
+  SubgraphStrategy,
+} from 'lib/LendingStrategy';
+import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
+import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -13,33 +21,62 @@ import { useQuery } from 'urql';
 import { useAccount, useSigner } from 'wagmi';
 import styles from '../strategy.module.css';
 
-export type VaultPageProps = {
-  strategy: string;
-  id: string;
+type ServerSideProps = {
+  vaultId: string;
+  subgraphStrategy: SubgraphStrategy;
+  subgraphPool: SubgraphPool;
 };
 
-export const getServerSideProps: GetServerSideProps<VaultPageProps> = async (
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
-  const strategy = context.params?.strategy as string;
+  const address = (context.params?.strategy as string).toLowerCase();
+  const network = context.params?.network as SupportedNetwork;
   const id = context.params?.id as string;
+
+  const subgraphStrategy = await subgraphStrategyByAddress(address);
+
+  if (!subgraphStrategy?.lendingStrategy) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const subgraphPool = await subgraphUniswapPoolById(
+    subgraphStrategy.lendingStrategy.poolAddress,
+  );
+
+  if (!subgraphPool?.pool) {
+    return {
+      notFound: true,
+    };
+  }
 
   return {
     props: {
-      id: id,
-      strategy: strategy,
+      vaultId: id,
+      subgraphStrategy: subgraphStrategy.lendingStrategy,
+      subgraphPool: subgraphPool.pool,
     },
   };
 };
 
-export default function VaultPage({ id, strategy }: VaultPageProps) {
+export default function VaultPage({
+  vaultId,
+  subgraphPool,
+  subgraphStrategy,
+}: ServerSideProps) {
   const [vaultInfo, setVaultInfo] = useState<Vault | null>(null);
   const config = useConfig();
   const { data: signer } = useSigner();
+
+  const lendingStrategy = useMemo(() => {
+    return makeLendingStrategy(subgraphStrategy, subgraphPool, signer!, config);
+  }, [config, signer, subgraphPool, subgraphStrategy]);
   const { replace } = useRouter();
   const [{ data }] = useQuery({
     query: VaultByIdDocument,
-    variables: { id },
+    variables: { id: vaultId },
   });
 
   const jsonRpcProvider = useMemo(() => {
@@ -58,22 +95,23 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
 
   const fetchVaultInfo = useCallback(async () => {
     const i = await getVaultInfo(
-      ethers.BigNumber.from(id),
-      strategy,
+      ethers.BigNumber.from(vaultId),
+      lendingStrategy,
       signer || jsonRpcProvider,
     );
     setVaultInfo(i);
-  }, [id, jsonRpcProvider, signer, strategy]);
+  }, [jsonRpcProvider, lendingStrategy, signer, vaultId]);
 
   useEffect(() => {
     fetchVaultInfo();
   }, [fetchVaultInfo]);
 
-  const debtPrice = useMemo(() => {
-    return strategy.token0IsUnderlying
-      ? strategy.pool.token1Price.toFixed()
-      : strategy.pool.token0Price.toFixed();
-  }, [strategy]);
+  const debtPrice = useAsyncValue(async () => {
+    const pool = await lendingStrategy.pool();
+    return lendingStrategy.token0IsUnderlying
+      ? await pool.token1Price.toFixed(4)
+      : await pool.token0Price.toFixed(4);
+  }, [lendingStrategy]);
 
   const collateralVaulation = useMemo(() => {
     if (vaultInfo == null) {
@@ -82,12 +120,10 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     return ethers.utils.formatUnits(vaultInfo.price, 18);
   }, [vaultInfo]);
 
-  const maxLTVPercent = useMemo(() => {
-    if (vaultInfo == null) {
-      return '';
-    }
-    return vaultInfo.strategy.maxLTVPercent;
-  }, [vaultInfo]);
+  const maxLTVPercent = useAsyncValue(
+    () => lendingStrategy.maxLTVPercent(),
+    [lendingStrategy],
+  );
 
   const debtAmount = useMemo(() => {
     if (vaultInfo == null) {
@@ -100,8 +136,8 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
   const [repayPending, setRepayPending] = useState(false);
   const repayDebt = useCallback(async () => {
     if (vaultInfo) {
-      const tx = await vaultInfo.strategy.contract.reduceDebt(
-        ethers.BigNumber.from(id).toHexString(),
+      const tx = await lendingStrategy.reduceDebt(
+        ethers.BigNumber.from(vaultId).toHexString(),
         vaultInfo.debt,
       );
       setRepayHash(tx.hash);
@@ -113,13 +149,13 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     } else {
       console.error('No vault info, cannot reduce debt');
     }
-  }, [id, fetchVaultInfo, vaultInfo]);
+  }, [fetchVaultInfo, lendingStrategy, vaultId, vaultInfo]);
 
   // TODO: use removeCollateral instead of closeVault
 
   return (
     <div className={styles.column}>
-      <a href={`/network/${config.network}/in-kind/strategies/${strategy}`}>
+      <a href={`/network/${config.network}/strategy/${lendingStrategy.id}`}>
         ⬅ strategy
       </a>
       {!!vaultInfo && (
@@ -132,7 +168,7 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
             <p>max LTV: {maxLTVPercent}%</p>
             <p>
               current LTV:{' '}
-              {((parseFloat(debtPrice) * parseFloat(debtAmount)) /
+              {((parseFloat(debtPrice || '0') * parseFloat(debtAmount)) /
                 parseFloat(collateralVaulation)) *
                 100}
               %
@@ -148,7 +184,7 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
             )}
             <p>
               current debt token price: {debtPrice}{' '}
-              {vaultInfo.strategy.underlying.symbol}
+              {lendingStrategy.underlying.symbol}
             </p>
           </Fieldset>
           <Fieldset legend="🎬 Vault Actions">
