@@ -8,10 +8,10 @@ export type SubgraphStrategy = NonNullable<
 export function makeLendingStrategy(
   subgraphStrategy: SubgraphStrategy,
 ): LendingStrategy {
-  const c = new LendingStrategyInternal(subgraphStrategy);
+  const instance = new LendingStrategyInternal(subgraphStrategy);
 
   Object.entries(subgraphStrategy).forEach(([k, v]) => {
-    Object.defineProperty(c, k, {
+    Object.defineProperty(instance, k, {
       enumerable: true,
       get() {
         return v;
@@ -19,7 +19,7 @@ export function makeLendingStrategy(
     });
   });
 
-  return c as LendingStrategy;
+  return instance as LendingStrategy;
 }
 
 class LendingStrategyInternal {
