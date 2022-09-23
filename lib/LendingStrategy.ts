@@ -34,7 +34,8 @@ export function makeLendingStrategy(
   );
 
   Object.entries(subgraphStrategy).forEach(([k, v]) => {
-    Object.defineProperty(instance, k, {
+    const key = k === 'underlying' ? 'underlyingAddress' : k;
+    Object.defineProperty(instance, key, {
       enumerable: true,
       get() {
         return v;
@@ -149,5 +150,11 @@ class LendingStrategyInternal {
 
   get token0IsUnderlying() {
     return this._subgraphStrategy.underlying === this.subgraphPool.token0.id;
+  }
+
+  get underlying() {
+    return this._subgraphStrategy.underlying === this.subgraphPool.token0.id
+      ? this.subgraphPool.token0
+      : this.subgraphPool.token1;
   }
 }

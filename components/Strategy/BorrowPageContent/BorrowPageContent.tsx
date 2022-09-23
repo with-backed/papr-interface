@@ -1,5 +1,5 @@
 import { StrategyPricesData } from 'lib/strategies/charts';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import strategyStyles from 'components/Strategy/Strategy.module.css';
 import { AccountNFTs } from 'components/Strategy/AccountNFTs';
 import { OpenVault } from 'components/Strategy/OpenVault';
@@ -9,6 +9,7 @@ import { useCenterNFTs } from 'hooks/useCenterNFTs';
 import styles from './BorrowPageContent.module.css';
 import StrategiesToBorrowFrom from 'components/StrategiesToBorrowFrom/StrategiesToBorrowFrom';
 import { LendingStrategy } from 'lib/LendingStrategy';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 
 export type BorrowPageProps = {
   strategyAddress: string;
@@ -31,12 +32,17 @@ export function BorrowPageContent({
   );
   const [nftsSelected, setNFTsSelected] = useState<string[]>([]);
 
+  const maxLTVPercent = useAsyncValue(
+    () => lendingStrategy.maxLTVPercent(),
+    [lendingStrategy],
+  );
+
   if (!lendingStrategy || !pricesData) return <></>;
 
   return (
     <div className={strategyStyles.wrapper}>
       <StrategiesToBorrowFrom
-        legend={`Borrow: $papr${lendingStrategy.underlying.symbol}_${lendingStrategy.symbol}${lendingStrategy.maxLTVPercent}`}
+        legend={`Borrow: $papr${lendingStrategy.underlying.symbol}_${lendingStrategy.symbol}${maxLTVPercent}`}
         strategies={[lendingStrategy]}
         pricesData={{ [lendingStrategy.id]: pricesData }}
         includeDetails

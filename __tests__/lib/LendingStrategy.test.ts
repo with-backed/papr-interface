@@ -55,7 +55,12 @@ describe('LendingStrategy', () => {
 
       // Dynamic test to check all properties
       Object.keys(subgraphStrategy).forEach((key) => {
-        const instanceValue = strategyInstance[key as keyof LendingStrategy];
+        const instanceValue =
+          strategyInstance[
+            (key === 'underlying'
+              ? 'underlyingAddress'
+              : key) as keyof LendingStrategy
+          ];
         const inputValue = subgraphStrategy[key as keyof SubgraphStrategy];
 
         expect(instanceValue).toBeDefined();
