@@ -1,18 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import styles from 'components/Strategy/Strategy.module.css';
-import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { useConfig } from 'hooks/useConfig';
-import { populateLendingStrategy } from 'lib/strategies';
 import StrategyState from './StrategyState';
 import PoolState from './PoolState';
 import ProvideLiquidity from './ProvideLiquidty';
 import SwapQuote from './SwapQuote';
 import SwapTokens from './SwapTokens';
+import { LendingStrategy } from 'lib/LendingStrategy';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 
 export type OldStrategyPageProps = {
   address: string;
-  subgraphLendingStrategy: LendingStrategyByIdQuery['lendingStrategy'] | null;
+  lendingStrategy: LendingStrategy;
   pricesData: StrategyPricesData | null;
 };
 
@@ -21,21 +20,10 @@ const PRICE = 20_000;
 
 export function OldStrategyOverviewContent({
   address,
-  subgraphLendingStrategy,
+  lendingStrategy,
   pricesData,
 }: OldStrategyPageProps) {
-  const config = useConfig();
-  const [lendingStrategy, setLendingStrategy] = useState<any | null>(null);
-
-  const populate = useCallback(async () => {
-    const s = await populateLendingStrategy(address, config);
-    setLendingStrategy(s);
-  }, [address, config]);
-
-  useEffect(() => {
-    populate();
-  }, [populate]);
-
+  const pool = useAsyncValue(() => lendingStrategy.pool(), [lendingStrategy]);
   return (
     <div>
       {!!lendingStrategy && !!pricesData && (
@@ -45,13 +33,13 @@ export function OldStrategyOverviewContent({
             <p>(fake) oracle price: {PRICE} </p>
           </div>
           <StrategyState strategy={lendingStrategy} pricesData={pricesData} />
-          <PoolState pool={lendingStrategy.pool} />
-          <ProvideLiquidity pool={lendingStrategy.pool} />
+          <PoolState pool={pool} />
+          <ProvideLiquidity pool={pool} />
           <SwapQuote strategy={lendingStrategy} swapForUnderlying />
           <SwapQuote strategy={lendingStrategy} swapForUnderlying={false} />
           <SwapTokens
-            tokenOne={lendingStrategy!.token0}
-            tokenTwo={lendingStrategy!.token1}
+            tokenOne={lendingStrategy.subgraphPool.token0}
+            tokenTwo={lendingStrategy.subgraphPool.token1}
           />
         </div>
       )}

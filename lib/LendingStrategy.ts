@@ -104,6 +104,10 @@ class LendingStrategyInternal {
     return convertONEScaledPercent(maxLTV, 2);
   }
 
+  multiplier() {
+    return this._contract.multiplier();
+  }
+
   newNorm() {
     return this._contract.newNorm();
   }
