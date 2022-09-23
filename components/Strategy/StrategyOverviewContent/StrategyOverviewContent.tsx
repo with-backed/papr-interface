@@ -18,6 +18,7 @@ export function StrategyOverviewContent({
   subgraphLendingStrategy,
   pricesData,
 }: StrategyPageProps) {
+  console.log({ subgraphLendingStrategy });
   return (
     <div className={styles.wrapper}>
       <AssociatedVaults strategy={address} />
