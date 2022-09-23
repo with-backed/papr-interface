@@ -1,5 +1,4 @@
 import { GetServerSideProps } from 'next';
-import { LendingStrategy as SubgraphLendingStrategy } from 'types/generated/graphql/inKindSubgraph';
 import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { SupportedNetwork } from 'lib/config';
@@ -7,6 +6,7 @@ import {
   OldStrategyOverviewContent,
   OldStrategyPageProps,
 } from 'components/Strategy/OldStrategyOverviewContent';
+import { LendingStrategy } from 'lib/LendingStrategy';
 
 export const getServerSideProps: GetServerSideProps<
   OldStrategyPageProps
@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps<
   var pricesData: StrategyPricesData | null = null;
   if (subgraphStrategy?.lendingStrategy) {
     pricesData = await strategyPricesData(
-      subgraphStrategy.lendingStrategy as SubgraphLendingStrategy,
+      subgraphStrategy.lendingStrategy as LendingStrategy,
       network,
     );
   }

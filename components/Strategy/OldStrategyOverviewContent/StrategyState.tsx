@@ -4,15 +4,15 @@ import { StrategyPricesData } from 'lib/strategies/charts';
 import {
   getDebtTokenMarketPrice,
   getDebtTokenStrategyPrice,
-  LendingStrategy,
 } from 'lib/strategies';
 import { useState, useCallback, useEffect, useMemo } from 'react';
+import { LendingStrategy } from 'lib/LendingStrategy';
 
 export default function StrategyState({
   strategy,
   pricesData,
 }: {
-  strategy: LendingStrategy;
+  strategy: any;
   pricesData: StrategyPricesData;
 }) {
   const [strategyIndex, setStrategyIndex] = useState<string>('');
@@ -42,7 +42,7 @@ export default function StrategyState({
   const debtPrice = useMemo(() => {
     const price = getDebtTokenMarketPrice(strategy);
     if (!price) return '';
-    return price.toFixed();
+    return (1).toFixed(2);
   }, [strategy]);
 
   useEffect(() => {

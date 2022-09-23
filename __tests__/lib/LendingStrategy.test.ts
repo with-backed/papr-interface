@@ -1,7 +1,10 @@
+import { configs } from 'lib/config';
+import { makeProvider } from 'lib/contracts';
 import {
   makeLendingStrategy,
   SubgraphStrategy,
   LendingStrategy,
+  SubgraphPool,
 } from 'lib/LendingStrategy';
 
 const subgraphStrategy: SubgraphStrategy = {
@@ -17,7 +20,32 @@ const subgraphStrategy: SubgraphStrategy = {
   __typename: 'LendingStrategy',
 };
 
-let strategyInstance = makeLendingStrategy(subgraphStrategy);
+const subgraphPool: SubgraphPool = {
+  token0: {
+    id: '0x3089b47853df1b82877beef6d904a0ce98a12553',
+    decimals: '18',
+    symbol: 'USDC',
+    name: 'USDC',
+    __typename: 'Token',
+  },
+  token1: {
+    id: '0xb5e5f51e3e112634975fb44e6351380413f653ac',
+    decimals: '18',
+    symbol: 'dtAP_USDC',
+    name: 'APE Loans debt token',
+    __typename: 'Token',
+  },
+  __typename: 'Pool',
+};
+
+const provider = makeProvider(configs.goerli.jsonRpcProvider, 'goerli');
+
+let strategyInstance = makeLendingStrategy(
+  subgraphStrategy,
+  subgraphPool,
+  provider,
+  configs.goerli,
+);
 
 describe('LendingStrategy', () => {
   describe('constructor', () => {

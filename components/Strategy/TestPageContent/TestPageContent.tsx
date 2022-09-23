@@ -1,5 +1,5 @@
 import { useConfig } from 'hooks/useConfig';
-import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
+import { populateLendingStrategy } from 'lib/strategies';
 import React, { useCallback, useEffect, useState } from 'react';
 import strategyStyles from 'components/Strategy/Strategy.module.css';
 import styles from './TestPageContent.module.css';
@@ -12,8 +12,7 @@ type TestPageContentProps = {
 
 export function TestPageContent({ strategyAddress }: TestPageContentProps) {
   const config = useConfig();
-  const [lendingStrategy, setLendingStrategy] =
-    useState<LendingStrategy | null>(null);
+  const [lendingStrategy, setLendingStrategy] = useState<any | null>(null);
 
   const populate = useCallback(async () => {
     const s = await populateLendingStrategy(strategyAddress, config);

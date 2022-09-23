@@ -12,14 +12,14 @@ export default function SwapTokens({ tokenOne, tokenTwo }: SwapTokensProps) {
       <a
         target="_blank"
         rel="noreferrer"
-        href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenTwo.contract.address}&outputCurrency=${tokenOne.contract.address}`}>
+        href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenTwo.id}&outputCurrency=${tokenOne.id}`}>
         Get {tokenOne.symbol}
       </a>
       <br />
       <a
         target="_blank"
         rel="noreferrer"
-        href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenOne.contract.address}&outputCurrency=${tokenTwo.contract.address}`}>
+        href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenOne.id}&outputCurrency=${tokenTwo.id}`}>
         Get {tokenTwo.symbol}
       </a>
     </Fieldset>

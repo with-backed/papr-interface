@@ -1,7 +1,6 @@
 import { Fieldset } from 'components/Fieldset';
-import { useConfig } from 'hooks/useConfig';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
-import { LendingStrategy } from 'lib/strategies';
+import { LendingStrategy } from 'lib/LendingStrategy';
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
 
@@ -18,8 +17,6 @@ export default function SwapQuote({ strategy, swapForUnderlying }: QuoteProps) {
     amountIn,
     swapForUnderlying,
   );
-  const [internalAPRAfter, setInternalAPRAfter] =
-    useState<string>('coming soon');
 
   return (
     <Fieldset legend={`💱 ${tokenIn.symbol} ➡ ${tokenOut.symbol}`}>
@@ -38,7 +35,7 @@ export default function SwapQuote({ strategy, swapForUnderlying }: QuoteProps) {
           <a
             target="_blank"
             rel="noreferrer"
-            href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenIn.contract.address}&outputCurrency=${tokenOut.contract.address}&exactAmount=${amountIn}`}>
+            href={`https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=${tokenIn.id}&outputCurrency=${tokenOut.id}&exactAmount=${amountIn}`}>
             {' '}
             uniswap
           </a>

@@ -5,37 +5,28 @@ import { AccountNFTs } from 'components/Strategy/AccountNFTs';
 import { OpenVault } from 'components/Strategy/OpenVault';
 import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
-import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
 import { useCenterNFTs } from 'hooks/useCenterNFTs';
 import styles from './BorrowPageContent.module.css';
 import StrategiesToBorrowFrom from 'components/StrategiesToBorrowFrom/StrategiesToBorrowFrom';
+import { LendingStrategy } from 'lib/LendingStrategy';
 
 export type BorrowPageProps = {
   strategyAddress: string;
   pricesData: StrategyPricesData | null;
+  lendingStrategy: LendingStrategy;
 };
 
 export function BorrowPageContent({
   strategyAddress,
+  lendingStrategy,
   pricesData,
 }: BorrowPageProps) {
   const config = useConfig();
   const { address } = useAccount();
-  const [lendingStrategy, setLendingStrategy] =
-    useState<LendingStrategy | null>(null);
-
-  const populate = useCallback(async () => {
-    const s = await populateLendingStrategy(strategyAddress, config);
-    setLendingStrategy(s);
-  }, [config, strategyAddress]);
-
-  useEffect(() => {
-    populate();
-  }, [populate]);
 
   const { userCollectionNFTs, nftsLoading } = useCenterNFTs(
     address,
-    lendingStrategy?.collateral.contract.address,
+    lendingStrategy.collateralAddress,
     config,
   );
   const [nftsSelected, setNFTsSelected] = useState<string[]>([]);
@@ -45,9 +36,9 @@ export function BorrowPageContent({
   return (
     <div className={strategyStyles.wrapper}>
       <StrategiesToBorrowFrom
-        legend={`Borrow: $papr${lendingStrategy.underlying.symbol}_${lendingStrategy.collateral.symbol}${lendingStrategy.maxLTVPercent}`}
+        legend={`Borrow: $papr${lendingStrategy.underlying.symbol}_${lendingStrategy.symbol}${lendingStrategy.maxLTVPercent}`}
         strategies={[lendingStrategy]}
-        pricesData={{ [lendingStrategy.contract.address]: pricesData }}
+        pricesData={{ [lendingStrategy.id]: pricesData }}
         includeDetails
       />
       <AccountNFTs

@@ -1,7 +1,7 @@
 import StrategiesToBorrowFrom from 'components/StrategiesToBorrowFrom/StrategiesToBorrowFrom';
 import { useConfig } from 'hooks/useConfig';
 import { getAllStrategies } from 'lib/pAPRSubgraph';
-import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
+import { populateLendingStrategy } from 'lib/strategies';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { GetServerSideProps } from 'next';
 import { LendingStrategy as SubgraphLendingStrategy } from 'types/generated/graphql/inKindSubgraph';
@@ -41,9 +41,7 @@ export default function SelectStrategyBorrowPage({
   pricesData,
 }: SelectStrategyBorrowPageProps) {
   const config = useConfig();
-  const [lendingStrategies, setLendingStrategies] = useState<LendingStrategy[]>(
-    [],
-  );
+  const [lendingStrategies, setLendingStrategies] = useState<any[]>([]);
   const [strategiesLoading, setStrategiesLoading] = useState<boolean>(true);
 
   const populate = useCallback(async () => {

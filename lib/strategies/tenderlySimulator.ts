@@ -64,7 +64,7 @@ export async function simulateSwap(
 
   const approveParams = [
     {
-      to: token0.contract.address,
+      to: token0.id,
       from,
       data: approveEncodedData,
       gas: ethers.utils.hexValue(3000000),
@@ -77,18 +77,7 @@ export async function simulateSwap(
   const iface = new ethers.utils.Interface(IUniswapRouterABI);
   const encodedData = iface.encodeFunctionData(
     'exactInputSingle(tuple(address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 deadline, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96))',
-    [
-      [
-        token0.contract.address,
-        token1.contract.address,
-        pool.fee,
-        from,
-        blockTimestamp,
-        amountIn,
-        0,
-        0,
-      ],
-    ],
+    [[token0.id, token1.id, pool.fee, from, blockTimestamp, amountIn, 0, 0]],
   );
 
   const transactionParameters = [

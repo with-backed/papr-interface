@@ -3,7 +3,7 @@ import styles from 'components/Strategy/Strategy.module.css';
 import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { useConfig } from 'hooks/useConfig';
-import { LendingStrategy, populateLendingStrategy } from 'lib/strategies';
+import { populateLendingStrategy } from 'lib/strategies';
 import StrategyState from './StrategyState';
 import PoolState from './PoolState';
 import ProvideLiquidity from './ProvideLiquidty';
@@ -25,8 +25,7 @@ export function OldStrategyOverviewContent({
   pricesData,
 }: OldStrategyPageProps) {
   const config = useConfig();
-  const [lendingStrategy, setLendingStrategy] =
-    useState<LendingStrategy | null>(null);
+  const [lendingStrategy, setLendingStrategy] = useState<any | null>(null);
 
   const populate = useCallback(async () => {
     const s = await populateLendingStrategy(address, config);

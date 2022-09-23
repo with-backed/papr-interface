@@ -1,4 +1,3 @@
-import { Pool } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
 import { Config, SupportedNetwork } from 'lib/config';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
@@ -10,7 +9,6 @@ import {
   ERC721__factory,
   IQuoter,
   IUniswapV3Pool__factory,
-  Strategy,
   Strategy__factory,
 } from 'types/generated/abis';
 import { ONE, PRICE } from './constants';
@@ -19,29 +17,16 @@ import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { getAddress } from 'ethers/lib/utils';
+import { LendingStrategy } from 'lib/LendingStrategy';
 
 dayjs.extend(duration);
 
-// TODO this is mostly redudant to the graph info,
-// probably just use the graph is possible
-export type LendingStrategy = {
-  contract: Strategy;
-  pool: Pool;
-  token0IsUnderlying: boolean;
-  token0: ERC20Token;
-  token1: ERC20Token;
-  underlying: ERC20Token;
-  collateral: ERC721Token;
-  maxLTVPercent: number;
-  targetAnnualGrowthPercent: number;
-};
-
-export type ERC20Token = {
-  contract: ERC20;
+export interface ERC20Token {
+  id: string;
   decimals: number;
   name: string;
   symbol: string;
-};
+}
 
 export type ERC721Token = {
   contract: ERC721;
@@ -53,7 +38,7 @@ export async function populateLendingStrategy(
   address: string,
   config: Config,
   signerOrProvider?: ethers.Signer | ethers.providers.Provider,
-): Promise<LendingStrategy> {
+) {
   const provider = makeProvider(
     config.jsonRpcProvider,
     config.network as SupportedNetwork,
@@ -111,7 +96,7 @@ export async function populateLendingStrategy(
     underlying,
     maxLTVPercent: convertONEScaledPercent(maxLTV, 2),
     targetAnnualGrowthPercent: convertONEScaledPercent(targetAnnualGrowth, 2),
-    token0IsUnderlying: token0.contract.address == underlying.contract.address,
+    token0IsUnderlying: token0.id == underlying.id,
   };
 }
 
@@ -131,7 +116,7 @@ export function convertOneScaledValue(
 
 export async function buildToken(token: ERC20): Promise<ERC20Token> {
   return {
-    contract: token,
+    id: token.address,
     decimals: await token.decimals(),
     symbol: await token.symbol(),
     name: await token.name(),
@@ -174,10 +159,10 @@ export async function multiplier(
   now: ethers.BigNumber,
   mark: ethers.BigNumber,
 ) {
-  const lastUpdated = await strategy.contract.lastUpdated();
+  const lastUpdated = await strategy.lastUpdated();
   const PERIOD = ethers.BigNumber.from(28 * SECONDS_IN_A_DAY);
-  const targetGrowthPerPeriod = await strategy.contract.targetGrowthPerPeriod();
-  const index = await strategy.contract.index();
+  const targetGrowthPerPeriod = await strategy.targetGrowthPerPeriod();
+  const index = await strategy.index();
 
   const period = now.sub(lastUpdated);
   const periodRatio = period.mul(ONE).div(PERIOD);
@@ -198,12 +183,12 @@ export async function multiplier(
 export async function getQuoteForSwap(
   quoter: IQuoter,
   amount: ethers.BigNumber,
-  tokenIn: ERC20Token,
-  tokenOut: ERC20Token,
+  tokenIn: string,
+  tokenOut: string,
 ) {
   const q = await quoter.callStatic.quoteExactInputSingle(
-    tokenIn.contract.address,
-    tokenOut.contract.address,
+    tokenIn,
+    tokenOut,
     ethers.BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
     amount,
     0,
@@ -226,9 +211,8 @@ export async function computeLiquidationEstimation(
   const PERIOD = 28 * SECONDS_IN_A_DAY;
 
   const targetGrowthPerPeriod =
-    (await strategy.contract.targetGrowthPerPeriod())
-      .div(ONE.div(10000))
-      .toNumber() * 0.0001;
+    (await strategy.targetGrowthPerPeriod()).div(ONE.div(10000)).toNumber() *
+    0.0001;
 
   const indexMarkRatio = 1.4;
 
@@ -257,8 +241,8 @@ export async function computeSlippageForSwap(
   quoter: IQuoter,
 ) {
   const quoteWithoutSlippage = await quoter.callStatic.quoteExactInputSingle(
-    tokenIn.contract.address,
-    tokenOut.contract.address,
+    tokenIn.id,
+    tokenOut.id,
     ethers.BigNumber.from(10).pow(4),
     ethers.utils.parseUnits('1', tokenIn.decimals),
     0,
@@ -291,17 +275,16 @@ export async function computeSlippageForSwap(
   return priceImpact * 100;
 }
 
-export function getDebtTokenMarketPrice(strategy: LendingStrategy) {
+export async function getDebtTokenMarketPrice(strategy: LendingStrategy) {
   if (strategy == null) {
     return null;
   }
-  return strategy.token0IsUnderlying
-    ? strategy.pool.token1Price
-    : strategy.pool.token0Price;
+  const pool = await strategy.pool();
+  return strategy.token0IsUnderlying ? pool.token1Price : pool.token0Price;
 }
 
 export async function getDebtTokenStrategyPrice(strategy: LendingStrategy) {
-  return await strategy.contract.newNorm();
+  return await strategy.newNorm();
 }
 
 export async function getOracleValueForStrategy(strategy: LendingStrategy) {

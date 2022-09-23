@@ -60,24 +60,20 @@ export default function VaultPage({ id, strategy }: VaultPageProps) {
     const i = await getVaultInfo(
       ethers.BigNumber.from(id),
       strategy,
-      config,
       signer || jsonRpcProvider,
     );
     setVaultInfo(i);
-  }, [config, id, jsonRpcProvider, signer, strategy]);
+  }, [id, jsonRpcProvider, signer, strategy]);
 
   useEffect(() => {
     fetchVaultInfo();
   }, [fetchVaultInfo]);
 
   const debtPrice = useMemo(() => {
-    if (vaultInfo == null) {
-      return '';
-    }
-    return vaultInfo.strategy.token0IsUnderlying
-      ? vaultInfo.strategy.pool.token1Price.toFixed()
-      : vaultInfo.strategy.pool.token0Price.toFixed();
-  }, [vaultInfo]);
+    return strategy.token0IsUnderlying
+      ? strategy.pool.token1Price.toFixed()
+      : strategy.pool.token0Price.toFixed();
+  }, [strategy]);
 
   const collateralVaulation = useMemo(() => {
     if (vaultInfo == null) {
