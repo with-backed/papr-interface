@@ -58,9 +58,6 @@ export function Activity({ lendingStrategy }: ActivityProps) {
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
   }, [activityData, swapsData]);
 
-  console.log({ feed, swapsData, error });
-  console.log(lendingStrategy.poolAddress);
-
   if (swapsFetching || activityFetching) {
     return <Fieldset legend="🐝 Activity">Loading...</Fieldset>;
   }
