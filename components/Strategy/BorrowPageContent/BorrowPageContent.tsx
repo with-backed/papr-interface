@@ -31,7 +31,7 @@ export function BorrowPageContent({
 
   const { userCollectionNFTs, nftsLoading } = useCenterNFTs(
     address,
-    collateralContractAddresses,
+    ['0x5116e901dbf4b4254b4c5f0c6e65d8e6411ddb33'],
     config,
   );
   const [nftsSelected, setNFTsSelected] = useState<string[]>([]);
