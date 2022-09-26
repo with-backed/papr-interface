@@ -5,6 +5,7 @@ import { AssociatedVaults } from '../AssociatedVaults';
 import { Charts } from 'components/Strategy/Charts';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { Collateral } from '../Collateral';
+import { Activity } from '../Activity';
 
 export type StrategyPageProps = {
   address: string;
@@ -22,6 +23,7 @@ export function StrategyOverviewContent({
       <AssociatedVaults strategy={address} />
       <Charts pricesData={pricesData} />
       <Collateral lendingStrategy={lendingStrategy} />
+      <Activity lendingStrategy={lendingStrategy} />
     </div>
   );
 }
