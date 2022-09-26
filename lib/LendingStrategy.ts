@@ -1,5 +1,5 @@
 import { Pool } from '@uniswap/v3-sdk';
-import { ethers } from 'ethers';
+import { ethers, providers } from 'ethers';
 import {
   Strategy__factory,
   Strategy,
@@ -46,7 +46,9 @@ export function makeLendingStrategy(
   const instance = new LendingStrategyInternal(
     subgraphStrategy,
     subgraphPool,
-    signerOrProvider,
+    !!signerOrProvider
+      ? signerOrProvider
+      : new providers.AlchemyProvider(config.network, config.alchemyId),
     config,
   );
 

@@ -50,7 +50,10 @@ export const useCenterNFTs = (
   );
 
   useEffect(() => {
-    if (!address || !collections) return;
+    if (!address || !collections) {
+      setNFTsLoading(false);
+      return;
+    }
     getAllUserNFTs(address, collections);
   }, [address, collections, getAllUserNFTs]);
 
