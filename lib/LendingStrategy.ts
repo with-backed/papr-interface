@@ -12,8 +12,10 @@ import {
 import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 import { Config } from './config';
+import { subgraphStrategyByAddress } from './pAPRSubgraph';
 import { buildToken, convertONEScaledPercent, ERC20Token } from './strategies';
 import { getPool } from './strategies/uniswap';
+import { subgraphUniswapPoolById } from './uniswapSubgraph';
 
 export type LendingStrategy = SubgraphStrategy & LendingStrategyInternal;
 export type SubgraphStrategy = NonNullable<
@@ -188,4 +190,31 @@ class LendingStrategyInternal {
       ? this.subgraphPool.token0
       : this.subgraphPool.token1;
   }
+}
+
+/**
+ * Returns an object containing the subgraph data required to instantiate
+ * LendingStrategy, or returns null if any subgraph data is not found.
+ *
+ * TODO: fallback to node?
+ */
+export async function fetchSubgraphData(strategyAddress: string) {
+  const subgraphStrategy = await subgraphStrategyByAddress(strategyAddress);
+
+  if (!subgraphStrategy?.lendingStrategy) {
+    return null;
+  }
+
+  const subgraphPool = await subgraphUniswapPoolById(
+    subgraphStrategy.lendingStrategy.poolAddress,
+  );
+
+  if (!subgraphPool?.pool) {
+    return null;
+  }
+
+  return {
+    lendingStrategy: subgraphStrategy.lendingStrategy,
+    pool: subgraphPool.pool,
+  };
 }

@@ -6,13 +6,12 @@ import { useConfig } from 'hooks/useConfig';
 import { SupportedNetwork } from 'lib/config';
 import { makeProvider } from 'lib/contracts';
 import {
+  fetchSubgraphData,
   makeLendingStrategy,
   SubgraphPool,
   SubgraphStrategy,
 } from 'lib/LendingStrategy';
-import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
-import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -34,29 +33,21 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   const network = context.params?.network as SupportedNetwork;
   const id = context.params?.id as string;
 
-  const subgraphStrategy = await subgraphStrategyByAddress(address);
+  const strategySubgraphData = await fetchSubgraphData(address);
 
-  if (!subgraphStrategy?.lendingStrategy) {
+  if (!strategySubgraphData) {
     return {
       notFound: true,
     };
   }
 
-  const subgraphPool = await subgraphUniswapPoolById(
-    subgraphStrategy.lendingStrategy.poolAddress,
-  );
-
-  if (!subgraphPool?.pool) {
-    return {
-      notFound: true,
-    };
-  }
+  const { pool, lendingStrategy } = strategySubgraphData;
 
   return {
     props: {
       vaultId: id,
-      subgraphStrategy: subgraphStrategy.lendingStrategy,
-      subgraphPool: subgraphPool.pool,
+      subgraphStrategy: lendingStrategy,
+      subgraphPool: pool,
     },
   };
 };

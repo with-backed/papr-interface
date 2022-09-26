@@ -1,13 +1,12 @@
 import { SupportedNetwork } from 'lib/config';
-import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { strategyPricesData, StrategyPricesData } from 'lib/strategies/charts';
 import { GetServerSideProps } from 'next';
 import {
   BorrowPageContent,
   BorrowPageProps,
 } from 'components/Strategy/BorrowPageContent';
-import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import {
+  fetchSubgraphData,
   makeLendingStrategy,
   SubgraphPool,
   SubgraphStrategy,
@@ -30,29 +29,21 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   const address = (context.params?.strategy as string).toLowerCase();
   const network = context.params?.network as SupportedNetwork;
 
-  const subgraphStrategy = await subgraphStrategyByAddress(address);
+  const strategySubgraphData = await fetchSubgraphData(address);
 
-  if (!subgraphStrategy?.lendingStrategy) {
+  if (!strategySubgraphData) {
     return {
       notFound: true,
     };
   }
 
-  const subgraphPool = await subgraphUniswapPoolById(
-    subgraphStrategy.lendingStrategy.poolAddress,
-  );
-
-  if (!subgraphPool?.pool) {
-    return {
-      notFound: true,
-    };
-  }
+  const { pool, lendingStrategy } = strategySubgraphData;
 
   return {
     props: {
       strategyAddress: address,
-      subgraphStrategy: subgraphStrategy.lendingStrategy,
-      subgraphPool: subgraphPool.pool,
+      subgraphStrategy: lendingStrategy,
+      subgraphPool: pool,
     },
   };
 };
