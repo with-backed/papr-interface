@@ -37,7 +37,11 @@ export function AccountNFTs({
   }>({});
 
   const collateralContract = useMemo(() => {
+<<<<<<< HEAD
     return erc721Contract(strategy.collateralAddress, signer!);
+=======
+    return erc721Contract(strategy.allowedCollateral.contract.address, signer!);
+>>>>>>> ff85274 (more progress)
   }, [strategy, signer]);
 
   const isNFTApproved = useCallback(

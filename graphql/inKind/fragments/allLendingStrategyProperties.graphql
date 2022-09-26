@@ -7,4 +7,9 @@ fragment allLendingStrategyProperties on LendingStrategy {
   underlying
   norm
   targetAPR
+  allowedCollateral(where: { allowed: true }) {
+    id
+    contractAddress
+    allowed
+  }
 }

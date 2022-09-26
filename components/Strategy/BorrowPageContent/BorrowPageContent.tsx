@@ -27,7 +27,11 @@ export function BorrowPageContent({
 
   const { userCollectionNFTs, nftsLoading } = useCenterNFTs(
     address,
+<<<<<<< HEAD
     lendingStrategy.collateralAddress,
+=======
+    lendingStrategy?.allowedCollateral.contract.address,
+>>>>>>> ff85274 (more progress)
     config,
   );
   const [nftsSelected, setNFTsSelected] = useState<string[]>([]);
@@ -42,7 +46,11 @@ export function BorrowPageContent({
   return (
     <div className={strategyStyles.wrapper}>
       <StrategiesToBorrowFrom
+<<<<<<< HEAD
         legend={`Borrow: $papr${lendingStrategy.underlying.symbol}_${lendingStrategy.symbol}${maxLTVPercent}`}
+=======
+        legend={`Borrow: $papr${lendingStrategy.underlying.symbol}_${lendingStrategy.allowedCollateral.symbol}${lendingStrategy.maxLTVPercent}`}
+>>>>>>> ff85274 (more progress)
         strategies={[lendingStrategy]}
         pricesData={{ [lendingStrategy.id]: pricesData }}
         includeDetails

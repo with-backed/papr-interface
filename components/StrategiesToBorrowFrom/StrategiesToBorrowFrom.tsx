@@ -172,7 +172,11 @@ export default function StrategiesToBorrowFrom({
                       <TooltipReference {...tokenTooltip}>
                         <p>
                           $papr{strategy.underlying.symbol}_
+<<<<<<< HEAD
                           {strategy.collateralSymbol}
+=======
+                          {strategy.allowedCollateral.symbol}
+>>>>>>> ff85274 (more progress)
                           {strategy.maxLTVPercent}
                         </p>
                       </TooltipReference>

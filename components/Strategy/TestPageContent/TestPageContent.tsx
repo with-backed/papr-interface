@@ -22,7 +22,11 @@ export function TestPageContent({ lendingStrategy }: TestPageContentProps) {
       <div className={styles.wrapper}>
         <div className={strategyStyles.column}>
           <MintERC20 token={lendingStrategy.underlying} />
+<<<<<<< HEAD
           <MintCollateral token={collateral} />
+=======
+          <MintCollateral token={lendingStrategy.allowedCollateral} />
+>>>>>>> ff85274 (more progress)
         </div>
       </div>
     </div>

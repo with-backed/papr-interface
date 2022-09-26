@@ -107,7 +107,11 @@ export function OpenVault({
   const [approvalsLoading, setApprovalsLoading] = useState<boolean>(false);
 
   const collateralContract = useMemo(() => {
+<<<<<<< HEAD
     return erc721Contract(strategy.collateralAddress, signer!);
+=======
+    return erc721Contract(strategy.allowedCollateral.contract.address, signer!);
+>>>>>>> ff85274 (more progress)
   }, [strategy, signer]);
 
   const addCollateralAndSwap = useCallback(async () => {
@@ -169,7 +173,11 @@ export function OpenVault({
       const addCollateralArgs = tokenIds.map((tokenId) => ({
         ...baseAddCollateralRequest,
         collateral: {
+<<<<<<< HEAD
           addr: strategy.collateralAddress,
+=======
+          addr: strategy.allowedCollateral.contract.address,
+>>>>>>> ff85274 (more progress)
           id: ethers.BigNumber.from(tokenId),
         },
       }));
