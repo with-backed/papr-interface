@@ -6,7 +6,7 @@ import { StrategyPricesData } from 'lib/strategies/charts';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
-import { Tooltip, TooltipReference, useTooltipState } from 'reakit';
+import { TooltipReference, useTooltipState } from 'reakit';
 
 import styles from './strategiesToBorrowFrom.module.css';
 import {
@@ -172,7 +172,6 @@ export default function StrategiesToBorrowFrom({
                       <TooltipReference {...tokenTooltip}>
                         <p>
                           $papr{strategy.underlying.symbol}_
-                          {strategy.collateralSymbol}
                           {strategy.maxLTVPercent}
                         </p>
                       </TooltipReference>

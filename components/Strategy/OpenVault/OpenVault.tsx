@@ -12,12 +12,11 @@ import { useCallback, useEffect, useState, useMemo } from 'react';
 import { PRICE } from 'lib/strategies/constants';
 import LendingStrategyABI from 'abis/Strategy.json';
 import { ILendingStrategy } from 'types/generated/abis/Strategy';
-import { useAccount, useSigner } from 'wagmi';
+import { useAccount } from 'wagmi';
 import styles from './OpenVault.module.css';
 import VaultMath from './VaultMath';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
-import { erc721Contract } from 'lib/contracts';
 import { getAddress } from 'ethers/lib/utils';
 import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
 import { LendingStrategy } from 'lib/LendingStrategy';
@@ -86,7 +85,6 @@ export function OpenVault({
   pricesData,
 }: BorrowProps) {
   const { address } = useAccount();
-  const { data: signer } = useSigner();
 
   const [debt, setDebt] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
   const [maxDebt, setMaxDebt] = useState<ethers.BigNumber>(
@@ -106,12 +104,10 @@ export function OpenVault({
   const [nftsApproved, setNFTsApproved] = useState<string[]>([]);
   const [approvalsLoading, setApprovalsLoading] = useState<boolean>(false);
 
-  const collateralContract = useMemo(() => {
-    return erc721Contract(strategy.collateralAddress, signer!);
-  }, [strategy, signer]);
-
   const addCollateralAndSwap = useCallback(async () => {
-    const tokenIds = nftsSelected.map((id) => deconstructFromId(id)[1]);
+    const contractsAndTokenIds = nftsSelected.map((id) =>
+      deconstructFromId(id),
+    );
 
     const nextNonce = await getNextVaultNonceForUser(strategy, address!);
     const vaultNonce = ethers.BigNumber.from(nextNonce).add(1);
@@ -133,7 +129,7 @@ export function OpenVault({
       s: ethers.utils.formatBytes32String('y'),
     };
 
-    if (tokenIds.length === 1) {
+    if (contractsAndTokenIds.length === 1) {
       const erc721ReceivedArgs: OnERC721ReceivedArgsStruct = {
         debt: debtForArgs,
         vaultNonce,
@@ -145,12 +141,16 @@ export function OpenVault({
         sig,
       };
 
+      const collateralContract = strategy.collateralContracts.find(
+        (c) => getAddress(c.address) === getAddress(contractsAndTokenIds[0][0]),
+      )!;
+
       await collateralContract[
         'safeTransferFrom(address,address,uint256,bytes)'
       ](
         address!,
         strategy.id,
-        ethers.BigNumber.from(tokenIds[0]),
+        ethers.BigNumber.from(contractsAndTokenIds[0][1]),
         ethers.utils.defaultAbiCoder.encode(
           [OnERC721ReceivedArgsEncoderString],
           [erc721ReceivedArgs],
@@ -161,18 +161,20 @@ export function OpenVault({
       );
     } else {
       const baseAddCollateralRequest: Partial<AddCollateralArgsStruct> = {
-        vaultNonce: ethers.BigNumber.from(nextNonce),
+        vaultNonce,
         oracleInfo,
         sig,
       };
 
-      const addCollateralArgs = tokenIds.map((tokenId) => ({
-        ...baseAddCollateralRequest,
-        collateral: {
-          addr: strategy.collateralAddress,
-          id: ethers.BigNumber.from(tokenId),
-        },
-      }));
+      const addCollateralArgs = contractsAndTokenIds.map(
+        ([contractAddress, tokenId]) => ({
+          ...baseAddCollateralRequest,
+          collateral: {
+            addr: contractAddress,
+            id: ethers.BigNumber.from(tokenId),
+          },
+        }),
+      );
 
       const lendingStrategyIFace = new ethers.utils.Interface(
         LendingStrategyABI.abi,
@@ -213,15 +215,7 @@ export function OpenVault({
         .then(() => console.log('success')) // TODO(adamgobes): redirect to vault page once thats fleshed out
         .catch((e) => console.log({ e }));
     }
-  }, [
-    address,
-    collateralContract,
-    nftsSelected,
-    debt,
-    strategy,
-    quoteForSwap,
-    tokenOut.decimals,
-  ]);
+  }, [address, nftsSelected, debt, strategy, quoteForSwap, tokenOut.decimals]);
 
   // TODO: I think useCallback may not be able to introspect the debounced
   // function this produces. May need to either manually handle debounce with
@@ -260,20 +254,23 @@ export function OpenVault({
   const maxLTV = useAsyncValue(() => strategy.maxLTVPercent(), [strategy]);
 
   const isNFTApproved = useCallback(
-    async (tokenId: string) => {
+    async (contractAddress: string, tokenId: string) => {
+      const collateralContract = strategy.collateralContracts.find(
+        (c) => getAddress(c.address) === getAddress(contractAddress),
+      )!;
       const approved =
         getAddress(await collateralContract.getApproved(tokenId)) ===
           getAddress(strategy.id) ||
         (await collateralContract.isApprovedForAll(address!, strategy.id));
       return approved;
     },
-    [strategy, collateralContract, address],
+    [strategy, address],
   );
 
   const initializeNFTsApproved = useCallback(async () => {
     const nftApprovals = await Promise.all(
       userCollectionNFTs.map(async (nft) => {
-        return (await isNFTApproved(nft.tokenId))
+        return (await isNFTApproved(nft.address, nft.tokenId))
           ? getUniqueNFTId(nft.address, nft.tokenId)
           : '';
       }),
@@ -288,15 +285,18 @@ export function OpenVault({
 
   const performApproveAll = useCallback(async () => {
     setApprovalsLoading(true);
-    await collateralContract.setApprovalForAll(strategy.id, true).then(() => {
-      setApprovalsLoading(false);
-      setNFTsApproved(
-        userCollectionNFTs.map((nft) =>
-          getUniqueNFTId(nft.address, nft.tokenId),
-        ),
-      );
-    });
-  }, [collateralContract, userCollectionNFTs, strategy]);
+    for (let i = 0; i < userCollectionNFTs.length; i++) {
+      const nft = userCollectionNFTs[i];
+      const collateralContract = strategy.collateralContracts.find(
+        (c) => getAddress(c.address) === getAddress(nft.address),
+      )!;
+      await collateralContract.setApprovalForAll(strategy.id, true);
+    }
+    setNFTsApproved(
+      userCollectionNFTs.map((nft) => getUniqueNFTId(nft.address, nft.tokenId)),
+    );
+    setApprovalsLoading(false);
+  }, [userCollectionNFTs, strategy]);
 
   const borrowDisabled = useMemo(() => {
     const allSelectedAreApproved =
