@@ -14,15 +14,20 @@ type TestPageContentProps = {
 export function TestPageContent({ lendingStrategy }: TestPageContentProps) {
   const { data: signer } = useSigner();
   const collateral = useMemo(
-    () => erc721Contract(lendingStrategy.collateralAddress, signer!),
-    [lendingStrategy, signer],
+    () =>
+      lendingStrategy.allowedCollateral.map((ac) =>
+        erc721Contract(ac.contractAddress, signer!),
+      ),
+    [lendingStrategy.allowedCollateral, signer],
   );
   return (
     <div className={strategyStyles.wrapper}>
       <div className={styles.wrapper}>
         <div className={strategyStyles.column}>
           <MintERC20 token={lendingStrategy.underlying} />
-          <MintCollateral token={collateral} />
+          {collateral.map((c) => (
+            <MintCollateral token={c} key={c.address} />
+          ))}
         </div>
       </div>
     </div>
