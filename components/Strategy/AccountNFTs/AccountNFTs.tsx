@@ -56,14 +56,15 @@ export function AccountNFTs({
         {!address && (
           <div>
             <p>
-              Connect wallet to see strategies that lend to an NFT you have.
+              Connect wallet to see if you have NFTs that this strategy lends
+              to.
             </p>
           </div>
         )}
         {userCollectionNFTs.length === 0 && !!address && (
           <div>
             <p>
-              No lending strategies currently use any of your NFTs as
+              This lending strategy currently does not use any of your NFTs as
               collateral.
             </p>
           </div>
