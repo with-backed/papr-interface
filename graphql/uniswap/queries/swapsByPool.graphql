@@ -8,5 +8,8 @@ query swapsByPool($pool: String) {
     amount1
     amountUSD
     sqrtPriceX96
+    transaction {
+      id
+    }
   }
 }

@@ -3,6 +3,7 @@ import {
   EtherscanTransactionLink,
 } from 'components/EtherscanLink';
 import { Fieldset } from 'components/Fieldset';
+import { ethers } from 'ethers';
 import { humanizedTimestamp } from 'lib/duration';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import React, { useMemo } from 'react';
@@ -85,7 +86,13 @@ export function Activity({ lendingStrategy }: ActivityProps) {
             case 'RemoveCollateralEvent':
               return <CollateralRemoved event={event} key={event.id} />;
             case 'Swap':
-              return <Swap event={event} key={event.id} />;
+              return (
+                <Swap
+                  event={event}
+                  key={event.id}
+                  lendingStrategy={lendingStrategy}
+                />
+              );
           }
         })}
       </ul>
@@ -117,7 +124,14 @@ function CollateralAdded({
     return debtIncreasedEvents.find((e) => e.txHash === event.txHash);
   }, [debtIncreasedEvents, event]);
 
-  console.log({ debtIncreasedEvents, hash: event.txHash });
+  const borrowedAmount = useMemo(() => {
+    return ethers.utils.formatUnits(
+      debtIncreasedEvent?.amount,
+      lendingStrategy.token0IsUnderlying
+        ? lendingStrategy.subgraphPool.token0.decimals
+        : lendingStrategy.subgraphPool.token1.decimals,
+    );
+  }, [debtIncreasedEvent, lendingStrategy]);
 
   return (
     <li className={styles.event}>
@@ -128,7 +142,7 @@ function CollateralAdded({
         <EtherscanAddressLink address={vaultOwner}>
           {vaultOwner.substring(0, 8)}
         </EtherscanAddressLink>{' '}
-        deposited #{event.collateral.tokenId} and borrowed $XX,XXX
+        deposited #{event.collateral.tokenId} and borrowed {borrowedAmount}
       </span>
     </li>
   );
@@ -152,6 +166,33 @@ function DebtIncreased({}: {
   return <div>debt increased</div>;
 }
 
-function Swap({}: { event: ArrayElement<SwapsByPoolQuery['swaps']> }) {
-  return <div>Swap</div>;
+function Swap({
+  event,
+  lendingStrategy,
+}: {
+  event: ArrayElement<SwapsByPoolQuery['swaps']>;
+  lendingStrategy: LendingStrategy;
+}) {
+  const description = useMemo(() => {
+    const formatter = new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: 2,
+    });
+    const amount0 = formatter.format(Math.abs(event.amount0));
+    const amount1 = formatter.format(Math.abs(event.amount1));
+    const token0Symbol = lendingStrategy.subgraphPool.token0.symbol;
+    const token1Symbol = lendingStrategy.subgraphPool.token1.symbol;
+
+    if (event.amount0 < 0) {
+      return `${amount0} ${token0Symbol} sold for ${amount1} ${token1Symbol}`;
+    }
+    return `${amount1} ${token1Symbol} sold for ${amount0} ${token0Symbol}`;
+  }, [event, lendingStrategy]);
+  return (
+    <li className={styles.event}>
+      <EtherscanTransactionLink transactionHash={event.transaction.id}>
+        {humanizedTimestamp(event.timestamp)}
+      </EtherscanTransactionLink>
+      <span>{description}</span>
+    </li>
+  );
 }
