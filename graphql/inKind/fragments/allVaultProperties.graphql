@@ -6,4 +6,9 @@ fragment allVaultProperties on Vault {
   tokenId
   nonce
   debt
+  collateral {
+    id
+    contractAddress
+    tokenId
+  }
 }

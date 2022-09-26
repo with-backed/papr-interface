@@ -585,6 +585,13 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@center-inc/api-client@0.5.2":
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/@center-inc/api-client/-/api-client-0.5.2.tgz#7a08a5a169088205720a6acac191254c06f8c350"
+  integrity sha512-RMQxAzy0sB9B2RTSVA0LQmQPo0DRxsEem3bMxjlK4+wP5ZvTIoBrLTZhnZ23zALxfPGLsUQbVdC6laoDrY8z+g==
+  dependencies:
+    form-data "^4.0.0"
+
 "@coinbase/wallet-sdk@^3.3.0":
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/@coinbase/wallet-sdk/-/wallet-sdk-3.3.0.tgz#e77383bce1388e5367dc35f8309702e73be47503"
@@ -8067,6 +8074,13 @@ next@12.1.0:
     "@next/swc-win32-arm64-msvc" "12.1.0"
     "@next/swc-win32-ia32-msvc" "12.1.0"
     "@next/swc-win32-x64-msvc" "12.1.0"
+
+nft-react@^0.5.10:
+  version "0.5.10"
+  resolved "https://registry.yarnpkg.com/nft-react/-/nft-react-0.5.10.tgz#e7c41cfa53bae02d0bfd62b889c3c5129ce6b4e0"
+  integrity sha512-GLPaaaNlXjwdHRDVpVSFfuYzlNNgmKPC37rvCDT8kOSKx+utsoaym6A7ThJZ9gXpk3o1BK9YktFoGHKG7bnBQg==
+  dependencies:
+    "@center-inc/api-client" "0.5.2"
 
 no-case@^3.0.4:
   version "3.0.4"
