@@ -107,9 +107,6 @@ class LendingStrategyInternal {
       signerOrProvider,
     );
     this.multicall = this._contract.multicall;
-    console.log({
-      allowedCollateral: this._subgraphStrategy.allowedCollateral,
-    });
     this.collateralContracts = this._subgraphStrategy.allowedCollateral.map(
       (c) => {
         return ERC721__factory.connect(c.contractAddress, signerOrProvider);

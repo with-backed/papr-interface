@@ -130,6 +130,7 @@ export function OpenVault({
     };
 
     if (contractsAndTokenIds.length === 1) {
+      const [contractAddress, tokenId] = contractsAndTokenIds[0];
       const erc721ReceivedArgs: OnERC721ReceivedArgsStruct = {
         debt: debtForArgs,
         vaultNonce,
@@ -142,7 +143,7 @@ export function OpenVault({
       };
 
       const collateralContract = strategy.collateralContracts.find(
-        (c) => getAddress(c.address) === getAddress(contractsAndTokenIds[0][0]),
+        (c) => getAddress(c.address) === getAddress(contractAddress),
       )!;
 
       await collateralContract[
@@ -150,7 +151,7 @@ export function OpenVault({
       ](
         address!,
         strategy.id,
-        ethers.BigNumber.from(contractsAndTokenIds[0][1]),
+        ethers.BigNumber.from(tokenId),
         ethers.utils.defaultAbiCoder.encode(
           [OnERC721ReceivedArgsEncoderString],
           [erc721ReceivedArgs],
