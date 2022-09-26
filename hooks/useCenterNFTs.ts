@@ -46,13 +46,13 @@ export const useCenterNFTs = (
       setUserCollectionNFTs(allNFTsFromCollections.flat());
       setNFTsLoading(false);
     },
-    [address, collections, config],
+    [config],
   );
 
   useEffect(() => {
     if (!address || !collections) return;
     getAllUserNFTs(address, collections);
-  }, [address, collections]);
+  }, [address, collections, getAllUserNFTs]);
 
   return { userCollectionNFTs, nftsLoading };
 };
