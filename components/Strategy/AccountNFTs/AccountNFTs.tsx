@@ -1,17 +1,8 @@
 import { Fieldset } from 'components/Fieldset';
-import { getAddress } from 'ethers/lib/utils';
 import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
-import { erc721Contract } from 'lib/contracts';
 import { getUniqueNFTId } from 'lib/strategies';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
-import { useAccount, useSigner } from 'wagmi';
+import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 import styles from './AccountNFTs.module.css';
 
 export type AccountNFTsProps = {
@@ -29,28 +20,6 @@ export function AccountNFTs({
   nftsSelected,
   setNFTsSelected,
 }: AccountNFTsProps) {
-  const { address } = useAccount();
-  const { data: signer } = useSigner();
-
-  const [approvalsLoading, setApprovalsLoading] = useState<{
-    [key: string]: boolean;
-  }>({});
-
-  const collateralContract = useMemo(() => {
-    return erc721Contract(strategy.collateralAddress, signer!);
-  }, [strategy, signer]);
-
-  const isNFTApproved = useCallback(
-    async (tokenId: string) => {
-      const approved =
-        getAddress(await collateralContract.getApproved(tokenId)) ===
-          getAddress(strategy.id) ||
-        (await collateralContract.isApprovedForAll(address!, strategy.id));
-      return approved;
-    },
-    [strategy, collateralContract, address],
-  );
-
   const handleNFTSelected = useCallback(
     (address: string, tokenId: string, checked: boolean) => {
       setNFTsSelected((prevNFTSelected) => {

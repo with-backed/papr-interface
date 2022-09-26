@@ -6,6 +6,8 @@ import {
   IUniswapV3Pool__factory,
   ERC20__factory,
   ERC20,
+  ERC721,
+  ERC721__factory,
 } from 'types/generated/abis';
 import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
@@ -76,14 +78,11 @@ class LendingStrategyInternal {
   private _signerOrProvider: SignerOrProvider;
   private _subgraphStrategy: SubgraphStrategy;
 
-  // TODO: make real
-  collateralAddress = process.env.NEXT_PUBLIC_MOCK_APE as string;
-  collateralSymbol = 'FAPE';
-
   multicall: Strategy['multicall'];
   subgraphPool: SubgraphPool;
   token0: ERC20;
   token1: ERC20;
+  collateralContracts: ERC721[];
 
   constructor(
     subgraphStrategy: SubgraphStrategy,
@@ -108,6 +107,11 @@ class LendingStrategyInternal {
       signerOrProvider,
     );
     this.multicall = this._contract.multicall;
+    this.collateralContracts = this._subgraphStrategy.allowedCollateral.map(
+      (c) => {
+        return ERC721__factory.connect(c.contractAddress, signerOrProvider);
+      },
+    );
   }
 
   index() {
