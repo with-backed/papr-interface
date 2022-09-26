@@ -12,5 +12,15 @@ query poolById($id: ID!) {
       symbol
       name
     }
+    swaps {
+      id
+      timestamp
+      sender
+      recipient
+      amount0
+      amount1
+      amountUSD
+      sqrtPriceX96
+    }
   }
 }

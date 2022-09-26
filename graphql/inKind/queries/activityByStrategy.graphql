@@ -1,0 +1,42 @@
+query activityByStrategy($strategyId: String) {
+  addCollateralEvents(where: { strategy: $strategyId }) {
+    id
+    timestamp
+    vault {
+      id
+    }
+    collateral {
+      id
+      contractAddress
+      tokenId
+    }
+  }
+  removeCollateralEvents(where: { strategy: $strategyId }) {
+    id
+    timestamp
+    vault {
+      id
+    }
+    collateral {
+      id
+      contractAddress
+      tokenId
+    }
+  }
+  debtDecreasedEvents(where: { strategy: $strategyId }) {
+    id
+    timestamp
+    vault {
+      id
+    }
+    amount
+  }
+  debtIncreasedEvents(where: { strategy: $strategyId }) {
+    id
+    timestamp
+    vault {
+      id
+    }
+    amount
+  }
+}
