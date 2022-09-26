@@ -1,5 +1,4 @@
 import { GetServerSideProps } from 'next';
-import { subgraphStrategyByAddress } from 'lib/pAPRSubgraph';
 import { strategyPricesData, StrategyPricesData } from 'lib/strategies/charts';
 import { SupportedNetwork } from 'lib/config';
 import {
@@ -8,13 +7,13 @@ import {
 } from 'components/Strategy/StrategyOverviewContent';
 import { useEffect, useMemo, useState } from 'react';
 import {
+  fetchSubgraphData,
   makeLendingStrategy,
   SubgraphPool,
   SubgraphStrategy,
 } from 'lib/LendingStrategy';
 import { useSigner } from 'wagmi';
 import { useConfig } from 'hooks/useConfig';
-import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 
 type ServerSideProps = Omit<
   StrategyPageProps,
@@ -30,29 +29,21 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   const address = (context.params?.strategy as string).toLowerCase();
   const network = context.params?.network as SupportedNetwork;
 
-  const subgraphStrategy = await subgraphStrategyByAddress(address);
+  const strategySubgraphData = await fetchSubgraphData(address);
 
-  if (!subgraphStrategy?.lendingStrategy) {
+  if (!strategySubgraphData) {
     return {
       notFound: true,
     };
   }
 
-  const subgraphPool = await subgraphUniswapPoolById(
-    subgraphStrategy.lendingStrategy.poolAddress,
-  );
-
-  if (!subgraphPool?.pool) {
-    return {
-      notFound: true,
-    };
-  }
+  const { pool, lendingStrategy } = strategySubgraphData;
 
   return {
     props: {
       address: address,
-      subgraphStrategy: subgraphStrategy.lendingStrategy,
-      subgraphPool: subgraphPool.pool,
+      subgraphStrategy: lendingStrategy,
+      subgraphPool: pool,
     },
   };
 };
