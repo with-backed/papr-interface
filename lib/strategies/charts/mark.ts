@@ -33,11 +33,12 @@ export async function markValues(
   // add an artifial data point at the current timestamp
   // could also use the uniswap Pool object and fetch price
   // TODO consider fetching mark from contract? But need to convert back to sqrtPriceX96
+  // TODO: had to cast this dummy value to satisfy new type, should figure out a better way
   if (sortedSwaps.length > 0) {
     sortedSwaps.push({
       sqrtPriceX96: sortedSwaps[sortedSwaps.length - 1].sqrtPriceX96,
       timestamp: now,
-    });
+    } as any);
   }
 
   let dprValues: ChartValue[] = [];
