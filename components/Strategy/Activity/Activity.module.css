@@ -1,0 +1,10 @@
+.event {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 21px;
+}
+
+.feed {
+  padding: 0;
+  margin: 0;
+}

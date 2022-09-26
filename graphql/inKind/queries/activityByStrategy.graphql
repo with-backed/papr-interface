@@ -10,6 +10,7 @@ query activityByStrategy($strategyId: String) {
       contractAddress
       tokenId
     }
+    txHash
   }
   removeCollateralEvents(where: { strategy: $strategyId }) {
     id
@@ -22,6 +23,7 @@ query activityByStrategy($strategyId: String) {
       contractAddress
       tokenId
     }
+    txHash
   }
   debtDecreasedEvents(where: { strategy: $strategyId }) {
     id
@@ -30,6 +32,7 @@ query activityByStrategy($strategyId: String) {
       id
     }
     amount
+    txHash
   }
   debtIncreasedEvents(where: { strategy: $strategyId }) {
     id
@@ -38,5 +41,6 @@ query activityByStrategy($strategyId: String) {
       id
     }
     amount
+    txHash
   }
 }
