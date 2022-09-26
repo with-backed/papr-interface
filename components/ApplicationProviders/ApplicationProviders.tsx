@@ -93,7 +93,9 @@ export const ApplicationProviders = ({
             disclaimer: Disclaimer,
           }}>
           {/* TODO: make this typesafe? */}
-          <CenterProvider network={centerNetwork as any}>
+          <CenterProvider
+            network={centerNetwork as any}
+            apiKey={process.env.NEXT_PUBLIC_CENTER_KEY!}>
             <TimestampProvider>
               <CachedRatesProvider>
                 <CommunityGradientProvider>
