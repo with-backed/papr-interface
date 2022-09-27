@@ -9,6 +9,7 @@ query activityByStrategy($strategyId: String) {
       id
       contractAddress
       tokenId
+      symbol
     }
     txHash
   }
@@ -22,6 +23,7 @@ query activityByStrategy($strategyId: String) {
       id
       contractAddress
       tokenId
+      symbol
     }
     txHash
   }

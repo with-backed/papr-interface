@@ -155,7 +155,8 @@ function CollateralAdded({
           <EtherscanAddressLink address={vaultOwner}>
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
-          deposited #{event.collateral.tokenId} and borrowed {borrowedAmount}
+          deposited {event.collateral.symbol} #{event.collateral.tokenId} and
+          borrowed {borrowedAmount}
         </span>
       </td>
     </tr>
@@ -207,7 +208,8 @@ function CollateralRemoved({
           <EtherscanAddressLink address={vaultOwner}>
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
-          returned {returnedAmount} and reclaimed #{event.collateral.tokenId}
+          returned {returnedAmount} and reclaimed {event.collateral.symbol} #
+          {event.collateral.tokenId}
         </span>
       </td>
     </tr>
