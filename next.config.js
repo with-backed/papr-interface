@@ -16,7 +16,9 @@ const moduleExports = {
     return [
       {
         source: '/',
-        destination: `/network/${process.env.NEXT_PUBLIC_ENV}`,
+        destination: `/network/${
+          process.env.NEXT_PUBLIC_ENV === 'preview' ? 'goerli' : 'ethereum'
+        }`,
         permanent: false,
       },
     ];
