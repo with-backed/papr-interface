@@ -14,25 +14,9 @@ const moduleExports = {
   },
   async redirects() {
     return [
-      { source: '/', destination: '/network/ethereum', permanent: false },
       {
-        source: '/loans/:id',
-        destination: '/network/ethereum/loans/:id',
-        permanent: false,
-      },
-      {
-        source: '/loans/create',
-        destination: '/network/ethereum/loans/create',
-        permanent: false,
-      },
-      {
-        source: '/profile/:address',
-        destination: '/network/ethereum/profile/:address',
-        permanent: false,
-      },
-      {
-        source: '/test',
-        destination: '/network/rinkeby/test',
+        source: '/',
+        destination: `/network/${process.env.NEXT_PUBLIC_ENV}`,
         permanent: false,
       },
     ];

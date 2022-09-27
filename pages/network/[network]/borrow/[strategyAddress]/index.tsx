@@ -26,7 +26,7 @@ type ServerSideProps = Omit<
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
-  const address = (context.params?.strategy as string).toLowerCase();
+  const address = (context.params?.strategyAddress as string).toLowerCase();
   const network = context.params?.network as SupportedNetwork;
 
   const strategySubgraphData = await fetchSubgraphData(address);

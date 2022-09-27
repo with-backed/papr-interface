@@ -17,7 +17,11 @@ type Page = {
   isNetworkSpecialCase?: boolean;
 };
 const prodPages: Page[] = [
-  { name: 'Borrow', route: 'borrow' },
+  {
+    name: 'Borrow',
+    // TODO: in the single-strategy case, we should have the deployed strategy in the config for each network.
+    route: 'borrow/0x41739c3547992ca3f2a40d110ad33afeb582eb7c',
+  },
   { name: 'Swap', route: 'swap' },
   { name: 'LP', route: 'lp' },
   { name: 'Community', route: 'community', isNetworkSpecialCase: true },
