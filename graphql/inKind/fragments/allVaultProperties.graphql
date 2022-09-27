@@ -12,4 +12,5 @@ fragment allVaultProperties on Vault {
     tokenId
     symbol
   }
+  totalCollateralValue
 }
