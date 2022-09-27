@@ -11,6 +11,7 @@ export default function MintCollateral({ token }: MintCollateralProps) {
   const [balance, setBalance] = useState<string>('');
   const { address } = useAccount();
   const { data: signer } = useSigner();
+  const [symbol, setSymbol] = useState<string>('');
 
   const getBalance = useCallback(async () => {
     if (address) {
@@ -18,6 +19,12 @@ export default function MintCollateral({ token }: MintCollateralProps) {
       setBalance(b.toString());
     }
   }, [address, token]);
+
+  const getSymbol = useCallback(async () => {
+    if (token) {
+      setSymbol(await token.symbol());
+    }
+  }, [token]);
 
   const mint = useCallback(async () => {
     if (signer == null || address == null) {
@@ -32,11 +39,12 @@ export default function MintCollateral({ token }: MintCollateralProps) {
 
   useEffect(() => {
     getBalance();
-  }, [getBalance]);
+    getSymbol();
+  }, [getBalance, getSymbol]);
 
   return (
-    <Fieldset legend={`➕ Mint yourself ${token.symbol}`}>
-      <p> your balance: {balance || 'not connected'} </p>
+    <Fieldset legend={`Mint yourself ${symbol}`}>
+      <p> your balance: {balance || 0} </p>
       <button disabled={!address} onClick={mint}>
         mint
       </button>

@@ -1,3 +1,7 @@
 .wrapper {
   margin-top: 40px;
 }
+
+.wrapper fieldset {
+  margin: 20px 0;
+}
