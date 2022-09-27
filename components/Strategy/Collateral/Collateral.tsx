@@ -24,9 +24,40 @@ export function Collateral({ lendingStrategy: { vaults } }: CollateralProps) {
 
   return (
     <Fieldset legend="🖼 Collateral">
-      {collateral.map(({ id, contractAddress, tokenId }) => {
-        <Asset key={id} address={contractAddress} tokenId={tokenId} />;
-      })}
+      <table className={styles.table}>
+        <thead>
+          <tr className={styles['header-row']}>
+            <th aria-hidden></th>
+            <th>ID</th>
+          </tr>
+        </thead>
+        <tbody className={styles.body}>
+          {collateral.map(({ id, contractAddress, tokenId }) => (
+            <Row key={id} contractAddress={contractAddress} tokenId={tokenId} />
+          ))}
+        </tbody>
+      </table>
+      <div className={styles.wrapper}></div>
     </Fieldset>
+  );
+}
+
+type RowProps = {
+  contractAddress: string;
+  tokenId: string;
+};
+
+function Row({ contractAddress, tokenId }: RowProps) {
+  return (
+    <tr className={styles.row}>
+      <td aria-hidden className={styles['thumbnail-container']}>
+        <div className={styles.thumbnail}>
+          <Asset address={contractAddress} tokenId={tokenId} preset="small" />
+        </div>
+      </td>
+      <td className={styles['token-id']}>
+        <span>#{tokenId}</span>
+      </td>
+    </tr>
   );
 }
