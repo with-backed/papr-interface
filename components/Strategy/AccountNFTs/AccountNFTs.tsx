@@ -43,8 +43,6 @@ export function AccountNFTs({
       .flat();
   }, [userVaultsData]);
 
-  console.log({ userVaultNFTIds });
-
   const handleNFTSelected = useCallback(
     (address: string, tokenId: string, checked: boolean) => {
       setNFTsSelected((prevNFTSelected) => {
