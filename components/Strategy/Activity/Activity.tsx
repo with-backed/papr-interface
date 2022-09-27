@@ -84,7 +84,16 @@ export function Activity({ lendingStrategy }: ActivityProps) {
                   />
                 );
               case 'RemoveCollateralEvent':
-                return <CollateralRemoved event={event} key={event.id} />;
+                return (
+                  <CollateralRemoved
+                    event={event}
+                    debtDecreasedEvents={
+                      activityData?.debtDecreasedEvents || []
+                    }
+                    lendingStrategy={lendingStrategy}
+                    key={event.id}
+                  />
+                );
               case 'Swap':
                 return (
                   <Swap
@@ -153,10 +162,56 @@ function CollateralAdded({
   );
 }
 
-function CollateralRemoved({}: {
+function CollateralRemoved({
+  event,
+  lendingStrategy,
+  debtDecreasedEvents,
+}: {
   event: ArrayElement<ActivityByStrategyQuery['removeCollateralEvents']>;
+  debtDecreasedEvents: ActivityByStrategyQuery['debtDecreasedEvents'];
+  lendingStrategy: LendingStrategy;
 }) {
-  return <div>Collateral removed</div>;
+  const vaultOwner = useMemo(() => {
+    const vaultId = event.vault.id;
+    const vault = lendingStrategy.vaults?.find((v) => v.id === vaultId);
+
+    if (!vault) {
+      return 'Unknown';
+    }
+
+    return vault.owner.id;
+  }, [event, lendingStrategy]);
+
+  const debtDecreasedEvent = useMemo(() => {
+    return debtDecreasedEvents.find((e) => e.txHash === event.txHash);
+  }, [debtDecreasedEvents, event]);
+
+  const returnedAmount = useMemo(() => {
+    return ethers.utils.formatUnits(
+      debtDecreasedEvent?.amount,
+      lendingStrategy.token0IsUnderlying
+        ? lendingStrategy.subgraphPool.token0.decimals
+        : lendingStrategy.subgraphPool.token1.decimals,
+    );
+  }, [debtDecreasedEvent, lendingStrategy]);
+
+  return (
+    <tr>
+      <td>
+        <EtherscanTransactionLink transactionHash={event.txHash}>
+          {humanizedTimestamp(event.timestamp)}
+        </EtherscanTransactionLink>
+      </td>
+      <td>
+        <span>
+          <EtherscanAddressLink address={vaultOwner}>
+            {vaultOwner.substring(0, 8)}
+          </EtherscanAddressLink>{' '}
+          returned {returnedAmount} and reclaimed #{event.collateral.tokenId}
+        </span>
+      </td>
+    </tr>
+  );
 }
 
 function Swap({
