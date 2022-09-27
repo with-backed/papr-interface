@@ -286,13 +286,15 @@ export function OpenVault({
 
   const performApproveAll = useCallback(async () => {
     setApprovalsLoading(true);
-    for (let i = 0; i < nftsSelected.length; i++) {
-      const [contractAddress, _tokenId] = deconstructFromId(nftsSelected[i]);
-      const collateralContract = strategy.collateralContracts.find(
-        (c) => getAddress(c.address) === getAddress(contractAddress),
-      )!;
-      await collateralContract.setApprovalForAll(strategy.id, true);
-    }
+    await Promise.all(
+      nftsSelected.map(async (id) => {
+        const [contractAddress, _tokenId] = deconstructFromId(id);
+        const collateralContract = strategy.collateralContracts.find(
+          (c) => getAddress(c.address) === getAddress(contractAddress),
+        )!;
+        await collateralContract.setApprovalForAll(strategy.id, true);
+      }),
+    );
     setNFTsApproved((prevNFTsApproved) => [
       ...prevNFTsApproved,
       ...nftsSelected,
