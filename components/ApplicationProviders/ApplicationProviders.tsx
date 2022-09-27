@@ -18,6 +18,7 @@ import {
   createClient as createUrqlClient,
   Provider as UrqlProvider,
 } from 'urql';
+import { CenterProvider } from 'nft-react';
 
 const prodChains = [chain.mainnet, chain.polygon, chain.optimism];
 const CHAINS =
@@ -41,7 +42,7 @@ type ApplicationProvidersProps = {};
 export const ApplicationProviders = ({
   children,
 }: PropsWithChildren<ApplicationProvidersProps>) => {
-  const { infuraId, alchemyId, network } = useConfig();
+  const { infuraId, alchemyId, network, centerNetwork } = useConfig();
   const orderedChains = useMemo(() => {
     const thisChain = CHAINS.find((c) => c.name.toLowerCase() === network)!;
     return [thisChain, ...CHAINS];
@@ -91,13 +92,18 @@ export const ApplicationProviders = ({
             appName: 'Backed',
             disclaimer: Disclaimer,
           }}>
-          <TimestampProvider>
-            <CachedRatesProvider>
-              <CommunityGradientProvider>
-                <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-              </CommunityGradientProvider>
-            </CachedRatesProvider>
-          </TimestampProvider>
+          {/* TODO: make this typesafe? */}
+          <CenterProvider
+            network={centerNetwork as any}
+            apiKey={process.env.NEXT_PUBLIC_CENTER_KEY!}>
+            <TimestampProvider>
+              <CachedRatesProvider>
+                <CommunityGradientProvider>
+                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
+                </CommunityGradientProvider>
+              </CachedRatesProvider>
+            </TimestampProvider>
+          </CenterProvider>
         </RainbowKitProvider>
       </WagmiConfig>
     </GlobalMessagingProvider>

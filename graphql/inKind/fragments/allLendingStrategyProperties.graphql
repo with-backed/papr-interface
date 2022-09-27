@@ -12,4 +12,7 @@ fragment allLendingStrategyProperties on LendingStrategy {
     contractAddress
     allowed
   }
+  vaults {
+    ...allVaultProperties
+  }
 }
