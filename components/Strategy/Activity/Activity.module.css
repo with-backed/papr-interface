@@ -8,6 +8,10 @@
   background-color: var(--background-white);
 }
 
+.table td:first-child {
+  padding-left: 8px;
+}
+
 .table td:not(:first-child) {
   padding-left: 1rem;
 }
