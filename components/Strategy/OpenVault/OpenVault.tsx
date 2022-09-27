@@ -292,7 +292,7 @@ export function OpenVault({
         const collateralContract = strategy.collateralContracts.find(
           (c) => getAddress(c.address) === getAddress(contractAddress),
         )!;
-        await collateralContract.setApprovalForAll(strategy.id, true);
+        return collateralContract.setApprovalForAll(strategy.id, true);
       }),
     );
     setNFTsApproved((prevNFTsApproved) => [
