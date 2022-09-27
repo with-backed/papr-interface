@@ -106,11 +106,7 @@ export function AccountNFTs({
                 {userVaultNFTIds?.map((id, i) => {
                   const [address, tokenId] = deconstructFromId(id);
                   return (
-                    <li
-                      className={`${styles.row} ${
-                        i % 2 === 0 ? styles.even : ''
-                      }`}
-                      key={`${address}-${tokenId}`}>
+                    <li className={styles.row} key={`${address}-${tokenId}`}>
                       <div className={styles.imageTokenId}>
                         <div className={styles.thumbnail}>
                           <Asset address={address} tokenId={tokenId} />
@@ -131,11 +127,7 @@ export function AccountNFTs({
                 {userCollectionNFTs.map((id, i) => {
                   const [address, tokenId] = deconstructFromId(id);
                   return (
-                    <li
-                      className={`${styles.row} ${
-                        i % 2 === 0 ? styles.even : ''
-                      }`}
-                      key={`${address}-${tokenId}`}>
+                    <li className={styles.row} key={`${address}-${tokenId}`}>
                       <div className={styles.imageTokenId}>
                         <div className={styles.thumbnail}>
                           <Asset address={address} tokenId={tokenId} />

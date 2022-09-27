@@ -8,6 +8,10 @@
     padding: 0px;
 }
 
+.nfts ol li:nth-child(even) {
+    background-color: white;
+}
+
 .columnLabels p {
     color: var(--greentext);
     text-transform: uppercase;
@@ -66,10 +70,6 @@
 
 .row input {
     vertical-align: middle;
-}
-
-.even {
-    background-color: white;
 }
 
 .approve {
