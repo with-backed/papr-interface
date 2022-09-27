@@ -1,12 +1,21 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .table th {
   text-transform: uppercase;
   color: var(--greentext);
   text-align: left;
+}
+
+.table .right-align {
+  text-align: right;
+}
+
+.table .center-align {
+  text-align: center;
 }
 
 .table th,

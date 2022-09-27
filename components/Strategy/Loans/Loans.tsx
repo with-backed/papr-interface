@@ -41,6 +41,17 @@ export function Loans({ lendingStrategy }: LoansProps) {
     );
   }, [ltvs]);
 
+  const totalDebt = useMemo(
+    () =>
+      activeVaults.reduce(
+        (prev, v) => prev.add(v.debt),
+        ethers.BigNumber.from(0),
+      ),
+    [activeVaults],
+  );
+
+  console.log(totalDebt);
+
   useEffect(() => {
     if (!norm) {
       return;
@@ -60,19 +71,25 @@ export function Loans({ lendingStrategy }: LoansProps) {
         <thead>
           <tr>
             <th>Total</th>
-            <th>Amount</th>
-            <th>Days</th>
-            <th>Avg. LTV</th>
-            <th>Health</th>
+            <th className={styles['right-align']}>Amount</th>
+            <th className={styles['right-align']}>Days</th>
+            <th className={styles['right-align']}>Avg. LTV</th>
+            <th className={styles['center-align']}>Health</th>
           </tr>
         </thead>
         <tbody>
           <tr className={styles.row}>
             <td>{activeVaults.length} Loans</td>
-            <td>$1.165M</td>
-            <td>???</td>
-            <td>{avgLtv}</td>
-            <td>???</td>
+            <td className={styles['right-align']}>
+              {ethers.utils.formatUnits(
+                totalDebt,
+                lendingStrategy.underlying.decimals,
+              )}{' '}
+              {lendingStrategy.underlying.symbol}
+            </td>
+            <td className={styles['right-align']}>???</td>
+            <td className={styles['right-align']}>{avgLtv}</td>
+            <td className={styles['center-align']}>???</td>
           </tr>
         </tbody>
       </table>
@@ -80,10 +97,10 @@ export function Loans({ lendingStrategy }: LoansProps) {
         <thead>
           <tr>
             <th>Loan</th>
-            <th>Amount</th>
-            <th>Days</th>
-            <th>LTV</th>
-            <th>Health</th>
+            <th className={styles['right-align']}>Amount</th>
+            <th className={styles['right-align']}>Days</th>
+            <th className={styles['right-align']}>LTV</th>
+            <th className={styles['center-align']}>Health</th>
           </tr>
         </thead>
         <tbody>
@@ -92,10 +109,16 @@ export function Loans({ lendingStrategy }: LoansProps) {
             return (
               <tr key={v.id} className={styles.row}>
                 <td>#{v.id.substring(0, 7)}</td>
-                <td>{v.debt}</td>
-                <td>???</td>
-                <td>{ltv}</td>
-                <td>???</td>
+                <td className={styles['right-align']}>
+                  {ethers.utils.formatUnits(
+                    v.debt,
+                    lendingStrategy.underlying.decimals,
+                  )}{' '}
+                  {lendingStrategy.underlying.symbol}
+                </td>
+                <td className={styles['right-align']}>???</td>
+                <td className={styles['right-align']}>{ltv}</td>
+                <td className={styles['center-align']}>???</td>
               </tr>
             );
           })}
