@@ -1,10 +1,17 @@
-.event {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 21px;
+.table {
+  border-spacing: 0;
+  width: 100%;
 }
 
-.feed {
-  padding: 0;
-  margin: 0;
+.table tr {
+  height: 30px;
+  background-color: var(--background-white);
+}
+
+.table td:not(:first-child) {
+  padding-left: 1rem;
+}
+
+.table tr:nth-child(even) {
+  background-color: transparent;
 }

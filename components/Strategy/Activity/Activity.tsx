@@ -68,31 +68,35 @@ export function Activity({ lendingStrategy }: ActivityProps) {
 
   return (
     <Fieldset legend="🐝 Activity">
-      <ul className={styles.feed}>
-        {feed.map((event) => {
-          switch (event.__typename) {
-            case 'AddCollateralEvent':
-              return (
-                <CollateralAdded
-                  event={event}
-                  debtIncreasedEvents={activityData?.debtIncreasedEvents || []}
-                  lendingStrategy={lendingStrategy}
-                  key={event.id}
-                />
-              );
-            case 'RemoveCollateralEvent':
-              return <CollateralRemoved event={event} key={event.id} />;
-            case 'Swap':
-              return (
-                <Swap
-                  event={event}
-                  key={event.id}
-                  lendingStrategy={lendingStrategy}
-                />
-              );
-          }
-        })}
-      </ul>
+      <table className={styles.table}>
+        <tbody>
+          {feed.map((event) => {
+            switch (event.__typename) {
+              case 'AddCollateralEvent':
+                return (
+                  <CollateralAdded
+                    event={event}
+                    debtIncreasedEvents={
+                      activityData?.debtIncreasedEvents || []
+                    }
+                    lendingStrategy={lendingStrategy}
+                    key={event.id}
+                  />
+                );
+              case 'RemoveCollateralEvent':
+                return <CollateralRemoved event={event} key={event.id} />;
+              case 'Swap':
+                return (
+                  <Swap
+                    event={event}
+                    key={event.id}
+                    lendingStrategy={lendingStrategy}
+                  />
+                );
+            }
+          })}
+        </tbody>
+      </table>
     </Fieldset>
   );
 }
@@ -131,17 +135,21 @@ function CollateralAdded({
   }, [debtIncreasedEvent, lendingStrategy]);
 
   return (
-    <li className={styles.event}>
-      <EtherscanTransactionLink transactionHash={event.txHash}>
-        {humanizedTimestamp(event.timestamp)}
-      </EtherscanTransactionLink>
-      <span>
-        <EtherscanAddressLink address={vaultOwner}>
-          {vaultOwner.substring(0, 8)}
-        </EtherscanAddressLink>{' '}
-        deposited #{event.collateral.tokenId} and borrowed {borrowedAmount}
-      </span>
-    </li>
+    <tr>
+      <td>
+        <EtherscanTransactionLink transactionHash={event.txHash}>
+          {humanizedTimestamp(event.timestamp)}
+        </EtherscanTransactionLink>
+      </td>
+      <td>
+        <span>
+          <EtherscanAddressLink address={vaultOwner}>
+            {vaultOwner.substring(0, 8)}
+          </EtherscanAddressLink>{' '}
+          deposited #{event.collateral.tokenId} and borrowed {borrowedAmount}
+        </span>
+      </td>
+    </tr>
   );
 }
 
@@ -149,18 +157,6 @@ function CollateralRemoved({}: {
   event: ArrayElement<ActivityByStrategyQuery['removeCollateralEvents']>;
 }) {
   return <div>Collateral removed</div>;
-}
-
-function DebtDecreased({}: {
-  event: ArrayElement<ActivityByStrategyQuery['debtDecreasedEvents']>;
-}) {
-  return <div>debt decreased</div>;
-}
-
-function DebtIncreased({}: {
-  event: ArrayElement<ActivityByStrategyQuery['debtIncreasedEvents']>;
-}) {
-  return <div>debt increased</div>;
 }
 
 function Swap({
@@ -185,11 +181,15 @@ function Swap({
     return `${amount1} ${token1Symbol} sold for ${amount0} ${token0Symbol}`;
   }, [event, lendingStrategy]);
   return (
-    <li className={styles.event}>
-      <EtherscanTransactionLink transactionHash={event.transaction.id}>
-        {humanizedTimestamp(event.timestamp)}
-      </EtherscanTransactionLink>
-      <span>{description}</span>
-    </li>
+    <tr>
+      <td>
+        <EtherscanTransactionLink transactionHash={event.transaction.id}>
+          {humanizedTimestamp(event.timestamp)}
+        </EtherscanTransactionLink>
+      </td>
+      <td>
+        <span>{description}</span>
+      </td>
+    </tr>
   );
 }
