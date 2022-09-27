@@ -54,7 +54,7 @@ type RowProps = {
   symbol: string;
 };
 
-function Row({ contractAddress, tokenId, symbol }: RowProps) {
+export function Row({ contractAddress, tokenId, symbol }: RowProps) {
   return (
     <tr className={styles.row}>
       <td aria-hidden className={styles['thumbnail-container']}>

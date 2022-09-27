@@ -10,6 +10,7 @@ import styles from './BorrowPageContent.module.css';
 import StrategiesToBorrowFrom from 'components/StrategiesToBorrowFrom/StrategiesToBorrowFrom';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { getUniqueNFTId } from 'lib/strategies';
 
 export type BorrowPageProps = {
   strategyAddress: string;
@@ -52,8 +53,10 @@ export function BorrowPageContent({
         includeDetails
       />
       <AccountNFTs
-        strategy={lendingStrategy}
-        userCollectionNFTs={userCollectionNFTs}
+        strategyAddress={lendingStrategy.id}
+        userCollectionNFTs={userCollectionNFTs.map((nft) =>
+          getUniqueNFTId(nft.address, nft.tokenId),
+        )}
         nftsSelected={nftsSelected}
         nftsLoading={nftsLoading}
         setNFTsSelected={setNFTsSelected}

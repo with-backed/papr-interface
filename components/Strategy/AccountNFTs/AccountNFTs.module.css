@@ -36,6 +36,12 @@
     width: 20%;
 }
 
+.thumbnail {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+}
+
 .imageTokenId div:nth-child(2) {
     margin: 0 10px;
 }
