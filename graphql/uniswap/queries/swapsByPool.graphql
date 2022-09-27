@@ -1,6 +1,15 @@
 query swapsByPool($pool: String) {
   swaps(where: { pool: $pool }) {
-    sqrtPriceX96
+    id
     timestamp
+    sender
+    recipient
+    amount0
+    amount1
+    amountUSD
+    sqrtPriceX96
+    transaction {
+      id
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { Fieldset } from 'components/Fieldset';
+import { symbol } from 'd3';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { Asset } from 'nft-react';
 import React, { useMemo } from 'react';
@@ -32,8 +33,13 @@ export function Collateral({ lendingStrategy: { vaults } }: CollateralProps) {
           </tr>
         </thead>
         <tbody className={styles.body}>
-          {collateral.map(({ id, contractAddress, tokenId }) => (
-            <Row key={id} contractAddress={contractAddress} tokenId={tokenId} />
+          {collateral.map(({ id, contractAddress, tokenId, symbol }) => (
+            <Row
+              key={id}
+              contractAddress={contractAddress}
+              symbol={symbol}
+              tokenId={tokenId}
+            />
           ))}
         </tbody>
       </table>
@@ -45,9 +51,10 @@ export function Collateral({ lendingStrategy: { vaults } }: CollateralProps) {
 type RowProps = {
   contractAddress: string;
   tokenId: string;
+  symbol: string;
 };
 
-function Row({ contractAddress, tokenId }: RowProps) {
+function Row({ contractAddress, tokenId, symbol }: RowProps) {
   return (
     <tr className={styles.row}>
       <td aria-hidden className={styles['thumbnail-container']}>
@@ -56,7 +63,9 @@ function Row({ contractAddress, tokenId }: RowProps) {
         </div>
       </td>
       <td className={styles['token-id']}>
-        <span>#{tokenId}</span>
+        <span>
+          {symbol} #{tokenId}
+        </span>
       </td>
     </tr>
   );

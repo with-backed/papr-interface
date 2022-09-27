@@ -10,5 +10,6 @@ fragment allVaultProperties on Vault {
     id
     contractAddress
     tokenId
+    symbol
   }
 }
