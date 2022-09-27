@@ -1,27 +1,48 @@
 import { Fieldset } from 'components/Fieldset';
 import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
-import { getUniqueNFTId } from 'lib/strategies';
+import { deconstructFromId, getUniqueNFTId } from 'lib/strategies';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 import styles from './AccountNFTs.module.css';
 import { useAccount } from 'wagmi';
+import { Asset } from 'nft-react';
+import { useQuery } from 'urql';
+import { VaultsByOwnerForStrategyDocument } from 'types/generated/graphql/inKindSubgraph';
 
 export type AccountNFTsProps = {
-  strategy: LendingStrategy;
-  userCollectionNFTs: CenterUserNFTsResponse[];
+  strategyAddress: string;
+  userCollectionNFTs: string[];
   nftsLoading: boolean;
   nftsSelected: string[];
   setNFTsSelected: Dispatch<SetStateAction<string[]>>;
 };
 
 export function AccountNFTs({
-  strategy,
+  strategyAddress,
   userCollectionNFTs,
   nftsLoading,
   nftsSelected,
   setNFTsSelected,
 }: AccountNFTsProps) {
   const { address } = useAccount();
+  const [{ data: userVaultsData, fetching: vaultsFetching }] = useQuery({
+    query: VaultsByOwnerForStrategyDocument,
+    variables: {
+      owner: address?.toLowerCase(),
+      strategy: strategyAddress.toLowerCase(),
+    },
+  });
+
+  const userVaultNFTIds = useMemo(() => {
+    return userVaultsData?.vaults
+      .map((vault) =>
+        vault.collateral.map((c) =>
+          getUniqueNFTId(c.contractAddress, c.tokenId),
+        ),
+      )
+      .flat();
+  }, [userVaultsData]);
+
   const handleNFTSelected = useCallback(
     (address: string, tokenId: string, checked: boolean) => {
       setNFTsSelected((prevNFTSelected) => {
@@ -39,16 +60,14 @@ export function AccountNFTs({
   }, [nftsSelected]);
 
   const performSelectAll = useCallback(() => {
-    setNFTsSelected(
-      userCollectionNFTs.map((nft) => getUniqueNFTId(nft.address, nft.tokenId)),
-    );
+    setNFTsSelected(userCollectionNFTs);
   }, [userCollectionNFTs, setNFTsSelected]);
 
   const performUnselectAll = useCallback(() => {
     setNFTsSelected([]);
   }, [setNFTsSelected]);
 
-  if (nftsLoading) return <></>;
+  if (nftsLoading || vaultsFetching) return <></>;
 
   return (
     <Fieldset legend="🖼️ collateral">
@@ -84,40 +103,60 @@ export function AccountNFTs({
                     </div>
                   </div>
                 </li>
-                {userCollectionNFTs.map((nft, i) => (
-                  <li
-                    className={`${styles.row} ${
-                      i % 2 === 0 ? styles.even : ''
-                    }`}
-                    key={`${nft.address}-${nft.tokenId}`}>
-                    <div className={styles.imageTokenId}>
-                      <div>
-                        <img src={nft.smallPreviewImageUrl} />
+                {userVaultNFTIds?.map((id, i) => {
+                  const [address, tokenId] = deconstructFromId(id);
+                  return (
+                    <li className={styles.row} key={`${address}-${tokenId}`}>
+                      <div className={styles.imageTokenId}>
+                        <div className={styles.thumbnail}>
+                          <Asset address={address} tokenId={tokenId} />
+                        </div>
+                        <div>#{tokenId}</div>
                       </div>
-                      <div>#{nft.tokenId}</div>
-                    </div>
-                    <div className={styles.oracleCheckBox}>
-                      <div>
-                        <p>$72,188</p>
+                      <div className={styles.oracleCheckBox}>
+                        <div>
+                          <p>$72,188</p>
+                        </div>
+                        <div>
+                          <input type="checkbox" disabled checked />
+                        </div>
                       </div>
-                      <div>
-                        <input
-                          type="checkbox"
-                          checked={nftsSelected.includes(
-                            getUniqueNFTId(nft.address, nft.tokenId),
-                          )}
-                          onChange={(e) =>
-                            handleNFTSelected(
-                              nft.address,
-                              nft.tokenId,
-                              e.target.checked,
-                            )
-                          }
-                        />
+                    </li>
+                  );
+                })}
+                {userCollectionNFTs.map((id, i) => {
+                  const [address, tokenId] = deconstructFromId(id);
+                  return (
+                    <li className={styles.row} key={`${address}-${tokenId}`}>
+                      <div className={styles.imageTokenId}>
+                        <div className={styles.thumbnail}>
+                          <Asset address={address} tokenId={tokenId} />
+                        </div>
+                        <div>#{tokenId}</div>
                       </div>
-                    </div>
-                  </li>
-                ))}
+                      <div className={styles.oracleCheckBox}>
+                        <div>
+                          <p>$72,188</p>
+                        </div>
+                        <div>
+                          <input
+                            type="checkbox"
+                            checked={nftsSelected.includes(
+                              getUniqueNFTId(address, tokenId),
+                            )}
+                            onChange={(e) =>
+                              handleNFTSelected(
+                                address,
+                                tokenId,
+                                e.target.checked,
+                              )
+                            }
+                          />
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
               </ol>
             </div>
             <div className={styles.selectAll}>

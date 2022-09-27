@@ -8,6 +8,10 @@
     padding: 0px;
 }
 
+.nfts ol li:nth-child(even) {
+    background-color: white;
+}
+
 .columnLabels p {
     color: var(--greentext);
     text-transform: uppercase;
@@ -36,6 +40,12 @@
     width: 20%;
 }
 
+.thumbnail {
+    width: 30px;
+    height: 30px;
+    margin: 0;
+}
+
 .imageTokenId div:nth-child(2) {
     margin: 0 10px;
 }
@@ -60,10 +70,6 @@
 
 .row input {
     vertical-align: middle;
-}
-
-.even {
-    background-color: white;
 }
 
 .approve {
