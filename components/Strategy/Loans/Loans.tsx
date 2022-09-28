@@ -4,12 +4,15 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { convertOneScaledValue } from 'lib/strategies';
+import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Strategy__factory } from 'types/generated/abis';
+import { Health } from '../Health';
 import styles from './Loans.module.css';
 
 type LoansProps = {
   lendingStrategy: LendingStrategy;
+  pricesData: StrategyPricesData | null;
 };
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -17,7 +20,7 @@ const formatter = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 2,
 });
 
-export function Loans({ lendingStrategy }: LoansProps) {
+export function Loans({ lendingStrategy, pricesData }: LoansProps) {
   const signerOrProvider = useSignerOrProvider();
   const [ltvs, setLtvs] = useState<{ [key: string]: number }>({});
   const norm = useAsyncValue(async () => {
@@ -89,7 +92,9 @@ export function Loans({ lendingStrategy }: LoansProps) {
             </td>
             <td className={styles['right-align']}>???</td>
             <td className={styles['right-align']}>{avgLtv}</td>
-            <td className={styles['center-align']}>???</td>
+            <td className={styles['center-align']}>
+              {!!pricesData ? <Health pricesData={pricesData} /> : '???'}
+            </td>
           </tr>
         </tbody>
       </table>

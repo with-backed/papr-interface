@@ -25,7 +25,7 @@ export function StrategyOverviewContent({
       <Charts pricesData={pricesData} />
       <Collateral lendingStrategy={lendingStrategy} />
       <Activity lendingStrategy={lendingStrategy} />
-      <Loans lendingStrategy={lendingStrategy} />
+      <Loans lendingStrategy={lendingStrategy} pricesData={pricesData} />
     </div>
   );
 }
