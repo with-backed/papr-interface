@@ -54,7 +54,7 @@ function Connected() {
 
     const filter = strategy.filters.CreateLendingStrategy(null);
     strategy.once(filter, (address) => {
-      push(`/network/${network}/in-kind/strategies/${address}`);
+      push(`/networks/${network}/in-kind/strategies/${address}`);
     });
 
     setTxHash(tx.hash);
@@ -82,7 +82,8 @@ function Connected() {
             {data.lendingStrategies.map((s) => {
               return (
                 <li key={s.id}>
-                  <Link href={`/network/${network}/in-kind/strategies/${s.id}`}>
+                  <Link
+                    href={`/networks/${network}/in-kind/strategies/${s.id}`}>
                     <a>{s.id}</a>
                   </Link>
                 </li>
