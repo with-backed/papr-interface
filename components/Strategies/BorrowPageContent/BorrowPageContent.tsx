@@ -44,6 +44,8 @@ export function BorrowPageContent({
 
   if (!lendingStrategy || !pricesData) return <></>;
 
+  console.log({ userCollectionNFTs });
+
   return (
     <div className={strategyStyles.wrapper}>
       <StrategiesToBorrowFrom

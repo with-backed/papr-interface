@@ -109,7 +109,7 @@ export function AccountNFTs({
                     <li className={styles.row} key={`${address}-${tokenId}`}>
                       <div className={styles.imageTokenId}>
                         <div className={styles.thumbnail}>
-                          <Asset address={address} tokenId={tokenId} />
+                          {/* <Asset address={address} tokenId={tokenId} /> */}
                         </div>
                         <div>#{tokenId}</div>
                       </div>

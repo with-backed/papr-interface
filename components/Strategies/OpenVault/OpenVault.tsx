@@ -169,6 +169,10 @@ export function OpenVault({
         sig,
       };
 
+      console.log({
+        erc721ReceivedArgs,
+      });
+
       const collateralContract = strategy.collateralContracts.find(
         (c) => getAddress(c.address) === getAddress(contractAddress),
       )!;
