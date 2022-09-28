@@ -37,7 +37,7 @@ export async function getNFTInfoFromTokenInfo({
 }: NFTInfoParams): Promise<GetNFTInfoResponse | null> {
   try {
     const tokenURIRes = await fetch(
-      `/api/network/${network}/nftInfo/${collateralContractAddress}/${collateralTokenId.toString()}`,
+      `/api/networks/${network}/nftInfo/${collateralContractAddress}/${collateralTokenId.toString()}`,
     );
     const NFTInfo: NFTResponseData = await tokenURIRes.json();
 

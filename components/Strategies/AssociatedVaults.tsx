@@ -56,7 +56,7 @@ function Loaded({ strategy, vaults }: LoadedProps) {
         return (
           <li key={v.id}>
             <Link
-              href={`/network/${network}/in-kind/strategies/${strategy}/vaults/${ethers.BigNumber.from(
+              href={`/networks/${network}/in-kind/strategies/${strategy}/vaults/${ethers.BigNumber.from(
                 v.id,
               )}`}>
               <a>{v.id.substring(0, 16)}...</a>

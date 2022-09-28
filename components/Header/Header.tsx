@@ -21,7 +21,7 @@ const prodPages: Page[] = [
   {
     name: 'Borrow',
     // TODO: in the single-strategy case, we should have the deployed strategy in the config for each network.
-    route: 'borrow/0x41739c3547992ca3f2a40d110ad33afeb582eb7c',
+    route: 'strategies/0x41739c3547992ca3f2a40d110ad33afeb582eb7c/borrow',
   },
   {
     name: 'Swap',
@@ -71,7 +71,7 @@ function NavLinks({ activeRoute }: NavLinksProps) {
                 ? `/${p.route}`
                 : p.externalRedirect
                 ? p.route
-                : `/network/${network}/${p.route}`
+                : `/networks/${network}/${p.route}`
             }>
             <a
               className={
@@ -99,7 +99,7 @@ function LogoLink() {
   );
 
   return (
-    <Link href={`/network/${network}/`} passHref>
+    <Link href={`/networks/${network}/`} passHref>
       <a title="Backed">
         <Logo error={isErrorPage} />
       </a>

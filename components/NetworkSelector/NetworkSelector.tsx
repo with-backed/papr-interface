@@ -22,11 +22,11 @@ const options =
         label: capitalize(network),
       }));
 
-const NETWORK_REGEXP = /\/network\/[^\/]*(.*)$/;
+const NETWORK_REGEXP = /\/networks\/[^\/]*(.*)$/;
 
 /**
  * @param path Typically the `route` part of `next/router`
- * @returns The route without the /network/[network] prefix
+ * @returns The route without the /networks/[network] prefix
  */
 function pathWithoutNetwork(path: string) {
   const matches = path.match(NETWORK_REGEXP);
@@ -34,7 +34,7 @@ function pathWithoutNetwork(path: string) {
 }
 
 /**
- * @param path A path, without the /network/[network] prefix
+ * @param path A path, without the /networks/[network] prefix
  * @returns Whether we should return to the homepage when changing network. If not, show the same page on the new network.
  */
 function shouldReturnToHomepage(path: string): boolean {
@@ -61,9 +61,9 @@ export const NetworkSelector = ({ isErrorPage }: NetworkSelectorProps) => {
         const currentPath = pathWithoutNetwork(route);
         const returnHome = shouldReturnToHomepage(currentPath);
         if (returnHome) {
-          window.location.assign('/network/' + option.value);
+          window.location.assign('/networks/' + option.value);
         } else {
-          window.location.assign('/network/' + option.value + currentPath);
+          window.location.assign('/networks/' + option.value + currentPath);
         }
       }
     },
