@@ -26,7 +26,7 @@ const prodPages: Page[] = [
   {
     name: 'Swap',
     route:
-      'https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=0x3089b47853df1b82877beef6d904a0ce98a12553&outputCurrency=0xb5e5f51e3e112634975fb44e6351380413f653ac',
+      'https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=0x3089b47853df1b82877beef6d904a0ce98a12553&outputCurrency=0xb5e5f51e3e112634975fb44e6351380413f653ac&chain=goerli',
     externalRedirect: true,
   },
   {
