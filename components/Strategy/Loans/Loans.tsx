@@ -1,12 +1,16 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { timestampDaysAgo } from 'lib/duration';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { convertOneScaledValue } from 'lib/strategies';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Strategy__factory } from 'types/generated/abis';
+import {
+  DebtIncreasesByVaultDocument,
+  DebtIncreasesByVaultQuery,
+} from 'types/generated/graphql/inKindSubgraph';
+import { useQuery } from 'urql';
 import { Health } from '../Health';
 import styles from './Loans.module.css';
 
@@ -89,7 +93,9 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
               )}{' '}
               {lendingStrategy.underlying.symbol}
             </td>
-            <td className={styles['right-align']}>???</td>
+            <td className={styles['right-align']}>
+              {timestampDaysAgo(lendingStrategy.createdAt)}
+            </td>
             <td className={styles['right-align']}>{avgLtv}</td>
             <td className={styles['center-align']}>
               {!!pricesData ? <Health pricesData={pricesData} /> : '???'}
@@ -137,13 +143,30 @@ type VaultRowProps = {
   maxLTV: ethers.BigNumber | null;
 };
 function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
+  const [{ data, fetching }] = useQuery<DebtIncreasesByVaultQuery>({
+    query: DebtIncreasesByVaultDocument,
+    variables: { vaultId: id },
+  });
+
+  const createdTimestamp = useMemo(() => {
+    if (!data?.debtIncreasedEvents) {
+      return undefined;
+    }
+
+    return data.debtIncreasedEvents.reduce((prev, e) =>
+      prev.timestamp < e.timestamp ? prev : e,
+    ).timestamp;
+  }, [data]);
+
   return (
     <tr className={styles.row}>
       <td>#{id.substring(0, 7)}</td>
       <td className={styles['right-align']}>
         {ethers.utils.formatUnits(debt, decimals)} {symbol}
       </td>
-      <td className={styles['right-align']}>???</td>
+      <td className={styles['right-align']}>
+        {!!createdTimestamp ? timestampDaysAgo(createdTimestamp) : '...'}
+      </td>
       <td className={styles['right-align']}>
         {ltv ? formatter.format(ltv) : '...'}
       </td>

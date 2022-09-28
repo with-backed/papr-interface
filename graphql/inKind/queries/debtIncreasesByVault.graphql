@@ -1,0 +1,6 @@
+query debtIncreasesByVault($vaultId: String) {
+  debtIncreasedEvents(where: { vault: $vaultId }) {
+    id
+    timestamp
+  }
+}
