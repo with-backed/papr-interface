@@ -33,6 +33,10 @@
   transition: outline 0.1s;
 }
 
+.track-1 {
+  background-image: url('../../public/slider-tile-bright.svg');
+}
+
 .thumb > div {
   color: var(--greentext);
   position: relative;

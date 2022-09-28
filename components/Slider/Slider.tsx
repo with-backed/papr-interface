@@ -4,14 +4,23 @@ import styles from './Slider.module.css';
 export type SliderProps = {
   min: number;
   max: number;
-  onChange: (value: number, index: number) => void;
+  onChange: (value: number[], index: number) => void;
   renderThumb: (
     props: any,
-    state: { index: number; value: number; valueNow: number },
+    state: { index: number; value: number[]; valueNow: number },
   ) => JSX.Element | null;
+  ariaLabel?: string[];
+  defaultValue?: number[];
 };
 
-export function Slider({ min, max, onChange, renderThumb }: SliderProps) {
+export function Slider({
+  min,
+  max,
+  onChange,
+  renderThumb,
+  ariaLabel = [],
+  defaultValue = [],
+}: SliderProps) {
   return (
     <ReactSlider
       className={styles.slider}
@@ -21,6 +30,8 @@ export function Slider({ min, max, onChange, renderThumb }: SliderProps) {
       min={min}
       max={max}
       onChange={onChange}
+      ariaLabel={ariaLabel}
+      defaultValue={defaultValue}
     />
   );
 }

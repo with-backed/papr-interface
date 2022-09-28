@@ -81,6 +81,8 @@ export function useQuoteWithSlippage(
     getQuoteAndPriceImpactForSwap();
   }, [amount, getQuoteAndPriceImpactForSwap]);
 
+  console.log({ quoteForSwap });
+
   return {
     quoteForSwap,
     priceImpact,
