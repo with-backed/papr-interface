@@ -15,6 +15,7 @@ type Page = {
   // Some pages (about, community) don't fit into our resource-oriented hierarchy.
   // We'll just put them at the top-level
   isNetworkSpecialCase?: boolean;
+  externalRedirect?: boolean;
 };
 const prodPages: Page[] = [
   {
@@ -22,8 +23,18 @@ const prodPages: Page[] = [
     // TODO: in the single-strategy case, we should have the deployed strategy in the config for each network.
     route: 'borrow/0x41739c3547992ca3f2a40d110ad33afeb582eb7c',
   },
-  { name: 'Swap', route: 'swap' },
-  { name: 'LP', route: 'lp' },
+  {
+    name: 'Swap',
+    route:
+      'https://app.uniswap.org/#/swap?chain=rinkeby&inputCurrency=0x3089b47853df1b82877beef6d904a0ce98a12553&outputCurrency=0xb5e5f51e3e112634975fb44e6351380413f653ac',
+    externalRedirect: true,
+  },
+  {
+    name: 'LP',
+    route:
+      'https://app.uniswap.org/#/add/0x3089B47853df1b82877bEef6D904a0ce98a12553/0xb5e5f51E3E112634975Fb44e6351380413F653aC/10000?chain=goerli',
+    externalRedirect: true,
+  },
   { name: 'Community', route: 'community', isNetworkSpecialCase: true },
 ];
 
@@ -58,6 +69,8 @@ function NavLinks({ activeRoute }: NavLinksProps) {
             href={
               p.isNetworkSpecialCase
                 ? `/${p.route}`
+                : p.externalRedirect
+                ? p.route
                 : `/network/${network}/${p.route}`
             }>
             <a
@@ -65,7 +78,8 @@ function NavLinks({ activeRoute }: NavLinksProps) {
                 isActiveRoute(activeRoute, p.route)
                   ? styles['link-active']
                   : styles.link
-              }>
+              }
+              target={p.externalRedirect ? '_blank' : ''}>
               {p.name}
             </a>
           </Link>
