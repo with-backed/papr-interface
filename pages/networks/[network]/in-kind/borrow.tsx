@@ -2,7 +2,7 @@ import StrategiesToBorrowFrom from 'components/StrategiesToBorrowFrom/Strategies
 import { getAllStrategies } from 'lib/pAPRSubgraph';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { GetServerSideProps } from 'next';
-import strategyStyles from 'components/Strategy/Strategy.module.css';
+import strategyStyles from 'components/Strategies/Strategy.module.css';
 import styles from './strategiesBorrow.module.css';
 import { SupportedNetwork } from 'lib/config';
 import {

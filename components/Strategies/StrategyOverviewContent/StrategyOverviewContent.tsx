@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from 'components/Strategy/Strategy.module.css';
+import styles from 'components/Strategies/Strategy.module.css';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { AssociatedVaults } from '../AssociatedVaults';
 import { Charts } from 'components/Strategies/Charts';

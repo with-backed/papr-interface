@@ -21,7 +21,7 @@ const prodPages: Page[] = [
   {
     name: 'Borrow',
     // TODO: in the single-strategy case, we should have the deployed strategy in the config for each network.
-    route: 'borrow/0x41739c3547992ca3f2a40d110ad33afeb582eb7c',
+    route: 'strategies/0x41739c3547992ca3f2a40d110ad33afeb582eb7c/borrow',
   },
   {
     name: 'Swap',

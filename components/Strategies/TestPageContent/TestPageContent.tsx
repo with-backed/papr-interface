@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import strategyStyles from 'components/Strategy/Strategy.module.css';
+import strategyStyles from 'components/Strategies/Strategy.module.css';
 import styles from './TestPageContent.module.css';
 import MintERC20 from './MintERC20';
 import MintCollateral from './MintCollateral';
