@@ -21,12 +21,15 @@ const formatter = new Intl.NumberFormat('en-US', {
 });
 
 export function Loans({ lendingStrategy, pricesData }: LoansProps) {
-  const signerOrProvider = useSignerOrProvider();
   const [ltvs, setLtvs] = useState<{ [key: string]: number }>({});
-  const norm = useAsyncValue(async () => {
-    const s = Strategy__factory.connect(lendingStrategy.id, signerOrProvider);
-    return s.newNorm();
-  }, [lendingStrategy, signerOrProvider]);
+  const norm = useAsyncValue(
+    () => lendingStrategy.newNorm(),
+    [lendingStrategy],
+  );
+  const maxLTV = useAsyncValue(
+    () => lendingStrategy.maxLTV(),
+    [lendingStrategy],
+  );
   const activeVaults = useMemo(
     () =>
       lendingStrategy.vaults?.filter((v) => v.totalCollateralValue > 0) || [],
@@ -53,8 +56,6 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
     [activeVaults],
   );
 
-  console.log(totalDebt);
-
   useEffect(() => {
     if (!norm) {
       return;
@@ -65,8 +66,6 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
     }, {} as { [key: string]: number });
     setLtvs(calculatedLtvs);
   }, [activeVaults, norm]);
-
-  console.log({ activeVaults });
 
   return (
     <Fieldset legend="💸 Loans">
@@ -112,24 +111,42 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
           {activeVaults.map((v) => {
             const ltv = ltvs[v.id] ? formatter.format(ltvs[v.id]) : '...';
             return (
-              <tr key={v.id} className={styles.row}>
-                <td>#{v.id.substring(0, 7)}</td>
-                <td className={styles['right-align']}>
-                  {ethers.utils.formatUnits(
-                    v.debt,
-                    lendingStrategy.underlying.decimals,
-                  )}{' '}
-                  {lendingStrategy.underlying.symbol}
-                </td>
-                <td className={styles['right-align']}>???</td>
-                <td className={styles['right-align']}>{ltv}</td>
-                <td className={styles['center-align']}>???</td>
-              </tr>
+              <VaultRow
+                key={v.id}
+                id={v.id}
+                debt={v.debt}
+                decimals={lendingStrategy.underlying.decimals}
+                symbol={lendingStrategy.underlying.symbol}
+                ltv={ltv}
+                maxLTV={maxLTV}
+              />
             );
           })}
         </tbody>
       </table>
     </Fieldset>
+  );
+}
+
+type VaultRowProps = {
+  id: string;
+  debt: ethers.BigNumberish;
+  decimals: ethers.BigNumberish;
+  symbol: string;
+  ltv: string;
+  maxLTV: ethers.BigNumber | null;
+};
+function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
+  return (
+    <tr className={styles.row}>
+      <td>#{id.substring(0, 7)}</td>
+      <td className={styles['right-align']}>
+        {ethers.utils.formatUnits(debt, decimals)} {symbol}
+      </td>
+      <td className={styles['right-align']}>???</td>
+      <td className={styles['right-align']}>{ltv}</td>
+      <td className={styles['center-align']}>???</td>
+    </tr>
   );
 }
 
