@@ -23,7 +23,7 @@ export const ConnectWallet = () => {
           </Button>
         ) : (
           <ButtonLink
-            href={`/network/${network}/profile/${account.address}`}
+            href={`/networks/${network}/profile/${account.address}`}
             kind="dark">
             <span className={styles.address}>
               🔓 <DisplayAddress address={account.address} />

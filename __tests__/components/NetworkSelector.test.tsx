@@ -11,7 +11,7 @@ const mockedUseRouter = nextRouter.useRouter as jest.MockedFunction<
   typeof nextRouter.useRouter
 >;
 mockedUseRouter.mockImplementation(
-  () => ({ route: '/network/rinkeby/loans/create' } as any),
+  () => ({ route: '/networks/goerli/loans/create' } as any),
 );
 
 const mockAssign = jest.fn();

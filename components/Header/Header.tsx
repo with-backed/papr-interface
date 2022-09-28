@@ -71,7 +71,7 @@ function NavLinks({ activeRoute }: NavLinksProps) {
                 ? `/${p.route}`
                 : p.externalRedirect
                 ? p.route
-                : `/network/${network}/${p.route}`
+                : `/networks/${network}/${p.route}`
             }>
             <a
               className={
@@ -99,7 +99,7 @@ function LogoLink() {
   );
 
   return (
-    <Link href={`/network/${network}/`} passHref>
+    <Link href={`/networks/${network}/`} passHref>
       <a title="Backed">
         <Logo error={isErrorPage} />
       </a>
