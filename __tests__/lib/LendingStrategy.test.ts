@@ -17,6 +17,13 @@ const subgraphStrategy: SubgraphStrategy = {
   norm: '1000000000000000000',
   targetAPR: '200000000000000000',
   vaults: [],
+  allowedCollateral: [
+    {
+      id: '0x41739c3547992ca3f2a40d110ad33afeb582eb7c-0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
+      contractAddress: '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
+      allowed: true,
+    },
+  ],
   __typename: 'LendingStrategy',
 };
 

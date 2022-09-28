@@ -8,7 +8,6 @@ const baseConfig = {
 
 export type Config = {
   // things that aren't guaranteed to exist in all configs should be declared here
-  nftSalesSubgraph: string | null;
 } & Omit<typeof ethereum, 'nftSalesSubgraph'>;
 
 export type SupportedNetwork = keyof typeof configs;
@@ -20,16 +19,11 @@ const goerli: Config = {
   ...baseConfig,
   centerNetwork: 'ethereum-goerli',
   chainId: 5,
-  nftBackedLoansSubgraph:
-    'https://api.thegraph.com/subgraphs/name/with-backed/backed-protocol-rinkeby',
   jsonRpcProvider:
     'https://eth-goerli.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
   alchemyId: developmentAlchemyKey,
-  eip721Subgraph:
-    'https://api.thegraph.com/subgraphs/name/sunguru98/erc721-rinkeby-subgraph',
   openSeaUrl: 'https://testnets.opensea.io',
   etherscanUrl: 'https://goerli.etherscan.io',
-  nftSalesSubgraph: null,
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
   emailSubjectPrefix: '[Testnet]:',
@@ -39,12 +33,6 @@ const goerli: Config = {
 const ethereum = {
   ...baseConfig,
   centerNetwork: 'ethereum-mainnet',
-  nftBackedLoansSubgraph:
-    'https://api.thegraph.com/subgraphs/name/with-backed/backed-protocol',
-  nftSalesSubgraph:
-    'https://api.thegraph.com/subgraphs/name/adamgobes/nft-sales-indexer',
-  eip721Subgraph:
-    'https://api.thegraph.com/subgraphs/name/sunguru98/mainnet-erc721-subgraph',
   infuraId:
     process.env.VERCEL_ENV === 'production'
       ? '54c753f04ec64374aa679e383e7f84d5'
@@ -64,10 +52,6 @@ const ethereum = {
 const optimism: Config = {
   ...baseConfig,
   centerNetwork: '',
-  nftBackedLoansSubgraph:
-    'https://api.thegraph.com/subgraphs/name/with-backed/backed-protocol-optimism',
-  eip721Subgraph:
-    'https://api.thegraph.com/subgraphs/name/with-backed/optimism-erc721-subgraph',
   infuraId: '54c753f04ec64374aa679e383e7f84d5',
   openSeaUrl: 'https://quixotic.io',
   etherscanUrl: 'https://optimistic.etherscan.io',
@@ -81,16 +65,12 @@ const optimism: Config = {
   siteUrl: 'https://withbacked.xyz',
   network: 'optimism',
   emailSubjectPrefix: '[Optimism]:',
-  nftSalesSubgraph: null,
   facilitatorStartBlock: 6679943,
 };
 
 const polygon: Config = {
   ...baseConfig,
   centerNetwork: '',
-  nftBackedLoansSubgraph:
-    'https://api.thegraph.com/subgraphs/name/with-backed/backed-protocol-polygon',
-  eip721Subgraph: 'https://nfts-by-account-polygon.vercel.app/graphql',
   infuraId: '54c753f04ec64374aa679e383e7f84d5',
   openSeaUrl: 'https://opensea.io',
   etherscanUrl: 'https://polygonscan.com',
@@ -104,7 +84,6 @@ const polygon: Config = {
   siteUrl: 'https://withbacked.xyz',
   network: 'polygon',
   emailSubjectPrefix: '[Polygon]:',
-  nftSalesSubgraph: null,
   facilitatorStartBlock: 28234089,
 };
 
