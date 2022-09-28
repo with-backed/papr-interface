@@ -109,7 +109,7 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
         </thead>
         <tbody>
           {activeVaults.map((v) => {
-            const ltv = ltvs[v.id] ? formatter.format(ltvs[v.id]) : '...';
+            const ltv = ltvs[v.id];
             return (
               <VaultRow
                 key={v.id}
@@ -133,7 +133,7 @@ type VaultRowProps = {
   debt: ethers.BigNumberish;
   decimals: ethers.BigNumberish;
   symbol: string;
-  ltv: string;
+  ltv?: number;
   maxLTV: ethers.BigNumber | null;
 };
 function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
@@ -144,8 +144,12 @@ function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
         {ethers.utils.formatUnits(debt, decimals)} {symbol}
       </td>
       <td className={styles['right-align']}>???</td>
-      <td className={styles['right-align']}>{ltv}</td>
-      <td className={styles['center-align']}>???</td>
+      <td className={styles['right-align']}>
+        {ltv ? formatter.format(ltv) : '...'}
+      </td>
+      <td className={styles['center-align']}>
+        {!!ltv && !!maxLTV ? <VaultHealth ltv={ltv} maxLtv={maxLTV} /> : '...'}
+      </td>
     </tr>
   );
 }
@@ -157,4 +161,28 @@ function ltv(
 ) {
   const valueNormRatio = ethers.BigNumber.from(totalCollateralValue).div(norm);
   return ethers.BigNumber.from(debt).div(valueNormRatio);
+}
+
+type VaultHealthProps = {
+  ltv: number;
+  maxLtv: ethers.BigNumber;
+};
+function VaultHealth({ ltv, maxLtv }: VaultHealthProps) {
+  const maxLTV = convertOneScaledValue(maxLtv, 4);
+  const ratio = ltv / maxLTV;
+
+  const indicator = useMemo(() => {
+    // Ratio, but as a number out of 10 rather than a decimal out of 1
+    const numHashes = Math.round(ratio * 10);
+    const dashes = Array(10).fill('-');
+    const hashes = Array(numHashes).fill('#');
+    return hashes.concat(dashes).join('').substring(0, 10);
+  }, [ratio]);
+
+  return (
+    <span
+      className={ratio > 0.5 ? styles['indicator-danger'] : styles.indicator}>
+      {indicator}
+    </span>
+  );
 }
