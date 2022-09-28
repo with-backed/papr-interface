@@ -4,7 +4,6 @@ import {
   RainbowKitProvider,
   DisclaimerComponent,
 } from '@rainbow-me/rainbowkit';
-import { CachedRatesProvider } from 'hooks/useCachedRates/useCachedRates';
 import { CommunityGradientProvider } from 'hooks/useCommunityGradient';
 import { useConfig } from 'hooks/useConfig';
 import { GlobalMessagingProvider } from 'hooks/useGlobalMessages';
@@ -97,11 +96,9 @@ export const ApplicationProviders = ({
             network={centerNetwork as any}
             apiKey={process.env.NEXT_PUBLIC_CENTER_KEY!}>
             <TimestampProvider>
-              <CachedRatesProvider>
-                <CommunityGradientProvider>
-                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-                </CommunityGradientProvider>
-              </CachedRatesProvider>
+              <CommunityGradientProvider>
+                <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
+              </CommunityGradientProvider>
             </TimestampProvider>
           </CenterProvider>
         </RainbowKitProvider>

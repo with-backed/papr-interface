@@ -1,7 +1,7 @@
 import { Price, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Q192, SECONDS_IN_A_DAY } from 'lib/constants';
-import { ChartValue } from 'lib/d3';
+import { ChartValue } from '../charts';
 import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { subgraphUniswapSwapsByPool } from 'lib/uniswapSubgraph';
 import {

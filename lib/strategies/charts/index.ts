@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
 import { configs, SupportedNetwork } from 'lib/config';
 import { makeProvider } from 'lib/contracts';
-import { ChartValue } from 'lib/d3';
 import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { Strategy__factory } from 'types/generated/abis';
@@ -9,6 +8,8 @@ import { Pool } from 'types/generated/graphql/uniswapSubgraph';
 import { convertONEScaledPercent } from '..';
 import { markValues } from './mark';
 import { normValues } from './norm';
+
+export type ChartValue = [number, number];
 
 export interface StrategyPricesData {
   normalizationDPRValues: ChartValue[];

@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { configs, SupportedNetwork } from 'lib/config';
 import { ONE } from 'lib/constants';
-import { ChartValue } from 'lib/d3';
+import { ChartValue } from '../charts';
 import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { clientFromUrl } from 'lib/urql';
 import { Strategy__factory } from 'types/generated/abis';

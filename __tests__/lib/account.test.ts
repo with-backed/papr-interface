@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { getAccountLoanAssetAllowance, resolveEns } from 'lib/account';
+import { resolveEns } from 'lib/account';
 import { configs } from 'lib/config';
 
 jest.mock('lib/contracts', () => ({
@@ -24,17 +24,6 @@ providerSpy.mockImplementation(
 describe('account utilities', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  });
-  describe('getAccountLoanAssetAllowance', () => {
-    it('returns what the contract says the allowance is', async () => {
-      const value = await getAccountLoanAssetAllowance(
-        '0xaccount',
-        '0xcontract',
-        configs.goerli.jsonRpcProvider,
-        'goerli',
-      );
-      expect(value).toEqual(10000000000);
-    });
   });
 
   describe('resolveEns', () => {
