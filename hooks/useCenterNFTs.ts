@@ -20,6 +20,7 @@ export const useCenterNFTs = (
 
   const getAllUserNFTs = useCallback(
     async (address: string, collections: string[]) => {
+      return [];
       const allNFTsFromCollections = await Promise.all(
         collections.map(async (collection) => {
           try {

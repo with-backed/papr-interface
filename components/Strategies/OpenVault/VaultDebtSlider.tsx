@@ -1,37 +1,26 @@
 import { Slider } from 'components/Slider';
-import { ethers } from 'ethers';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import styles from './OpenVault.module.css';
 
 type VaultDebtSliderProps = {
   strategy: LendingStrategy;
   maxDebt: number;
-  currentDebtTaken: number;
-  debtForSelectedLTV: number;
+  currentVaultDebt: number;
+  chosenDebt: number;
   maxLTV: number | null;
-  handleDebtAmountChanged: (val: string) => void;
+  handleChosenDebtChanged: (val: string) => void;
 };
 
 export function VaultDebtSlider({
   strategy,
   maxDebt,
-  currentDebtTaken,
-  debtForSelectedLTV,
+  currentVaultDebt,
+  chosenDebt,
   maxLTV,
-  handleDebtAmountChanged,
+  handleChosenDebtChanged,
 }: VaultDebtSliderProps) {
-  const repaymentAmount = useMemo(() => {
-    return (currentDebtTaken - debtForSelectedLTV).toString();
-  }, [currentDebtTaken, debtForSelectedLTV]);
-
-  const {
-    quoteForSwap: quoteForRepayment,
-    priceImpact,
-    tokenOut,
-  } = useQuoteWithSlippage(strategy, repaymentAmount, false);
-
   if (maxDebt === 0) return <></>;
 
   return (
@@ -39,13 +28,11 @@ export function VaultDebtSlider({
       <Slider
         min={0}
         max={maxDebt}
-        onChange={(val: number[], index: number) =>
-          index === 0
-            ? handleDebtAmountChanged(val[0].toString())
-            : console.log({ val })
-        }
-        ariaLabel={['left thumb', 'right thumb']}
-        defaultValue={[0, currentDebtTaken]}
+        onChange={(val: number[], index: number) => {
+          handleChosenDebtChanged(val.toString());
+        }}
+        ariaLabel={['left thumb']}
+        defaultValue={[currentVaultDebt]}
         renderThumb={(props, state) => {
           if (!maxLTV) {
             return null;
@@ -78,10 +65,10 @@ export function VaultDebtSlider({
                     <p>{currentLTV.toFixed(2)}% LTV</p>
                   </>
                 )}
-                {state.index === 1 && (
+                {state.index === 1 && state.value[0] != state.value[1] && (
                   <>
                     <p>Repayment</p>
-                    <p>${quoteForRepayment}</p>
+                    <p>${}</p>
                   </>
                 )}
               </div>

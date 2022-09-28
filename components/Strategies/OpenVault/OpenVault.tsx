@@ -92,19 +92,16 @@ export function OpenVault({
 }: BorrowProps) {
   const { address } = useAccount();
 
-  const [debtForSelectedLTV, setDebtForSelectedLTV] =
-    useState<ethers.BigNumber>(ethers.BigNumber.from(0));
+  const [chosenDebt, setChosenDebt] = useState<ethers.BigNumber>(
+    ethers.BigNumber.from(0),
+  );
   const [maxDebt, setMaxDebt] = useState<ethers.BigNumber>(
     ethers.BigNumber.from(0),
   );
 
   const [liquidationDateEstimation, setLiquidationDateEstimation] =
     useState<string>('');
-  const { quoteForSwap, priceImpact, tokenOut } = useQuoteWithSlippage(
-    strategy,
-    debtForSelectedLTV.toString(),
-    true,
-  );
+
   const [showMath, setShowMath] = useState<boolean>(false);
   const [nftsApproved, setNFTsApproved] = useState<string[]>([]);
   const [approvalsLoading, setApprovalsLoading] = useState<boolean>(false);
@@ -116,13 +113,23 @@ export function OpenVault({
     },
   });
 
-  const currentDebtTaken = useMemo(() => {
+  const underlying = useMemo(() => {
+    return strategy.underlying;
+  }, [strategy]);
+
+  const currentVaultDebt = useMemo(() => {
     if (vaultsFetching || vaultsData?.vaults.length === 0)
       return ethers.BigNumber.from(0);
     return vaultsData?.vaults
       .map((v) => ethers.BigNumber.from(v.debt))
       .reduce((a, b) => a.add(b));
   }, [vaultsData, vaultsFetching]);
+
+  const { quoteForSwap, priceImpact } = useQuoteWithSlippage(
+    strategy,
+    chosenDebt.toString(),
+    true,
+  );
 
   const addCollateralAndSwap = useCallback(async () => {
     const contractsAndTokenIds = nftsSelected.map((id) =>
@@ -131,12 +138,12 @@ export function OpenVault({
 
     const nextNonce = await getNextVaultNonceForUser(strategy, address!);
     const vaultNonce = ethers.BigNumber.from(nextNonce).add(1);
-    const minOut = ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals);
+    const minOut = ethers.utils.parseUnits(quoteForSwap, underlying.decimals);
     const sqrtPriceLimitX96 = strategy.token0IsUnderlying
       ? ethers.BigNumber.from(TickMath.MAX_SQRT_RATIO.toString()).sub(1)
       : ethers.BigNumber.from(TickMath.MIN_SQRT_RATIO.toString()).add(1);
     const debtForArgs = ethers.utils.parseUnits(
-      debtForSelectedLTV.toString(),
+      chosenDebt.toString(),
       strategy.underlying.decimals,
     );
     const oracleInfo = {
@@ -239,17 +246,17 @@ export function OpenVault({
   }, [
     address,
     nftsSelected,
-    debtForSelectedLTV,
+    chosenDebt,
     strategy,
+    underlying.decimals,
     quoteForSwap,
-    tokenOut.decimals,
   ]);
 
   // TODO: I think useCallback may not be able to introspect the debounced
   // function this produces. May need to either manually handle debounce with
   // timeouts or do something else.
-  const handleDebtAmountChanged = debounce(async (value: string) => {
-    setDebtForSelectedLTV(ethers.BigNumber.from(value));
+  const handleChosenDebtChanged = debounce(async (value: string) => {
+    setChosenDebt(ethers.BigNumber.from(value));
 
     if (value === '') {
       setLiquidationDateEstimation('');
@@ -357,12 +364,12 @@ export function OpenVault({
       <div className={styles.borrowComponentWrapper}>
         <VaultDebtSlider
           strategy={strategy}
-          debtForSelectedLTV={parseFloat(debtForSelectedLTV.toString())}
-          currentDebtTaken={parseFloat(
-            ethers.utils.formatEther(currentDebtTaken!),
+          chosenDebt={parseFloat(chosenDebt.toString())}
+          currentVaultDebt={parseFloat(
+            ethers.utils.formatEther(currentVaultDebt!),
           )}
           maxDebt={parseFloat(maxDebt.toString())}
-          handleDebtAmountChanged={handleDebtAmountChanged}
+          handleChosenDebtChanged={handleChosenDebtChanged}
           maxLTV={maxLTV}
         />
         <div className={`${styles.mathWrapper} ${styles.priceImpactWrapper}`}>
@@ -387,7 +394,7 @@ export function OpenVault({
         <div className={styles.borrowInput}>
           <div className={styles.underlyingInput}>
             <div>{quoteForSwap}</div>
-            <div>{tokenOut.symbol}</div>
+            <div>{underlying.symbol}</div>
           </div>
           <div
             className={styles.showMath}
@@ -409,7 +416,7 @@ export function OpenVault({
             maxDebt.isZero() || !maxLTV
               ? '0.00'
               : (
-                  (parseFloat(debtForSelectedLTV.toString()) /
+                  (parseFloat(chosenDebt.toString()) /
                     parseFloat(maxDebt.toString())) *
                   maxLTV
                 ).toFixed(2)
