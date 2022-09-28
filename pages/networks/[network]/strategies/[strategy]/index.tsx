@@ -1,22 +1,22 @@
 import { GetServerSideProps } from 'next';
+import { strategyPricesData, StrategyPricesData } from 'lib/strategies/charts';
 import { SupportedNetwork } from 'lib/config';
 import {
-  OldStrategyOverviewContent,
-  OldStrategyPageProps,
-} from 'components/Strategy/OldStrategyOverviewContent';
+  StrategyOverviewContent,
+  StrategyPageProps,
+} from 'components/Strategies/StrategyOverviewContent';
+import { useEffect, useMemo, useState } from 'react';
 import {
   fetchSubgraphData,
   makeLendingStrategy,
   SubgraphPool,
   SubgraphStrategy,
 } from 'lib/LendingStrategy';
-import { useConfig } from 'hooks/useConfig';
 import { useSigner } from 'wagmi';
-import { useEffect, useMemo, useState } from 'react';
-import { strategyPricesData, StrategyPricesData } from 'lib/strategies/charts';
+import { useConfig } from 'hooks/useConfig';
 
 type ServerSideProps = Omit<
-  OldStrategyPageProps,
+  StrategyPageProps,
   'lendingStrategy' | 'pricesData'
 > & {
   subgraphStrategy: SubgraphStrategy;
@@ -48,7 +48,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   };
 };
 
-export default function OldStrategyPage({
+export default function StrategyPage({
   address,
   subgraphStrategy,
   subgraphPool,
@@ -70,7 +70,7 @@ export default function OldStrategyPage({
   }, [lendingStrategy, config]);
 
   return (
-    <OldStrategyOverviewContent
+    <StrategyOverviewContent
       address={address}
       lendingStrategy={lendingStrategy}
       pricesData={pricesData}

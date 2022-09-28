@@ -146,7 +146,7 @@ export default function VaultPage({
 
   return (
     <div className={styles.column}>
-      <a href={`/networks/${config.network}/strategy/${lendingStrategy.id}`}>
+      <a href={`/networks/${config.network}/strategies/${lendingStrategy.id}`}>
         ⬅ strategy
       </a>
       {!!vaultInfo && (

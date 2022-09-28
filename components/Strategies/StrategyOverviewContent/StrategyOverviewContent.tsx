@@ -2,7 +2,7 @@ import React from 'react';
 import styles from 'components/Strategy/Strategy.module.css';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { AssociatedVaults } from '../AssociatedVaults';
-import { Charts } from 'components/Strategy/Charts';
+import { Charts } from 'components/Strategies/Charts';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { Collateral } from '../Collateral';
 import { Activity } from '../Activity';

@@ -1,8 +1,8 @@
 import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useMemo, useState } from 'react';
 import strategyStyles from 'components/Strategy/Strategy.module.css';
-import { AccountNFTs } from 'components/Strategy/AccountNFTs';
-import { OpenVault } from 'components/Strategy/OpenVault';
+import { AccountNFTs } from 'components/Strategies/AccountNFTs';
+import { OpenVault } from 'components/Strategies/OpenVault';
 import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
 import { CenterUserNFTsResponse, useCenterNFTs } from 'hooks/useCenterNFTs';

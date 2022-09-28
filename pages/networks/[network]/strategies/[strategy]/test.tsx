@@ -1,4 +1,4 @@
-import { TestPageContent } from 'components/Strategy/TestPageContent';
+import { TestPageContent } from 'components/Strategies/TestPageContent';
 import { useConfig } from 'hooks/useConfig';
 import {
   fetchSubgraphData,

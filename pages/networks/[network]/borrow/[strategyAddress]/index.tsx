@@ -4,7 +4,7 @@ import { GetServerSideProps } from 'next';
 import {
   BorrowPageContent,
   BorrowPageProps,
-} from 'components/Strategy/BorrowPageContent';
+} from 'components/Strategies/BorrowPageContent';
 import {
   fetchSubgraphData,
   makeLendingStrategy,

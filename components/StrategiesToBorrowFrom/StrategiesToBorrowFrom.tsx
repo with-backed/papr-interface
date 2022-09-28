@@ -1,5 +1,5 @@
 import { Fieldset } from 'components/Fieldset';
-import { Health } from 'components/Strategy/Health';
+import { Health } from 'components/Strategies/Health';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy } from 'lib/LendingStrategy';
@@ -123,7 +123,7 @@ export default function StrategiesToBorrowFrom({
                 <tr
                   onClick={() =>
                     router.push(
-                      `/networks/${config.network}/strategy/${strategy.id}/borrow`,
+                      `/networks/${config.network}/strategies/${strategy.id}/borrow`,
                     )
                   }
                   className={`${i % 2 === 0 ? styles.even : ''} ${
@@ -187,7 +187,7 @@ export default function StrategiesToBorrowFrom({
                   {includeDetails && (
                     <td colSpan={6}>
                       <Link
-                        href={`/networks/${config.network}/strategy/${strategy.id}`}>
+                        href={`/networks/${config.network}/strategies/${strategy.id}`}>
                         <a>Details ↗</a>
                       </Link>
                     </td>
