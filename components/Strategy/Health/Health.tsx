@@ -29,11 +29,11 @@ export function Health({
   return (
     <span>
       {['-', '-', '-', '-', '|', '-', '-', '-', '-'].map((char, i) => (
-        <>
+        <span key={char + i}>
           {markPosition === i && <>R</>}
           {normPosition === i && <>C</>}
           {markPosition !== i && normPosition !== i && <>{char}</>}
-        </>
+        </span>
       ))}
     </span>
   );
