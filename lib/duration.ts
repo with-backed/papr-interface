@@ -7,6 +7,12 @@ import { SECONDS_IN_A_DAY } from './constants';
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 
+export function timestampDaysAgo(timestamp: number) {
+  const t1 = dayjs.unix(timestamp);
+  const diff = Math.abs(t1.diff());
+  return Math.round(dayjs.duration({ milliseconds: diff }).asDays());
+}
+
 export function humanizedDuration(
   duration: number,
   unit: duration.DurationUnitType = 'seconds',
