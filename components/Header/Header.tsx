@@ -38,7 +38,10 @@ const prodPages = (strategyAddress: string): Page[] => [
       'https://app.uniswap.org/#/add/0x3089B47853df1b82877bEef6D904a0ce98a12553/0xb5e5f51E3E112634975Fb44e6351380413F653aC/10000?chain=goerli',
     externalRedirect: true,
   },
-  { name: 'Community', route: 'community', isNetworkSpecialCase: true },
+  {
+    name: 'Mint Test NFTs',
+    route: `/strategies/${strategyAddress}/test`,
+  },
 ];
 
 const stagingPages: Page[] = [];
