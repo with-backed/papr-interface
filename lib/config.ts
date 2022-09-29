@@ -96,7 +96,7 @@ export const configs = {
   polygon,
 };
 
-export const prodConfigs = [ethereum, optimism, polygon];
+export const prodConfigs = [];
 
 export const devConfigs = [goerli];
 
