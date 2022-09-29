@@ -59,9 +59,9 @@ function NavLinks({ activeRoute }: NavLinksProps) {
 
   const pages = useMemo(() => {
     if (process.env.VERCEL_ENV === 'production') {
-      return prodPages(strategyAddress);
+      return prodPages(strategyAddress!);
     }
-    return [...prodPages(strategyAddress), ...stagingPages];
+    return [...prodPages(strategyAddress!), ...stagingPages];
   }, [strategyAddress]);
 
   return (
