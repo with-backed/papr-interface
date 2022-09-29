@@ -49,7 +49,6 @@ const ethereum = {
   network: 'ethereum',
   emailSubjectPrefix: '[Ethereum]:',
   facilitatorStartBlock: 14636317,
-  strategyAddress: 'TODO: UPDATE WITH DEPLOYED ADDRESS',
 };
 
 const optimism: Config = {
