@@ -375,7 +375,7 @@ export function OpenVault({
   }, [nftsSelected, strategy]);
 
   const borrowDisabled = useMemo(() => {
-    if (!!currentVault) return false;
+    if (!!currentVault && nftsSelected.length === 0) return false;
     const allSelectedAreApproved =
       nftsSelected.filter((val) => nftsApproved.includes(val)).length ===
       nftsSelected.length;

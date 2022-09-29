@@ -20,9 +20,6 @@ export function VaultDebtSlider({
   handleChosenDebtChanged,
 }: VaultDebtSliderProps) {
   const maxDebtNumber = useMemo(() => {
-    console.log(
-      parseInt(ethers.utils.formatUnits(maxDebt, strategy.debtToken.decimals)),
-    );
     return parseInt(
       ethers.utils.formatUnits(maxDebt, strategy.debtToken.decimals),
     );
@@ -33,12 +30,12 @@ export function VaultDebtSlider({
     );
   }, [currentVaultDebt, strategy.debtToken.decimals]);
 
-  const [currentLTVLeft, setCurrentLTVLeft] = useState<string>('');
+  const [indicatorLeftPixels, setIndicatorLeftPixels] = useState<string>('');
   const initializeCurrentLTVLeft = useCallback(
     (val: string) => {
-      if (!currentLTVLeft && val !== '0px') setCurrentLTVLeft(val);
+      if (!indicatorLeftPixels && val !== '0px') setIndicatorLeftPixels(val);
     },
-    [currentLTVLeft],
+    [indicatorLeftPixels],
   );
 
   return (
@@ -81,7 +78,7 @@ export function VaultDebtSlider({
                 <div
                   className={styles.currentIndicator}
                   style={{
-                    left: currentLTVLeft,
+                    left: indicatorLeftPixels,
                   }}>
                   <div>
                     <p>
