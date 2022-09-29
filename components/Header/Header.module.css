@@ -29,9 +29,8 @@
 }
 
 .controls {
-  display: grid;
-  grid-template-columns: 1fr minmax(0, 1fr);
-  gap: 20px;
+  display: flex;
+  align-items: flex-end;
 }
 
 .mobile-header > .controls {

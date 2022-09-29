@@ -1,6 +1,6 @@
 import { Select } from 'components/Select';
 import { useConfig } from 'hooks/useConfig';
-import { configs, prodConfigs } from 'lib/config';
+import { prodConfigs, devConfigs } from 'lib/config';
 import capitalize from 'lodash/capitalize';
 import { useRouter } from 'next/router';
 import React, { useCallback, useMemo } from 'react';
@@ -17,7 +17,7 @@ const options =
         value: network,
         label: capitalize(network),
       }))
-    : Object.keys(configs).map((network) => ({
+    : [...prodConfigs, ...devConfigs].map(({ network }) => ({
         value: network,
         label: capitalize(network),
       }));
@@ -53,7 +53,7 @@ type NetworkSelectorProps = {
 };
 export const NetworkSelector = ({ isErrorPage }: NetworkSelectorProps) => {
   const { network } = useConfig();
-  const { push, route } = useRouter();
+  const { route } = useRouter();
 
   const onChange = useCallback(
     (option: SingleValue<Option>) => {
