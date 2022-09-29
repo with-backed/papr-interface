@@ -3,6 +3,7 @@ import { Health } from 'components/Strategies/Health';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy } from 'lib/LendingStrategy';
+import { formatThreeFractionDigits } from 'lib/numberFormat';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -154,7 +155,7 @@ export default function StrategiesToBorrowFrom({
 
                   <td className={styles.stat}>
                     <TooltipReference {...nftCapTooltip}>
-                      <p>{nftOverCap.toFixed(2)}</p>
+                      <p>{formatThreeFractionDigits(nftOverCap)}</p>
                     </TooltipReference>
                     <NFTCapTooltip
                       strategy={strategy}
@@ -165,7 +166,7 @@ export default function StrategiesToBorrowFrom({
                   </td>
                   <td className={styles.stat}>
                     <TooltipReference {...mktCtrTooltip}>
-                      <p>{markOverNorm.toFixed(2)}</p>
+                      <p>{formatThreeFractionDigits(markOverNorm)}</p>
                     </TooltipReference>
                     <MktCtrTooltip
                       strategy={strategy}

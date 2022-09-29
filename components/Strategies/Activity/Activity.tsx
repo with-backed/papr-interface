@@ -6,6 +6,7 @@ import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { humanizedTimestamp } from 'lib/duration';
 import { LendingStrategy } from 'lib/LendingStrategy';
+import { formatTokenAmount } from 'lib/numberFormat';
 import React, { useMemo } from 'react';
 import {
   ActivityByStrategyDocument,
@@ -135,11 +136,15 @@ function CollateralAdded({
   }, [debtIncreasedEvents, event]);
 
   const borrowedAmount = useMemo(() => {
-    return ethers.utils.formatUnits(
+    const bigNumAmount = ethers.utils.formatUnits(
       debtIncreasedEvent?.amount,
       lendingStrategy.token0IsUnderlying
         ? lendingStrategy.subgraphPool.token0.decimals
         : lendingStrategy.subgraphPool.token1.decimals,
+    );
+    return (
+      formatTokenAmount(parseFloat(bigNumAmount)) +
+      ` ${lendingStrategy.underlying.symbol}`
     );
   }, [debtIncreasedEvent, lendingStrategy]);
 
@@ -188,11 +193,15 @@ function CollateralRemoved({
   }, [debtDecreasedEvents, event]);
 
   const returnedAmount = useMemo(() => {
-    return ethers.utils.formatUnits(
+    const bigNumAmount = ethers.utils.formatUnits(
       debtDecreasedEvent?.amount,
       lendingStrategy.token0IsUnderlying
         ? lendingStrategy.subgraphPool.token0.decimals
         : lendingStrategy.subgraphPool.token1.decimals,
+    );
+    return (
+      formatTokenAmount(parseFloat(bigNumAmount)) +
+      ` ${lendingStrategy.underlying.symbol}`
     );
   }, [debtDecreasedEvent, lendingStrategy]);
 
@@ -224,11 +233,8 @@ function Swap({
   lendingStrategy: LendingStrategy;
 }) {
   const description = useMemo(() => {
-    const formatter = new Intl.NumberFormat('en-US', {
-      maximumFractionDigits: 2,
-    });
-    const amount0 = formatter.format(Math.abs(event.amount0));
-    const amount1 = formatter.format(Math.abs(event.amount1));
+    const amount0 = formatTokenAmount(Math.abs(event.amount0));
+    const amount1 = formatTokenAmount(Math.abs(event.amount1));
     const token0Symbol = lendingStrategy.subgraphPool.token0.symbol;
     const token1Symbol = lendingStrategy.subgraphPool.token1.symbol;
 
