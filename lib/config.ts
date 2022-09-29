@@ -8,7 +8,8 @@ const baseConfig = {
 
 export type Config = {
   // things that aren't guaranteed to exist in all configs should be declared here
-} & Omit<typeof ethereum, 'nftSalesSubgraph'>;
+  strategyAddress?: string;
+} & Omit<typeof ethereum, 'nftSalesSubgraph' | 'strategyAddress'>;
 
 export type SupportedNetwork = keyof typeof configs;
 
@@ -28,6 +29,7 @@ const goerli: Config = {
   network: 'goerli',
   emailSubjectPrefix: '[Testnet]:',
   facilitatorStartBlock: 10550059,
+  strategyAddress: '0x206a9c917148cd6c290ab289599760b2eea5d983',
 };
 
 const ethereum = {
