@@ -32,6 +32,26 @@ const goerli: Config = {
   strategyAddress: '0x206a9c917148cd6c290ab289599760b2eea5d983',
 };
 
+const ethereum = {
+  ...baseConfig,
+  centerNetwork: 'ethereum-mainnet',
+  infuraId:
+    process.env.VERCEL_ENV === 'production'
+      ? '54c753f04ec64374aa679e383e7f84d5'
+      : developmentAlchemyKey,
+  openSeaUrl: 'https://opensea.io',
+  etherscanUrl: 'https://etherscan.io',
+  chainId: 1,
+  jsonRpcProvider:
+    'https://eth-mainnet.alchemyapi.io/v2/De3LMv_8CYuN9WzVEgoOI5w7ltnGIhnH',
+  alchemyId: 'De3LMv_8CYuN9WzVEgoOI5w7ltnGIhnH',
+  siteUrl: 'https://withbacked.xyz',
+  network: 'ethereum',
+  emailSubjectPrefix: '[Ethereum]:',
+  facilitatorStartBlock: 14636317,
+  strategyAddress: 'TODO: UPDATE WITH DEPLOYED ADDRESS',
+};
+
 const optimism: Config = {
   ...baseConfig,
   centerNetwork: '',
@@ -68,26 +88,6 @@ const polygon: Config = {
   network: 'polygon',
   emailSubjectPrefix: '[Polygon]:',
   facilitatorStartBlock: 28234089,
-};
-
-const ethereum = {
-  ...baseConfig,
-  centerNetwork: 'ethereum-mainnet',
-  infuraId:
-    process.env.VERCEL_ENV === 'production'
-      ? '54c753f04ec64374aa679e383e7f84d5'
-      : developmentAlchemyKey,
-  openSeaUrl: 'https://opensea.io',
-  etherscanUrl: 'https://etherscan.io',
-  chainId: 1,
-  jsonRpcProvider:
-    'https://eth-mainnet.alchemyapi.io/v2/De3LMv_8CYuN9WzVEgoOI5w7ltnGIhnH',
-  alchemyId: 'De3LMv_8CYuN9WzVEgoOI5w7ltnGIhnH',
-  siteUrl: 'https://withbacked.xyz',
-  network: 'ethereum',
-  emailSubjectPrefix: '[Ethereum]:',
-  facilitatorStartBlock: 14636317,
-  strategyAddress: 'TODO: UPDATE WITH DEPLOYED ADDRESS',
 };
 
 export const configs = {
