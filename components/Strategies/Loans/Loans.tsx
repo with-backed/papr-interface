@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { timestampDaysAgo } from 'lib/duration';
 import { LendingStrategy } from 'lib/LendingStrategy';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { convertOneScaledValue } from 'lib/strategies';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -18,11 +19,6 @@ type LoansProps = {
   lendingStrategy: LendingStrategy;
   pricesData: StrategyPricesData | null;
 };
-
-const formatter = new Intl.NumberFormat('en-US', {
-  style: 'percent',
-  maximumFractionDigits: 2,
-});
 
 export function Loans({ lendingStrategy, pricesData }: LoansProps) {
   const [ltvs, setLtvs] = useState<{ [key: string]: number }>({});
@@ -46,9 +42,7 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
       return '...';
     }
 
-    return formatter.format(
-      ltvValues.reduce((a, b) => a + b) / ltvValues.length,
-    );
+    return formatPercent(ltvValues.reduce((a, b) => a + b) / ltvValues.length);
   }, [ltvs]);
 
   const totalDebt = useMemo(
@@ -59,6 +53,17 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
       ),
     [activeVaults],
   );
+
+  const formattedTotalDebt = useMemo(() => {
+    const debtBigNum = activeVaults.reduce(
+      (prev, v) => prev.add(v.debt),
+      ethers.BigNumber.from(0),
+    );
+    const debtNum = parseFloat(
+      ethers.utils.formatUnits(debtBigNum, lendingStrategy.underlying.decimals),
+    );
+    return formatTokenAmount(debtNum) + ` ${lendingStrategy.underlying.symbol}`;
+  }, [activeVaults, lendingStrategy.underlying]);
 
   useEffect(() => {
     if (!norm) {
@@ -86,13 +91,7 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
         <tbody>
           <tr className={styles.row}>
             <td>{activeVaults.length} Loans</td>
-            <td className={styles['right-align']}>
-              {ethers.utils.formatUnits(
-                totalDebt,
-                lendingStrategy.underlying.decimals,
-              )}{' '}
-              {lendingStrategy.underlying.symbol}
-            </td>
+            <td className={styles['right-align']}>{formattedTotalDebt}</td>
             <td className={styles['right-align']}>
               {timestampDaysAgo(lendingStrategy.createdAt)}
             </td>
@@ -143,7 +142,7 @@ type VaultRowProps = {
   maxLTV: ethers.BigNumber | null;
 };
 function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
-  const [{ data, fetching }] = useQuery<DebtIncreasesByVaultQuery>({
+  const [{ data }] = useQuery<DebtIncreasesByVaultQuery>({
     query: DebtIncreasesByVaultDocument,
     variables: { vaultId: id },
   });
@@ -158,17 +157,20 @@ function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
     ).timestamp;
   }, [data]);
 
+  const formattedDebt = useMemo(() => {
+    const debtNum = parseFloat(ethers.utils.formatUnits(debt, decimals));
+    return formatTokenAmount(debtNum) + ` ${symbol}`;
+  }, [debt, decimals, symbol]);
+
   return (
     <tr className={styles.row}>
       <td>#{id.substring(0, 7)}</td>
-      <td className={styles['right-align']}>
-        {ethers.utils.formatUnits(debt, decimals)} {symbol}
-      </td>
+      <td className={styles['right-align']}>{formattedDebt}</td>
       <td className={styles['right-align']}>
         {!!createdTimestamp ? timestampDaysAgo(createdTimestamp) : '...'}
       </td>
       <td className={styles['right-align']}>
-        {ltv ? formatter.format(ltv) : '...'}
+        {ltv ? formatPercent(ltv) : '...'}
       </td>
       <td className={styles['center-align']}>
         {!!ltv && !!maxLTV ? <VaultHealth ltv={ltv} maxLtv={maxLTV} /> : '...'}
