@@ -24,6 +24,23 @@
     text-align: center;
 }
 
+.currentIndicator {
+    position: absolute;
+    top: -50px;
+    display: flex;
+    flex-direction: column;
+    margin: 0px;
+}
+
+.currentIndicator div {
+    margin: 0;
+    text-align: left;
+}
+
+.currentIndicator div p {
+    margin: 0;
+}
+
 .borrowInput {
     width: 100%;
     margin-top: 24px;

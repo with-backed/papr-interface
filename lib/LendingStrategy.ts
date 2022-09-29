@@ -1,5 +1,5 @@
 import { Pool } from '@uniswap/v3-sdk';
-import { ethers, providers } from 'ethers';
+import { ethers, Overrides, providers } from 'ethers';
 import {
   Strategy__factory,
   Strategy,
@@ -170,6 +170,42 @@ class LendingStrategyInternal {
     return pool;
   }
 
+  async mintAndSellDebt(
+    vaultNonce: ethers.BigNumberish,
+    debt: ethers.BigNumberish,
+    minOut: ethers.BigNumberish,
+    sqrtPriceLimitX96: ethers.BigNumberish,
+    proceedsTo: string,
+    overrides?: Overrides & { from?: string | Promise<string> },
+  ) {
+    return this._contract.mintAndSellDebt(
+      vaultNonce,
+      debt,
+      minOut,
+      sqrtPriceLimitX96,
+      proceedsTo,
+      overrides,
+    );
+  }
+
+  async buyAndReduceDebt(
+    vaultId: ethers.BigNumberish,
+    underlyingAmount: ethers.BigNumberish,
+    minOut: ethers.BigNumberish,
+    sqrtPriceLimitX96: ethers.BigNumberish,
+    proceedsTo: string,
+    overrides?: Overrides & { from?: string | Promise<string> },
+  ) {
+    return this._contract.buyAndReduceDebt(
+      vaultId,
+      underlyingAmount,
+      minOut,
+      sqrtPriceLimitX96,
+      proceedsTo,
+      overrides,
+    );
+  }
+
   async reduceDebt(vaultId: ethers.BigNumberish, amount: ethers.BigNumberish) {
     return this._contract.reduceDebt(vaultId, amount);
   }
@@ -191,6 +227,12 @@ class LendingStrategyInternal {
     return this._subgraphStrategy.underlying === this.subgraphPool.token0.id
       ? this.subgraphPool.token0
       : this.subgraphPool.token1;
+  }
+
+  get debtToken() {
+    return this._subgraphStrategy.underlying === this.subgraphPool.token0.id
+      ? this.subgraphPool.token1
+      : this.subgraphPool.token0;
   }
 }
 

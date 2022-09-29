@@ -1,14 +1,13 @@
 import { Slider } from 'components/Slider';
-import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
+import { ethers } from 'ethers';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
 
 type VaultDebtSliderProps = {
   strategy: LendingStrategy;
-  maxDebt: number;
-  currentVaultDebt: number;
-  chosenDebt: number;
+  maxDebt: ethers.BigNumber;
+  currentVaultDebt: ethers.BigNumber;
   maxLTV: number | null;
   handleChosenDebtChanged: (val: string) => void;
 };
@@ -17,32 +16,50 @@ export function VaultDebtSlider({
   strategy,
   maxDebt,
   currentVaultDebt,
-  chosenDebt,
   maxLTV,
   handleChosenDebtChanged,
 }: VaultDebtSliderProps) {
-  if (maxDebt === 0) return <></>;
+  const maxDebtNumber = useMemo(() => {
+    console.log(
+      parseInt(ethers.utils.formatUnits(maxDebt, strategy.debtToken.decimals)),
+    );
+    return parseInt(
+      ethers.utils.formatUnits(maxDebt, strategy.debtToken.decimals),
+    );
+  }, [maxDebt, strategy.debtToken.decimals]);
+  const currentVaultDebtNumber = useMemo(() => {
+    return parseFloat(
+      ethers.utils.formatUnits(currentVaultDebt, strategy.debtToken.decimals),
+    );
+  }, [currentVaultDebt, strategy.debtToken.decimals]);
+
+  const [currentLTVLeft, setCurrentLTVLeft] = useState<string>('');
+  const initializeCurrentLTVLeft = useCallback(
+    (val: string) => {
+      if (!currentLTVLeft && val !== '0px') setCurrentLTVLeft(val);
+    },
+    [currentLTVLeft],
+  );
 
   return (
     <div className={styles.sliderWrapper}>
       <Slider
         min={0}
-        max={maxDebt}
-        onChange={(val: number[], index: number) => {
+        max={maxDebtNumber}
+        onChange={(val: number, index: number) => {
           handleChosenDebtChanged(val.toString());
         }}
-        ariaLabel={['left thumb']}
-        defaultValue={[currentVaultDebt]}
+        defaultValue={currentVaultDebtNumber}
         renderThumb={(props, state) => {
           if (!maxLTV) {
             return null;
           }
           let currentLTV: number;
-          if (maxDebt == 0) {
+          if (maxDebt.isZero()) {
             currentLTV = 0;
           } else {
             currentLTV = Math.min(
-              (state.valueNow / parseFloat(maxDebt.toString())) * maxLTV,
+              (state.valueNow / maxDebtNumber) * maxLTV,
               maxLTV,
             );
           }
@@ -55,24 +72,44 @@ export function VaultDebtSlider({
           } else {
             pushedClassName = '';
           }
+          console.log({ left: props.style.left });
+          initializeCurrentLTVLeft(props.style.left);
 
           return (
-            <div {...props}>
-              <div className={`${styles.sliderLabel} ${pushedClassName}`}>
-                {state.index === 0 && (
-                  <>
-                    <p>Loan Amount</p>
-                    <p>{currentLTV.toFixed(2)}% LTV</p>
-                  </>
-                )}
-                {state.index === 1 && state.value[0] != state.value[1] && (
-                  <>
-                    <p>Repayment</p>
-                    <p>${}</p>
-                  </>
-                )}
+            <>
+              {currentVaultDebtNumber !== 0 && (
+                <div
+                  className={styles.currentIndicator}
+                  style={{
+                    left: currentLTVLeft,
+                  }}>
+                  <div>
+                    <p>
+                      Current LTV:{' '}
+                      {(
+                        (currentVaultDebtNumber / maxDebtNumber) *
+                        maxLTV
+                      ).toFixed(2)}
+                      %
+                    </p>
+                  </div>
+                  <div>
+                    <p>↓</p>
+                  </div>
+                </div>
+              )}
+
+              <div {...props}>
+                <div className={`${styles.sliderLabel} ${pushedClassName}`}>
+                  {state.index === 0 && (
+                    <>
+                      <p>Loan Amount</p>
+                      <p>{currentLTV.toFixed(2)}% LTV</p>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
+            </>
           );
         }}
       />

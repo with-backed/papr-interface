@@ -26,7 +26,7 @@ export async function subgraphStrategyByAddress(id: string) {
   return data || null;
 }
 
-export async function getNextVaultNonceForUser(
+export async function currentVaultNonceForUser(
   strategy: LendingStrategy,
   owner: string,
 ) {

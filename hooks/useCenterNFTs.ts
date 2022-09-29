@@ -20,20 +20,6 @@ export const useCenterNFTs = (
 
   const getAllUserNFTs = useCallback(
     async (address: string, collections: string[]) => {
-      setUserCollectionNFTs([
-        {
-          address: '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
-          tokenId: '3',
-          smallPreviewImageUrl: '',
-        },
-        {
-          address: '0x6ef2c9cb23f03014d18d7e4ceeaec497db00247c',
-          tokenId: '3',
-          smallPreviewImageUrl: '',
-        },
-      ]);
-      setNFTsLoading(false);
-      return;
       const allNFTsFromCollections = await Promise.all(
         collections.map(async (collection) => {
           try {

@@ -124,8 +124,12 @@ export async function computeLiquidationEstimation(
   max: ethers.BigNumber,
   strategy: LendingStrategy,
 ) {
-  const debtTaken = debt.toNumber();
-  const maxDebt = max.toNumber();
+  const debtTaken = parseFloat(
+    ethers.utils.formatUnits(debt, strategy.debtToken.decimals),
+  );
+  const maxDebt = parseFloat(
+    ethers.utils.formatUnits(max, strategy.debtToken.decimals),
+  );
 
   const percentage = (debtTaken / maxDebt) * 100;
 
