@@ -8,30 +8,45 @@ import { Footer } from 'components/Footer';
 import { ConfigProvider } from 'hooks/useConfig';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { SupportedNetwork, isSupportedNetwork } from 'lib/config';
+import {
+  SupportedNetwork,
+  isSupportedNetwork,
+  prodConfigs,
+  devConfigs,
+} from 'lib/config';
 import { ApplicationProviders } from 'components/ApplicationProviders';
 import { useNetworkSpecificStyles } from 'hooks/useNetworkSpecificStyles';
 import { Header } from 'components/Header';
 import { ErrorBanners } from 'components/ErrorBanners';
 
+const networks = (
+  process.env.NEXT_PUBLIC_ENV === 'production'
+    ? prodConfigs.map(({ network }) => network)
+    : [...prodConfigs, ...devConfigs].map(({ network }) => network)
+) as SupportedNetwork[];
+
+const NETWORK_FROM_PATH_REGEXP = /\/networks\/([^\/]+)/;
+function networkFromPath(path: string) {
+  const match = path.match(NETWORK_FROM_PATH_REGEXP);
+  if (match) {
+    return match[1];
+  }
+  return networks[0];
+}
+
 export default function App({ Component, pageProps }: AppProps) {
-  const { query } = useRouter();
+  const { asPath } = useRouter();
   const [network, setNetwork] = useState<SupportedNetwork>(
-    isSupportedNetwork(query.network as string)
-      ? (query.network as SupportedNetwork)
-      : 'ethereum',
+    networkFromPath(asPath) as SupportedNetwork,
   );
   useNetworkSpecificStyles(network);
 
   useEffect(() => {
-    if (query.network) {
-      if (query.network !== network) {
-        if (isSupportedNetwork(query.network as string)) {
-          setNetwork(query.network as SupportedNetwork);
-        }
-      }
+    const newPath = networkFromPath(asPath);
+    if (newPath !== network) {
+      setNetwork(newPath as SupportedNetwork);
     }
-  }, [network, query.network]);
+  }, [asPath, network]);
 
   return (
     <ConfigProvider network={network}>

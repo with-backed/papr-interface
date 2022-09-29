@@ -1,7 +1,6 @@
 import { Button, TextButton } from 'components/Button';
 import { ConnectWallet } from 'components/ConnectWallet';
 import { Logo } from 'components/Logo';
-import { NetworkSelector } from 'components/NetworkSelector';
 import { useConfig } from 'hooks/useConfig';
 import { useOnClickOutside } from 'hooks/useOnClickOutside';
 import Link from 'next/link';
@@ -133,7 +132,6 @@ function MobileMenu({
       <div ref={mobileMenuNode} className={styles['mobile-menu-buttons']}>
         <NavLinks activeRoute={activeRoute} />
         <ConnectWallet />
-        {!shouldHideNetworkSelector(activeRoute) && <NetworkSelector />}
         <TextButton onClick={closeMobileMenu}>Close</TextButton>
       </div>
     </div>
@@ -168,11 +166,6 @@ export function Header() {
             <NavLinks activeRoute={activeRoute} />
           </div>
           <div className={styles.controls}>
-            {shouldHideNetworkSelector(activeRoute) ? (
-              <span />
-            ) : (
-              <NetworkSelector />
-            )}
             <ConnectWallet />
           </div>
         </div>
@@ -197,15 +190,5 @@ export function Header() {
         />
       </div>
     </nav>
-  );
-}
-
-/**
- * On pages that aren't network-namespaced, we should hide the network selector to avoid confusion.
- * @param activeRoute the current page
- */
-function shouldHideNetworkSelector(activeRoute: string) {
-  return ['errorPage', 'community', 'community/[address]', 'about'].some(
-    (v) => v === activeRoute,
   );
 }
