@@ -17,11 +17,14 @@ type Page = {
   isNetworkSpecialCase?: boolean;
   externalRedirect?: boolean;
 };
-const prodPages: Page[] = [
+const prodPages = (strategyAddress: string): Page[] => [
+  {
+    name: 'Strategy',
+    route: `strategies/${strategyAddress}`,
+  },
   {
     name: 'Borrow',
-    // TODO: in the single-strategy case, we should have the deployed strategy in the config for each network.
-    route: 'strategies/0x206a9c917148cd6c290ab289599760b2eea5d983/borrow',
+    route: `strategies/${strategyAddress}/borrow`,
   },
   {
     name: 'Swap',
@@ -52,14 +55,14 @@ type NavLinksProps = {
   activeRoute: string;
 };
 function NavLinks({ activeRoute }: NavLinksProps) {
-  const { network } = useConfig();
+  const { network, strategyAddress } = useConfig();
 
   const pages = useMemo(() => {
     if (process.env.VERCEL_ENV === 'production') {
-      return prodPages;
+      return prodPages(strategyAddress);
     }
-    return [...prodPages, ...stagingPages];
-  }, []);
+    return [...prodPages(strategyAddress), ...stagingPages];
+  }, [strategyAddress]);
 
   return (
     <ul className={styles.links}>
