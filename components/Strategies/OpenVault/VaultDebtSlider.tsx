@@ -10,6 +10,7 @@ type VaultDebtSliderProps = {
   currentVaultDebt: ethers.BigNumber;
   maxLTV: number | null;
   handleChosenDebtChanged: (val: string) => void;
+  isBorrowing: boolean;
 };
 
 export function VaultDebtSlider({
@@ -18,6 +19,7 @@ export function VaultDebtSlider({
   currentVaultDebt,
   maxLTV,
   handleChosenDebtChanged,
+  isBorrowing,
 }: VaultDebtSliderProps) {
   const maxDebtNumber = useMemo(() => {
     return parseInt(
@@ -30,6 +32,10 @@ export function VaultDebtSlider({
     );
   }, [currentVaultDebt, strategy.debtToken.decimals]);
 
+  const [controlledSliderValue, setControlledSliderValue] = useState<number>(
+    currentVaultDebtNumber,
+  );
+
   const [indicatorLeftPixels, setIndicatorLeftPixels] = useState<string>('');
   const initializeCurrentLTVLeft = useCallback(
     (val: string) => {
@@ -38,15 +44,29 @@ export function VaultDebtSlider({
     [indicatorLeftPixels],
   );
 
+  const sliderValues = useMemo(() => {
+    return isBorrowing
+      ? controlledSliderValue
+      : [controlledSliderValue, currentVaultDebtNumber];
+  }, [isBorrowing, controlledSliderValue, currentVaultDebtNumber]);
+
   return (
     <div className={styles.sliderWrapper}>
       <Slider
         min={0}
         max={maxDebtNumber}
-        onChange={(val: number, index: number) => {
-          handleChosenDebtChanged(val.toString());
+        onChange={(val: number | number[], index: number) => {
+          console.log('on change ran');
+          if (typeof val === 'number') {
+            setControlledSliderValue(val);
+            handleChosenDebtChanged(val.toString());
+          } else {
+            setControlledSliderValue(val[0]);
+            handleChosenDebtChanged(val[0].toString());
+          }
         }}
-        defaultValue={currentVaultDebtNumber}
+        hideTrackStyle={isBorrowing}
+        value={sliderValues}
         renderThumb={(props, state) => {
           if (!maxLTV) {
             return null;
@@ -69,7 +89,7 @@ export function VaultDebtSlider({
           } else {
             pushedClassName = '';
           }
-          console.log({ left: props.style.left });
+
           initializeCurrentLTVLeft(props.style.left);
 
           return (

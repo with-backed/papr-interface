@@ -118,7 +118,7 @@ export function OpenVault({
 
   const isBorrowing = useMemo(() => {
     if (!currentVault) return true;
-    return chosenDebt.gt(currentVaultDebt);
+    return chosenDebt.gte(currentVaultDebt);
   }, [chosenDebt, currentVaultDebt, currentVault]);
 
   const { quoteForSwap, priceImpact } = useQuoteWithSlippage(
@@ -400,6 +400,7 @@ export function OpenVault({
           maxDebt={maxDebt}
           handleChosenDebtChanged={handleChosenDebtChanged}
           maxLTV={maxLTV}
+          isBorrowing={isBorrowing}
         />
         <div className={`${styles.mathWrapper} ${styles.priceImpactWrapper}`}>
           <div className={`${styles.mathRow} ${styles.even}`}>
@@ -427,56 +428,72 @@ export function OpenVault({
             </div>
             <div>{underlying.symbol}</div>
           </div>
-          <div
-            className={styles.showMath}
-            onClick={() => setShowMath(!showMath)}>
-            Show Math
-          </div>
+          {isBorrowing && (
+            <div
+              className={styles.showMath}
+              onClick={() => setShowMath(!showMath)}>
+              Show Math
+            </div>
+          )}
 
-          <div
-            className={`${styles.button} ${styles.reviewButton}`}
-            onClick={() => setShowMath(true)}>
-            Review
-          </div>
+          {isBorrowing && (
+            <div
+              className={`${styles.button} ${styles.reviewButton}`}
+              onClick={() => setShowMath(true)}>
+              Review
+            </div>
+          )}
+
+          {!isBorrowing && (
+            <div className={styles.approveAndBorrowButtons}>
+              {!underlyingApproved && (
+                <button className={styles.button} onClick={approveUnderlying}>
+                  Approve {strategy.underlying.symbol}
+                </button>
+              )}
+              <button className={styles.button} onClick={repay}>
+                Repay
+              </button>
+            </div>
+          )}
         </div>
 
-        <VaultMath
-          strategy={strategy}
-          pricesData={pricesData}
-          inputtedLTV={
-            maxDebt.isZero() || !maxLTV
-              ? '0.00'
-              : (
-                  (parseFloat(chosenDebt.toString()) /
-                    parseFloat(maxDebt.toString())) *
-                  maxLTV
-                ).toFixed(2)
-          }
-          quoteForSwap={formattedQuoteForSwap}
-          showMath={showMath}
-        />
-        <div
-          className={`${styles.approveAndBorrowButtons} ${
-            !showMath && styles.noDisplay
-          }`}>
-          {!approveDisabled && (
-            <button className={styles.button} onClick={performApproveAll}>
-              {approvalsLoading && '...'}
-              {!approvalsLoading && 'Approve NFTs'}
+        {isBorrowing && (
+          <VaultMath
+            strategy={strategy}
+            pricesData={pricesData}
+            inputtedLTV={
+              maxDebt.isZero() || !maxLTV
+                ? '0.00'
+                : (
+                    (parseFloat(chosenDebt.toString()) /
+                      parseFloat(maxDebt.toString())) *
+                    maxLTV
+                  ).toFixed(2)
+            }
+            quoteForSwap={formattedQuoteForSwap}
+            showMath={showMath}
+          />
+        )}
+        {isBorrowing && (
+          <div
+            className={`${styles.approveAndBorrowButtons} ${
+              !showMath && styles.noDisplay
+            }`}>
+            {!approveDisabled && (
+              <button className={styles.button} onClick={performApproveAll}>
+                {approvalsLoading && '...'}
+                {!approvalsLoading && 'Approve NFTs'}
+              </button>
+            )}
+            <button
+              className={styles.button}
+              onClick={borrowMore}
+              disabled={borrowDisabled}>
+              Borrow
             </button>
-          )}
-          {!isBorrowing && !underlyingApproved && (
-            <button className={styles.button} onClick={approveUnderlying}>
-              Approve {strategy.underlying.symbol}
-            </button>
-          )}
-          <button
-            className={styles.button}
-            onClick={isBorrowing ? borrowMore : repay}
-            disabled={isBorrowing ? borrowDisabled : false}>
-            {isBorrowing ? 'Borrow' : 'Repay'}
-          </button>
-        </div>
+          </div>
+        )}
       </div>
     </Fieldset>
   );
