@@ -37,7 +37,7 @@ export function VaultDebtSlider({
   );
 
   const [indicatorLeftPixels, setIndicatorLeftPixels] = useState<string>('');
-  const initializeCurrentLTVLeft = useCallback(
+  const initIndicatorLeftPixels = useCallback(
     (val: string) => {
       if (!indicatorLeftPixels && val !== '0px') setIndicatorLeftPixels(val);
     },
@@ -55,8 +55,7 @@ export function VaultDebtSlider({
       <Slider
         min={0}
         max={maxDebtNumber}
-        onChange={(val: number | number[], index: number) => {
-          console.log('on change ran');
+        onChange={(val: number | number[], _index: number) => {
           if (typeof val === 'number') {
             setControlledSliderValue(val);
             handleChosenDebtChanged(val.toString());
@@ -90,7 +89,7 @@ export function VaultDebtSlider({
             pushedClassName = '';
           }
 
-          initializeCurrentLTVLeft(props.style.left);
+          initIndicatorLeftPixels(props.style.left);
 
           return (
             <>
