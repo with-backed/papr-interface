@@ -45,7 +45,7 @@ export default function MintCollateral({ token }: MintCollateralProps) {
   return (
     <Fieldset legend={`Mint yourself ${symbol}`}>
       <p> your balance: {balance || 0} </p>
-      <button disabled={!address} onClick={mint}>
+      <button disabled={!signer} onClick={mint}>
         mint
       </button>
     </Fieldset>

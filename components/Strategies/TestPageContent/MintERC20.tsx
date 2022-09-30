@@ -48,7 +48,7 @@ export default function MintERC20({ token }: TokenInfoProps) {
       <input
         placeholder={'amount'}
         onChange={(e) => setValue(e.target.value)}></input>
-      <button disabled={!address} onClick={mint}>
+      <button disabled={!signer} onClick={mint}>
         mint
       </button>
     </Fieldset>
