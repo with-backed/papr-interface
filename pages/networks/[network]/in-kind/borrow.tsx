@@ -4,7 +4,7 @@ import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { GetServerSideProps } from 'next';
 import strategyStyles from 'components/Strategies/Strategy.module.css';
 import styles from './strategiesBorrow.module.css';
-import { SupportedNetwork } from 'lib/config';
+import { configs, SupportedNetwork } from 'lib/config';
 import {
   makeLendingStrategy,
   SubgraphPool,
@@ -25,15 +25,20 @@ export const getServerSideProps: GetServerSideProps<
   SelectStrategyBorrowPageProps
 > = async (context) => {
   const network = context.params?.network as SupportedNetwork;
+  const config = configs[network];
   const subgraphStrategies = await getAllStrategies();
   const pools = await (
     await Promise.all(
-      subgraphStrategies.map((s) => subgraphUniswapPoolById(s.poolAddress)),
+      subgraphStrategies.map((s) =>
+        subgraphUniswapPoolById(s.poolAddress, config.uniswapSubgraph),
+      ),
     )
   ).map((value) => value?.pool || null);
   const pricesData: { [key: string]: StrategyPricesData } = {};
   const prices = await Promise.all(
-    subgraphStrategies.map((strategy) => strategyPricesData(strategy, network)),
+    subgraphStrategies.map((strategy) =>
+      strategyPricesData(strategy, network, config.uniswapSubgraph),
+    ),
   );
   subgraphStrategies.forEach((s, i) => (pricesData[s.id] = prices[i]));
 

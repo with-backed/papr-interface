@@ -8,8 +8,9 @@ const baseConfig = {
 
 export type Config = {
   // things that aren't guaranteed to exist in all configs should be declared here
+  // TODO: when we move to prod, these should be in each config and not optional
   strategyAddress?: string;
-} & Omit<typeof ethereum, 'nftSalesSubgraph' | 'strategyAddress'>;
+} & Omit<typeof ethereum, 'strategyAddress'>;
 
 export type SupportedNetwork = keyof typeof configs;
 
@@ -30,6 +31,8 @@ const goerli: Config = {
   emailSubjectPrefix: '[Testnet]:',
   facilitatorStartBlock: 10550059,
   strategyAddress: '0x206a9c917148cd6c290ab289599760b2eea5d983',
+  uniswapSubgraph:
+    'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
 };
 
 const ethereum = {
@@ -49,51 +52,12 @@ const ethereum = {
   network: 'ethereum',
   emailSubjectPrefix: '[Ethereum]:',
   facilitatorStartBlock: 14636317,
-};
-
-const optimism: Config = {
-  ...baseConfig,
-  centerNetwork: '',
-  infuraId: '54c753f04ec64374aa679e383e7f84d5',
-  openSeaUrl: 'https://quixotic.io',
-  etherscanUrl: 'https://optimistic.etherscan.io',
-  chainId: 10,
-  jsonRpcProvider:
-    'https://opt-mainnet.g.alchemy.com/v2/_K-HnfZvE5ChalM8ys4TQEkmsWn8CPTU',
-  alchemyId:
-    process.env.VERCEL_ENV === 'production'
-      ? '_K-HnfZvE5ChalM8ys4TQEkmsWn8CPTU'
-      : developmentAlchemyKey,
-  siteUrl: 'https://withbacked.xyz',
-  network: 'optimism',
-  emailSubjectPrefix: '[Optimism]:',
-  facilitatorStartBlock: 6679943,
-};
-
-const polygon: Config = {
-  ...baseConfig,
-  centerNetwork: '',
-  infuraId: '54c753f04ec64374aa679e383e7f84d5',
-  openSeaUrl: 'https://opensea.io',
-  etherscanUrl: 'https://polygonscan.com',
-  chainId: 137,
-  jsonRpcProvider:
-    'https://polygon-mainnet.g.alchemy.com/v2/sRuR0U0CxGifKBURcsLPibuCjYj8nmZJ',
-  alchemyId:
-    process.env.VERCEL_ENV === 'production'
-      ? 'sRuR0U0CxGifKBURcsLPibuCjYj8nmZJ'
-      : developmentAlchemyKey,
-  siteUrl: 'https://withbacked.xyz',
-  network: 'polygon',
-  emailSubjectPrefix: '[Polygon]:',
-  facilitatorStartBlock: 28234089,
+  uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
 };
 
 export const configs = {
   ethereum,
   goerli,
-  optimism,
-  polygon,
 };
 
 export const prodConfigs = [];

@@ -13,6 +13,7 @@ export async function markValues(
   now: number,
   strategy: LendingStrategy | SubgraphStrategy,
   pool: Pool,
+  uniswapSubgraphUrl: string,
 ): Promise<[string[], ChartValue[]]> {
   let quoteCurrency: UniSubgraphToken;
   let baseCurrency: UniSubgraphToken;
@@ -24,7 +25,10 @@ export async function markValues(
     baseCurrency = pool.token1;
   }
 
-  const swapsQuery = await subgraphUniswapSwapsByPool(strategy.poolAddress);
+  const swapsQuery = await subgraphUniswapSwapsByPool(
+    strategy.poolAddress,
+    uniswapSubgraphUrl,
+  );
   const sortedSwaps =
     swapsQuery?.swaps.sort(
       (a: any, b: any) => parseInt(a.timestamp) - parseInt(b.timestamp),

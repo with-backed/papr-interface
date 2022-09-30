@@ -24,12 +24,14 @@ export interface StrategyPricesData {
 export async function strategyPricesData(
   strategy: LendingStrategy | SubgraphStrategy,
   network: SupportedNetwork,
+  uniswapSubgraphUrl: string,
 ): Promise<StrategyPricesData> {
   const targetDPRScaled = ethers.BigNumber.from(strategy.targetAPR).div(365);
   const targetDPR = convertONEScaledPercent(targetDPRScaled, 4);
   const now = Math.floor(Date.now() / 1000);
   const subgraphUniswapPool = await subgraphUniswapPoolById(
     strategy.poolAddress,
+    uniswapSubgraphUrl,
   );
   const createdAt = parseInt(strategy.createdAt);
 
@@ -45,6 +47,7 @@ export async function strategyPricesData(
       now,
       strategy,
       subgraphUniswapPool.pool as Pool,
+      uniswapSubgraphUrl,
     );
   }
 
