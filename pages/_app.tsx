@@ -8,14 +8,8 @@ import { Footer } from 'components/Footer';
 import { ConfigProvider } from 'hooks/useConfig';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import {
-  SupportedNetwork,
-  isSupportedNetwork,
-  prodConfigs,
-  devConfigs,
-} from 'lib/config';
+import { SupportedNetwork, prodConfigs, devConfigs } from 'lib/config';
 import { ApplicationProviders } from 'components/ApplicationProviders';
-import { useNetworkSpecificStyles } from 'hooks/useNetworkSpecificStyles';
 import { Header } from 'components/Header';
 import { ErrorBanners } from 'components/ErrorBanners';
 
@@ -39,7 +33,6 @@ export default function App({ Component, pageProps }: AppProps) {
   const [network, setNetwork] = useState<SupportedNetwork>(
     networkFromPath(asPath) as SupportedNetwork,
   );
-  useNetworkSpecificStyles(network);
 
   useEffect(() => {
     const newPath = networkFromPath(asPath);

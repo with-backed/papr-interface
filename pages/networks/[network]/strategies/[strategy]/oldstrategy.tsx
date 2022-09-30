@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next';
-import { SupportedNetwork } from 'lib/config';
+import { configs, SupportedNetwork } from 'lib/config';
 import {
   OldStrategyOverviewContent,
   OldStrategyPageProps,
@@ -12,8 +12,9 @@ import {
 } from 'lib/LendingStrategy';
 import { useConfig } from 'hooks/useConfig';
 import { useSigner } from 'wagmi';
-import { useEffect, useMemo, useState } from 'react';
-import { strategyPricesData, StrategyPricesData } from 'lib/strategies/charts';
+import { useMemo } from 'react';
+import { strategyPricesData } from 'lib/strategies/charts';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 
 type ServerSideProps = Omit<
   OldStrategyPageProps,
@@ -29,7 +30,10 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   const address = (context.params?.strategy as string).toLowerCase();
   const network = context.params?.network as SupportedNetwork;
 
-  const strategySubgraphData = await fetchSubgraphData(address);
+  const strategySubgraphData = await fetchSubgraphData(
+    address,
+    configs[network].uniswapSubgraph,
+  );
 
   if (!strategySubgraphData) {
     return {
@@ -60,14 +64,15 @@ export default function OldStrategyPage({
     return makeLendingStrategy(subgraphStrategy, subgraphPool, signer!, config);
   }, [config, signer, subgraphPool, subgraphStrategy]);
 
-  const [pricesData, setPricesData] = useState<StrategyPricesData | null>(null);
-
-  useEffect(() => {
-    strategyPricesData(
-      lendingStrategy,
-      config.network as SupportedNetwork,
-    ).then(setPricesData);
-  }, [lendingStrategy, config]);
+  const pricesData = useAsyncValue(
+    () =>
+      strategyPricesData(
+        lendingStrategy,
+        config.network as SupportedNetwork,
+        config.uniswapSubgraph,
+      ),
+    [config, lendingStrategy],
+  );
 
   return (
     <OldStrategyOverviewContent

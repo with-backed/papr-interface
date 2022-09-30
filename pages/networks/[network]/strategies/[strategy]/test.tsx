@@ -1,5 +1,6 @@
 import { TestPageContent } from 'components/Strategies/TestPageContent';
 import { useConfig } from 'hooks/useConfig';
+import { configs, SupportedNetwork } from 'lib/config';
 import {
   fetchSubgraphData,
   makeLendingStrategy,
@@ -19,8 +20,12 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
   context,
 ) => {
   const address = (context.params?.strategy as string).toLowerCase();
+  const network = context.params?.network as SupportedNetwork;
 
-  const strategySubgraphData = await fetchSubgraphData(address);
+  const strategySubgraphData = await fetchSubgraphData(
+    address,
+    configs[network].uniswapSubgraph,
+  );
 
   if (!strategySubgraphData) {
     return {

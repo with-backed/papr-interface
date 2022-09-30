@@ -30,14 +30,14 @@ export const getServerSideProps: GetServerSideProps<
   const pools = await (
     await Promise.all(
       subgraphStrategies.map((s) =>
-        subgraphUniswapPoolById(s.poolAddress, config.uniswapSubgraph!),
+        subgraphUniswapPoolById(s.poolAddress, config.uniswapSubgraph),
       ),
     )
   ).map((value) => value?.pool || null);
   const pricesData: { [key: string]: StrategyPricesData } = {};
   const prices = await Promise.all(
     subgraphStrategies.map((strategy) =>
-      strategyPricesData(strategy, network, config.uniswapSubgraph!),
+      strategyPricesData(strategy, network, config.uniswapSubgraph),
     ),
   );
   subgraphStrategies.forEach((s, i) => (pricesData[s.id] = prices[i]));

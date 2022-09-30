@@ -3,7 +3,7 @@ import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
-import { SupportedNetwork } from 'lib/config';
+import { configs, SupportedNetwork } from 'lib/config';
 import { makeProvider } from 'lib/contracts';
 import {
   fetchSubgraphData,
@@ -33,7 +33,10 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   const network = context.params?.network as SupportedNetwork;
   const id = context.params?.id as string;
 
-  const strategySubgraphData = await fetchSubgraphData(address);
+  const strategySubgraphData = await fetchSubgraphData(
+    address,
+    configs[network].uniswapSubgraph,
+  );
 
   if (!strategySubgraphData) {
     return {
