@@ -200,7 +200,10 @@ class LendingStrategyInternal {
  *
  * TODO: fallback to node?
  */
-export async function fetchSubgraphData(strategyAddress: string) {
+export async function fetchSubgraphData(
+  strategyAddress: string,
+  uniswapSubgraphUrl: string,
+) {
   const subgraphStrategy = await subgraphStrategyByAddress(strategyAddress);
 
   if (!subgraphStrategy?.lendingStrategy) {
@@ -209,6 +212,7 @@ export async function fetchSubgraphData(strategyAddress: string) {
 
   const subgraphPool = await subgraphUniswapPoolById(
     subgraphStrategy.lendingStrategy.poolAddress,
+    uniswapSubgraphUrl,
   );
 
   if (!subgraphPool?.pool) {

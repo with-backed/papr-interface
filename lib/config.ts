@@ -8,8 +8,10 @@ const baseConfig = {
 
 export type Config = {
   // things that aren't guaranteed to exist in all configs should be declared here
+  // TODO: when we move to prod, these should be in each config and not optional
   strategyAddress?: string;
-} & Omit<typeof ethereum, 'nftSalesSubgraph' | 'strategyAddress'>;
+  uniswapSubgraph?: string;
+} & Omit<typeof ethereum, 'strategyAddress' | 'uniswapSubgraph'>;
 
 export type SupportedNetwork = keyof typeof configs;
 
@@ -30,6 +32,8 @@ const goerli: Config = {
   emailSubjectPrefix: '[Testnet]:',
   facilitatorStartBlock: 10550059,
   strategyAddress: '0x206a9c917148cd6c290ab289599760b2eea5d983',
+  uniswapSubgraph:
+    'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
 };
 
 const ethereum = {
@@ -49,6 +53,7 @@ const ethereum = {
   network: 'ethereum',
   emailSubjectPrefix: '[Ethereum]:',
   facilitatorStartBlock: 14636317,
+  uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
 };
 
 const optimism: Config = {

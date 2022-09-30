@@ -8,11 +8,11 @@ import {
 } from 'types/generated/graphql/uniswapSubgraph';
 import { clientFromUrl } from './urql';
 
-export async function subgraphUniswapPriceByPool(pool: string) {
-  // TODO: dynamic client address
-  const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
-  );
+export async function subgraphUniswapPriceByPool(
+  pool: string,
+  uniswapSubgraphUrl: string,
+) {
+  const client = clientFromUrl(uniswapSubgraphUrl);
   const { data, error } = await client
     .query<SqrtPricesByPoolQuery>(SqrtPricesByPoolDocument, { pool })
     .toPromise();
@@ -25,11 +25,11 @@ export async function subgraphUniswapPriceByPool(pool: string) {
   return data || null;
 }
 
-export async function subgraphUniswapSwapsByPool(pool: string) {
-  // TODO: dynamic client address
-  const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
-  );
+export async function subgraphUniswapSwapsByPool(
+  pool: string,
+  uniswapSubgraphUrl: string,
+) {
+  const client = clientFromUrl(uniswapSubgraphUrl);
   const { data, error } = await client
     .query<SwapsByPoolQuery>(SwapsByPoolDocument, { pool: pool })
     .toPromise();
@@ -42,11 +42,11 @@ export async function subgraphUniswapSwapsByPool(pool: string) {
   return data || null;
 }
 
-export async function subgraphUniswapPoolById(id: string) {
-  // TODO: dynamic client address
-  const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
-  );
+export async function subgraphUniswapPoolById(
+  id: string,
+  uniswapSubgraphUrl: string,
+) {
+  const client = clientFromUrl(uniswapSubgraphUrl);
   const { data, error } = await client
     .query<PoolByIdQuery>(PoolByIdDocument, { id })
     .toPromise();

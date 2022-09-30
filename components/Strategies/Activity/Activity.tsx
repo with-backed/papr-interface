@@ -4,6 +4,7 @@ import {
 } from 'components/EtherscanLink';
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
+import { useConfig } from 'hooks/useConfig';
 import { humanizedTimestamp } from 'lib/duration';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { formatTokenAmount } from 'lib/numberFormat';
@@ -26,19 +27,17 @@ type ActivityProps = {
   lendingStrategy: LendingStrategy;
 };
 
-const uniswapURL =
-  'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli';
-
 export function Activity({ lendingStrategy }: ActivityProps) {
+  const { uniswapSubgraph } = useConfig();
   const [{ data: swapsData, fetching: swapsFetching, error }] =
     useQuery<SwapsByPoolQuery>({
       query: SwapsByPoolDocument,
       variables: { pool: lendingStrategy.poolAddress },
       context: useMemo(
         () => ({
-          url: uniswapURL,
+          url: uniswapSubgraph,
         }),
-        [],
+        [uniswapSubgraph],
       ),
     });
 
