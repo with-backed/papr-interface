@@ -39,7 +39,7 @@ const prodPages = (strategyAddress: string): Page[] => [
   },
   {
     name: 'Mint Test NFTs',
-    route: `/strategies/${strategyAddress}/test`,
+    route: `strategies/${strategyAddress}/test`,
   },
 ];
 
