@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { JsonRpcProvider } from 'ethers/node_modules/@ethersproject/providers';
 import { Config } from 'lib/config';
 import { ReservoirResponseData, USDC_DECIMALS } from './reservoir';
 
@@ -7,7 +6,7 @@ export async function generateDummyOracleMessage(
   collection: string,
   config: Config,
 ) {
-  const rpcProvider = new JsonRpcProvider(
+  const rpcProvider = new ethers.providers.JsonRpcProvider(
     config.jsonRpcProvider,
     config.chainId,
   );
