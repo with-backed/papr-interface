@@ -1,7 +1,7 @@
 import { Slider } from 'components/Slider';
 import { ethers } from 'ethers';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
 
 type VaultDebtSliderProps = {
@@ -11,6 +11,7 @@ type VaultDebtSliderProps = {
   maxLTV: number | null;
   handleChosenDebtChanged: (val: string) => void;
   isBorrowing: boolean;
+  setIsBorrowing: (val: boolean) => void;
 };
 
 export function VaultDebtSlider({
@@ -20,6 +21,7 @@ export function VaultDebtSlider({
   maxLTV,
   handleChosenDebtChanged,
   isBorrowing,
+  setIsBorrowing,
 }: VaultDebtSliderProps) {
   const maxDebtNumber = useMemo(() => {
     return parseInt(
@@ -35,6 +37,11 @@ export function VaultDebtSlider({
   const [controlledSliderValue, setControlledSliderValue] = useState<number>(
     currentVaultDebtNumber,
   );
+  const [sliderValues, setSliderValues] = useState<number | number[]>(
+    isBorrowing
+      ? controlledSliderValue
+      : [controlledSliderValue, currentVaultDebtNumber],
+  );
 
   const [indicatorLeftPixels, setIndicatorLeftPixels] = useState<string>('');
   const initIndicatorLeftPixels = useCallback(
@@ -44,11 +51,7 @@ export function VaultDebtSlider({
     [indicatorLeftPixels],
   );
 
-  const sliderValues = useMemo(() => {
-    return isBorrowing
-      ? controlledSliderValue
-      : [controlledSliderValue, currentVaultDebtNumber];
-  }, [isBorrowing, controlledSliderValue, currentVaultDebtNumber]);
+  console.log({ isBorrowing, sliderValues });
 
   return (
     <div className={styles.sliderWrapper}>
@@ -56,11 +59,23 @@ export function VaultDebtSlider({
         min={0}
         max={maxDebtNumber}
         onChange={(val: number | number[], _index: number) => {
+          let result: number;
           if (typeof val === 'number') {
-            setControlledSliderValue(val);
+            result = val;
+          } else {
+            result = val[0];
+          }
+          setIsBorrowing(result >= currentVaultDebtNumber);
+          setSliderValues(
+            result >= currentVaultDebtNumber
+              ? result
+              : [result, currentVaultDebtNumber],
+          );
+        }}
+        onAfterChange={(val: number | number[], _index: number) => {
+          if (typeof val === 'number') {
             handleChosenDebtChanged(val.toString());
           } else {
-            setControlledSliderValue(val[0]);
             handleChosenDebtChanged(val[0].toString());
           }
         }}

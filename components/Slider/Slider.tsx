@@ -5,6 +5,7 @@ export type SliderProps = {
   min: number;
   max: number;
   onChange: (value: number | number[], index: number) => void;
+  onAfterChange: (value: number | number[], index: number) => void;
   renderThumb: (
     props: any,
     state: { index: number; value: number | number[]; valueNow: number },
@@ -17,6 +18,7 @@ export function Slider({
   min,
   max,
   onChange,
+  onAfterChange,
   renderThumb,
   value,
   hideTrackStyle = false,
@@ -40,6 +42,7 @@ export function Slider({
         max={max}
         pearling
         onChange={onChange}
+        onAfterChange={onAfterChange}
         value={value}
       />
     </>

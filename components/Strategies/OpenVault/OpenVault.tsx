@@ -94,6 +94,7 @@ export function OpenVault({
   const [chosenDebt, setChosenDebt] =
     useState<ethers.BigNumber>(currentVaultDebt);
   const [maxDebt, setMaxDebt] = useState<ethers.BigNumber | null>(null);
+  const [isBorrowing, setIsBorrowing] = useState<boolean>(true);
   const [liquidationDateEstimation, setLiquidationDateEstimation] =
     useState<string>('');
   const [showMath, setShowMath] = useState<boolean>(false);
@@ -115,11 +116,6 @@ export function OpenVault({
       return chosenDebt.sub(currentVaultDebt);
     return currentVaultDebt.sub(chosenDebt);
   }, [chosenDebt, currentVaultDebt]);
-
-  const isBorrowing = useMemo(() => {
-    if (!currentVault) return true;
-    return chosenDebt.gte(currentVaultDebt);
-  }, [chosenDebt, currentVaultDebt, currentVault]);
 
   const { quoteForSwap, priceImpact } = useQuoteWithSlippage(
     strategy,
@@ -401,6 +397,7 @@ export function OpenVault({
           handleChosenDebtChanged={handleChosenDebtChanged}
           maxLTV={maxLTV}
           isBorrowing={isBorrowing}
+          setIsBorrowing={setIsBorrowing}
         />
         <div className={`${styles.mathWrapper} ${styles.priceImpactWrapper}`}>
           <div className={`${styles.mathRow} ${styles.even}`}>
