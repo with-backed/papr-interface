@@ -4,23 +4,44 @@ import styles from './Slider.module.css';
 export type SliderProps = {
   min: number;
   max: number;
-  onChange: (value: number, index: number) => void;
+  onChange: (value: number | number[], index: number) => void;
   renderThumb: (
     props: any,
-    state: { index: number; value: number; valueNow: number },
+    state: { index: number; value: number | number[]; valueNow: number },
   ) => JSX.Element | null;
+  value: number | number[] | undefined;
+  hideTrackStyle: boolean;
 };
 
-export function Slider({ min, max, onChange, renderThumb }: SliderProps) {
+export function Slider({
+  min,
+  max,
+  onChange,
+  renderThumb,
+  value,
+  hideTrackStyle = false,
+}: SliderProps) {
   return (
-    <ReactSlider
-      className={styles.slider}
-      trackClassName={styles.track}
-      thumbClassName={styles.thumb}
-      renderThumb={renderThumb}
-      min={min}
-      max={max}
-      onChange={onChange}
-    />
+    <>
+      {!hideTrackStyle && (
+        <style>
+          {`.${styles.track}-1 {
+          background-image: url('/slider-tile-black.svg') !important;
+        }`}
+        </style>
+      )}
+
+      <ReactSlider
+        className={styles.slider}
+        trackClassName={styles.track}
+        thumbClassName={styles.thumb}
+        renderThumb={renderThumb}
+        min={min}
+        max={max}
+        pearling
+        onChange={onChange}
+        value={value}
+      />
+    </>
   );
 }

@@ -11,6 +11,7 @@ import StrategiesToBorrowFrom from 'components/StrategiesToBorrowFrom/Strategies
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { getUniqueNFTId } from 'lib/strategies';
+import { useCurrentVault } from 'hooks/useCurrentVault/useCurrentVault';
 
 export type BorrowPageProps = {
   strategyAddress: string;
@@ -42,7 +43,12 @@ export function BorrowPageContent({
     [lendingStrategy],
   );
 
-  if (!lendingStrategy || !pricesData) return <></>;
+  const { currentVault, vaultFetching } = useCurrentVault(
+    lendingStrategy,
+    address,
+  );
+
+  if (!lendingStrategy || !pricesData || vaultFetching) return <></>;
 
   return (
     <div className={strategyStyles.wrapper}>
@@ -65,6 +71,7 @@ export function BorrowPageContent({
         strategy={lendingStrategy}
         pricesData={pricesData}
         userCollectionNFTs={userCollectionNFTs}
+        currentVault={currentVault}
         nftsSelected={nftsSelected}
       />
     </div>

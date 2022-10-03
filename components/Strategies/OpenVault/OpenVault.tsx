@@ -1,6 +1,4 @@
-import { TickMath } from '@uniswap/v3-sdk';
 import { Fieldset } from 'components/Fieldset';
-import { Slider } from 'components/Slider';
 import { ethers } from 'ethers';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
 import {
@@ -16,16 +14,19 @@ import { useAccount } from 'wagmi';
 import styles from './OpenVault.module.css';
 import VaultMath from './VaultMath';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { getNextVaultNonceForUser } from 'lib/pAPRSubgraph';
+import { currentVaultNonceForUser } from 'lib/pAPRSubgraph';
 import { getAddress } from 'ethers/lib/utils';
 import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { VaultDebtSlider } from './VaultDebtSlider';
+import { VaultsByOwnerForStrategyQuery } from 'types/generated/graphql/inKindSubgraph';
 
 type BorrowProps = {
   strategy: LendingStrategy;
   userCollectionNFTs: CenterUserNFTsResponse[];
   nftsSelected: string[];
+  currentVault: VaultsByOwnerForStrategyQuery['vaults'][0] | null;
   pricesData: StrategyPricesData;
 };
 
@@ -40,7 +41,7 @@ interface AddCollateralArgsStruct {
 }
 
 const MintAndSwapEncoderString =
-  'mintAndSellDebt(uint256 vaultNonce, int256 debt, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo)';
+  'mintAndSellDebt(uint256 vaultNonce, uint256 debt, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo)';
 
 interface MintAndSwapArgsStruct {
   vaultNonce: ethers.BigNumber;
@@ -82,43 +83,101 @@ export function OpenVault({
   strategy,
   userCollectionNFTs,
   nftsSelected,
+  currentVault,
   pricesData,
 }: BorrowProps) {
   const { address } = useAccount();
 
-  const [debt, setDebt] = useState<ethers.BigNumber>(ethers.BigNumber.from(0));
-  const [maxDebt, setMaxDebt] = useState<ethers.BigNumber>(
-    ethers.BigNumber.from(0),
-  );
-
+  const currentVaultDebt = useMemo(() => {
+    return ethers.BigNumber.from(currentVault?.debt || 0);
+  }, [currentVault]);
+  const [chosenDebt, setChosenDebt] =
+    useState<ethers.BigNumber>(currentVaultDebt);
+  const [maxDebt, setMaxDebt] = useState<ethers.BigNumber | null>(null);
   const [liquidationDateEstimation, setLiquidationDateEstimation] =
     useState<string>('');
-  const {
-    quoteForSwap,
-    priceImpact,
-    tokenOut,
-    quoteLoading,
-    priceImpactLoading,
-  } = useQuoteWithSlippage(strategy, debt.toString(), true);
   const [showMath, setShowMath] = useState<boolean>(false);
   const [nftsApproved, setNFTsApproved] = useState<string[]>([]);
+  const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
   const [approvalsLoading, setApprovalsLoading] = useState<boolean>(false);
 
-  const addCollateralAndSwap = useCallback(async () => {
+  const underlying = useMemo(() => {
+    return strategy.underlying;
+  }, [strategy]);
+
+  const debtToken = useMemo(() => {
+    return strategy.debtToken;
+  }, [strategy]);
+
+  const debtToBorrowOrRepay = useMemo(() => {
+    if (currentVaultDebt.isZero()) return chosenDebt;
+    if (chosenDebt.gt(currentVaultDebt))
+      return chosenDebt.sub(currentVaultDebt);
+    return currentVaultDebt.sub(chosenDebt);
+  }, [chosenDebt, currentVaultDebt]);
+
+  const isBorrowing = useMemo(() => {
+    if (!currentVault) return true;
+    return chosenDebt.gte(currentVaultDebt);
+  }, [chosenDebt, currentVaultDebt, currentVault]);
+
+  const { quoteForSwap, priceImpact } = useQuoteWithSlippage(
+    strategy,
+    debtToBorrowOrRepay,
+    true,
+  );
+  const formattedQuoteForSwap = useMemo(() => {
+    if (!quoteForSwap) return '';
+    return parseFloat(quoteForSwap).toFixed(4);
+  }, [quoteForSwap]);
+
+  const initializeUnderlyingApproved = useCallback(async () => {
+    const connectedToken = strategy.token0IsUnderlying
+      ? strategy.token0
+      : strategy.token1;
+    if (
+      (await connectedToken.allowance(address!, strategy.id)) >
+      ethers.BigNumber.from(0)
+    ) {
+      setUnderlyingApproved(true);
+    }
+  }, [strategy, address]);
+
+  const approveUnderlying = useCallback(async () => {
+    const connectedToken = strategy.token0IsUnderlying
+      ? strategy.token0
+      : strategy.token1;
+    connectedToken
+      .approve(strategy.id, ethers.constants.MaxInt256)
+      .then(() => setUnderlyingApproved(true));
+  }, [strategy]);
+
+  const repay = useCallback(async () => {
+    if (!currentVault) return;
+
+    await strategy.buyAndReduceDebt(
+      currentVault.id,
+      ethers.utils.parseUnits(quoteForSwap, strategy.underlying.decimals),
+      chosenDebt,
+      ethers.BigNumber.from(0),
+      address!,
+      {
+        gasLimit: ethers.utils.hexValue(3000000),
+      },
+    );
+  }, [currentVault, strategy, address, chosenDebt, quoteForSwap]);
+
+  const borrowMore = useCallback(async () => {
     const contractsAndTokenIds = nftsSelected.map((id) =>
       deconstructFromId(id),
     );
 
-    const nextNonce = await getNextVaultNonceForUser(strategy, address!);
-    const vaultNonce = ethers.BigNumber.from(nextNonce).add(1);
-    const minOut = ethers.utils.parseUnits(quoteForSwap, tokenOut.decimals);
-    const sqrtPriceLimitX96 = strategy.token0IsUnderlying
-      ? ethers.BigNumber.from(TickMath.MAX_SQRT_RATIO.toString()).sub(1)
-      : ethers.BigNumber.from(TickMath.MIN_SQRT_RATIO.toString()).add(1);
-    const debtForArgs = ethers.utils.parseUnits(
-      debt.toString(),
+    const vaultNonce = await currentVaultNonceForUser(strategy, address!);
+    const minOut = ethers.utils.parseUnits(
+      quoteForSwap,
       strategy.underlying.decimals,
     );
+
     const oracleInfo = {
       price: ethers.utils.parseUnits(PRICE.toString(), 18),
       period: ethers.BigNumber.from(0),
@@ -129,13 +188,32 @@ export function OpenVault({
       s: ethers.utils.formatBytes32String('y'),
     };
 
-    if (contractsAndTokenIds.length === 1) {
+    const mintAndSellDebtArgs: MintAndSwapArgsStruct = {
+      vaultNonce,
+      debt: debtToBorrowOrRepay,
+      minOut,
+      sqrtPriceLimitX96: ethers.BigNumber.from(0),
+      proceedsTo: address!,
+    };
+
+    if (contractsAndTokenIds.length === 0) {
+      await strategy.mintAndSellDebt(
+        mintAndSellDebtArgs.vaultNonce,
+        mintAndSellDebtArgs.debt,
+        mintAndSellDebtArgs.minOut,
+        mintAndSellDebtArgs.sqrtPriceLimitX96,
+        mintAndSellDebtArgs.proceedsTo,
+        {
+          gasLimit: ethers.utils.hexValue(3000000),
+        },
+      );
+    } else if (contractsAndTokenIds.length === 1) {
       const [contractAddress, tokenId] = contractsAndTokenIds[0];
       const erc721ReceivedArgs: OnERC721ReceivedArgsStruct = {
-        debt: debtForArgs,
+        debt: debtToBorrowOrRepay,
         vaultNonce,
         minOut,
-        sqrtPriceLimitX96,
+        sqrtPriceLimitX96: ethers.BigNumber.from(0),
         mintDebtOrProceedsTo: address!,
         mintVaultTo: address!,
         oracleInfo,
@@ -190,14 +268,6 @@ export function OpenVault({
         ]),
       );
 
-      const mintAndSellDebtArgs: MintAndSwapArgsStruct = {
-        vaultNonce,
-        debt: debtForArgs,
-        minOut,
-        sqrtPriceLimitX96,
-        proceedsTo: address!,
-      };
-
       const calldataWithSwap = [
         ...calldata,
         lendingStrategyIFace.encodeFunctionData(MintAndSwapEncoderString, [
@@ -216,13 +286,16 @@ export function OpenVault({
         .then(() => console.log('success')) // TODO(adamgobes): redirect to vault page once thats fleshed out
         .catch((e) => console.log({ e }));
     }
-  }, [address, nftsSelected, debt, strategy, quoteForSwap, tokenOut.decimals]);
+  }, [address, nftsSelected, debtToBorrowOrRepay, strategy, quoteForSwap]);
 
   // TODO: I think useCallback may not be able to introspect the debounced
   // function this produces. May need to either manually handle debounce with
   // timeouts or do something else.
-  const handleDebtAmountChanged = debounce(async (value: string) => {
-    setDebt(ethers.BigNumber.from(value));
+  const handleChosenDebtChanged = debounce(async (value: string) => {
+    if (!maxDebt) return;
+
+    const debtBigNumber = ethers.utils.parseUnits(value, debtToken.decimals);
+    setChosenDebt(debtBigNumber);
 
     if (value === '') {
       setLiquidationDateEstimation('');
@@ -231,11 +304,7 @@ export function OpenVault({
 
     setLiquidationDateEstimation(
       await (
-        await computeLiquidationEstimation(
-          ethers.BigNumber.from(value),
-          maxDebt,
-          strategy,
-        )
+        await computeLiquidationEstimation(debtBigNumber, maxDebt, strategy)
       ).toFixed(0),
     );
   }, 500);
@@ -244,13 +313,15 @@ export function OpenVault({
     const newNorm = await strategy.newNorm();
     const maxLTV = await strategy.maxLTV();
 
+    const totalNFTsInVault = !currentVault ? 0 : currentVault.collateral.length;
+
     const maxDebt = maxLTV
-      .mul(ethers.BigNumber.from(PRICE))
+      .mul(ethers.utils.parseUnits(PRICE.toString(), underlying.decimals))
       .div(newNorm)
-      .mul(ethers.BigNumber.from(nftsSelected.length));
+      .mul(ethers.BigNumber.from(nftsSelected.length + totalNFTsInVault));
 
     setMaxDebt(maxDebt);
-  }, [strategy, nftsSelected]);
+  }, [strategy, nftsSelected, currentVault, underlying.decimals]);
 
   const maxLTV = useAsyncValue(() => strategy.maxLTVPercent(), [strategy]);
 
@@ -281,8 +352,9 @@ export function OpenVault({
 
   useEffect(() => {
     initializeNFTsApproved();
+    initializeUnderlyingApproved();
     getMaxDebt();
-  }, [initializeNFTsApproved, getMaxDebt]);
+  }, [initializeNFTsApproved, initializeUnderlyingApproved, getMaxDebt]);
 
   const performApproveAll = useCallback(async () => {
     setApprovalsLoading(true);
@@ -303,6 +375,7 @@ export function OpenVault({
   }, [nftsSelected, strategy]);
 
   const borrowDisabled = useMemo(() => {
+    if (!!currentVault && nftsSelected.length === 0) return false;
     const allSelectedAreApproved =
       nftsSelected.filter((val) => nftsApproved.includes(val)).length ===
       nftsSelected.length;
@@ -310,58 +383,25 @@ export function OpenVault({
       (!allSelectedAreApproved && nftsSelected.length !== 1) ||
       nftsSelected.length === 0
     );
-  }, [nftsSelected, nftsApproved]);
+  }, [nftsSelected, nftsApproved, currentVault]);
 
   const approveDisabled = useMemo(() => {
     return !borrowDisabled || nftsSelected.length < 2;
   }, [nftsSelected, borrowDisabled]);
 
+  if (!maxDebt) return <></>;
+
   return (
     <Fieldset legend="🏦 Set Loan Amount">
       <div className={styles.borrowComponentWrapper}>
-        <div className={styles.sliderWrapper}>
-          <Slider
-            min={0}
-            max={parseFloat(maxDebt.toString())}
-            onChange={(val, _index) => handleDebtAmountChanged(val.toString())}
-            renderThumb={(props, state) => {
-              if (!maxLTV) {
-                return null;
-              }
-              let currentLTV: number;
-              if (maxDebt.isZero()) {
-                currentLTV = 0;
-              } else {
-                currentLTV = Math.min(
-                  (state.valueNow / parseFloat(maxDebt.toString())) * maxLTV,
-                  maxLTV,
-                );
-              }
-
-              let pushedClassName: string;
-              if (currentLTV < 5) {
-                pushedClassName = styles.sliderLabelPushedRight;
-              } else if (currentLTV > maxLTV - 5) {
-                pushedClassName = styles.sliderLabelPushedLeft;
-              } else {
-                pushedClassName = '';
-              }
-
-              return (
-                <div {...props}>
-                  <div className={`${styles.sliderLabel} ${pushedClassName}`}>
-                    <p>Loan Amount</p>
-                    <p>{currentLTV.toFixed(2)}% LTV</p>
-                  </div>
-                </div>
-              );
-            }}
-          />
-          <p className={styles.sliderLabel}>
-            Max Loan {!!maxLTV && maxLTV.toString()}% LTV
-          </p>
-        </div>
-
+        <VaultDebtSlider
+          strategy={strategy}
+          currentVaultDebt={currentVaultDebt!}
+          maxDebt={maxDebt}
+          handleChosenDebtChanged={handleChosenDebtChanged}
+          maxLTV={maxLTV}
+          isBorrowing={isBorrowing}
+        />
         <div className={`${styles.mathWrapper} ${styles.priceImpactWrapper}`}>
           <div className={`${styles.mathRow} ${styles.even}`}>
             <div>
@@ -383,54 +423,77 @@ export function OpenVault({
 
         <div className={styles.borrowInput}>
           <div className={styles.underlyingInput}>
-            <div>{quoteForSwap}</div>
-            <div>{tokenOut.symbol}</div>
+            <div>
+              {isBorrowing ? '+' : '-'} {formattedQuoteForSwap}
+            </div>
+            <div>{underlying.symbol}</div>
           </div>
-          <div
-            className={styles.showMath}
-            onClick={() => setShowMath(!showMath)}>
-            Show Math
-          </div>
-
-          <div
-            className={`${styles.button} ${styles.reviewButton}`}
-            onClick={() => setShowMath(true)}>
-            Review
-          </div>
-        </div>
-
-        <VaultMath
-          strategy={strategy}
-          pricesData={pricesData}
-          inputtedLTV={
-            maxDebt.isZero() || !maxLTV
-              ? '0.00'
-              : (
-                  (parseFloat(debt.toString()) /
-                    parseFloat(maxDebt.toString())) *
-                  maxLTV
-                ).toFixed(2)
-          }
-          quoteForSwap={quoteForSwap}
-          showMath={showMath}
-        />
-        <div
-          className={`${styles.approveAndBorrowButtons} ${
-            !showMath && styles.noDisplay
-          }`}>
-          {!approveDisabled && (
-            <button className={styles.button} onClick={performApproveAll}>
-              {approvalsLoading && '...'}
-              {!approvalsLoading && 'Approve NFTs'}
-            </button>
+          {isBorrowing && (
+            <div
+              className={styles.showMath}
+              onClick={() => setShowMath(!showMath)}>
+              Show Math
+            </div>
           )}
-          <button
-            className={styles.button}
-            onClick={addCollateralAndSwap}
-            disabled={borrowDisabled}>
-            Borrow
-          </button>
+
+          {isBorrowing && (
+            <div
+              className={`${styles.button} ${styles.reviewButton}`}
+              onClick={() => setShowMath(true)}>
+              Review
+            </div>
+          )}
+
+          {!isBorrowing && (
+            <div className={styles.approveAndBorrowButtons}>
+              {!underlyingApproved && (
+                <button className={styles.button} onClick={approveUnderlying}>
+                  Approve {strategy.underlying.symbol}
+                </button>
+              )}
+              <button className={styles.button} onClick={repay}>
+                Repay
+              </button>
+            </div>
+          )}
         </div>
+
+        {isBorrowing && (
+          <VaultMath
+            strategy={strategy}
+            pricesData={pricesData}
+            inputtedLTV={
+              maxDebt.isZero() || !maxLTV
+                ? '0.00'
+                : (
+                    (parseFloat(chosenDebt.toString()) /
+                      parseFloat(maxDebt.toString())) *
+                    maxLTV
+                  ).toFixed(2)
+            }
+            quoteForSwap={formattedQuoteForSwap}
+            showMath={showMath}
+          />
+        )}
+        {isBorrowing && (
+          <div
+            className={`${styles.approveAndBorrowButtons} ${
+              !showMath && styles.noDisplay
+            }`}>
+            {!approveDisabled && (
+              <button className={styles.button} onClick={performApproveAll}>
+                {approvalsLoading && '...'}
+                {!approvalsLoading && 'Approve NFTs'}
+              </button>
+            )}
+            <button
+              className={styles.button}
+              onClick={borrowMore}
+              disabled={borrowDisabled}>
+              Borrow
+            </button>
+          </div>
+        )}
       </div>
     </Fieldset>
   );

@@ -1,4 +1,5 @@
 import { Fieldset } from 'components/Fieldset';
+import { ethers } from 'ethers';
 import { useQuoteWithSlippage } from 'hooks/useQuoteWithSlippage';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { useState } from 'react';
@@ -14,7 +15,7 @@ export default function SwapQuote({ strategy, swapForUnderlying }: QuoteProps) {
   const [amountIn, setAmountIn] = useState<string>('');
   const { quoteForSwap, priceImpact, tokenIn, tokenOut } = useQuoteWithSlippage(
     strategy,
-    amountIn,
+    ethers.utils.parseEther(amountIn),
     swapForUnderlying,
   );
 

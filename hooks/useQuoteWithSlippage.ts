@@ -8,7 +8,7 @@ import { useConfig } from './useConfig';
 
 export function useQuoteWithSlippage(
   strategy: LendingStrategy,
-  amount: string,
+  amount: ethers.BigNumber,
   swapForUnderlying: boolean,
 ) {
   const { network, jsonRpcProvider } = useConfig();
@@ -43,19 +43,12 @@ export function useQuoteWithSlippage(
     }
   }, [strategy, swapForUnderlying]);
 
-  const amountToSwap = useMemo(() => {
-    if (!parseInt(amount)) return ethers.BigNumber.from(0);
-    return ethers.utils.parseUnits(amount, tokenIn.decimals);
-  }, [tokenIn, amount]);
-
   const getQuoteAndPriceImpactForSwap = useCallback(async () => {
     let q: ethers.BigNumber;
     try {
-      q = await getQuoteForSwap(quoter, amountToSwap, tokenIn.id, tokenOut.id);
+      q = await getQuoteForSwap(quoter, amount, tokenIn.id, tokenOut.id);
       setQuoteForSwap(
-        parseFloat(
-          ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
-        ).toFixed(4),
+        ethers.utils.formatUnits(q, ethers.BigNumber.from(tokenOut.decimals)),
       );
       setQuoteLoading(false);
     } catch (e) {
@@ -69,15 +62,15 @@ export function useQuoteWithSlippage(
       q,
       tokenIn,
       tokenOut,
-      amountToSwap,
+      amount,
       quoter,
     );
     setPriceImpact(priceImpact.toFixed(4));
     setPriceImpactLoading(false);
-  }, [amountToSwap, tokenIn, tokenOut, quoter]);
+  }, [tokenIn, tokenOut, quoter, amount]);
 
   useEffect(() => {
-    if (!parseInt(amount)) return;
+    if (amount.isZero()) return;
     getQuoteAndPriceImpactForSwap();
   }, [amount, getQuoteAndPriceImpactForSwap]);
 
