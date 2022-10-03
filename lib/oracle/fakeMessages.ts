@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { JsonRpcProvider } from 'ethers/node_modules/@ethersproject/providers';
 import { Config } from 'lib/config';
-import { ReservoirResponseData } from './reservoir';
+import { ReservoirResponseData, USDC_DECIMALS } from './reservoir';
 
 export async function generateDummyOracleMessage(
   collection: string,
@@ -12,7 +12,7 @@ export async function generateDummyOracleMessage(
     config.chainId,
   );
 
-  const price = ethers.utils.parseEther('2078.49');
+  const price = ethers.utils.parseUnits('2078.49', USDC_DECIMALS);
   const signer = new ethers.Wallet(process.env.SIGNER_KEY!, rpcProvider);
   const id = ethers.utils.hexZeroPad(ethers.utils.hexlify(1), 32);
   const payload = ethers.utils.hexlify(price);
@@ -26,7 +26,7 @@ export async function generateDummyOracleMessage(
   );
 
   const signedMessage: ReservoirResponseData = {
-    price: parseFloat(ethers.utils.formatEther(price)),
+    price: parseFloat(ethers.utils.formatUnits(price, USDC_DECIMALS)),
     message: {
       id,
       payload,

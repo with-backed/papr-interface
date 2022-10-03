@@ -16,14 +16,14 @@ async function handler(
       network: SupportedNetwork;
       collection: string;
     };
-    if (network === 'goerli') {
-      return res
-        .status(200)
-        .json(await generateDummyOracleMessage(collection, configs[network]));
-    } else {
+    if (network === 'ethereum') {
       return res
         .status(200)
         .json(await getSignedOracleFloorPriceMessage(collection));
+    } else {
+      return res
+        .status(200)
+        .json(await generateDummyOracleMessage(collection, configs[network]));
     }
   } catch (e) {
     return res.status(400).json(null);
