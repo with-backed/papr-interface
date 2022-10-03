@@ -27,6 +27,10 @@ export function Slider({
         <style>
           {`.${styles.track}-1 {
           background-image: url('/slider-tile-black.svg') !important;
+          left: 0 !important;
+        }`}
+          {`.${styles.thumb}-1 {
+          display: none;
         }`}
         </style>
       )}

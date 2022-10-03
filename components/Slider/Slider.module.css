@@ -9,6 +9,7 @@
 .track {
   height: 36px;
   background-image: url('../../public/slider-tile-bright.svg');
+  z-index: 2;
 }
 
 /* The track comes in 2 parts. This selects everything _but_ the first element
@@ -17,6 +18,7 @@
    colors. */
 .track ~ .track {
   background-image: none;
+  z-index: 1;
 }
 
 .thumb {
@@ -31,6 +33,7 @@
   /* remove default outline when selected */
   outline: none;
   transition: outline 0.1s;
+  z-index: 2 !important;
 }
 
 .thumb > div {

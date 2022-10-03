@@ -81,6 +81,7 @@ class LendingStrategyInternal {
   private _pool?: Pool;
   private _signerOrProvider: SignerOrProvider;
   private _subgraphStrategy: SubgraphStrategy;
+  private _targetGrowthPerPeriodCache: ethers.BigNumber | null;
 
   multicall: Strategy['multicall'];
   subgraphPool: SubgraphPool;
@@ -116,6 +117,10 @@ class LendingStrategyInternal {
         return ERC721__factory.connect(c.contractAddress, signerOrProvider);
       },
     );
+    this._targetGrowthPerPeriodCache = null;
+    this._contract
+      .targetGrowthPerPeriod()
+      .then((v) => (this._targetGrowthPerPeriodCache = v));
   }
 
   index() {
@@ -216,6 +221,9 @@ class LendingStrategyInternal {
   }
 
   targetGrowthPerPeriod() {
+    if (this._targetGrowthPerPeriodCache) {
+      return this._targetGrowthPerPeriodCache;
+    }
     return this._contract.targetGrowthPerPeriod();
   }
 

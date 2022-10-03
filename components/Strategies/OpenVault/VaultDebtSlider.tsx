@@ -99,19 +99,16 @@ export function VaultDebtSlider({
                   style={{
                     left: indicatorLeftPixels,
                   }}>
-                  <div>
-                    <p>
-                      Current LTV:{' '}
-                      {(
-                        (currentVaultDebtNumber / maxDebtNumber) *
-                        maxLTV
-                      ).toFixed(2)}
-                      %
-                    </p>
-                  </div>
-                  <div>
-                    <p>↓</p>
-                  </div>
+                  <p>
+                    Current LTV
+                    <br />
+                    {(
+                      (currentVaultDebtNumber / maxDebtNumber) *
+                      maxLTV
+                    ).toFixed(2)}
+                    %
+                  </p>
+                  <span>↓</span>
                 </div>
               )}
 
