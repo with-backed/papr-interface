@@ -8,10 +8,12 @@ import { useAccount } from 'wagmi';
 import { Asset } from 'nft-react';
 import { useQuery } from 'urql';
 import { VaultsByOwnerForStrategyDocument } from 'types/generated/graphql/inKindSubgraph';
+import { ReservoirResponseData } from 'lib/oracle/reservoir';
 
 export type AccountNFTsProps = {
   strategyAddress: string;
   userCollectionNFTs: string[];
+  oracleInfo: { [key: string]: ReservoirResponseData };
   nftsLoading: boolean;
   nftsSelected: string[];
   setNFTsSelected: Dispatch<SetStateAction<string[]>>;
