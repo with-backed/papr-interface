@@ -37,11 +37,6 @@ export function VaultDebtSlider({
   const [controlledSliderValue, setControlledSliderValue] = useState<number>(
     currentVaultDebtNumber,
   );
-  const [sliderValues, setSliderValues] = useState<number | number[]>(
-    isBorrowing
-      ? controlledSliderValue
-      : [controlledSliderValue, currentVaultDebtNumber],
-  );
 
   const [indicatorLeftPixels, setIndicatorLeftPixels] = useState<string>('');
   const initIndicatorLeftPixels = useCallback(
@@ -50,37 +45,32 @@ export function VaultDebtSlider({
     },
     [indicatorLeftPixels],
   );
+  const [blackTrackStyles, setBlackTrackStyles] = useState<any>({});
 
-  console.log({ isBorrowing, sliderValues });
+  const initBlackTrackStyles = useCallback(
+    (val: any) => {
+      console.log(val['left']);
+      if (Object.keys(blackTrackStyles).length === 0 && val['left'] !== 0)
+        setBlackTrackStyles(val);
+    },
+    [blackTrackStyles],
+  );
 
   return (
     <div className={styles.sliderWrapper}>
       <Slider
         min={0}
         max={maxDebtNumber}
-        onChange={(val: number | number[], _index: number) => {
-          let result: number;
-          if (typeof val === 'number') {
-            result = val;
-          } else {
-            result = val[0];
-          }
-          setIsBorrowing(result >= currentVaultDebtNumber);
-          setSliderValues(
-            result >= currentVaultDebtNumber
-              ? result
-              : [result, currentVaultDebtNumber],
-          );
+        onChange={(val: number, _index: number) => {
+          setControlledSliderValue(val);
+          setIsBorrowing(val >= currentVaultDebtNumber);
         }}
-        onAfterChange={(val: number | number[], _index: number) => {
+        onAfterChange={(val: number, _index: number) => {
           if (typeof val === 'number') {
             handleChosenDebtChanged(val.toString());
-          } else {
-            handleChosenDebtChanged(val[0].toString());
           }
         }}
-        hideTrackStyle={isBorrowing}
-        value={sliderValues}
+        value={controlledSliderValue}
         renderThumb={(props, state) => {
           if (!maxLTV) {
             return null;
@@ -143,6 +133,14 @@ export function VaultDebtSlider({
             </>
           );
         }}
+        renderTrack={(props, state) => {
+          initBlackTrackStyles({
+            ...props.style,
+            width: `${props.style.left}px`,
+          });
+          return <div {...props}></div>;
+        }}
+        blackTrackStyles={blackTrackStyles}
       />
       <p className={styles.sliderLabel}>
         Max Loan {!!maxLTV && maxLTV.toString()}% LTV
