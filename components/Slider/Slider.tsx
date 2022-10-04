@@ -15,7 +15,7 @@ export type SliderProps = {
     props: any,
     state: { index: number; value: number },
   ) => JSX.Element | null;
-  blackTrackStyles: any;
+  blackTrackWidth: string;
 };
 
 export function Slider({
@@ -26,13 +26,16 @@ export function Slider({
   renderThumb,
   renderTrack,
   value,
-  blackTrackStyles,
+  blackTrackWidth,
 }: SliderProps) {
   return (
     <>
       <div
         style={{
-          ...blackTrackStyles,
+          width: blackTrackWidth,
+          left: '0px',
+          position: 'relative',
+          top: '36px',
           height: '36px',
           backgroundImage: "url('/slider-tile-black.svg')",
           zIndex: 1,

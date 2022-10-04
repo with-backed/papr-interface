@@ -45,15 +45,13 @@ export function VaultDebtSlider({
     },
     [indicatorLeftPixels],
   );
-  const [blackTrackStyles, setBlackTrackStyles] = useState<any>({});
+  const [blackTrackWidth, setBlackTrackWidth] = useState<string>('');
 
-  const initBlackTrackStyles = useCallback(
-    (val: any) => {
-      console.log(val['left']);
-      if (Object.keys(blackTrackStyles).length === 0 && val['left'] !== 0)
-        setBlackTrackStyles(val);
+  const initBlackTrackWidth = useCallback(
+    (val: string) => {
+      if (!blackTrackWidth && val !== '0px') setBlackTrackWidth(val);
     },
-    [blackTrackStyles],
+    [blackTrackWidth],
   );
 
   return (
@@ -133,14 +131,11 @@ export function VaultDebtSlider({
             </>
           );
         }}
-        renderTrack={(props, state) => {
-          initBlackTrackStyles({
-            ...props.style,
-            width: `${props.style.left}px`,
-          });
+        renderTrack={(props, _state) => {
+          initBlackTrackWidth(`${props.style.left}px`);
           return <div {...props}></div>;
         }}
-        blackTrackStyles={blackTrackStyles}
+        blackTrackWidth={blackTrackWidth}
       />
       <p className={styles.sliderLabel}>
         Max Loan {!!maxLTV && maxLTV.toString()}% LTV
