@@ -18,7 +18,7 @@ export const ConnectWallet = () => {
               openConnectModal();
             }}
             type="button"
-            kind="dark">
+            kind="primary">
             🥕 Connect
           </Button>
         ) : (
