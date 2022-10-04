@@ -18,7 +18,7 @@ type Page = {
 };
 const prodPages = (strategyAddress: string): Page[] => [
   {
-    name: 'Swap',
+    name: 'Swap ↗',
     route:
       'https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=0x3089b47853df1b82877beef6d904a0ce98a12553&outputCurrency=0xb5e5f51e3e112634975fb44e6351380413f653ac',
     externalRedirect: true,
@@ -29,7 +29,7 @@ const prodPages = (strategyAddress: string): Page[] => [
     matcher: 'strategies/[strategy]/borrow',
   },
   {
-    name: 'LP',
+    name: 'LP ↗',
     route:
       'https://app.uniswap.org/#/add/0x3089B47853df1b82877bEef6D904a0ce98a12553/0xb5e5f51E3E112634975Fb44e6351380413F653aC/10000?chain=goerli',
     externalRedirect: true,
