@@ -24,7 +24,7 @@ export const ConnectWallet = () => {
         ) : (
           <ButtonLink
             href={`/networks/${network}/profile/${account.address}`}
-            kind="dark">
+            kind="primary">
             <span className={styles.address}>
               🔓 <DisplayAddress address={account.address} />
             </span>

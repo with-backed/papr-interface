@@ -1,16 +1,16 @@
-import { Button, TextButton } from 'components/Button';
 import { ConnectWallet } from 'components/ConnectWallet';
+import { PaprMEME } from 'components/Icons/PaprMEME';
 import { Logo } from 'components/Logo';
 import { useConfig } from 'hooks/useConfig';
-import { useOnClickOutside } from 'hooks/useOnClickOutside';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 import styles from './Header.module.css';
 
 type Page = {
   name: string;
   route: string;
+  matcher?: string;
   // Some pages (about, community) don't fit into our resource-oriented hierarchy.
   // We'll just put them at the top-level
   isNetworkSpecialCase?: boolean;
@@ -18,18 +18,15 @@ type Page = {
 };
 const prodPages = (strategyAddress: string): Page[] => [
   {
-    name: 'Strategy',
-    route: `strategies/${strategyAddress}`,
-  },
-  {
-    name: 'Borrow',
-    route: `strategies/${strategyAddress}/borrow`,
-  },
-  {
     name: 'Swap',
     route:
       'https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=0x3089b47853df1b82877beef6d904a0ce98a12553&outputCurrency=0xb5e5f51e3e112634975fb44e6351380413f653ac',
     externalRedirect: true,
+  },
+  {
+    name: 'Borrow',
+    route: `strategies/${strategyAddress}/borrow`,
+    matcher: 'strategies/[strategy]/borrow',
   },
   {
     name: 'LP',
@@ -38,19 +35,25 @@ const prodPages = (strategyAddress: string): Page[] => [
     externalRedirect: true,
   },
   {
-    name: 'Mint Test NFTs',
-    route: `strategies/${strategyAddress}/test`,
+    name: 'Details',
+    route: `strategies/${strategyAddress}`,
+    matcher: 'strategies/[strategy]',
   },
 ];
 
 const stagingPages: Page[] = [];
 
-function isActiveRoute(activeRoute: string, candidate: string) {
-  if (candidate.length === 0) {
+function isActiveRoute(activeRoute: string, candidate: Page) {
+  console.log({ activeRoute, candidate });
+  if (candidate.route.length === 0) {
     return activeRoute.length === 0;
   }
 
-  return activeRoute.startsWith(candidate);
+  if (candidate.matcher) {
+    return activeRoute === candidate.matcher;
+  }
+
+  return activeRoute.startsWith(candidate.route);
 }
 
 type NavLinksProps = {
@@ -80,7 +83,7 @@ function NavLinks({ activeRoute }: NavLinksProps) {
             }>
             <a
               className={
-                isActiveRoute(activeRoute, p.route)
+                isActiveRoute(activeRoute, p)
                   ? styles['link-active']
                   : styles.link
               }
@@ -112,38 +115,19 @@ function LogoLink() {
   );
 }
 
-type MobileMenuProps = {
-  activeRoute: string;
-  closeMobileMenu: () => void;
-  mobileMenuNode: React.RefObject<HTMLDivElement>;
-  mobileMenuOpen: boolean;
-};
-function MobileMenu({
-  activeRoute,
-  closeMobileMenu,
-  mobileMenuNode,
-  mobileMenuOpen,
-}: MobileMenuProps) {
+function PaprLink() {
+  const { network } = useConfig();
+
   return (
-    <div
-      className={
-        mobileMenuOpen ? styles['mobile-nav-open'] : styles['mobile-nav']
-      }>
-      <div ref={mobileMenuNode} className={styles['mobile-menu-buttons']}>
-        <NavLinks activeRoute={activeRoute} />
-        <ConnectWallet />
-        <TextButton onClick={closeMobileMenu}>Close</TextButton>
-      </div>
-    </div>
+    <Link href={`/networks/${network}/`} passHref>
+      <a title="paprMEME">
+        <PaprMEME />
+      </a>
+    </Link>
   );
 }
 
 export function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const openMobileMenu = useCallback(() => setMobileMenuOpen(true), []);
-  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
-  const mobileMenuNode = useRef<HTMLDivElement>(null);
-  useOnClickOutside(mobileMenuNode, () => setMobileMenuOpen(false));
   const { pathname } = useRouter();
 
   const activeRoute = useMemo(() => {
@@ -160,34 +144,16 @@ export function Header() {
   return (
     <nav className={styles.nav}>
       <div className={styles.content}>
-        <div className={styles['desktop-header']}>
-          <div className={styles['left-side']}>
-            <LogoLink />
-            <NavLinks activeRoute={activeRoute} />
-          </div>
-          <div className={styles.controls}>
-            <ConnectWallet />
-          </div>
+        <div className={styles['left-side']}>
+          <LogoLink />
         </div>
-
-        <div className={styles['mobile-header']}>
-          <div className={styles['left-side']}>
-            <LogoLink />
-          </div>
-          <div className={styles.controls}>
-            <Button
-              onClick={mobileMenuOpen ? closeMobileMenu : openMobileMenu}
-              kind={mobileMenuOpen ? 'secondary' : 'primary'}>
-              🍔 Menu
-            </Button>
-          </div>
+        <div className={styles.center}>
+          <PaprLink />
+          <NavLinks activeRoute={activeRoute} />
         </div>
-        <MobileMenu
-          activeRoute={activeRoute}
-          closeMobileMenu={closeMobileMenu}
-          mobileMenuNode={mobileMenuNode}
-          mobileMenuOpen={mobileMenuOpen}
-        />
+        <div className={styles['right-side']}>
+          <ConnectWallet />
+        </div>
       </div>
     </nav>
   );
