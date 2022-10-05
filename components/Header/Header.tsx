@@ -44,7 +44,6 @@ const prodPages = (strategyAddress: string): Page[] => [
 const stagingPages: Page[] = [];
 
 function isActiveRoute(activeRoute: string, candidate: Page) {
-  console.log({ activeRoute, candidate });
   if (candidate.route.length === 0) {
     return activeRoute.length === 0;
   }

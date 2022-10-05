@@ -1,8 +1,9 @@
 import { Fieldset } from 'components/Fieldset';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import styles from './Charts.module.css';
 import dynamic from 'next/dynamic';
+import { createChart, LineStyle, UTCTimestamp } from 'lightweight-charts';
 
 // apexcharts uses `window`, so will break if we SSR
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -85,6 +86,33 @@ function RateOfGrowth({
     },
   };
 
+  const lightweightSeries = useMemo(
+    () => [
+      {
+        name: 'Contract',
+        data: normalizationDPRValues.map(([value, timestamp]) => ({
+          time: timestamp,
+          value,
+        })),
+      },
+      {
+        name: 'Target',
+        data: indexDPRValues.map(([value, timestamp]) => ({
+          time: timestamp,
+          value,
+        })),
+      },
+      {
+        name: 'Market',
+        data: markDPRValues.map(([value, timestamp]) => ({
+          time: timestamp,
+          value,
+        })),
+      },
+    ],
+    [indexDPRValues, markDPRValues, normalizationDPRValues],
+  );
+
   const series = useMemo(
     () => [
       {
@@ -112,9 +140,62 @@ function RateOfGrowth({
     [indexDPRValues, markDPRValues, normalizationDPRValues],
   );
 
-  return (
-    <Chart options={options as any} series={series} type="line" width="580" />
-  );
+  const chartRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chartRef.current) {
+      const chart = createChart(chartRef.current, {
+        height: 360,
+        grid: { horzLines: { visible: false } },
+        layout: { textColor: '#ffffff' },
+      });
+      chart
+        .priceScale()
+        .applyOptions({ drawTicks: false, borderVisible: false });
+      chart.timeScale().applyOptions({
+        visible: false,
+      });
+      const indexSeries = chart.addLineSeries({
+        lineStyle: LineStyle.SparseDotted,
+        color: '#000000',
+        priceLineVisible: false,
+      });
+      indexSeries.setData(
+        indexDPRValues.map(([value, timestamp]) => ({
+          time: timestamp as UTCTimestamp,
+          value,
+        })),
+      );
+
+      const markSeries = chart.addLineSeries({
+        color: '#007155',
+        priceLineVisible: false,
+      });
+      markSeries.setData(
+        markDPRValues.map(([value, timestamp]) => ({
+          time: timestamp as UTCTimestamp,
+          value,
+        })),
+      );
+
+      const normSeries = chart.addLineSeries({
+        color: '#000000',
+        priceLineVisible: false,
+      });
+      normSeries.setData(
+        normalizationDPRValues.map(([value, timestamp]) => ({
+          time: timestamp as UTCTimestamp,
+          value,
+        })),
+      );
+
+      chart.timeScale().fitContent();
+
+      return () => chart.remove();
+    }
+  }, [indexDPRValues, markDPRValues, normalizationDPRValues]);
+
+  return <div ref={chartRef} />;
 }
 
 type PriceInUSDCProps = {
