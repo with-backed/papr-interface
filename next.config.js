@@ -3,12 +3,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 const { withSentryConfig } = require('@sentry/nextjs');
 
-const withTM = require('next-transpile-modules')([
-  'lightweight-charts',
-  'fancy-canvas',
-]);
-
-const moduleExports = withTM({
+const moduleExports = {
   swcMinify: false,
   compiler: {
     // remove properties matching the default regex ^data-test
@@ -28,7 +23,7 @@ const moduleExports = withTM({
       },
     ];
   },
-});
+};
 
 const shouldInitializeSentry = !process.env.GITHUB_ACTIONS;
 

@@ -74,72 +74,6 @@ type RateOfGrowthProps = {
 function RateOfGrowth({
   pricesData: { normalizationDPRValues, indexDPRValues, markDPRValues },
 }: RateOfGrowthProps) {
-  const options = {
-    ...baseOptions,
-    tooltip: {
-      y: {
-        show: true,
-        formatter: function (val: number) {
-          return percentFormatter.format(val);
-        },
-      },
-    },
-  };
-
-  const lightweightSeries = useMemo(
-    () => [
-      {
-        name: 'Contract',
-        data: normalizationDPRValues.map(([value, timestamp]) => ({
-          time: timestamp,
-          value,
-        })),
-      },
-      {
-        name: 'Target',
-        data: indexDPRValues.map(([value, timestamp]) => ({
-          time: timestamp,
-          value,
-        })),
-      },
-      {
-        name: 'Market',
-        data: markDPRValues.map(([value, timestamp]) => ({
-          time: timestamp,
-          value,
-        })),
-      },
-    ],
-    [indexDPRValues, markDPRValues, normalizationDPRValues],
-  );
-
-  const series = useMemo(
-    () => [
-      {
-        name: 'Contract',
-        data: normalizationDPRValues.map(([value, timestamp]) => ({
-          x: timestamp,
-          y: value,
-        })),
-      },
-      {
-        name: 'Target',
-        data: indexDPRValues.map(([value, timestamp]) => ({
-          x: timestamp,
-          y: value,
-        })),
-      },
-      {
-        name: 'Market',
-        data: markDPRValues.map(([value, timestamp]) => ({
-          x: timestamp,
-          y: value,
-        })),
-      },
-    ],
-    [indexDPRValues, markDPRValues, normalizationDPRValues],
-  );
-
   const chartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -253,3 +187,5 @@ function PriceInUSDC({
     <Chart options={options as any} series={series} type="line" width="580" />
   );
 }
+
+export default Charts;
