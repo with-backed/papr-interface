@@ -4,42 +4,57 @@ import styles from './Slider.module.css';
 export type SliderProps = {
   min: number;
   max: number;
-  onChange: (value: number | number[], index: number) => void;
+  onChange: (value: number, index: number) => void;
+  onAfterChange: (value: number, index: number) => void;
   renderThumb: (
     props: any,
-    state: { index: number; value: number | number[]; valueNow: number },
+    state: { index: number; value: number; valueNow: number },
   ) => JSX.Element | null;
-  value: number | number[] | undefined;
-  hideTrackStyle: boolean;
+  value: number | undefined;
+  renderTrack: (
+    props: any,
+    state: { index: number; value: number },
+  ) => JSX.Element | null;
+  blackTrackWidth: string;
+  hideBlackTrack: boolean;
 };
 
 export function Slider({
   min,
   max,
   onChange,
+  onAfterChange,
   renderThumb,
+  renderTrack,
   value,
-  hideTrackStyle = false,
+  blackTrackWidth,
+  hideBlackTrack,
 }: SliderProps) {
   return (
     <>
-      {!hideTrackStyle && (
-        <style>
-          {`.${styles.track}-1 {
-          background-image: url('/slider-tile-black.svg') !important;
-        }`}
-        </style>
+      {!hideBlackTrack && (
+        <div
+          style={{
+            width: blackTrackWidth,
+            left: '0px',
+            position: 'relative',
+            top: '36px',
+            height: '36px',
+            backgroundImage: "url('/slider-tile-black.svg')",
+            zIndex: 1,
+          }}></div>
       )}
-
       <ReactSlider
         className={styles.slider}
         trackClassName={styles.track}
         thumbClassName={styles.thumb}
         renderThumb={renderThumb}
+        renderTrack={renderTrack}
         min={min}
         max={max}
         pearling
         onChange={onChange}
+        onAfterChange={onAfterChange}
         value={value}
       />
     </>
