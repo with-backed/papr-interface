@@ -18,13 +18,13 @@ export const ConnectWallet = () => {
               openConnectModal();
             }}
             type="button"
-            kind="dark">
+            kind="primary">
             🥕 Connect
           </Button>
         ) : (
           <ButtonLink
             href={`/networks/${network}/profile/${account.address}`}
-            kind="dark">
+            kind="primary">
             <span className={styles.address}>
               🔓 <DisplayAddress address={account.address} />
             </span>
