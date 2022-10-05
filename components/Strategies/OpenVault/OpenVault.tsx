@@ -287,23 +287,26 @@ export function OpenVault({
   // TODO: I think useCallback may not be able to introspect the debounced
   // function this produces. May need to either manually handle debounce with
   // timeouts or do something else.
-  const handleChosenDebtChanged = debounce(async (value: string) => {
-    if (!maxDebt) return;
+  const handleChosenDebtChanged = useCallback(
+    async (value: string) => {
+      if (!maxDebt) return;
 
-    const debtBigNumber = ethers.utils.parseUnits(value, debtToken.decimals);
-    setChosenDebt(debtBigNumber);
+      const debtBigNumber = ethers.utils.parseUnits(value, debtToken.decimals);
+      setChosenDebt(debtBigNumber);
 
-    if (value === '') {
-      setLiquidationDateEstimation('');
-      return;
-    }
+      if (value === '') {
+        setLiquidationDateEstimation('');
+        return;
+      }
 
-    setLiquidationDateEstimation(
-      await (
-        await computeLiquidationEstimation(debtBigNumber, maxDebt, strategy)
-      ).toFixed(0),
-    );
-  }, 500);
+      setLiquidationDateEstimation(
+        await (
+          await computeLiquidationEstimation(debtBigNumber, maxDebt, strategy)
+        ).toFixed(0),
+      );
+    },
+    [maxDebt, debtToken.decimals, strategy],
+  );
 
   const getMaxDebt = useCallback(async () => {
     const newNorm = await strategy.newNorm();

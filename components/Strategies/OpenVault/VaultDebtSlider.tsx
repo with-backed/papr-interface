@@ -136,6 +136,7 @@ export function VaultDebtSlider({
           return <div {...props}></div>;
         }}
         blackTrackWidth={blackTrackWidth}
+        hideBlackTrack={currentVaultDebtNumber === 0}
       />
       <p className={styles.sliderLabel}>
         Max Loan {!!maxLTV && maxLTV.toString()}% LTV

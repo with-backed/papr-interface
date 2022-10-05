@@ -16,6 +16,7 @@ export type SliderProps = {
     state: { index: number; value: number },
   ) => JSX.Element | null;
   blackTrackWidth: string;
+  hideBlackTrack: boolean;
 };
 
 export function Slider({
@@ -27,19 +28,22 @@ export function Slider({
   renderTrack,
   value,
   blackTrackWidth,
+  hideBlackTrack,
 }: SliderProps) {
   return (
     <>
-      <div
-        style={{
-          width: blackTrackWidth,
-          left: '0px',
-          position: 'relative',
-          top: '36px',
-          height: '36px',
-          backgroundImage: "url('/slider-tile-black.svg')",
-          zIndex: 1,
-        }}></div>
+      {!hideBlackTrack && (
+        <div
+          style={{
+            width: blackTrackWidth,
+            left: '0px',
+            position: 'relative',
+            top: '36px',
+            height: '36px',
+            backgroundImage: "url('/slider-tile-black.svg')",
+            zIndex: 1,
+          }}></div>
+      )}
       <ReactSlider
         className={styles.slider}
         trackClassName={styles.track}
