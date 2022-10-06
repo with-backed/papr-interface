@@ -143,7 +143,7 @@ export function RateTooltip({
     pricesData.normalizationDPRValues[
       pricesData.normalizationDPRValues.length - 1
     ][0];
-  const contractYearly = contractDaily * 12;
+  const contractYearly = contractDaily * 365;
 
   return (
     <Tooltip {...tooltip}>
