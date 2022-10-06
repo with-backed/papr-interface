@@ -144,7 +144,7 @@ function PriceInUSDC({
         },
       });
       chart.priceScale().applyOptions({ ...BASE_PRICE_SCALE_OPTIONS });
-      chart.timeScale().applyOptions({ ...BASE_LINE_SERIES_OPTIONS });
+      chart.timeScale().applyOptions({ ...BASE_TIME_SCALE_OPTIONS });
       const indexSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
         lineStyle: LineStyle.SparseDotted,
