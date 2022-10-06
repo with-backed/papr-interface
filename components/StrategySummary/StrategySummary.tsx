@@ -136,10 +136,7 @@ export default function StrategySummary({
                   {!includeDetails && (
                     <td className={styles.tokenName}>
                       <TooltipReference {...tokenTooltip}>
-                        <p>
-                          $papr{strategy.underlying.symbol}_
-                          {strategy.maxLTVPercent}
-                        </p>
+                        <p>$papr_${strategy.debtToken.symbol}</p>
                       </TooltipReference>
                       <TokenTooltip
                         strategy={strategy}
