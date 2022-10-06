@@ -1,4 +1,4 @@
-import StrategiesToBorrowFrom from 'components/StrategiesToBorrowFrom/StrategiesToBorrowFrom';
+import StrategySummary from 'components/StrategySummary/StrategySummary';
 import { getAllStrategies } from 'lib/pAPRSubgraph';
 import { StrategyPricesData, strategyPricesData } from 'lib/strategies/charts';
 import { GetServerSideProps } from 'next';
@@ -72,7 +72,7 @@ export default function SelectStrategyBorrowPage({
     <div className={strategyStyles.wrapper}>
       <div className={styles.selectStrategyWrapper}>
         <div className={strategyStyles.column}>
-          <StrategiesToBorrowFrom
+          <StrategySummary
             legend="🎮 strategies"
             strategies={lendingStrategies}
             pricesData={pricesData}
