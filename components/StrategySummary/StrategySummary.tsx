@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
 
-import styles from './strategiesToBorrowFrom.module.css';
+import styles from './strategySummary.module.css';
 import {
   APRTooltip,
   MktCtrTooltip,
@@ -19,19 +19,19 @@ import {
   TokenTooltip,
 } from './Tooltips';
 
-export type StrategiesToBorrowFromProps = {
+export type StrategySummaryProps = {
   strategies: LendingStrategy[];
-  pricesData: { [key: string]: StrategyPricesData };
+  pricesData: { [key: string]: StrategyPricesData | null };
   includeDetails: boolean;
   legend: string;
 };
 
-export default function StrategiesToBorrowFrom({
+export default function StrategySummary({
   strategies,
   pricesData,
   includeDetails,
   legend,
-}: StrategiesToBorrowFromProps) {
+}: StrategySummaryProps) {
   const config = useConfig();
   const router = useRouter();
   const [debtTokenSupplies, setDebtTokenSupplies] = useState<{
@@ -98,6 +98,8 @@ export default function StrategiesToBorrowFrom({
           <tbody>
             {strategies.map((strategy, i) => {
               const pricesDataForStrategy = pricesData[strategy.id];
+              if (!pricesDataForStrategy) return <></>;
+
               const targetYearlyGrowth = pricesDataForStrategy.indexDPR * 365;
 
               const mark = parseFloat(
@@ -134,10 +136,7 @@ export default function StrategiesToBorrowFrom({
                   {!includeDetails && (
                     <td className={styles.tokenName}>
                       <TooltipReference {...tokenTooltip}>
-                        <p>
-                          $papr{strategy.underlying.symbol}_
-                          {strategy.maxLTVPercent}
-                        </p>
+                        <p>$papr_${strategy.debtToken.symbol}</p>
                       </TooltipReference>
                       <TokenTooltip
                         strategy={strategy}

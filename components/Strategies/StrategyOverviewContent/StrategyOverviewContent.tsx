@@ -7,6 +7,8 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { Collateral } from '../Collateral';
 import { Activity } from '../Activity';
 import { Loans } from '../Loans';
+import StrategySummary from 'components/StrategySummary/StrategySummary';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 
 export type StrategyPageProps = {
   address: string;
@@ -19,9 +21,19 @@ export function StrategyOverviewContent({
   lendingStrategy,
   pricesData,
 }: StrategyPageProps) {
+  const maxLTVPercent = useAsyncValue(
+    () => lendingStrategy.maxLTVPercent(),
+    [lendingStrategy],
+  );
   return (
     <div className={styles.wrapper}>
       <AssociatedVaults strategy={address} />
+      <StrategySummary
+        includeDetails={false}
+        legend={`Strategy: $papr_${lendingStrategy.debtToken.symbol}${maxLTVPercent}`}
+        pricesData={{ [lendingStrategy.id]: pricesData }}
+        strategies={[lendingStrategy]}
+      />
       <Charts pricesData={pricesData} />
       <Collateral lendingStrategy={lendingStrategy} />
       <Activity lendingStrategy={lendingStrategy} />
