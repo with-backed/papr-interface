@@ -16,6 +16,7 @@ import { useSigner } from 'wagmi';
 import { useMemo } from 'react';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
+import { getAddress } from 'ethers/lib/utils';
 
 type ServerSideProps = Omit<
   BorrowPageProps,
@@ -61,7 +62,10 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     }),
   );
   const oracleInfo = collectionAddresses.reduce(
-    (prev, current, i) => ({ ...prev, [current]: oracleInfoFromAPI[i] }),
+    (prev, current, i) => ({
+      ...prev,
+      [getAddress(current)]: oracleInfoFromAPI[i],
+    }),
     {},
   );
 
