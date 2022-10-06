@@ -2,13 +2,18 @@ import React from 'react';
 import styles from 'components/Strategies/Strategy.module.css';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { AssociatedVaults } from '../AssociatedVaults';
-import { Charts } from 'components/Strategies/Charts';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { Collateral } from '../Collateral';
 import { Activity } from '../Activity';
 import { Loans } from '../Loans';
 import StrategySummary from 'components/StrategySummary/StrategySummary';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import dynamic from 'next/dynamic';
+
+/* lightweight-charts uses canvas and cannot be SSRed */
+const Charts = dynamic(() => import('components/Strategies/Charts/Charts'), {
+  ssr: false,
+});
 
 export type StrategyPageProps = {
   address: string;
