@@ -2,7 +2,16 @@ import { Fieldset } from 'components/Fieldset';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useEffect, useRef } from 'react';
 import styles from './Charts.module.css';
-import { createChart, LineStyle, UTCTimestamp } from 'lightweight-charts';
+import {
+  ChartOptions,
+  createChart,
+  DeepPartial,
+  LineSeriesOptions,
+  LineStyle,
+  PriceScaleOptions,
+  TimeScaleOptions,
+  UTCTimestamp,
+} from 'lightweight-charts';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 
 type ChartsProps = {
@@ -26,6 +35,27 @@ export function Charts({ pricesData }: ChartsProps) {
   );
 }
 
+const BASE_CHART_OPTIONS: DeepPartial<ChartOptions> = {
+  height: 360,
+  grid: { horzLines: { visible: false } },
+  layout: {
+    textColor: '#ffffff',
+    fontFamily: "'GT Maru Regular', Helvetica, sans-serif",
+    fontSize: 12,
+  },
+};
+const BASE_PRICE_SCALE_OPTIONS: DeepPartial<PriceScaleOptions> = {
+  drawTicks: false,
+  borderVisible: false,
+};
+const BASE_TIME_SCALE_OPTIONS: DeepPartial<TimeScaleOptions> = {
+  visible: false,
+};
+const BASE_LINE_SERIES_OPTIONS: DeepPartial<LineSeriesOptions> = {
+  priceLineVisible: false,
+  lineWidth: 1,
+};
+
 type RateOfGrowthProps = {
   pricesData: StrategyPricesData;
 };
@@ -37,24 +67,19 @@ function RateOfGrowth({
   useEffect(() => {
     if (chartRef.current) {
       const chart = createChart(chartRef.current, {
-        height: 360,
-        grid: { horzLines: { visible: false } },
-        layout: { textColor: '#ffffff' },
+        ...BASE_CHART_OPTIONS,
         localization: {
           priceFormatter: (value: string) =>
             formatPercent(parseFloat(value) / 100),
         },
       });
-      chart
-        .priceScale()
-        .applyOptions({ drawTicks: false, borderVisible: false });
-      chart.timeScale().applyOptions({
-        visible: false,
-      });
+      chart.priceScale().applyOptions({ ...BASE_PRICE_SCALE_OPTIONS });
+      chart.timeScale().applyOptions({ ...BASE_TIME_SCALE_OPTIONS });
       const indexSeries = chart.addLineSeries({
+        ...BASE_LINE_SERIES_OPTIONS,
         lineStyle: LineStyle.SparseDotted,
+        lineWidth: 2,
         color: '#000000',
-        priceLineVisible: false,
       });
       indexSeries.setData(
         indexDPRValues.map(([value, timestamp]) => ({
@@ -64,8 +89,8 @@ function RateOfGrowth({
       );
 
       const markSeries = chart.addLineSeries({
-        color: '#007155',
-        priceLineVisible: false,
+        ...BASE_LINE_SERIES_OPTIONS,
+        color: '#0000ee',
       });
       markSeries.setData(
         markDPRValues.map(([value, timestamp]) => ({
@@ -75,8 +100,8 @@ function RateOfGrowth({
       );
 
       const normSeries = chart.addLineSeries({
+        ...BASE_LINE_SERIES_OPTIONS,
         color: '#000000',
-        priceLineVisible: false,
       });
       normSeries.setData(
         normalizationDPRValues.map(([value, timestamp]) => ({
@@ -112,24 +137,19 @@ function PriceInUSDC({
   useEffect(() => {
     if (chartRef.current) {
       const chart = createChart(chartRef.current, {
-        height: 360,
-        grid: { horzLines: { visible: false } },
-        layout: { textColor: '#ffffff' },
+        ...BASE_CHART_OPTIONS,
         localization: {
           priceFormatter: (value: string) =>
             formatTokenAmount(parseFloat(value)) + ' USDC',
         },
       });
-      chart
-        .priceScale()
-        .applyOptions({ drawTicks: false, borderVisible: false });
-      chart.timeScale().applyOptions({
-        visible: false,
-      });
+      chart.priceScale().applyOptions({ ...BASE_PRICE_SCALE_OPTIONS });
+      chart.timeScale().applyOptions({ ...BASE_LINE_SERIES_OPTIONS });
       const indexSeries = chart.addLineSeries({
+        ...BASE_LINE_SERIES_OPTIONS,
         lineStyle: LineStyle.SparseDotted,
+        lineWidth: 2,
         color: '#000000',
-        priceLineVisible: false,
       });
       indexSeries.setData(
         indexDPRValues.map(([_, timestamp]) => ({
@@ -139,8 +159,8 @@ function PriceInUSDC({
       );
 
       const markSeries = chart.addLineSeries({
-        color: '#007155',
-        priceLineVisible: false,
+        ...BASE_LINE_SERIES_OPTIONS,
+        color: '#0000ee',
       });
       markSeries.setData(
         markDPRValues.map(([_, timestamp], i) => ({
@@ -150,8 +170,8 @@ function PriceInUSDC({
       );
 
       const normSeries = chart.addLineSeries({
+        ...BASE_LINE_SERIES_OPTIONS,
         color: '#000000',
-        priceLineVisible: false,
       });
       normSeries.setData(
         normalizationDPRValues.map(([_, timestamp], i) => ({
