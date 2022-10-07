@@ -114,3 +114,10 @@ a:visited {
 p {
   line-height: 2rem;
 }
+
+/* Have to override Reakit default to make sure that our tooltips go above
+ * other things that have a z-index > 0
+ */
+div[role='tooltip'] {
+  z-index: 3 !important;
+}

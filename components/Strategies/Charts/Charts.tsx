@@ -69,8 +69,7 @@ function RateOfGrowth({
       const chart = createChart(chartRef.current, {
         ...BASE_CHART_OPTIONS,
         localization: {
-          priceFormatter: (value: string) =>
-            formatPercent(parseFloat(value) / 100),
+          priceFormatter: (value: string) => formatPercent(parseFloat(value)),
         },
       });
       chart.priceScale().applyOptions({ ...BASE_PRICE_SCALE_OPTIONS });

@@ -1,6 +1,7 @@
 import { Slider } from 'components/Slider';
 import { ethers } from 'ethers';
 import { LendingStrategy } from 'lib/LendingStrategy';
+import { formatPercent } from 'lib/numberFormat';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
 
@@ -105,11 +106,9 @@ export function VaultDebtSlider({
                   <div>
                     <p>
                       Current LTV:{' '}
-                      {(
-                        (currentVaultDebtNumber / maxDebtNumber) *
-                        maxLTV
-                      ).toFixed(2)}
-                      %
+                      {formatPercent(
+                        (currentVaultDebtNumber / maxDebtNumber) * maxLTV,
+                      )}
                     </p>
                   </div>
                   <div>
@@ -123,7 +122,7 @@ export function VaultDebtSlider({
                   {state.index === 0 && (
                     <>
                       <p>Loan Amount</p>
-                      <p>{currentLTV.toFixed(2)}% LTV</p>
+                      <p>{formatPercent(currentLTV)} LTV</p>
                     </>
                   )}
                 </div>
@@ -139,7 +138,7 @@ export function VaultDebtSlider({
         hideBlackTrack={currentVaultDebtNumber === 0}
       />
       <p className={styles.sliderLabel}>
-        Max Loan {!!maxLTV && maxLTV.toString()}% LTV
+        Max Loan {!!maxLTV && formatPercent(maxLTV)} LTV
       </p>
     </div>
   );

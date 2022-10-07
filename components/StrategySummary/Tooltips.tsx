@@ -1,7 +1,9 @@
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { LendingStrategy } from 'lib/LendingStrategy';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { PRICE } from 'lib/strategies/constants';
+import { useMemo } from 'react';
 import { Tooltip, TooltipStateReturn } from 'reakit';
 import styles from './tooltips.module.css';
 
@@ -15,13 +17,19 @@ export function TokenTooltip({ strategy, tooltip }: ToolkitProps) {
     () => strategy.maxLTVPercent(),
     [strategy],
   );
+  const formattedMaxLTVPercent = useMemo(() => {
+    if (maxLTVPercent) {
+      return formatPercent(maxLTVPercent);
+    }
+    return '---';
+  }, [maxLTVPercent]);
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
         This lending strategy lends to Cryptopunks, lending up to{' '}
-        {maxLTVPercent}% of the value of the Punks floor. The oracle price for
-        Cryptopunks is ${PRICE}. The max loan value is {maxLTVPercent}% of that:
-        ${((PRICE * (maxLTVPercent || 0)) / 100).toFixed(2)}
+        {formattedMaxLTVPercent} of the value of the Punks floor. The oracle
+        price for Cryptopunks is ${PRICE}. The max loan value is{' '}
+        {formattedMaxLTVPercent} of that: ${PRICE * (maxLTVPercent || 0)}
       </div>
     </Tooltip>
   );
@@ -32,12 +40,18 @@ export function APRTooltip({ strategy, tooltip }: ToolkitProps) {
     () => strategy.targetAnnualGrowthPercent(),
     [strategy],
   );
+  const formattedTargetAnnualGrowthPercent = useMemo(() => {
+    if (targetAnnualGrowthPercent) {
+      return formatPercent(targetAnnualGrowthPercent);
+    }
+    return '---';
+  }, [targetAnnualGrowthPercent]);
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
         The strategy contract adjusts the (C) contract rate for minting and
-        liquidation, targeting steady growth of {targetAnnualGrowthPercent}% per
-        year.
+        liquidation, targeting steady growth of{' '}
+        {formattedTargetAnnualGrowthPercent} per year.
       </div>
     </Tooltip>
   );
@@ -53,13 +67,13 @@ export function NFTCapTooltip({
     <Tooltip {...tooltip}>
       <div className={`${styles.tooltip} ${styles.nftCapTooltip}`}>
         <div className={styles.value}>
-          <p>${nftMarketCap}</p>
+          <p>${formatTokenAmount(nftMarketCap)}</p>
         </div>
         <div className={styles.description}>
           <p>(NFT) Floor value of all deposited collateral</p>
         </div>
         <div className={styles.value}>
-          <p>${debtTokenMarketCap}</p>
+          <p>${formatTokenAmount(debtTokenMarketCap)}</p>
         </div>
         <div className={styles.description}>
           <p>(CAP) Market value of strategy&apos;s pAPR tokens</p>
@@ -98,7 +112,7 @@ export function MktCtrTooltip({
           </div>
           <div>
             <p>
-              ${mark.toFixed(2)} {strategy.underlying.symbol}
+              {formatTokenAmount(mark)} {strategy.underlying.symbol}
             </p>
           </div>
           <div>
@@ -106,7 +120,7 @@ export function MktCtrTooltip({
           </div>
           <div>
             <p>
-              ${norm.toFixed(2)} {strategy.underlying.symbol}
+              {formatTokenAmount(norm)} {strategy.underlying.symbol}
             </p>
           </div>
           <div>
@@ -118,9 +132,9 @@ export function MktCtrTooltip({
         </div>
         <div>
           <p>
-            The market price is {(diff * 100).toFixed(0)}% {lowerHigherText}{' '}
-            than the price used by the contract, which is aiming to {speedText}{' '}
-            the growth rate (target is {targetAnnualGrowthPercent}% APR).
+            The market price is {formatPercent(diff)} {lowerHigherText} than the
+            price used by the contract, which is aiming to {speedText} the
+            growth rate (target is {targetAnnualGrowthPercent}% APR).
           </p>
         </div>
       </div>
@@ -131,7 +145,9 @@ export function MktCtrTooltip({
 export function RateTooltip({
   tooltip,
   pricesData,
-}: ToolkitProps & { pricesData: StrategyPricesData }) {
+}: ToolkitProps & {
+  pricesData: StrategyPricesData;
+}) {
   const targetDaily = pricesData.indexDPR;
   const targetYearly = targetDaily * 365;
 
@@ -149,22 +165,22 @@ export function RateTooltip({
     <Tooltip {...tooltip}>
       <div className={`${styles.tooltip} ${styles.rateTooltip}`}>
         <div>
-          <p>Strategy targets: {targetYearly.toFixed(0)}% APR</p>
+          <p>Strategy targets: {formatPercent(targetYearly)} APR</p>
         </div>
         <div>
-          <p>= {pricesData.indexDPR.toFixed(2)}% daily</p>
+          <p>= {formatPercent(pricesData.indexDPR)} daily</p>
         </div>
         <div>
-          <p>(R) Realized rate: {realizedYearly.toFixed(0)}% APR</p>
+          <p>(R) Realized rate: {formatPercent(realizedYearly)} APR</p>
         </div>
         <div>
-          <p>= {realizedDaily.toFixed(2)}% daily</p>
+          <p>= {formatPercent(realizedDaily)} daily</p>
         </div>
         <div>
-          <p>(C) Contract rate: {contractYearly.toFixed(0)}% APR</p>
+          <p>(C) Contract rate: {formatPercent(contractYearly)} APR</p>
         </div>
         <div>
-          <p>= {contractDaily.toFixed(2)}% daily</p>
+          <p>= {formatPercent(contractDaily)} daily</p>
         </div>
       </div>
     </Tooltip>

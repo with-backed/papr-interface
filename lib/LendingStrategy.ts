@@ -13,7 +13,7 @@ import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 import { Config } from './config';
 import { subgraphStrategyByAddress } from './pAPRSubgraph';
-import { buildToken, convertONEScaledPercent, ERC20Token } from './strategies';
+import { buildToken, convertOneScaledValue } from './strategies';
 import { getPool } from './strategies/uniswap';
 import { subgraphUniswapPoolById } from './uniswapSubgraph';
 
@@ -132,7 +132,7 @@ class LendingStrategyInternal {
 
   async maxLTVPercent() {
     const maxLTV = await this._contract.maxLTV();
-    return convertONEScaledPercent(maxLTV, 2);
+    return convertOneScaledValue(maxLTV, 2);
   }
 
   multiplier() {
@@ -212,7 +212,7 @@ class LendingStrategyInternal {
 
   async targetAnnualGrowthPercent() {
     const targetAnnualGrowth = await this._contract.targetAPR();
-    return convertONEScaledPercent(targetAnnualGrowth, 2);
+    return convertOneScaledValue(targetAnnualGrowth, 2);
   }
 
   targetGrowthPerPeriod() {

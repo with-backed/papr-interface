@@ -284,9 +284,6 @@ export function OpenVault({
     }
   }, [address, nftsSelected, debtToBorrowOrRepay, strategy, quoteForSwap]);
 
-  // TODO: I think useCallback may not be able to introspect the debounced
-  // function this produces. May need to either manually handle debounce with
-  // timeouts or do something else.
   const handleChosenDebtChanged = useCallback(
     async (value: string) => {
       if (!maxDebt) return;
