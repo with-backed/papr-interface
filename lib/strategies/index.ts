@@ -23,13 +23,6 @@ export type ERC721Token = {
   symbol: string;
 };
 
-export function convertONEScaledPercent(
-  n: ethers.BigNumber,
-  decimals: number,
-): number {
-  return convertOneScaledValue(n, decimals + 2) * 100;
-}
-
 export function convertOneScaledValue(
   n: ethers.BigNumber,
   decimals: number,
@@ -73,7 +66,7 @@ export function computeEffectiveDPR(
     .div(delta.eq(0) ? 1 : delta) // how much growth per second
     .mul(SECONDS_IN_A_DAY); // compute for one day
 
-  return convertONEScaledPercent(dpr, decimals);
+  return convertOneScaledValue(dpr, decimals);
 }
 
 // TODO(adamgobes): figure out how to do powWad locally in JS

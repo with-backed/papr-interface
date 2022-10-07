@@ -5,7 +5,7 @@ import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { Strategy__factory } from 'types/generated/abis';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
-import { convertONEScaledPercent } from '..';
+import { convertOneScaledValue } from '..';
 import { markValues } from './mark';
 import { normValues } from './norm';
 
@@ -27,7 +27,7 @@ export async function strategyPricesData(
   uniswapSubgraphUrl: string,
 ): Promise<StrategyPricesData> {
   const targetDPRScaled = ethers.BigNumber.from(strategy.targetAPR).div(365);
-  const targetDPR = convertONEScaledPercent(targetDPRScaled, 4);
+  const targetDPR = convertOneScaledValue(targetDPRScaled, 4);
   const now = Math.floor(Date.now() / 1000);
   const subgraphUniswapPool = await subgraphUniswapPoolById(
     strategy.poolAddress,
