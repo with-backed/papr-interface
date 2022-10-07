@@ -1,14 +1,15 @@
 import { Fieldset } from 'components/Fieldset';
 import { Health } from 'components/Strategies/Health';
 import { ethers } from 'ethers';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { formatThreeFractionDigits } from 'lib/numberFormat';
+import { formatPercent, formatThreeFractionDigits } from 'lib/numberFormat';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
-import { TooltipReference, useTooltipState } from 'reakit';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { TooltipReference, TooltipStateReturn, useTooltipState } from 'reakit';
 
 import styles from './strategySummary.module.css';
 import {
@@ -96,108 +97,139 @@ export default function StrategySummary({
             </tr>
           </thead>
           <tbody>
-            {strategies.map((strategy, i) => {
-              const pricesDataForStrategy = pricesData[strategy.id];
-              if (!pricesDataForStrategy) return <></>;
-
-              const targetYearlyGrowth = pricesDataForStrategy.indexDPR * 365;
-
-              const mark = parseFloat(
-                pricesDataForStrategy.markValues[
-                  pricesDataForStrategy.markValues.length - 1
-                ],
-              );
-              const norm = parseFloat(
-                pricesDataForStrategy.normalizationValues[
-                  pricesDataForStrategy.normalizationValues.length - 1
-                ],
-              );
-              const markOverNorm = mark / norm;
-
-              const fakeNFTValue = 300000;
-              const debtTokenMarketCap =
-                parseFloat(
-                  ethers.utils.formatEther(debtTokenSupplies[strategy.id]),
-                ) * mark;
-
-              const nftOverCap = fakeNFTValue / debtTokenMarketCap;
-
-              return (
-                <tr
-                  onClick={() =>
-                    router.push(
-                      `/networks/${config.network}/strategies/${strategy.id}/borrow`,
-                    )
-                  }
-                  className={`${i % 2 === 0 ? styles.even : ''} ${
-                    styles.clickable
-                  }`}
-                  key={strategy.id}>
-                  {!includeDetails && (
-                    <td className={styles.tokenName}>
-                      <TooltipReference {...tokenTooltip}>
-                        <p>$papr_${strategy.debtToken.symbol}</p>
-                      </TooltipReference>
-                      <TokenTooltip
-                        strategy={strategy}
-                        tooltip={tokenTooltip}
-                      />
-                    </td>
-                  )}
-
-                  <td className={styles.stat}>
-                    <TooltipReference {...aprTooltip}>
-                      <p>{targetYearlyGrowth.toFixed(0)}% APR</p>
-                    </TooltipReference>
-                    <APRTooltip strategy={strategy} tooltip={aprTooltip} />
-                  </td>
-
-                  <td className={styles.stat}>
-                    <TooltipReference {...nftCapTooltip}>
-                      <p>{formatThreeFractionDigits(nftOverCap)}</p>
-                    </TooltipReference>
-                    <NFTCapTooltip
-                      strategy={strategy}
-                      tooltip={nftCapTooltip}
-                      nftMarketCap={fakeNFTValue}
-                      debtTokenMarketCap={debtTokenMarketCap}
-                    />
-                  </td>
-                  <td className={styles.stat}>
-                    <TooltipReference {...mktCtrTooltip}>
-                      <p>{formatThreeFractionDigits(markOverNorm)}</p>
-                    </TooltipReference>
-                    <MktCtrTooltip
-                      strategy={strategy}
-                      tooltip={mktCtrTooltip}
-                      mark={mark}
-                      norm={norm}
-                    />
-                  </td>
-                  <td className={styles.rate}>
-                    <TooltipReference {...rateTooltip}>
-                      <Health pricesData={pricesDataForStrategy} />
-                    </TooltipReference>
-                    <RateTooltip
-                      strategy={strategy}
-                      tooltip={rateTooltip}
-                      pricesData={pricesDataForStrategy}
-                    />
-                  </td>
-                  {includeDetails && (
-                    <td colSpan={6}>
-                      <Link
-                        href={`/networks/${config.network}/strategies/${strategy.id}`}>
-                        <a>Details ↗</a>
-                      </Link>
-                    </td>
-                  )}
-                </tr>
-              );
-            })}
+            {strategies.map((strategy, i) => (
+              <SummaryEntry
+                key={strategy.id}
+                tokenTooltip={tokenTooltip}
+                aprTooltip={aprTooltip}
+                nftCapTooltip={nftCapTooltip}
+                mktCtrTooltip={mktCtrTooltip}
+                rateTooltip={rateTooltip}
+                pricesData={pricesData[strategy.id]}
+                strategy={strategy}
+                includeDetails={includeDetails}
+              />
+            ))}
           </tbody>
         </table>
       </div>
     </Fieldset>
+  );
+}
+
+type SummaryEntryProps = {
+  tokenTooltip: TooltipStateReturn;
+  aprTooltip: TooltipStateReturn;
+  nftCapTooltip: TooltipStateReturn;
+  mktCtrTooltip: TooltipStateReturn;
+  rateTooltip: TooltipStateReturn;
+  pricesData: StrategyPricesData | null;
+  strategy: LendingStrategy;
+  includeDetails?: boolean;
+};
+function SummaryEntry({
+  tokenTooltip,
+  aprTooltip,
+  nftCapTooltip,
+  mktCtrTooltip,
+  rateTooltip,
+  strategy,
+  pricesData,
+  includeDetails,
+}: SummaryEntryProps) {
+  const { network } = useConfig();
+  const targetAnnualGrowthRate = useAsyncValue(
+    () => strategy.targetAnnualGrowthPercent(),
+    [strategy],
+  );
+  const formattedAnnualGrowthRate = useMemo(() => {
+    if (targetAnnualGrowthRate) {
+      return formatPercent(targetAnnualGrowthRate);
+    }
+    return '---';
+  }, [targetAnnualGrowthRate]);
+
+  const debtTokenSupply = useAsyncValue(
+    () =>
+      strategy.token0IsUnderlying
+        ? strategy.token1.totalSupply()
+        : strategy.token0.totalSupply(),
+    [strategy],
+  );
+
+  if (!pricesData) return <></>;
+
+  const mark = parseFloat(
+    pricesData.markValues[pricesData.markValues.length - 1],
+  );
+  const norm = parseFloat(
+    pricesData.normalizationValues[pricesData.normalizationValues.length - 1],
+  );
+  const markOverNorm = mark / norm;
+
+  const fakeNFTValue = 300000;
+  const debtTokenMarketCap =
+    parseFloat(ethers.utils.formatEther(debtTokenSupply || 0)) * mark;
+
+  const nftOverCap = fakeNFTValue / debtTokenMarketCap;
+
+  return (
+    <tr>
+      {!includeDetails && (
+        <td className={styles.tokenName}>
+          <TooltipReference {...tokenTooltip}>
+            <p>$papr_${strategy.debtToken.symbol}</p>
+          </TooltipReference>
+          <TokenTooltip strategy={strategy} tooltip={tokenTooltip} />
+        </td>
+      )}
+
+      <td className={styles.stat}>
+        <TooltipReference {...aprTooltip}>
+          <p>{formattedAnnualGrowthRate} APR</p>
+        </TooltipReference>
+        <APRTooltip strategy={strategy} tooltip={aprTooltip} />
+      </td>
+
+      <td className={styles.stat}>
+        <TooltipReference {...nftCapTooltip}>
+          <p>{formatThreeFractionDigits(nftOverCap)}</p>
+        </TooltipReference>
+        <NFTCapTooltip
+          strategy={strategy}
+          tooltip={nftCapTooltip}
+          nftMarketCap={fakeNFTValue}
+          debtTokenMarketCap={debtTokenMarketCap}
+        />
+      </td>
+      <td className={styles.stat}>
+        <TooltipReference {...mktCtrTooltip}>
+          <p>{formatThreeFractionDigits(markOverNorm)}</p>
+        </TooltipReference>
+        <MktCtrTooltip
+          strategy={strategy}
+          tooltip={mktCtrTooltip}
+          mark={mark}
+          norm={norm}
+        />
+      </td>
+      <td className={styles.rate}>
+        <TooltipReference {...rateTooltip}>
+          <Health pricesData={pricesData} />
+        </TooltipReference>
+        <RateTooltip
+          strategy={strategy}
+          tooltip={rateTooltip}
+          pricesData={pricesData}
+        />
+      </td>
+      {includeDetails && (
+        <td colSpan={6}>
+          <Link href={`/networks/${network}/strategies/${strategy.id}`}>
+            <a>Details ↗</a>
+          </Link>
+        </td>
+      )}
+    </tr>
   );
 }
