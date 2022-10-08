@@ -105,34 +105,19 @@ function RateOfGrowth({
         lineStyle: LineStyle.SparseDotted,
         color: INDEX_COLOR,
       });
-      indexSeries.setData(
-        indexDPRValues.map(([value, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
-          value,
-        })),
-      );
+      indexSeries.setData(indexDPRValues);
 
       const markSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
         color: MARK_COLOR,
       });
-      markSeries.setData(
-        markDPRValues.map(([value, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
-          value,
-        })),
-      );
+      markSeries.setData(markDPRValues);
 
       const normSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
         color: NORM_COLOR,
       });
-      normSeries.setData(
-        normalizationDPRValues.map(([value, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
-          value,
-        })),
-      );
+      normSeries.setData(normalizationDPRValues);
 
       chart.timeScale().fitContent();
 
@@ -174,9 +159,10 @@ function PriceInUSDC({
         lineStyle: LineStyle.SparseDotted,
         color: INDEX_COLOR,
       });
+
       indexSeries.setData(
-        indexDPRValues.map(([_, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
+        indexDPRValues.map(({ time }) => ({
+          time,
           value: index,
         })),
       );
@@ -185,23 +171,13 @@ function PriceInUSDC({
         ...BASE_LINE_SERIES_OPTIONS,
         color: MARK_COLOR,
       });
-      markSeries.setData(
-        markValues.map(([value, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
-          value,
-        })),
-      );
+      markSeries.setData(markValues);
 
       const normSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
         color: NORM_COLOR,
       });
-      normSeries.setData(
-        normalizationValues.map(([value, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
-          value,
-        })),
-      );
+      normSeries.setData(normalizationValues);
 
       chart.timeScale().fitContent();
 

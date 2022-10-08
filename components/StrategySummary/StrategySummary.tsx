@@ -148,12 +148,10 @@ function SummaryEntry({
 
   if (!pricesData) return <></>;
 
-  const mark = parseFloat(
-    pricesData.markValues[pricesData.markValues.length - 1],
-  );
-  const norm = parseFloat(
-    pricesData.normalizationValues[pricesData.normalizationValues.length - 1],
-  );
+  const mark = pricesData.markValues[pricesData.markValues.length - 1].value;
+  const norm =
+    pricesData.normalizationValues[pricesData.normalizationValues.length - 1]
+      .value;
   const markOverNorm = mark / norm;
 
   const fakeNFTValue = 300000;

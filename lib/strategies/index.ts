@@ -39,6 +39,29 @@ export async function buildToken(token: ERC20): Promise<ERC20Token> {
   };
 }
 
+export enum RatePeriod {
+  Daily,
+  Annual,
+}
+
+export function computeOneScaledRate(
+  value1: ethers.BigNumber,
+  value2: ethers.BigNumber,
+  time1: number,
+  time2: number,
+  type: RatePeriod,
+): number {
+  const periodSecods =
+    type == RatePeriod.Daily ? SECONDS_IN_A_DAY : SECONDS_IN_A_DAY * 365;
+  const timeDelta = time2 - time1;
+  const scalar = 1e10;
+  const percentageChange = value2.sub(value1).mul(scalar).div(value1);
+  const percentageChangePerSecond = percentageChange.div(
+    timeDelta == 0 ? 1 : timeDelta,
+  );
+  return percentageChangePerSecond.mul(periodSecods).toNumber() / scalar;
+}
+
 export function computeEffectiveAPR(
   now: ethers.BigNumber,
   lastUpdated: ethers.BigNumber,

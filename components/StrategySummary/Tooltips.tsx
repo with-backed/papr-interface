@@ -138,13 +138,13 @@ export function RateTooltip({
   const targetYearly = targetDaily * 365;
 
   const realizedDaily =
-    pricesData.markDPRValues[pricesData.markDPRValues.length - 1][0];
+    pricesData.markDPRValues[pricesData.markDPRValues.length - 1].value;
   const realizedYearly = realizedDaily * 365;
 
   const contractDaily =
     pricesData.normalizationDPRValues[
       pricesData.normalizationDPRValues.length - 1
-    ][0];
+    ].value;
   const contractYearly = contractDaily * 365;
 
   return (

@@ -2,18 +2,22 @@ import { ethers } from 'ethers';
 import { SupportedNetwork } from 'lib/config';
 import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
+import { UTCTimestamp } from 'lightweight-charts';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
 import { markValues } from './mark';
 import { normValues } from './norm';
 
-export type ChartValue = [number, number];
+export interface TimeSeriesValue {
+  value: number;
+  time: UTCTimestamp;
+}
 
 export interface StrategyPricesData {
-  normalizationDPRValues: ChartValue[];
-  markDPRValues: ChartValue[];
-  indexDPRValues: ChartValue[];
-  markValues: ChartValue[];
-  normalizationValues: ChartValue[];
+  normalizationDPRValues: TimeSeriesValue[];
+  markDPRValues: TimeSeriesValue[];
+  indexDPRValues: TimeSeriesValue[];
+  markValues: TimeSeriesValue[];
+  normalizationValues: TimeSeriesValue[];
   index: number;
   indexDPR: number;
 }
@@ -32,8 +36,8 @@ export async function strategyPricesData(
 
   const index = 1;
 
-  var markDPRs: ChartValue[] = [];
-  var marks: string[] = [];
+  var markDPRs: TimeSeriesValue[] = [];
+  var marks: TimeSeriesValue[] = [];
   if (subgraphUniswapPool) {
     [marks, markDPRs] = await markValues(
       now,
@@ -45,19 +49,16 @@ export async function strategyPricesData(
 
   const [norms, normDPRs] = await normValues(now, strategy, network);
 
-  console.log(marks);
-  console.log(norms);
-
   // add a starting data point all on target
-  markDPRs.unshift([0, createdAt]);
-  normDPRs.unshift([0, createdAt]);
+  markDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });
+  normDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });
 
   // each unique timestamp from the datasets, sorted ascending. Use this to
   // make sure we have an index entry for each other value
   const timestamps = Array.from(
     new Set([
-      ...markDPRs.map(([_, timestamp]) => timestamp),
-      ...normDPRs.map(([_, timestamp]) => timestamp),
+      ...markDPRs.map(({ time }) => time),
+      ...normDPRs.map(({ time }) => time),
     ]),
   ).sort((a, b) => a - b);
 
@@ -72,6 +73,11 @@ export async function strategyPricesData(
   };
 }
 
-function indexValues(targetDPR: number, timestamps: number[]): ChartValue[] {
-  return timestamps.map((t) => [targetDPR, t]);
+function indexValues(
+  targetDPR: number,
+  timestamps: UTCTimestamp[],
+): TimeSeriesValue[] {
+  return timestamps.map((t) => {
+    return { value: targetDPR, time: t };
+  });
 }

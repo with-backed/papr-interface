@@ -86,14 +86,14 @@ export default function StrategyState({
         {
           pricesData.normalizationDPRValues[
             pricesData.normalizationDPRValues.length - 1
-          ][0]
+          ].value
         }
         %
       </p>
       <p>
         {' '}
         Realized Market Daily Percentage Growth{' '}
-        {pricesData.markDPRValues[pricesData.markDPRValues.length - 1][0]}%
+        {pricesData.markDPRValues[pricesData.markDPRValues.length - 1].value}%
       </p>
     </Fieldset>
   );
