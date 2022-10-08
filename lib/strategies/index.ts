@@ -44,7 +44,7 @@ export enum RatePeriod {
   Annual,
 }
 
-export function computeOneScaledRate(
+export function computeRate(
   value1: ethers.BigNumber,
   value2: ethers.BigNumber,
   time1: number,
@@ -55,11 +55,16 @@ export function computeOneScaledRate(
     type == RatePeriod.Daily ? SECONDS_IN_A_DAY : SECONDS_IN_A_DAY * 365;
   const timeDelta = time2 - time1;
   const scalar = 1e10;
-  const percentageChange = value2.sub(value1).mul(scalar).div(value1);
+  const percentageChange = value2.sub(value1).mul(ONE).div(value1);
   const percentageChangePerSecond = percentageChange.div(
     timeDelta == 0 ? 1 : timeDelta,
   );
-  return percentageChangePerSecond.mul(periodSecods).toNumber() / scalar;
+  return (
+    percentageChangePerSecond
+      .mul(periodSecods)
+      .div(ONE.div(10000)) // four deciamls
+      .toNumber() / 10000
+  );
 }
 
 export function computeEffectiveAPR(

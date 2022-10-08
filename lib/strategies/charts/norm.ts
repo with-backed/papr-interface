@@ -9,7 +9,7 @@ import {
   NormalizationUpdatesByStrategyDocument,
   NormalizationUpdatesByStrategyQuery,
 } from 'types/generated/graphql/inKindSubgraph';
-import { computeEffectiveDPR, computeOneScaledRate, RatePeriod } from '..';
+import { computeRate, RatePeriod } from '..';
 import { UTCTimestamp } from 'lightweight-charts';
 
 interface NormUpdate {
@@ -44,7 +44,7 @@ export async function normValues(
     const prev = sortedNorms[i - 1];
     const current = sortedNorms[i];
     const t = parseInt(current.timestamp);
-    const dpr = computeOneScaledRate(
+    const dpr = computeRate(
       ethers.BigNumber.from(prev.newNorm),
       ethers.BigNumber.from(current.newNorm),
       parseInt(prev.timestamp),
@@ -63,8 +63,6 @@ export async function normValues(
       time: t as UTCTimestamp,
     });
   }
-  console.log(formattedNorms);
-  console.log(normDPRs);
 
   return [formattedNorms, normDPRs];
 }
