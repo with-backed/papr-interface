@@ -6,3 +6,16 @@
   fill: var(--greentext);
   font-family: var(--sans) !important;
 }
+
+.legendSquare{
+  height: 15px;
+  width: 15px;
+  margin-right: 5px;
+  float: left;
+  margin-top: 15px;
+}
+
+.legendItem{
+  display: inline-block;
+  width: 90px;
+}

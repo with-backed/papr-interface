@@ -14,7 +14,7 @@ export async function markValues(
   strategy: LendingStrategy | SubgraphStrategy,
   pool: Pool,
   uniswapSubgraphUrl: string,
-): Promise<[string[], ChartValue[]]> {
+): Promise<[ChartValue[], ChartValue[]]> {
   let quoteCurrency: UniSubgraphToken;
   let baseCurrency: UniSubgraphToken;
   if (strategy.underlying == pool.token0) {
@@ -46,21 +46,22 @@ export async function markValues(
   }
 
   let dprValues: ChartValue[] = [];
+  let formattedSwapValues: ChartValue[] = [];
   for (let { sqrtPriceX96, timestamp } of sortedSwaps) {
     const scaledMarkDPR = price(sqrtPriceX96, baseCurrency, quoteCurrency)
       .subtract(1)
       .divide(timestamp - strategy.createdAt)
       .multiply(SECONDS_IN_A_DAY);
 
-    dprValues.push([parseFloat(scaledMarkDPR.toFixed(8)), parseInt(timestamp)]);
+    const t = parseInt(timestamp);
+    dprValues.push([parseFloat(scaledMarkDPR.toFixed(8)), t]);
+    formattedSwapValues.push([
+      parseFloat(price(sqrtPriceX96, baseCurrency, quoteCurrency).toFixed()),
+      t,
+    ]);
   }
 
-  return [
-    sortedSwaps.map((swap: any) =>
-      price(swap.sqrtPriceX96, baseCurrency, quoteCurrency).toFixed(),
-    ),
-    dprValues,
-  ];
+  return [formattedSwapValues, dprValues];
 }
 
 function price(

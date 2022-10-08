@@ -12,8 +12,8 @@ export interface StrategyPricesData {
   normalizationDPRValues: ChartValue[];
   markDPRValues: ChartValue[];
   indexDPRValues: ChartValue[];
-  markValues: string[];
-  normalizationValues: string[];
+  markValues: ChartValue[];
+  normalizationValues: ChartValue[];
   index: number;
   indexDPR: number;
 }
@@ -44,6 +44,9 @@ export async function strategyPricesData(
   }
 
   const [norms, normDPRs] = await normValues(now, strategy, network);
+
+  console.log(marks);
+  console.log(norms);
 
   // add a starting data point all on target
   markDPRs.unshift([0, createdAt]);
