@@ -2,7 +2,10 @@ import { ethers } from 'ethers';
 import {
   arrayify,
   defaultAbiCoder,
+  formatBytes32String,
   getAddress,
+  parseBytes32String,
+  toUtf8Bytes,
   _TypedDataEncoder,
 } from 'ethers/lib/utils';
 import { Config } from 'lib/config';
@@ -71,7 +74,25 @@ export async function generateDummyOracleMessage(
     ),
   );
 
-  console.log(ethers.utils.parseEther('3').toString(), { signature });
+  const split = ethers.utils.splitSignature(signature);
+
+  console.log({
+    split,
+  });
+
+  console.log({
+    signature,
+    recovered: ethers.utils.verifyMessage(
+      arrayify(
+        _TypedDataEncoder.hashStruct('Message', EIP712_TYPES.Message, {
+          id: '0x40a3a8affd14f3bed0a260ab13b9704476a51b99ebfe9e60ffe47dc4790e2629',
+          payload,
+          timestamp: 15685783,
+        }),
+      ),
+      signature,
+    ),
+  });
 
   const signedMessage: ReservoirResponseData = {
     price: parseFloat(ethers.utils.formatUnits(price, USDC_DECIMALS)),
