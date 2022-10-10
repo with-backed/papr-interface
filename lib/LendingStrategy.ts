@@ -119,7 +119,7 @@ class LendingStrategyInternal {
   }
 
   index() {
-    return this._contract.index();
+    return 1;
   }
 
   lastUpdated() {
@@ -171,7 +171,6 @@ class LendingStrategyInternal {
   }
 
   async mintAndSellDebt(
-    vaultNonce: ethers.BigNumberish,
     debt: ethers.BigNumberish,
     minOut: ethers.BigNumberish,
     sqrtPriceLimitX96: ethers.BigNumberish,
@@ -179,7 +178,6 @@ class LendingStrategyInternal {
     overrides?: Overrides & { from?: string | Promise<string> },
   ) {
     return this._contract.mintAndSellDebt(
-      vaultNonce,
       debt,
       minOut,
       sqrtPriceLimitX96,
@@ -189,7 +187,7 @@ class LendingStrategyInternal {
   }
 
   async buyAndReduceDebt(
-    vaultId: ethers.BigNumberish,
+    account: string,
     underlyingAmount: ethers.BigNumberish,
     minOut: ethers.BigNumberish,
     sqrtPriceLimitX96: ethers.BigNumberish,
@@ -197,7 +195,7 @@ class LendingStrategyInternal {
     overrides?: Overrides & { from?: string | Promise<string> },
   ) {
     return this._contract.buyAndReduceDebt(
-      vaultId,
+      account,
       underlyingAmount,
       minOut,
       sqrtPriceLimitX96,
@@ -206,17 +204,8 @@ class LendingStrategyInternal {
     );
   }
 
-  async reduceDebt(vaultId: ethers.BigNumberish, amount: ethers.BigNumberish) {
-    return this._contract.reduceDebt(vaultId, amount);
-  }
-
-  async targetAnnualGrowthPercent() {
-    const targetAnnualGrowth = await this._contract.targetAPR();
-    return convertOneScaledValue(targetAnnualGrowth, 2);
-  }
-
-  targetGrowthPerPeriod() {
-    return this._contract.targetGrowthPerPeriod();
+  async reduceDebt(account: string, amount: ethers.BigNumberish) {
+    return this._contract.reduceDebt(account, amount);
   }
 
   get token0IsUnderlying() {

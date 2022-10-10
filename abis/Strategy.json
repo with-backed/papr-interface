@@ -1,7 +1,38 @@
 {
   "abi": [
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxLTV",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indexMarkRatioMax",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "indexMarkRatioMin",
+          "type": "uint256"
+        },
+        {
+          "internalType": "contract ERC20",
+          "name": "underlying",
+          "type": "address"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "constructor"
     },
@@ -52,15 +83,9 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "vaultNonce",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         },
         {
           "components": [
@@ -81,22 +106,10 @@
           "type": "tuple"
         },
         {
-          "components": [
-            {
-              "internalType": "uint128",
-              "name": "price",
-              "type": "uint128"
-            },
-            {
-              "internalType": "enum ILendingStrategy.OracleInfoPeriod",
-              "name": "period",
-              "type": "uint8"
-            }
-          ],
           "indexed": false,
-          "internalType": "struct ILendingStrategy.OracleInfo",
-          "name": "oracleInfo",
-          "type": "tuple"
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
         }
       ],
       "name": "AddCollateral",
@@ -132,9 +145,9 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         },
         {
           "indexed": false,
@@ -170,9 +183,9 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         },
         {
           "indexed": false,
@@ -189,9 +202,9 @@
       "inputs": [
         {
           "indexed": true,
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         },
         {
           "components": [
@@ -250,11 +263,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "vaultNonce",
-          "type": "uint256"
-        },
-        {
           "components": [
             {
               "internalType": "contract ERC721",
@@ -274,40 +282,57 @@
         {
           "components": [
             {
-              "internalType": "uint128",
-              "name": "price",
-              "type": "uint128"
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "id",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "payload",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "signature",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ReservoirOracle.Message",
+              "name": "message",
+              "type": "tuple"
             },
             {
-              "internalType": "enum ILendingStrategy.OracleInfoPeriod",
-              "name": "period",
-              "type": "uint8"
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "v",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "r",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "s",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ReservoirOracleUnderwriter.Sig",
+              "name": "sig",
+              "type": "tuple"
             }
           ],
-          "internalType": "struct ILendingStrategy.OracleInfo",
+          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
           "name": "oracleInfo",
-          "type": "tuple"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint8",
-              "name": "v",
-              "type": "uint8"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "r",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "s",
-              "type": "bytes32"
-            }
-          ],
-          "internalType": "struct ILendingStrategy.Sig",
-          "name": "sig",
           "type": "tuple"
         }
       ],
@@ -319,16 +344,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "vaultNonce",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "vaultOwner",
-          "type": "address"
-        },
-        {
           "components": [
             {
               "internalType": "contract ERC721",
@@ -348,40 +363,57 @@
         {
           "components": [
             {
-              "internalType": "uint128",
-              "name": "price",
-              "type": "uint128"
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "id",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "payload",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "signature",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct ReservoirOracle.Message",
+              "name": "message",
+              "type": "tuple"
             },
             {
-              "internalType": "enum ILendingStrategy.OracleInfoPeriod",
-              "name": "period",
-              "type": "uint8"
+              "components": [
+                {
+                  "internalType": "uint8",
+                  "name": "v",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "r",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "s",
+                  "type": "bytes32"
+                }
+              ],
+              "internalType": "struct ReservoirOracleUnderwriter.Sig",
+              "name": "sig",
+              "type": "tuple"
             }
           ],
-          "internalType": "struct ILendingStrategy.OracleInfo",
+          "internalType": "struct ReservoirOracleUnderwriter.OracleInfo",
           "name": "oracleInfo",
-          "type": "tuple"
-        },
-        {
-          "components": [
-            {
-              "internalType": "uint8",
-              "name": "v",
-              "type": "uint8"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "r",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "s",
-              "type": "bytes32"
-            }
-          ],
-          "internalType": "struct ILendingStrategy.Sig",
-          "name": "sig",
           "type": "tuple"
         },
         {
@@ -398,9 +430,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         },
         {
           "internalType": "uint256",
@@ -480,9 +512,9 @@
           "type": "tuple"
         },
         {
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         }
       ],
       "name": "collateralHash",
@@ -497,38 +529,7 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "debtToken",
-      "outputs": [
-        {
-          "internalType": "contract DebtToken",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "factory",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "vaultNonce",
-          "type": "uint256"
-        },
         {
           "internalType": "address",
           "name": "mintTo",
@@ -541,26 +542,6 @@
         }
       ],
       "name": "increaseDebt",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "index",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "initialize",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -600,9 +581,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         }
       ],
       "name": "liquidate",
@@ -613,9 +594,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         }
       ],
       "name": "liquidationPrice",
@@ -676,11 +657,6 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "vaultNonce",
-          "type": "uint256"
-        },
         {
           "internalType": "uint256",
           "name": "debt",
@@ -833,6 +809,19 @@
     },
     {
       "inputs": [],
+      "name": "perpetual",
+      "outputs": [
+        {
+          "internalType": "contract ERC20",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "pool",
       "outputs": [
         {
@@ -847,9 +836,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "vaultId",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         },
         {
           "internalType": "uint128",
@@ -868,11 +857,6 @@
           "internalType": "address",
           "name": "sendTo",
           "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "vaultNonce",
-          "type": "uint256"
         },
         {
           "components": [
@@ -923,47 +907,21 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "contract IUnderwriter",
+          "name": "newUnderwriter",
+          "type": "address"
+        }
+      ],
+      "name": "setUnderwriter",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "start",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "strategyURI",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "targetAPR",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "targetGrowthPerPeriod",
       "outputs": [
         {
           "internalType": "uint256",
@@ -1080,22 +1038,29 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
         }
       ],
       "name": "vaultInfo",
       "outputs": [
         {
-          "internalType": "uint128",
-          "name": "debt",
-          "type": "uint128"
-        },
-        {
-          "internalType": "uint128",
-          "name": "collateralValue",
-          "type": "uint128"
+          "components": [
+            {
+              "internalType": "uint128",
+              "name": "debt",
+              "type": "uint128"
+            },
+            {
+              "internalType": "uint128",
+              "name": "collateralValue",
+              "type": "uint128"
+            }
+          ],
+          "internalType": "struct ILendingStrategy.VaultInfo",
+          "name": "",
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",

@@ -35,23 +35,13 @@ export function TokenTooltip({ strategy, tooltip }: ToolkitProps) {
   );
 }
 
+/// TODO leaving refeactor until design decides new strategy summary design
 export function APRTooltip({ strategy, tooltip }: ToolkitProps) {
-  const targetAnnualGrowthPercent = useAsyncValue(
-    () => strategy.targetAnnualGrowthPercent(),
-    [strategy],
-  );
-  const formattedTargetAnnualGrowthPercent = useMemo(() => {
-    if (targetAnnualGrowthPercent) {
-      return formatPercent(targetAnnualGrowthPercent);
-    }
-    return '---';
-  }, [targetAnnualGrowthPercent]);
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
         The strategy contract adjusts the (C) contract rate for minting and
-        liquidation, targeting steady growth of{' '}
-        {formattedTargetAnnualGrowthPercent} per year.
+        liquidation, targeting steady growth of 0% per year.
       </div>
     </Tooltip>
   );
@@ -99,10 +89,6 @@ export function MktCtrTooltip({
   const diff = markOverNorm > 1 ? markOverNorm - 1 : 1 - markOverNorm;
   const lowerHigherText = markOverNorm > 1 ? 'higher' : 'lower';
   const speedText = markOverNorm > 1 ? 'slow' : 'accelerate';
-  const targetAnnualGrowthPercent = useAsyncValue(
-    () => strategy.targetAnnualGrowthPercent(),
-    [strategy],
-  );
   return (
     <Tooltip {...tooltip}>
       <div className={`${styles.tooltip} ${styles.mktCtrTooltip}`}>
@@ -133,8 +119,8 @@ export function MktCtrTooltip({
         <div>
           <p>
             The market price is {formatPercent(diff)} {lowerHigherText} than the
-            price used by the contract, which is aiming to {speedText} the
-            growth rate (target is {targetAnnualGrowthPercent}% APR).
+            price used by the contract, which is used to balance borrow and
+            lender demand.
           </p>
         </div>
       </div>

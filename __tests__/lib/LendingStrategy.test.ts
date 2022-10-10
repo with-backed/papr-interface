@@ -15,7 +15,6 @@ const subgraphStrategy: SubgraphStrategy = {
   poolAddress: '0xcf93a7655d76b43313a69f15f01a39ea6ada5aea',
   underlying: '0x3089b47853df1b82877beef6d904a0ce98a12553',
   norm: '1000000000000000000',
-  targetAPR: '200000000000000000',
   vaults: [],
   allowedCollateral: [
     {
