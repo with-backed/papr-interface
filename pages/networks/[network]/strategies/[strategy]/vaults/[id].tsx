@@ -83,7 +83,7 @@ export default function VaultPage({
   const { address } = useAccount();
 
   const userIsOwner = useMemo(
-    () => data?.vault?.owner.id.toLowerCase() === address?.toLowerCase(),
+    () => data?.vault?.id.toLowerCase() === address?.toLowerCase(),
     [address, data],
   );
 
