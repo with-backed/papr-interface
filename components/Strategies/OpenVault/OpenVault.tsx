@@ -205,7 +205,6 @@ export function OpenVault({
 
     if (contractsAndTokenIds.length === 0) {
       await strategy.mintAndSellDebt(
-        mintAndSellDebtArgs.vaultNonce,
         mintAndSellDebtArgs.debt,
         mintAndSellDebtArgs.minOut,
         mintAndSellDebtArgs.sqrtPriceLimitX96,
