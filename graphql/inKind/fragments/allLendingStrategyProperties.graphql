@@ -1,12 +1,9 @@
 fragment allLendingStrategyProperties on LendingStrategy {
   id
   createdAt
-  name
-  symbol
   poolAddress
   underlying
   norm
-  targetAPR
   allowedCollateral(where: { allowed: true }) {
     id
     contractAddress
