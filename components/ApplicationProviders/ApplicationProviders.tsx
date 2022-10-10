@@ -50,8 +50,8 @@ export const ApplicationProviders = ({
   const { provider, chains } = useMemo(
     () =>
       configureChains(orderedChains, [
-        alchemyProvider({ alchemyId }),
-        infuraProvider({ infuraId }),
+        alchemyProvider({ apiKey: alchemyId }),
+        infuraProvider({ apiKey: infuraId }),
         publicProvider(),
       ]),
     [alchemyId, infuraId, orderedChains],
