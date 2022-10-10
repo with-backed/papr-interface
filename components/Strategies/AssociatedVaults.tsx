@@ -11,10 +11,6 @@ type Vault = {
   id: string;
   tokenId: any;
   debt: any;
-  owner: {
-    __typename?: 'Account' | undefined;
-    id: string;
-  };
 };
 
 type AssociatedVaultsProps = {
