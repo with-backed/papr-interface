@@ -9,7 +9,10 @@ import {
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { PRICE } from 'lib/strategies/constants';
 import LendingStrategyABI from 'abis/Strategy.json';
-import { ILendingStrategy } from 'types/generated/abis/Strategy';
+import {
+  ILendingStrategy,
+  ReservoirOracleUnderwriter,
+} from 'types/generated/abis/Strategy';
 import { useAccount } from 'wagmi';
 import styles from './OpenVault.module.css';
 import VaultMath from './VaultMath';
@@ -36,8 +39,7 @@ const AddCollateralEncoderString =
 interface AddCollateralArgsStruct {
   vaultNonce: ethers.BigNumber;
   collateral: ILendingStrategy.CollateralStruct;
-  oracleInfo: ILendingStrategy.OracleInfoStruct;
-  sig: ILendingStrategy.SigStruct;
+  oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
 
 const MintAndSwapEncoderString =
@@ -61,8 +63,7 @@ interface OnERC721ReceivedArgsStruct {
   minOut: ethers.BigNumber;
   debt: ethers.BigNumber;
   sqrtPriceLimitX96: ethers.BigNumber;
-  oracleInfo: ILendingStrategy.OracleInfoStruct;
-  sig: ILendingStrategy.SigStruct;
+  oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
 
 const debounce = (func: any, wait: number) => {
@@ -174,9 +175,19 @@ export function OpenVault({
       strategy.underlying.decimals,
     );
 
-    const oracleInfo = {
-      price: ethers.utils.parseUnits(PRICE.toString(), 18),
-      period: ethers.BigNumber.from(0),
+    // TODO(adamgobes): update with real sig in follow up PR
+    const oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct = {
+      message: {
+        id: '',
+        payload: '',
+        signature: '',
+        timestamp: 0,
+      },
+      sig: {
+        r: '',
+        v: 0,
+        s: '',
+      },
     };
     const sig = {
       v: ethers.BigNumber.from(1),
@@ -213,7 +224,6 @@ export function OpenVault({
         mintDebtOrProceedsTo: address!,
         mintVaultTo: address!,
         oracleInfo,
-        sig,
       };
 
       const collateralContract = strategy.collateralContracts.find(
@@ -238,7 +248,6 @@ export function OpenVault({
       const baseAddCollateralRequest: Partial<AddCollateralArgsStruct> = {
         vaultNonce,
         oracleInfo,
-        sig,
       };
 
       const addCollateralArgs = contractsAndTokenIds.map(
@@ -260,7 +269,6 @@ export function OpenVault({
           args.vaultNonce,
           args.collateral,
           args.oracleInfo,
-          args.sig,
         ]),
       );
 
