@@ -1,10 +1,10 @@
-query vaultsByOwner($owner: String) {
+query vaultsByOwner($owner: ID) {
   vaults(where: { id: $owner }) {
     ...allVaultProperties
   }
 }
 
-query vaultsByOwnerForStrategy($owner: String, $strategy: String) {
+query vaultsByOwnerForStrategy($owner: ID, $strategy: String) {
   vaults(where: { id: $owner, strategy: $strategy }) {
     ...allVaultProperties
   }
