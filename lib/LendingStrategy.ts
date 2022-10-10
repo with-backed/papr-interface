@@ -143,6 +143,10 @@ class LendingStrategyInternal {
     return this._contract.newNorm();
   }
 
+  normalization() {
+    return this._contract.normalization();
+  }
+
   async pool() {
     if (this._pool) {
       return this._pool;

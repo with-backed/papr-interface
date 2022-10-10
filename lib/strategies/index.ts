@@ -77,11 +77,11 @@ export async function multiplier(
 ) {
   const lastUpdated = await strategy.lastUpdated();
   const PERIOD = ethers.BigNumber.from(28 * SECONDS_IN_A_DAY);
-  const index = await strategy.index();
+  const prevNorm = await strategy.normalization();
 
   const period = now.sub(lastUpdated);
   const periodRatio = period.mul(ONE).div(PERIOD);
-  let indexMarkRatio = ONE.div(mark);
+  let indexMarkRatio = ONE.div(mark.div(prevNorm));
 
   /// TODO fetch actual indexMark min and max from contract
   if (indexMarkRatio.gt(14e17)) {
