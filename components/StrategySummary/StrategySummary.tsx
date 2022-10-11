@@ -33,42 +33,11 @@ export default function StrategySummary({
   includeDetails,
   legend,
 }: StrategySummaryProps) {
-  const config = useConfig();
-  const router = useRouter();
-  const [debtTokenSupplies, setDebtTokenSupplies] = useState<{
-    [key: string]: ethers.BigNumber;
-  }>({});
-  const [debtTokenSuppliesLoading, setDebtTokenSuppliesLoading] =
-    useState<boolean>(true);
-
-  const initDebtTokenSupplies = useCallback(async () => {
-    const totalSupplies = await Promise.all(
-      strategies.map((strategy) =>
-        strategy.token0IsUnderlying
-          ? strategy.token1.totalSupply()
-          : strategy.token0.totalSupply(),
-      ),
-    );
-    for (let i = 0; i < totalSupplies.length; i++) {
-      setDebtTokenSupplies((prev) => ({
-        ...prev,
-        [strategies[i].id]: totalSupplies[i],
-      }));
-    }
-    setDebtTokenSuppliesLoading(false);
-  }, [strategies]);
-
-  useEffect(() => {
-    initDebtTokenSupplies();
-  }, [initDebtTokenSupplies]);
-
   const tokenTooltip = useTooltipState({ placement: 'bottom-start' });
   const aprTooltip = useTooltipState({ placement: 'bottom-start' });
   const nftCapTooltip = useTooltipState({ placement: 'bottom-start' });
   const mktCtrTooltip = useTooltipState({ placement: 'bottom-start' });
   const rateTooltip = useTooltipState({ placement: 'bottom-start' });
-
-  if (debtTokenSuppliesLoading) return <></>;
 
   return (
     <Fieldset legend={legend}>
@@ -148,10 +117,11 @@ function SummaryEntry({
 
   if (!pricesData) return <></>;
 
-  const mark = pricesData.markValues[pricesData.markValues.length - 1].value;
+  const mark =
+    pricesData.markValues[pricesData.markValues.length - 1]?.value || 1.0;
   const norm =
     pricesData.normalizationValues[pricesData.normalizationValues.length - 1]
-      .value;
+      ?.value || 1.0;
   const markOverNorm = mark / norm;
 
   const fakeNFTValue = 300000;

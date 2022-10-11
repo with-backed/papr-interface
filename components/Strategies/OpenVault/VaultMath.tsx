@@ -69,13 +69,13 @@ export default function VaultMath({
   }, [updateMaxDebt, updateOracleValue]);
 
   const debtTokenMarketPrice = useMemo(
-    () => pricesData.markValues[pricesData.markValues.length - 1].value || 1.0,
+    () => pricesData.markValues[pricesData.markValues.length - 1]?.value || 1.0,
     [pricesData],
   );
   const debtTokenStrategyPrice = useMemo(
     () =>
       pricesData.normalizationValues[pricesData.normalizationValues.length - 1]
-        .value,
+        ?.value || 1.0,
     [pricesData],
   );
 

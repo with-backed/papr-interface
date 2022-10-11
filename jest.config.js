@@ -16,7 +16,7 @@ const customJestConfig = {
   coverageReporters: ['json-summary', 'text'],
   coverageThreshold: {
     global: {
-      branches: 13,
+      branches: 12,
       functions: 14,
       lines: 18,
       statements: 19,
