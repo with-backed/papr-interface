@@ -9,12 +9,14 @@ import {
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { PRICE } from 'lib/strategies/constants';
 import LendingStrategyABI from 'abis/Strategy.json';
-import { ILendingStrategy } from 'types/generated/abis/Strategy';
+import {
+  ILendingStrategy,
+  ReservoirOracleUnderwriter,
+} from 'types/generated/abis/Strategy';
 import { useAccount } from 'wagmi';
 import styles from './OpenVault.module.css';
 import VaultMath from './VaultMath';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { currentVaultNonceForUser } from 'lib/pAPRSubgraph';
 import { getAddress } from 'ethers/lib/utils';
 import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
 import { LendingStrategy } from 'lib/LendingStrategy';
@@ -31,20 +33,17 @@ type BorrowProps = {
 };
 
 const AddCollateralEncoderString =
-  'addCollateral(uint256 vaultNonce, tuple(address addr, uint256 id) collateral, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)';
+  'addCollateral(tuple(address addr, uint256 id) collateral, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)';
 
 interface AddCollateralArgsStruct {
-  vaultNonce: ethers.BigNumber;
   collateral: ILendingStrategy.CollateralStruct;
-  oracleInfo: ILendingStrategy.OracleInfoStruct;
-  sig: ILendingStrategy.SigStruct;
+  oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
 
 const MintAndSwapEncoderString =
-  'mintAndSellDebt(uint256 vaultNonce, uint256 debt, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo)';
+  'mintAndSellDebt(uint256 debt, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo)';
 
 interface MintAndSwapArgsStruct {
-  vaultNonce: ethers.BigNumber;
   debt: ethers.BigNumber;
   minOut: ethers.BigNumber;
   sqrtPriceLimitX96: ethers.BigNumber;
@@ -52,17 +51,15 @@ interface MintAndSwapArgsStruct {
 }
 
 const OnERC721ReceivedArgsEncoderString =
-  'tuple(uint256 vaultNonce, address mintVaultTo, address mintDebtOrProceedsTo, uint256 minOut, int256 debt, uint160 sqrtPriceLimitX96, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)';
+  'tuple(address mintVaultTo, address mintDebtOrProceedsTo, uint256 minOut, int256 debt, uint160 sqrtPriceLimitX96, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)';
 
 interface OnERC721ReceivedArgsStruct {
-  vaultNonce: ethers.BigNumber;
   mintVaultTo: string;
   mintDebtOrProceedsTo: string;
   minOut: ethers.BigNumber;
   debt: ethers.BigNumber;
   sqrtPriceLimitX96: ethers.BigNumber;
-  oracleInfo: ILendingStrategy.OracleInfoStruct;
-  sig: ILendingStrategy.SigStruct;
+  oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
 
 const debounce = (func: any, wait: number) => {
@@ -168,15 +165,24 @@ export function OpenVault({
       deconstructFromId(id),
     );
 
-    const vaultNonce = await currentVaultNonceForUser(strategy, address!);
     const minOut = ethers.utils.parseUnits(
       quoteForSwap,
       strategy.underlying.decimals,
     );
 
-    const oracleInfo = {
-      price: ethers.utils.parseUnits(PRICE.toString(), 18),
-      period: ethers.BigNumber.from(0),
+    // TODO(adamgobes): update with real sig in follow up PR
+    const oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct = {
+      message: {
+        id: '',
+        payload: '',
+        signature: '',
+        timestamp: 0,
+      },
+      sig: {
+        r: '',
+        v: 0,
+        s: '',
+      },
     };
     const sig = {
       v: ethers.BigNumber.from(1),
@@ -185,7 +191,6 @@ export function OpenVault({
     };
 
     const mintAndSellDebtArgs: MintAndSwapArgsStruct = {
-      vaultNonce,
       debt: debtToBorrowOrRepay,
       minOut,
       sqrtPriceLimitX96: ethers.BigNumber.from(0),
@@ -194,7 +199,6 @@ export function OpenVault({
 
     if (contractsAndTokenIds.length === 0) {
       await strategy.mintAndSellDebt(
-        mintAndSellDebtArgs.vaultNonce,
         mintAndSellDebtArgs.debt,
         mintAndSellDebtArgs.minOut,
         mintAndSellDebtArgs.sqrtPriceLimitX96,
@@ -207,13 +211,11 @@ export function OpenVault({
       const [contractAddress, tokenId] = contractsAndTokenIds[0];
       const erc721ReceivedArgs: OnERC721ReceivedArgsStruct = {
         debt: debtToBorrowOrRepay,
-        vaultNonce,
         minOut,
         sqrtPriceLimitX96: ethers.BigNumber.from(0),
         mintDebtOrProceedsTo: address!,
         mintVaultTo: address!,
         oracleInfo,
-        sig,
       };
 
       const collateralContract = strategy.collateralContracts.find(
@@ -236,9 +238,7 @@ export function OpenVault({
       );
     } else {
       const baseAddCollateralRequest: Partial<AddCollateralArgsStruct> = {
-        vaultNonce,
         oracleInfo,
-        sig,
       };
 
       const addCollateralArgs = contractsAndTokenIds.map(
@@ -257,17 +257,14 @@ export function OpenVault({
 
       const calldata = addCollateralArgs.map((args) =>
         lendingStrategyIFace.encodeFunctionData(AddCollateralEncoderString, [
-          args.vaultNonce,
           args.collateral,
           args.oracleInfo,
-          args.sig,
         ]),
       );
 
       const calldataWithSwap = [
         ...calldata,
         lendingStrategyIFace.encodeFunctionData(MintAndSwapEncoderString, [
-          mintAndSellDebtArgs.vaultNonce,
           mintAndSellDebtArgs.debt,
           mintAndSellDebtArgs.minOut,
           mintAndSellDebtArgs.sqrtPriceLimitX96,

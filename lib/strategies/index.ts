@@ -77,23 +77,20 @@ export async function multiplier(
 ) {
   const lastUpdated = await strategy.lastUpdated();
   const PERIOD = ethers.BigNumber.from(28 * SECONDS_IN_A_DAY);
-  const targetGrowthPerPeriod = await strategy.targetGrowthPerPeriod();
-  const index = await strategy.index();
+  const prevNorm = await strategy.normalization();
 
   const period = now.sub(lastUpdated);
   const periodRatio = period.mul(ONE).div(PERIOD);
-  const targetGrowth = targetGrowthPerPeriod.mul(periodRatio).div(ONE).add(ONE);
-  let indexMarkRatio = index.mul(ONE).div(mark);
+  let indexMarkRatio = ONE.div(mark.div(prevNorm));
 
+  /// TODO fetch actual indexMark min and max from contract
   if (indexMarkRatio.gt(14e17)) {
     indexMarkRatio = ethers.BigNumber.from(14e17);
   } else {
     indexMarkRatio = ethers.BigNumber.from(8e17);
   }
 
-  const deviationMultiplier = indexMarkRatio.pow(periodRatio);
-
-  return deviationMultiplier.mul(targetGrowth).div(ONE);
+  return indexMarkRatio.pow(periodRatio);
 }
 
 export async function getQuoteForSwap(
@@ -130,9 +127,8 @@ export async function computeLiquidationEstimation(
 
   const PERIOD = 28 * SECONDS_IN_A_DAY;
 
-  const targetGrowthPerPeriod =
-    (await strategy.targetGrowthPerPeriod()).div(ONE.div(10000)).toNumber() *
-    0.0001;
+  /// TODO recheck formula with no target growth
+  const targetGrowthPerPeriod = 1;
 
   const indexMarkRatio = 1.4;
 

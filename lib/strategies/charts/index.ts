@@ -1,11 +1,8 @@
 import { ethers } from 'ethers';
-import { configs, SupportedNetwork } from 'lib/config';
-import { makeProvider } from 'lib/contracts';
+import { SupportedNetwork } from 'lib/config';
 import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
-import { Strategy__factory } from 'types/generated/abis';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
-import { convertOneScaledValue } from '..';
 import { markValues } from './mark';
 import { normValues } from './norm';
 
@@ -26,8 +23,6 @@ export async function strategyPricesData(
   network: SupportedNetwork,
   uniswapSubgraphUrl: string,
 ): Promise<StrategyPricesData> {
-  const targetDPRScaled = ethers.BigNumber.from(strategy.targetAPR).div(365);
-  const targetDPR = convertOneScaledValue(targetDPRScaled, 4);
   const now = Math.floor(Date.now() / 1000);
   const subgraphUniswapPool = await subgraphUniswapPoolById(
     strategy.poolAddress,
@@ -35,10 +30,7 @@ export async function strategyPricesData(
   );
   const createdAt = parseInt(strategy.createdAt);
 
-  const index = await Strategy__factory.connect(
-    strategy.id,
-    makeProvider(configs[network].jsonRpcProvider, network as SupportedNetwork),
-  ).index();
+  const index = 1;
 
   var markDPRs: ChartValue[] = [];
   var marks: string[] = [];
@@ -54,8 +46,8 @@ export async function strategyPricesData(
   const [norms, normDPRs] = await normValues(now, strategy, network);
 
   // add a starting data point all on target
-  markDPRs.unshift([targetDPR, createdAt]);
-  normDPRs.unshift([targetDPR, createdAt]);
+  markDPRs.unshift([0, createdAt]);
+  normDPRs.unshift([0, createdAt]);
 
   // each unique timestamp from the datasets, sorted ascending. Use this to
   // make sure we have an index entry for each other value
@@ -67,13 +59,13 @@ export async function strategyPricesData(
   ).sort((a, b) => a - b);
 
   return {
-    indexDPR: targetDPR,
+    indexDPR: 0,
     index: parseFloat(ethers.utils.formatEther(index)),
     normalizationDPRValues: normDPRs,
     normalizationValues: norms,
     markValues: marks,
     markDPRValues: markDPRs,
-    indexDPRValues: indexValues(targetDPR, timestamps),
+    indexDPRValues: indexValues(0, timestamps),
   };
 }
 

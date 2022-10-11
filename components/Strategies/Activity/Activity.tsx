@@ -127,7 +127,7 @@ function CollateralAdded({
       return 'Unknown';
     }
 
-    return vault.owner.id;
+    return vault.id;
   }, [event, lendingStrategy]);
 
   const debtIncreasedEvent = useMemo(() => {
@@ -184,7 +184,7 @@ function CollateralRemoved({
       return 'Unknown';
     }
 
-    return vault.owner.id;
+    return vault.id;
   }, [event, lendingStrategy]);
 
   const debtDecreasedEvent = useMemo(() => {

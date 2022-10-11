@@ -1,10 +1,6 @@
 fragment allVaultProperties on Vault {
   id
-  owner {
-    id
-  }
   tokenId
-  nonce
   debt
   collateral {
     id

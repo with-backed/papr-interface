@@ -138,17 +138,6 @@ function SummaryEntry({
   includeDetails,
 }: SummaryEntryProps) {
   const { network } = useConfig();
-  const targetAnnualGrowthRate = useAsyncValue(
-    () => strategy.targetAnnualGrowthPercent(),
-    [strategy],
-  );
-  const formattedAnnualGrowthRate = useMemo(() => {
-    if (targetAnnualGrowthRate) {
-      return formatPercent(targetAnnualGrowthRate);
-    }
-    return '---';
-  }, [targetAnnualGrowthRate]);
-
   const debtTokenSupply = useAsyncValue(
     () =>
       strategy.token0IsUnderlying
@@ -186,7 +175,8 @@ function SummaryEntry({
 
       <td className={styles.stat}>
         <TooltipReference {...aprTooltip}>
-          <p>{formattedAnnualGrowthRate} APR</p>
+          {/* TODO change this after design decides what new table looks like */}
+          <p>0% APR</p>
         </TooltipReference>
         <APRTooltip strategy={strategy} tooltip={aprTooltip} />
       </td>
