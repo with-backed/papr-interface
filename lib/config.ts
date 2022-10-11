@@ -30,7 +30,7 @@ const goerli: Config = {
   network: 'goerli',
   emailSubjectPrefix: '[Testnet]:',
   facilitatorStartBlock: 10550059,
-  strategyAddress: '0x206a9c917148cd6c290ab289599760b2eea5d983',
+  strategyAddress: '0x220ed94005aadd6d0d9679bc2049a45ce87b91e0',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
 };
