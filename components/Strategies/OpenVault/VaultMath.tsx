@@ -6,6 +6,7 @@ import { PRICE } from 'lib/strategies/constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { formatTokenAmount } from 'lib/numberFormat';
 
 type VaultMathProps = {
   strategy: LendingStrategy;
@@ -100,13 +101,13 @@ export default function VaultMath({
       <MathRow
         formula="M"
         description="Market $pAPR price"
-        content={(debtTokenMarketPrice || 0).toString()}
+        content={formatTokenAmount(debtTokenMarketPrice)}
         even
       />
       <MathRow
         formula="N"
         description="Strategy contract's $pAPR price"
-        content={debtTokenStrategyPrice.toString()}
+        content={formatTokenAmount(debtTokenStrategyPrice)}
         even={false}
       />
       <MathRow

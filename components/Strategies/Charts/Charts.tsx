@@ -43,20 +43,18 @@ export function Charts({ pricesData }: ChartsProps) {
 function Legend() {
   return (
     <div className={styles.legend}>
-      <LegendItem title={'target'} color={INDEX_COLOR} />
-      <LegendItem title={'c_pAPR'} color={NORM_COLOR} />
-      <LegendItem title={'pAPR'} color={MARK_COLOR} />
+      <LegendItem title={'target'} kind={'index'} />
+      <LegendItem title={'c_pAPR'} kind={'norm'} />
+      <LegendItem title={'pAPR'} kind={'mark'} />
     </div>
   );
 }
 
-function LegendItem({ title, color }: { title: string; color: string }) {
+function LegendItem({ title, kind }: { title: string; kind: string }) {
   return (
-    <div className={styles.legendItem}>
-      <div
-        className={styles.legendSquare}
-        style={{ backgroundColor: color }}></div>
-      <p> {title} </p>
+    <div className={styles['legend-item']}>
+      <div className={styles[`legend-${kind}`]} />
+      <span>{title}</span>
     </div>
   );
 }
