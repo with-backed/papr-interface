@@ -16,10 +16,10 @@ const customJestConfig = {
   coverageReporters: ['json-summary', 'text'],
   coverageThreshold: {
     global: {
-      branches: 31,
-      functions: 37.5,
-      lines: 46,
-      statements: 48.5,
+      branches: 13,
+      functions: 14,
+      lines: 18,
+      statements: 19,
     },
   },
   moduleDirectories: ['node_modules', '<rootDir>'],
