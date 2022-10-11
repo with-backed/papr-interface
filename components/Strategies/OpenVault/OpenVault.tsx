@@ -23,10 +23,15 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { VaultDebtSlider } from './VaultDebtSlider';
 import { VaultsByOwnerForStrategyQuery } from 'types/generated/graphql/inKindSubgraph';
+import {
+  getOraclePayloadFromReservoirObject,
+  ReservoirResponseData,
+} from 'lib/oracle/reservoir';
 
 type BorrowProps = {
   strategy: LendingStrategy;
   userCollectionNFTs: CenterUserNFTsResponse[];
+  oracleInfo: { [key: string]: ReservoirResponseData };
   nftsSelected: string[];
   currentVault: VaultsByOwnerForStrategyQuery['vaults'][0] | null;
   pricesData: StrategyPricesData;
@@ -62,24 +67,11 @@ interface OnERC721ReceivedArgsStruct {
   oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
 
-const debounce = (func: any, wait: number) => {
-  let timeout: any;
-
-  return function executedFunction(...args: any[]) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-};
-
 export function OpenVault({
   strategy,
   userCollectionNFTs,
   nftsSelected,
+  oracleInfo,
   currentVault,
   pricesData,
 }: BorrowProps) {
@@ -170,26 +162,6 @@ export function OpenVault({
       strategy.underlying.decimals,
     );
 
-    // TODO(adamgobes): update with real sig in follow up PR
-    const oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct = {
-      message: {
-        id: '',
-        payload: '',
-        signature: '',
-        timestamp: 0,
-      },
-      sig: {
-        r: '',
-        v: 0,
-        s: '',
-      },
-    };
-    const sig = {
-      v: ethers.BigNumber.from(1),
-      r: ethers.utils.formatBytes32String('x'),
-      s: ethers.utils.formatBytes32String('y'),
-    };
-
     const mintAndSellDebtArgs: MintAndSwapArgsStruct = {
       debt: debtToBorrowOrRepay,
       minOut,
@@ -209,13 +181,16 @@ export function OpenVault({
       );
     } else if (contractsAndTokenIds.length === 1) {
       const [contractAddress, tokenId] = contractsAndTokenIds[0];
+
       const erc721ReceivedArgs: OnERC721ReceivedArgsStruct = {
         debt: debtToBorrowOrRepay,
         minOut,
         sqrtPriceLimitX96: ethers.BigNumber.from(0),
         mintDebtOrProceedsTo: address!,
         mintVaultTo: address!,
-        oracleInfo,
+        oracleInfo: await getOraclePayloadFromReservoirObject(
+          oracleInfo[contractAddress],
+        ),
       };
 
       const collateralContract = strategy.collateralContracts.find(
@@ -237,18 +212,16 @@ export function OpenVault({
         },
       );
     } else {
-      const baseAddCollateralRequest: Partial<AddCollateralArgsStruct> = {
-        oracleInfo,
-      };
-
-      const addCollateralArgs = contractsAndTokenIds.map(
-        ([contractAddress, tokenId]) => ({
-          ...baseAddCollateralRequest,
+      const addCollateralArgs: AddCollateralArgsStruct[] = await Promise.all(
+        contractsAndTokenIds.map(async ([contractAddress, tokenId]) => ({
+          oracleInfo: await getOraclePayloadFromReservoirObject(
+            oracleInfo[contractAddress],
+          ),
           collateral: {
             addr: contractAddress,
             id: ethers.BigNumber.from(tokenId),
           },
-        }),
+        })),
       );
 
       const lendingStrategyIFace = new ethers.utils.Interface(
@@ -279,7 +252,14 @@ export function OpenVault({
         .then(() => console.log('success')) // TODO(adamgobes): redirect to vault page once thats fleshed out
         .catch((e) => console.log({ e }));
     }
-  }, [address, nftsSelected, debtToBorrowOrRepay, strategy, quoteForSwap]);
+  }, [
+    address,
+    nftsSelected,
+    debtToBorrowOrRepay,
+    strategy,
+    quoteForSwap,
+    oracleInfo,
+  ]);
 
   const handleChosenDebtChanged = useCallback(
     async (value: string) => {

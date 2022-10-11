@@ -74,6 +74,7 @@ export function BorrowPageContent({
         strategy={lendingStrategy}
         pricesData={pricesData}
         userCollectionNFTs={userCollectionNFTs}
+        oracleInfo={oracleInfo}
         currentVault={currentVault}
         nftsSelected={nftsSelected}
       />

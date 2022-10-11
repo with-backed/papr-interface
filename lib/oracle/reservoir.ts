@@ -1,3 +1,6 @@
+import { ethers } from 'ethers';
+import { ReservoirOracleUnderwriter } from 'types/generated/abis/Strategy';
+
 export type ReservoirResponseData = {
   price: number;
   message: {
@@ -22,4 +25,29 @@ export async function getSignedOracleFloorPriceMessage(
   );
   const json = await reservoirReq.json();
   return json;
+}
+
+export async function getOraclePayloadFromReservoirObject(
+  oracleFromReservoir: ReservoirResponseData,
+): Promise<ReservoirOracleUnderwriter.OracleInfoStruct> {
+  const { v, r, s } = await ethers.utils.splitSignature(
+    oracleFromReservoir.message.signature,
+  );
+
+  // TODO(adamgobes): update with real sig in follow up PR
+  const oraclePayload: ReservoirOracleUnderwriter.OracleInfoStruct = {
+    message: {
+      id: oracleFromReservoir.message.id,
+      payload: oracleFromReservoir.message.payload,
+      signature: oracleFromReservoir.message.signature,
+      timestamp: oracleFromReservoir.message.timestamp,
+    },
+    sig: {
+      v,
+      r,
+      s,
+    },
+  };
+
+  return oraclePayload;
 }
