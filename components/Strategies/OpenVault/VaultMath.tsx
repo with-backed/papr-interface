@@ -6,6 +6,7 @@ import { PRICE } from 'lib/strategies/constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { formatTokenAmount } from 'lib/numberFormat';
 
 type VaultMathProps = {
   strategy: LendingStrategy;
@@ -68,23 +69,21 @@ export default function VaultMath({
   }, [updateMaxDebt, updateOracleValue]);
 
   const debtTokenMarketPrice = useMemo(
-    () => pricesData.markValues[pricesData.markValues.length - 1] || '1.0000',
+    () => pricesData.markValues[pricesData.markValues.length - 1].value || 1.0,
     [pricesData],
   );
   const debtTokenStrategyPrice = useMemo(
     () =>
-      pricesData.normalizationValues[pricesData.normalizationValues.length - 1],
+      pricesData.normalizationValues[pricesData.normalizationValues.length - 1]
+        .value,
     [pricesData],
   );
 
   const priceDifference = useMemo(() => {
     if (!debtTokenMarketPrice) return 0;
     return (
-      Math.floor(
-        (parseFloat(debtTokenMarketPrice) / parseFloat(debtTokenStrategyPrice) -
-          1) *
-          10000,
-      ) / 100
+      Math.floor((debtTokenMarketPrice / debtTokenStrategyPrice - 1) * 10000) /
+      100
     );
   }, [debtTokenMarketPrice, debtTokenStrategyPrice]);
 
@@ -102,13 +101,13 @@ export default function VaultMath({
       <MathRow
         formula="M"
         description="Market $pAPR price"
-        content={parseFloat(debtTokenMarketPrice || '').toFixed(4)}
+        content={formatTokenAmount(debtTokenMarketPrice)}
         even
       />
       <MathRow
         formula="N"
         description="Strategy contract's $pAPR price"
-        content={parseFloat(debtTokenStrategyPrice).toFixed(4)}
+        content={formatTokenAmount(debtTokenStrategyPrice)}
         even={false}
       />
       <MathRow

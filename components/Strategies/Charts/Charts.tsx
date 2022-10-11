@@ -14,6 +14,10 @@ import {
 } from 'lightweight-charts';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 
+const INDEX_COLOR = '#000000';
+const NORM_COLOR = '#007155';
+const MARK_COLOR = '#0000ee';
+
 type ChartsProps = {
   pricesData: StrategyPricesData | null;
 };
@@ -27,11 +31,31 @@ export function Charts({ pricesData }: ChartsProps) {
 
   return (
     <Fieldset legend="💸 Performance">
+      <Legend />
       <h3 className={styles.header}>Price in USDC</h3>
       <PriceInUSDC pricesData={pricesData} />
       <h3 className={styles.header}>Rate of Growth</h3>
       <RateOfGrowth pricesData={pricesData} />
     </Fieldset>
+  );
+}
+
+function Legend() {
+  return (
+    <div className={styles.legend}>
+      <LegendItem title={'target'} kind={'index'} />
+      <LegendItem title={'c_pAPR'} kind={'norm'} />
+      <LegendItem title={'pAPR'} kind={'mark'} />
+    </div>
+  );
+}
+
+function LegendItem({ title, kind }: { title: string; kind: string }) {
+  return (
+    <div className={styles['legend-item']}>
+      <div className={styles[`legend-${kind}`]} />
+      <span>{title}</span>
+    </div>
   );
 }
 
@@ -53,7 +77,7 @@ const BASE_TIME_SCALE_OPTIONS: DeepPartial<TimeScaleOptions> = {
 };
 const BASE_LINE_SERIES_OPTIONS: DeepPartial<LineSeriesOptions> = {
   priceLineVisible: false,
-  lineWidth: 1,
+  lineWidth: 3,
 };
 
 type RateOfGrowthProps = {
@@ -77,37 +101,21 @@ function RateOfGrowth({
       const indexSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
         lineStyle: LineStyle.SparseDotted,
-        lineWidth: 2,
-        color: '#000000',
+        color: INDEX_COLOR,
       });
-      indexSeries.setData(
-        indexDPRValues.map(([value, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
-          value,
-        })),
-      );
+      indexSeries.setData(indexDPRValues);
 
       const markSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
-        color: '#0000ee',
+        color: MARK_COLOR,
       });
-      markSeries.setData(
-        markDPRValues.map(([value, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
-          value,
-        })),
-      );
+      markSeries.setData(markDPRValues);
 
       const normSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
-        color: '#000000',
+        color: NORM_COLOR,
       });
-      normSeries.setData(
-        normalizationDPRValues.map(([value, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
-          value,
-        })),
-      );
+      normSeries.setData(normalizationDPRValues);
 
       chart.timeScale().fitContent();
 
@@ -147,37 +155,27 @@ function PriceInUSDC({
       const indexSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
         lineStyle: LineStyle.SparseDotted,
-        lineWidth: 2,
-        color: '#000000',
+        color: INDEX_COLOR,
       });
+
       indexSeries.setData(
-        indexDPRValues.map(([_, timestamp]) => ({
-          time: timestamp as UTCTimestamp,
+        indexDPRValues.map(({ time }) => ({
+          time,
           value: index,
         })),
       );
 
       const markSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
-        color: '#0000ee',
+        color: MARK_COLOR,
       });
-      markSeries.setData(
-        markDPRValues.map(([_, timestamp], i) => ({
-          time: timestamp as UTCTimestamp,
-          value: markValues[i],
-        })),
-      );
+      markSeries.setData(markValues);
 
       const normSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
-        color: '#000000',
+        color: NORM_COLOR,
       });
-      normSeries.setData(
-        normalizationDPRValues.map(([_, timestamp], i) => ({
-          time: timestamp as UTCTimestamp,
-          value: parseFloat(normalizationValues[i]),
-        })),
-      );
+      normSeries.setData(normalizationValues);
 
       chart.timeScale().fitContent();
 

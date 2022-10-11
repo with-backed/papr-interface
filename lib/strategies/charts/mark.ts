@@ -1,20 +1,22 @@
 import { Price, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Q192, SECONDS_IN_A_DAY } from 'lib/constants';
-import { ChartValue } from '../charts';
+import { TimeSeriesValue } from '../charts';
 import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { subgraphUniswapSwapsByPool } from 'lib/uniswapSubgraph';
 import {
   Pool,
   Token as UniSubgraphToken,
 } from 'types/generated/graphql/uniswapSubgraph';
+import { RatePeriod } from '..';
+import { UTCTimestamp } from 'lightweight-charts';
 
 export async function markValues(
   now: number,
   strategy: LendingStrategy | SubgraphStrategy,
   pool: Pool,
   uniswapSubgraphUrl: string,
-): Promise<[string[], ChartValue[]]> {
+): Promise<[TimeSeriesValue[], TimeSeriesValue[]]> {
   let quoteCurrency: UniSubgraphToken;
   let baseCurrency: UniSubgraphToken;
   if (strategy.underlying == pool.token0) {
@@ -45,26 +47,48 @@ export async function markValues(
     } as any);
   }
 
-  let dprValues: ChartValue[] = [];
-  for (let { sqrtPriceX96, timestamp } of sortedSwaps) {
-    const scaledMarkDPR = price(sqrtPriceX96, baseCurrency, quoteCurrency)
-      .subtract(1)
-      .divide(timestamp - strategy.createdAt)
-      .multiply(SECONDS_IN_A_DAY);
+  const formattedSwapValues = sortedSwaps.map(({ sqrtPriceX96, timestamp }) => {
+    return {
+      value: parseFloat(
+        price(sqrtPriceX96, baseCurrency, quoteCurrency).toFixed(),
+      ),
+      time: parseInt(timestamp) as UTCTimestamp,
+    };
+  });
 
-    dprValues.push([parseFloat(scaledMarkDPR.toFixed(8)), parseInt(timestamp)]);
-  }
+  const dprValues = computeMarkPercentageRates(
+    formattedSwapValues,
+    RatePeriod.Daily,
+    strategy.createdAt,
+    baseCurrency,
+    quoteCurrency,
+  );
 
-  return [
-    sortedSwaps.map((swap: any) =>
-      price(swap.sqrtPriceX96, baseCurrency, quoteCurrency).toFixed(),
-    ),
-    dprValues,
-  ];
+  return [formattedSwapValues, dprValues];
+}
+
+export function computeMarkPercentageRates(
+  swaps: TimeSeriesValue[],
+  period: RatePeriod,
+  startTime: number,
+  baseCurrency: UniSubgraphToken,
+  quoteCurrency: UniSubgraphToken,
+): TimeSeriesValue[] {
+  const periodSecods =
+    period == RatePeriod.Daily ? SECONDS_IN_A_DAY : SECONDS_IN_A_DAY * 365;
+
+  return swaps.map(({ value, time }) => {
+    const rate = ((value - 1) / (time - startTime)) * periodSecods;
+
+    return {
+      value: rate,
+      time: time,
+    };
+  });
 }
 
 function price(
-  sqrtPriceX96: string,
+  sqrtPriceX96: number,
   baseCurrency: UniSubgraphToken,
   quoteCurrency: UniSubgraphToken,
 ): Price<Token, Token> {

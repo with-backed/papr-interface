@@ -9,10 +9,8 @@ export function Health({
   pricesData: { index, markValues, normalizationValues },
 }: HealthProps) {
   const { markPosition, normPosition } = useMemo(() => {
-    const mark = parseFloat(markValues[markValues.length - 1]);
-    const norm = parseFloat(
-      normalizationValues[normalizationValues.length - 1],
-    );
+    const mark = markValues[markValues.length - 1].value;
+    const norm = normalizationValues[normalizationValues.length - 1].value;
     const indexVersusMark = percentDiff(index, mark);
     const indexVersusNorm = percentDiff(index, norm);
 

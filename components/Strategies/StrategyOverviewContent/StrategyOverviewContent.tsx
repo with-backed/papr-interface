@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from 'components/Strategies/Strategy.module.css';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { AssociatedVaults } from '../AssociatedVaults';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { Collateral } from '../Collateral';
 import { Activity } from '../Activity';
@@ -32,7 +31,6 @@ export function StrategyOverviewContent({
   );
   return (
     <div className={styles.wrapper}>
-      <AssociatedVaults strategy={address} />
       <StrategySummary
         includeDetails={false}
         legend={`Strategy: $papr_${lendingStrategy.debtToken.symbol}${maxLTVPercent}`}

@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { configs, SupportedNetwork } from 'lib/config';
 import { ONE } from 'lib/constants';
-import { ChartValue } from '../charts';
+import { TimeSeriesValue } from '../charts';
 import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { clientFromUrl } from 'lib/urql';
 import { Strategy__factory } from 'types/generated/abis';
@@ -9,7 +9,8 @@ import {
   NormalizationUpdatesByStrategyDocument,
   NormalizationUpdatesByStrategyQuery,
 } from 'types/generated/graphql/inKindSubgraph';
-import { computeEffectiveDPR } from '..';
+import { computeRate, RatePeriod } from '..';
+import { UTCTimestamp } from 'lightweight-charts';
 
 interface NormUpdate {
   newNorm: string;
@@ -20,7 +21,7 @@ export async function normValues(
   now: number,
   strategy: LendingStrategy | SubgraphStrategy,
   network: SupportedNetwork,
-): Promise<[string[], ChartValue[]]> {
+): Promise<[TimeSeriesValue[], TimeSeriesValue[]]> {
   const result = await subgraphNormalizationUpdatesForStrategy(strategy.id);
 
   const sortedNorms: NormUpdate[] =
@@ -36,22 +37,32 @@ export async function normValues(
     });
   }
 
-  const normDPRs: ChartValue[] = [];
+  const normDPRs: TimeSeriesValue[] = [];
+  const formattedNorms: TimeSeriesValue[] = [];
 
   for (let i = 1; i < sortedNorms.length; i++) {
     const prev = sortedNorms[i - 1];
     const current = sortedNorms[i];
-    const dpr = computeEffectiveDPR(
-      ethers.BigNumber.from(current.timestamp),
-      ethers.BigNumber.from(prev.timestamp),
-      ethers.BigNumber.from(current.newNorm).mul(ONE).div(prev.newNorm),
+    const t = parseInt(current.timestamp);
+    const dpr = computeRate(
+      ethers.BigNumber.from(prev.newNorm),
+      ethers.BigNumber.from(current.newNorm),
+      parseInt(prev.timestamp),
+      t,
+      RatePeriod.Daily,
     );
-    normDPRs.push([dpr, parseInt(current.timestamp)]);
-  }
 
-  const formattedNorms = sortedNorms.map((norm) =>
-    ethers.utils.formatEther(ethers.BigNumber.from(norm.newNorm)),
-  );
+    normDPRs.push({
+      value: dpr,
+      time: t as UTCTimestamp,
+    });
+    formattedNorms.push({
+      value: parseFloat(
+        ethers.utils.formatEther(ethers.BigNumber.from(current.newNorm)),
+      ),
+      time: t as UTCTimestamp,
+    });
+  }
 
   return [formattedNorms, normDPRs];
 }

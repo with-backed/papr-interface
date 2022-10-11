@@ -6,3 +6,31 @@
   fill: var(--greentext);
   font-family: var(--sans) !important;
 }
+
+.legend-item {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.legend-square {
+  height: 15px;
+  width: 15px;
+}
+.legend-index {
+  composes: legend-square;
+  background-color: #000000;
+}
+.legend-mark {
+  composes: legend-square;
+  background-color: #0000ee;
+}
+.legend-norm {
+  composes: legend-square;
+  background-color: #007155;
+}
+
+.legend {
+  display: flex;
+  gap: 15px;
+}

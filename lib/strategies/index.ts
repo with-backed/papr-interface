@@ -39,34 +39,54 @@ export async function buildToken(token: ERC20): Promise<ERC20Token> {
   };
 }
 
-export function computeEffectiveAPR(
-  now: ethers.BigNumber,
-  lastUpdated: ethers.BigNumber,
-  multiplier: ethers.BigNumber,
-) {
-  const delta = now.sub(lastUpdated);
-  const currentAPRBIPs = multiplier
-    .sub(ONE) // only care about decimals
-    .div(delta.eq(0) ? 1 : delta) // how much growth per second
-    .mul(SECONDS_IN_A_YEAR) // annualize
-    .div(ONE.div(10000)); // convert to BIPs
-
-  return currentAPRBIPs;
+export enum RatePeriod {
+  Daily,
+  Annual,
 }
 
-export function computeEffectiveDPR(
-  now: ethers.BigNumber,
-  lastUpdated: ethers.BigNumber,
-  multiplier: ethers.BigNumber,
-  decimals = 4,
-) {
-  const delta = now.sub(lastUpdated);
-  const dpr = multiplier
-    .sub(ONE) // only care about decimals
-    .div(delta.eq(0) ? 1 : delta) // how much growth per second
-    .mul(SECONDS_IN_A_DAY); // compute for one day
+export function computeRate(
+  value1: ethers.BigNumber,
+  value2: ethers.BigNumber,
+  time1: number,
+  time2: number,
+  ratePeriod: RatePeriod,
+): number {
+  const timeDelta = time2 - time1;
+  const percentageChange = value2.sub(value1).mul(ONE).div(value1);
+  const percentageChangePerSecond = percentageChange.div(
+    timeDelta == 0 ? 1 : timeDelta,
+  );
+  return (
+    percentageChangePerSecond
+      .mul(secondsForRatePeriod(ratePeriod))
+      .div(ONE.div(10000)) // four deciamls
+      .toNumber() / 10000
+  );
+}
 
-  return convertOneScaledValue(dpr, decimals);
+// Compute the funding rate implied by the
+// current multiplier from the contract
+export function rateFromMultiplier(
+  now: number,
+  lastUpdated: number,
+  multiplier: ethers.BigNumber,
+  ratePeriod: RatePeriod,
+) {
+  const delta = now - lastUpdated;
+  return multiplier
+    .sub(ONE) // only care about decimals
+    .div(delta == 0 ? 1 : delta) // how much growth per second
+    .mul(secondsForRatePeriod(ratePeriod)) // annualize
+    .div(ONE.div(10000)); // convert to BIPs
+}
+
+export function secondsForRatePeriod(period: RatePeriod): number {
+  switch (period) {
+    case RatePeriod.Daily:
+      return SECONDS_IN_A_DAY;
+    case RatePeriod.Annual:
+      return SECONDS_IN_A_DAY * 365;
+  }
 }
 
 // TODO(adamgobes): figure out how to do powWad locally in JS
