@@ -45,7 +45,7 @@ describe('ErrorBanners', () => {
   it('renders WrongNetwork if you are on the wrong network', () => {
     const { getByText } = render(<ErrorBanners />);
     getByText(
-      "You're viewing data from the Rinkeby network, but your wallet is connected to the Unknown network.",
+      "You're viewing data from the Goerli network, but your wallet is connected to the Unknown network.",
     );
   });
 
@@ -54,7 +54,7 @@ describe('ErrorBanners', () => {
     const { getByText } = render(<ErrorBanners />);
     expect(() =>
       getByText(
-        "You're viewing data from the Rinkeby network, but your wallet is connected to the Unknown network.",
+        "You're viewing data from the Goerli network, but your wallet is connected to the Unknown network.",
       ),
     ).toThrowError();
   });
