@@ -152,6 +152,10 @@ function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
       return undefined;
     }
 
+    if (data.debtIncreasedEvents.length === 0) {
+      return undefined;
+    }
+
     return data.debtIncreasedEvents.reduce((prev, e) =>
       prev.timestamp < e.timestamp ? prev : e,
     ).timestamp;
@@ -185,6 +189,8 @@ function ltv(
   norm: ethers.BigNumberish,
 ) {
   const valueNormRatio = ethers.BigNumber.from(totalCollateralValue).div(norm);
+  if (valueNormRatio.isZero()) return ethers.BigNumber.from(0);
+
   return ethers.BigNumber.from(debt).div(valueNormRatio);
 }
 
