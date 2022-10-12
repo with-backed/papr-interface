@@ -19,3 +19,13 @@
 .table tr:nth-child(even) {
   background-color: transparent;
 }
+
+.table {
+  margin: 0 auto;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}

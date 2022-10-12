@@ -1,23 +1,18 @@
+import { TextButton } from 'components/Button';
 import {
   EtherscanAddressLink,
   EtherscanTransactionLink,
 } from 'components/EtherscanLink';
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { useConfig } from 'hooks/useConfig';
+import { useActivityByStrategy } from 'hooks/useActivityByStrategy';
+import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { humanizedTimestamp } from 'lib/duration';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { formatTokenAmount } from 'lib/numberFormat';
-import React, { useMemo } from 'react';
-import {
-  ActivityByStrategyDocument,
-  ActivityByStrategyQuery,
-} from 'types/generated/graphql/inKindSubgraph';
-import {
-  SwapsByPoolDocument,
-  SwapsByPoolQuery,
-} from 'types/generated/graphql/uniswapSubgraph';
-import { useQuery } from 'urql';
+import React, { useCallback, useMemo, useState } from 'react';
+import { ActivityByStrategyQuery } from 'types/generated/graphql/inKindSubgraph';
+import { SwapsByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
 import styles from './Activity.module.css';
 
 type ArrayElement<ArrayType extends readonly unknown[]> =
@@ -27,27 +22,17 @@ type ActivityProps = {
   lendingStrategy: LendingStrategy;
 };
 
+const EVENT_INCREMENT = 5;
+
 export function Activity({ lendingStrategy }: ActivityProps) {
-  const { uniswapSubgraph } = useConfig();
-  const [{ data: swapsData, fetching: swapsFetching, error }] =
-    useQuery<SwapsByPoolQuery>({
-      query: SwapsByPoolDocument,
-      variables: { pool: lendingStrategy.poolAddress },
-      context: useMemo(
-        () => ({
-          url: uniswapSubgraph,
-        }),
-        [uniswapSubgraph],
-      ),
-    });
+  const { data: swapsData, fetching: swapsFetching } = useUniswapSwapsByPool(
+    lendingStrategy.poolAddress,
+  );
 
-  const [{ data: activityData, fetching: activityFetching }] =
-    useQuery<ActivityByStrategyQuery>({
-      query: ActivityByStrategyDocument,
-      variables: { strategyId: lendingStrategy.id },
-    });
+  const { data: activityData, fetching: activityFetching } =
+    useActivityByStrategy(lendingStrategy.id);
 
-  const feed = useMemo(() => {
+  const allEvents = useMemo(() => {
     const unsortedEvents = [
       ...(activityData?.addCollateralEvents || []),
       ...(activityData?.debtDecreasedEvents || []),
@@ -58,11 +43,20 @@ export function Activity({ lendingStrategy }: ActivityProps) {
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
   }, [activityData, swapsData]);
 
+  const [feed, setFeed] = useState(allEvents.slice(0, EVENT_INCREMENT));
+  const [remaining, setRemaining] = useState(allEvents.slice(EVENT_INCREMENT));
+
+  const handleShowMore = useCallback(() => {
+    const nextFive = remaining.slice(0, EVENT_INCREMENT);
+    setRemaining((prev) => prev.slice(EVENT_INCREMENT));
+    setFeed((prev) => prev.concat(nextFive));
+  }, [remaining]);
+
   if (swapsFetching || activityFetching) {
     return <Fieldset legend="🐝 Activity">Loading...</Fieldset>;
   }
 
-  if (feed.length === 0) {
+  if (allEvents.length === 0) {
     return <Fieldset legend="🐝 Activity">No activity yet</Fieldset>;
   }
 
@@ -106,6 +100,14 @@ export function Activity({ lendingStrategy }: ActivityProps) {
           })}
         </tbody>
       </table>
+      {remaining.length > 0 && (
+        <div className={styles['button-container']}>
+          <TextButton kind="clickable" onClick={handleShowMore}>
+            Load {Math.min(EVENT_INCREMENT, remaining.length)} more (of{' '}
+            {remaining.length})
+          </TextButton>
+        </div>
+      )}
     </Fieldset>
   );
 }
@@ -135,7 +137,7 @@ function CollateralAdded({
   }, [debtIncreasedEvents, event]);
 
   const borrowedAmount = useMemo(() => {
-    if (!debtIncreasedEvent) return '';
+    if (!debtIncreasedEvent) return null;
     const bigNumAmount = ethers.utils.formatUnits(
       debtIncreasedEvent?.amount,
       lendingStrategy.token0IsUnderlying
@@ -161,7 +163,7 @@ function CollateralAdded({
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
           deposited {event.collateral.symbol} #{event.collateral.tokenId} and
-          borrowed {borrowedAmount}
+          borrowed {borrowedAmount || 'nothing'}
         </span>
       </td>
     </tr>
