@@ -10,7 +10,7 @@ import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { humanizedTimestamp } from 'lib/duration';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { formatTokenAmount } from 'lib/numberFormat';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityByStrategyQuery } from 'types/generated/graphql/inKindSubgraph';
 import { SwapsByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
 import styles from './Activity.module.css';
@@ -43,14 +43,21 @@ export function Activity({ lendingStrategy }: ActivityProps) {
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
   }, [activityData, swapsData]);
 
-  const [feed, setFeed] = useState(allEvents.slice(0, EVENT_INCREMENT));
-  const [remaining, setRemaining] = useState(allEvents.slice(EVENT_INCREMENT));
+  const [feed, setFeed] = useState<typeof allEvents>([]);
+  const [remaining, setRemaining] = useState<typeof allEvents>([]);
 
   const handleShowMore = useCallback(() => {
     const nextFive = remaining.slice(0, EVENT_INCREMENT);
     setRemaining((prev) => prev.slice(EVENT_INCREMENT));
     setFeed((prev) => prev.concat(nextFive));
   }, [remaining]);
+
+  useEffect(() => {
+    if (allEvents.length > 0) {
+      setFeed(allEvents.slice(0, EVENT_INCREMENT));
+      setRemaining(allEvents.slice(EVENT_INCREMENT));
+    }
+  }, [allEvents]);
 
   if (swapsFetching || activityFetching) {
     return <Fieldset legend="🐝 Activity">Loading...</Fieldset>;
