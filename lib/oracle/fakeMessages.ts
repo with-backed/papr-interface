@@ -20,11 +20,6 @@ export const dummyOracleInfoMap = {
   [getAddress('0xb7d7fe7995d1e347916faae8e16cfd6dd21a9bae')]: '21.22',
 };
 
-function keccak256(arg: string) {
-  const hexStr = ethers.utils.keccak256(arg);
-  return Buffer.from(hexStr.slice(2, hexStr.length), 'hex');
-}
-
 export async function generateDummyOracleMessage(
   collection: string,
   config: Config,
@@ -61,6 +56,9 @@ export async function generateDummyOracleMessage(
         { name: 'payload', type: 'bytes' },
         { name: 'timestamp', type: 'uint256' },
       ],
+    },
+    ContractWideCollectionPrice: {
+      ContractWideCollectionPrice: [{}],
     },
   };
 

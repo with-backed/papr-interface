@@ -56,10 +56,9 @@ interface MintAndSwapArgsStruct {
 }
 
 const OnERC721ReceivedArgsEncoderString =
-  'tuple(address mintVaultTo, address mintDebtOrProceedsTo, uint256 minOut, int256 debt, uint160 sqrtPriceLimitX96, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)';
+  'tuple(address mintDebtOrProceedsTo, uint256 minOut, uint256 debt, uint160 sqrtPriceLimitX96, tuple(tuple(bytes32 id, bytes payload, uint256 timestamp, bytes signature) message, tuple(uint8 v, bytes32 r, bytes32 s) sig) oracleInfo)';
 
 interface OnERC721ReceivedArgsStruct {
-  mintVaultTo: string;
   mintDebtOrProceedsTo: string;
   minOut: ethers.BigNumber;
   debt: ethers.BigNumber;
@@ -183,11 +182,10 @@ export function OpenVault({
       const [contractAddress, tokenId] = contractsAndTokenIds[0];
 
       const erc721ReceivedArgs: OnERC721ReceivedArgsStruct = {
-        debt: debtToBorrowOrRepay,
-        minOut,
+        debt: ethers.BigNumber.from(0),
+        minOut: ethers.BigNumber.from(0),
         sqrtPriceLimitX96: ethers.BigNumber.from(0),
         mintDebtOrProceedsTo: address!,
-        mintVaultTo: address!,
         oracleInfo: await getOraclePayloadFromReservoirObject(
           oracleInfo[contractAddress],
         ),
@@ -197,11 +195,13 @@ export function OpenVault({
         (c) => getAddress(c.address) === getAddress(contractAddress),
       )!;
 
+      console.log({ erc721ReceivedArgs });
+
       await collateralContract[
         'safeTransferFrom(address,address,uint256,bytes)'
       ](
         address!,
-        strategy.id,
+        '0xf075ef6915195591ef7da0095fccfe0288b5ccca',
         ethers.BigNumber.from(tokenId),
         ethers.utils.defaultAbiCoder.encode(
           [OnERC721ReceivedArgsEncoderString],

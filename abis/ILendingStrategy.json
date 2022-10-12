@@ -1,0 +1,46 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "vaultDebt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxDebt",
+          "type": "uint256"
+        }
+      ],
+      "name": "ExceedsMaxDebt",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidCollateral",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidCollateralVaultIDCombination",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "minOut",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "actualOut",
+          "type": "uint256"
+        }
+      ],
+      "name": "TooLittleOut",
+      "type": "error"
+    }
+  ]
+}
