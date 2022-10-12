@@ -1,12 +1,3 @@
-.tooltip {
-    background-color: #282828;
-    color: white;
-    padding: 20px;
-    border-radius: var(--border-radius-large);
-    max-width: 500px;
-    line-height: 22px;
-}
-
 .nftCapTooltip {
     width: 100%;
     display: flex;

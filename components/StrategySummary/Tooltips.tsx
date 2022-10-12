@@ -4,8 +4,9 @@ import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { PRICE } from 'lib/strategies/constants';
 import { useMemo } from 'react';
-import { Tooltip, TooltipStateReturn } from 'reakit';
+import { TooltipStateReturn } from 'reakit';
 import styles from './tooltips.module.css';
+import { Tooltip } from 'components/Tooltip';
 
 export type ToolkitProps = {
   strategy: LendingStrategy;
@@ -25,12 +26,10 @@ export function TokenTooltip({ strategy, tooltip }: ToolkitProps) {
   }, [maxLTVPercent]);
   return (
     <Tooltip {...tooltip}>
-      <div className={styles.tooltip}>
-        This lending strategy lends to Cryptopunks, lending up to{' '}
-        {formattedMaxLTVPercent} of the value of the Punks floor. The oracle
-        price for Cryptopunks is ${PRICE}. The max loan value is{' '}
-        {formattedMaxLTVPercent} of that: ${PRICE * (maxLTVPercent || 0)}
-      </div>
+      This lending strategy lends to Cryptopunks, lending up to{' '}
+      {formattedMaxLTVPercent} of the value of the Punks floor. The oracle price
+      for Cryptopunks is ${PRICE}. The max loan value is{' '}
+      {formattedMaxLTVPercent} of that: ${PRICE * (maxLTVPercent || 0)}
     </Tooltip>
   );
 }
@@ -39,10 +38,8 @@ export function TokenTooltip({ strategy, tooltip }: ToolkitProps) {
 export function APRTooltip({ strategy, tooltip }: ToolkitProps) {
   return (
     <Tooltip {...tooltip}>
-      <div className={styles.tooltip}>
-        The strategy contract adjusts the (C) contract rate for minting and
-        liquidation, targeting steady growth of 0% per year.
-      </div>
+      The strategy contract adjusts the (C) contract rate for minting and
+      liquidation, targeting steady growth of 0% per year.
     </Tooltip>
   );
 }
@@ -55,7 +52,7 @@ export function NFTCapTooltip({
 }: ToolkitProps & { debtTokenMarketCap: number; nftMarketCap: number }) {
   return (
     <Tooltip {...tooltip}>
-      <div className={`${styles.tooltip} ${styles.nftCapTooltip}`}>
+      <div className={styles.nftCapTooltip}>
         <div className={styles.value}>
           <p>${formatTokenAmount(nftMarketCap)}</p>
         </div>
@@ -91,7 +88,7 @@ export function MktCtrTooltip({
   const speedText = markOverNorm > 1 ? 'slow' : 'accelerate';
   return (
     <Tooltip {...tooltip}>
-      <div className={`${styles.tooltip} ${styles.mktCtrTooltip}`}>
+      <div className={styles.mktCtrTooltip}>
         <div className={styles.grid}>
           <div>
             <p>(MKT) Market price:</p>
@@ -149,7 +146,7 @@ export function RateTooltip({
 
   return (
     <Tooltip {...tooltip}>
-      <div className={`${styles.tooltip} ${styles.rateTooltip}`}>
+      <div className={styles.rateTooltip}>
         <div>
           <p>Strategy targets: {formatPercent(targetYearly)} APR</p>
         </div>
