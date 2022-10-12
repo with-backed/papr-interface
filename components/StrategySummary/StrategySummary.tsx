@@ -4,11 +4,10 @@ import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { formatPercent, formatThreeFractionDigits } from 'lib/numberFormat';
+import { formatThreeFractionDigits } from 'lib/numberFormat';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { TooltipReference, TooltipStateReturn, useTooltipState } from 'reakit';
 
 import styles from './strategySummary.module.css';

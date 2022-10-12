@@ -1,18 +1,35 @@
 import { Fieldset } from 'components/Fieldset';
-import { symbol } from 'd3';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { Asset } from 'nft-react';
+import { Asset, useAsset } from 'nft-react';
 import React, { useMemo } from 'react';
 import styles from './Collateral.module.css';
+import { useConfig } from '../../../hooks/useConfig';
+import { TooltipReference, useTooltipState } from 'reakit';
+import { Tooltip } from 'components/Tooltip';
+import { useAsyncValue } from '../../../hooks/useAsyncValue';
+import { ethers } from 'ethers';
+import { computeLtv, convertOneScaledValue } from '../../../lib/strategies';
+import { formatPercent } from '../../../lib/numberFormat';
 
 type CollateralProps = {
   lendingStrategy: LendingStrategy;
 };
 
-export function Collateral({ lendingStrategy: { vaults } }: CollateralProps) {
+export function Collateral({ lendingStrategy }: CollateralProps) {
+  const norm = useAsyncValue(
+    () => lendingStrategy.newNorm(),
+    [lendingStrategy],
+  );
   const collateral = useMemo(
-    () => vaults?.flatMap((v) => v.collateral),
-    [vaults],
+    () =>
+      lendingStrategy.vaults?.flatMap((v) =>
+        v.collateral.map((c) => ({
+          ...c,
+          debt: v.debt,
+          totalCollateralValue: v.totalCollateralValue,
+        })),
+      ),
+    [lendingStrategy],
   );
 
   if (!collateral || collateral.length === 0) {
@@ -25,48 +42,57 @@ export function Collateral({ lendingStrategy: { vaults } }: CollateralProps) {
 
   return (
     <Fieldset legend="🖼 Collateral">
-      <table className={styles.table}>
-        <thead>
-          <tr className={styles['header-row']}>
-            <th aria-hidden></th>
-            <th>ID</th>
-          </tr>
-        </thead>
-        <tbody className={styles.body}>
-          {collateral.map(({ id, contractAddress, tokenId, symbol }) => (
-            <Row
-              key={id}
-              contractAddress={contractAddress}
-              symbol={symbol}
-              tokenId={tokenId}
-            />
-          ))}
-        </tbody>
-      </table>
-      <div className={styles.wrapper}></div>
+      <div className={styles.wrapper}>
+        {collateral.map((c) => (
+          <Tile
+            key={c.id}
+            address={c.contractAddress}
+            tokenId={c.tokenId}
+            debt={c.debt}
+            totalCollateralValue={c.totalCollateralValue}
+            norm={norm}
+          />
+        ))}
+      </div>
     </Fieldset>
   );
 }
 
-type RowProps = {
-  contractAddress: string;
+type TileProps = {
+  address: string;
   tokenId: string;
-  symbol: string;
+  debt: any;
+  totalCollateralValue: any;
+  norm: ethers.BigNumber | null;
 };
-
-function Row({ contractAddress, tokenId, symbol }: RowProps) {
+function Tile({
+  address,
+  tokenId,
+  debt,
+  totalCollateralValue,
+  norm,
+}: TileProps) {
+  const { centerNetwork: network } = useConfig();
+  const result = useAsset({ network: network as any, tokenId, address });
+  const ltv = useMemo(() => {
+    if (norm) {
+      return formatPercent(
+        convertOneScaledValue(computeLtv(debt, totalCollateralValue, norm), 4),
+      );
+    }
+    return '...';
+  }, [debt, norm, totalCollateralValue]);
+  const tooltip = useTooltipState();
   return (
-    <tr className={styles.row}>
-      <td aria-hidden className={styles['thumbnail-container']}>
-        <div className={styles.thumbnail}>
-          <Asset address={contractAddress} tokenId={tokenId} preset="small" />
-        </div>
-      </td>
-      <td className={styles['token-id']}>
-        <span>
-          {symbol} #{tokenId}
-        </span>
-      </td>
-    </tr>
+    <div className={styles.tile}>
+      <TooltipReference {...tooltip}>
+        <Asset address={address} tokenId={tokenId} preset="small" />
+      </TooltipReference>
+      <Tooltip {...tooltip}>
+        {result?.collection_name} #{tokenId}
+        <br />
+        LTV: {ltv}
+      </Tooltip>
+    </div>
   );
 }

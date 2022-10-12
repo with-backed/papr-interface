@@ -4,7 +4,7 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { timestampDaysAgo } from 'lib/duration';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
-import { convertOneScaledValue } from 'lib/strategies';
+import { computeLtv, convertOneScaledValue } from 'lib/strategies';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
@@ -70,7 +70,7 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
       return;
     }
     const calculatedLtvs = activeVaults.reduce((prev, v) => {
-      const l = ltv(v.debt, v.totalCollateralValue, norm);
+      const l = computeLtv(v.debt, v.totalCollateralValue, norm);
       return { ...prev, [v.id]: convertOneScaledValue(l, 4) };
     }, {} as { [key: string]: number });
     setLtvs(calculatedLtvs);
@@ -181,17 +181,6 @@ function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
       </td>
     </tr>
   );
-}
-
-function ltv(
-  debt: ethers.BigNumberish,
-  totalCollateralValue: ethers.BigNumberish,
-  norm: ethers.BigNumberish,
-) {
-  const valueNormRatio = ethers.BigNumber.from(totalCollateralValue).div(norm);
-  if (valueNormRatio.isZero()) return ethers.BigNumber.from(0);
-
-  return ethers.BigNumber.from(debt).div(valueNormRatio);
 }
 
 type VaultHealthProps = {

@@ -236,3 +236,14 @@ export const deconstructFromId = (id: string): [string, string] => {
   const tokenId = id.substring(indexOfDash + 1);
   return [address, tokenId];
 };
+
+export function computeLtv(
+  debt: ethers.BigNumberish,
+  totalCollateralValue: ethers.BigNumberish,
+  norm: ethers.BigNumberish,
+) {
+  const valueNormRatio = ethers.BigNumber.from(totalCollateralValue).div(norm);
+  if (valueNormRatio.isZero()) return ethers.BigNumber.from(0);
+
+  return ethers.BigNumber.from(debt).div(valueNormRatio);
+}

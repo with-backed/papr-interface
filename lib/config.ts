@@ -33,6 +33,7 @@ const goerli: Config = {
   strategyAddress: '0x220ed94005aadd6d0d9679bc2049a45ce87b91e0',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
+  paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
 };
 
 const ethereum = {
@@ -53,6 +54,7 @@ const ethereum = {
   emailSubjectPrefix: '[Ethereum]:',
   facilitatorStartBlock: 14636317,
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
+  paprMemeSubgraph: 'TODO: update this when we have a prod subgraph',
 };
 
 export const configs = {

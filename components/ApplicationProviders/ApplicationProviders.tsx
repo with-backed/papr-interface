@@ -41,7 +41,8 @@ type ApplicationProvidersProps = {};
 export const ApplicationProviders = ({
   children,
 }: PropsWithChildren<ApplicationProvidersProps>) => {
-  const { infuraId, alchemyId, network, centerNetwork } = useConfig();
+  const { infuraId, alchemyId, network, centerNetwork, paprMemeSubgraph } =
+    useConfig();
   const orderedChains = useMemo(() => {
     const thisChain = CHAINS.find((c) => c.name.toLowerCase() === network)!;
     return [thisChain, ...CHAINS];
@@ -74,12 +75,11 @@ export const ApplicationProviders = ({
     });
   }, [connectors, provider]);
 
-  // TODO: may want to compartmentalize this just to v2 pages; can make a higher-order component to wrap those routes
   const inKindClient = useMemo(() => {
     return createUrqlClient({
-      url: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+      url: paprMemeSubgraph,
     });
-  }, []);
+  }, [paprMemeSubgraph]);
 
   return (
     <GlobalMessagingProvider>
