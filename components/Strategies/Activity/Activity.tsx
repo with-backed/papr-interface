@@ -135,6 +135,7 @@ function CollateralAdded({
   }, [debtIncreasedEvents, event]);
 
   const borrowedAmount = useMemo(() => {
+    if (!debtIncreasedEvent) return '';
     const bigNumAmount = ethers.utils.formatUnits(
       debtIncreasedEvent?.amount,
       lendingStrategy.token0IsUnderlying
