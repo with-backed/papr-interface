@@ -1,6 +1,5 @@
 fragment allVaultProperties on Vault {
   id
-  tokenId
   debt
   collateral {
     id

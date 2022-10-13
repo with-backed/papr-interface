@@ -37,7 +37,7 @@ type BorrowProps = {
 };
 
 const AddCollateralEncoderString =
-  'addCollateral(tuple(address addr, uint256 id) collateral, tuple(uint128 price, uint8 period) oracleInfo, tuple(uint8 v, bytes32 r, bytes32 s) sig)';
+  'addCollateral(tuple(address addr, uint256 id) collateral, tuple(tuple(bytes32 id, bytes payload, uint256 timestamp, bytes signature) message, tuple(uint8 v, bytes32 r, bytes32 s) sig) oracleInfo)';
 
 interface AddCollateralArgsStruct {
   collateral: ILendingStrategy.CollateralStruct;
@@ -74,7 +74,7 @@ export function OpenVault({
   pricesData,
 }: BorrowProps) {
   const { address } = useAccount();
-
+  console.log({ currentVault });
   const currentVaultDebt = useMemo(() => {
     return ethers.BigNumber.from(currentVault?.debt || 0);
   }, [currentVault]);
@@ -280,6 +280,7 @@ export function OpenVault({
   );
 
   const oracleValueOfCollateral = useMemo(() => {
+    // TODO(adamgobes): for NFTs already in the vault, use contract frozen oracle value in case they've been updated by reservoir post lock-up
     return [
       ...nftsSelected.map((id) => deconstructFromId(id)[0]),
       ...(currentVault?.collateral || []).map(
@@ -291,29 +292,16 @@ export function OpenVault({
   }, [nftsSelected, currentVault, oracleInfo]);
 
   const getMaxDebt = useCallback(async () => {
-    const newNorm = await strategy.newNorm();
-    const maxLTV = await strategy.maxLTV();
-
-    const totalNFTsInVault = !currentVault ? 0 : currentVault.collateral.length;
-
-    const maxDebt = maxLTV
-      .mul(
-        ethers.utils.parseUnits(
-          oracleValueOfCollateral.toString(),
-          underlying.decimals,
-        ),
-      )
-      .div(newNorm)
-      .mul(ethers.BigNumber.from(nftsSelected.length + totalNFTsInVault));
+    const maxDebt = await strategy.maxDebt(
+      address!,
+      ethers.utils.parseUnits(
+        oracleValueOfCollateral.toString(),
+        underlying.decimals,
+      ),
+    );
 
     setMaxDebt(maxDebt);
-  }, [
-    strategy,
-    nftsSelected,
-    oracleValueOfCollateral,
-    currentVault,
-    underlying.decimals,
-  ]);
+  }, [strategy, address, oracleValueOfCollateral, underlying.decimals]);
 
   const maxLTV = useAsyncValue(() => strategy.maxLTVPercent(), [strategy]);
 

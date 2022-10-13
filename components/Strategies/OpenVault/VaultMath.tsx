@@ -4,7 +4,7 @@ import { StrategyPricesData } from 'lib/strategies/charts';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { formatTokenAmount } from 'lib/numberFormat';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 
 type VaultMathProps = {
   strategy: LendingStrategy;
@@ -126,13 +126,13 @@ export default function VaultMath({
       <MathRow
         formula="K"
         description="Max LTV"
-        content={`${(maxLTV || 0).toFixed(4)}%`}
+        content={`${formatPercent(maxLTV || 0)}`}
         even={false}
       />
       <MathRow
         formula="X = R*K"
         description="Max Borrowable"
-        content={(effectiveOracleValue * ((maxLTV || 0) / 100)).toFixed(4)}
+        content={(effectiveOracleValue * (maxLTV || 0)).toFixed(4)}
         even
       />
       <MathRow
