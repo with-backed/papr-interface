@@ -74,7 +74,7 @@ export function OpenVault({
   pricesData,
 }: BorrowProps) {
   const { address } = useAccount();
-  console.log({ currentVault });
+
   const currentVaultDebt = useMemo(() => {
     return ethers.BigNumber.from(currentVault?.debt || 0);
   }, [currentVault]);

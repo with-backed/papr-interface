@@ -34,6 +34,7 @@ const goerli: Config = {
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+  oracleBaseUrl: 'http://localhost:3000',
 };
 
 const ethereum = {
@@ -55,6 +56,7 @@ const ethereum = {
   facilitatorStartBlock: 14636317,
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprMemeSubgraph: 'TODO: update this when we have a prod subgraph',
+  oracleBaseUrl: '',
 };
 
 export const configs = {

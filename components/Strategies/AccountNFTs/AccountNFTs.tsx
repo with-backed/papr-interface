@@ -109,10 +109,7 @@ export function AccountNFTs({
                 </li>
                 {userVaultNFTIds?.map((id, i) => {
                   const [address, tokenId] = deconstructFromId(id);
-                  console.log({
-                    address,
-                    oracle: oracleInfo[getAddress(address)],
-                  });
+
                   return (
                     <li className={styles.row} key={`${address}-${tokenId}`}>
                       <div className={styles.imageTokenId}>

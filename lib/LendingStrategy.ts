@@ -240,8 +240,6 @@ class LendingStrategyInternal {
       collateralValueToPass = collateralValue;
     }
 
-    console.log({ collateralValueToPass: collateralValueToPass.toString() });
-
     return await this._contract.maxDebt(collateralValueToPass);
   }
 }

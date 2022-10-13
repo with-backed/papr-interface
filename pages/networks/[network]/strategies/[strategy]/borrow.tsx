@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
     collectionAddresses.map(async (collectionAddress) => {
       const req = await fetch(
-        `http://localhost:3000/api/networks/${network}/oracle/collections/${collectionAddress}`,
+        `${configs[network].oracleBaseUrl}/api/networks/${network}/oracle/collections/${collectionAddress}`,
         {
           method: 'POST',
         },
