@@ -57,8 +57,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
           method: 'POST',
         },
       );
-      const json = await req.json();
-      return json;
+      return req.json();
     }),
   );
   const oracleInfo = collectionAddresses.reduce(
