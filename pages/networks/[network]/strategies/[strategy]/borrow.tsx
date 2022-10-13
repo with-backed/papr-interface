@@ -15,6 +15,8 @@ import { useConfig } from 'hooks/useConfig';
 import { useSigner } from 'wagmi';
 import { useMemo } from 'react';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { ReservoirResponseData } from 'lib/oracle/reservoir';
+import { getAddress } from 'ethers/lib/utils';
 
 type ServerSideProps = Omit<
   BorrowPageProps,
@@ -22,6 +24,7 @@ type ServerSideProps = Omit<
 > & {
   subgraphStrategy: SubgraphStrategy;
   subgraphPool: SubgraphPool;
+  oracleInfo: { [key: string]: ReservoirResponseData };
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
@@ -43,11 +46,34 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
   const { pool, lendingStrategy } = strategySubgraphData;
 
+  const collectionAddresses = lendingStrategy.allowedCollateral.map(
+    (ac) => ac.contractAddress,
+  );
+  const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
+    collectionAddresses.map(async (collectionAddress) => {
+      const req = await fetch(
+        `${configs[network].oracleBaseUrl}/api/networks/${network}/oracle/collections/${collectionAddress}`,
+        {
+          method: 'POST',
+        },
+      );
+      return req.json();
+    }),
+  );
+  const oracleInfo = collectionAddresses.reduce(
+    (prev, current, i) => ({
+      ...prev,
+      [getAddress(current)]: oracleInfoFromAPI[i],
+    }),
+    {},
+  );
+
   return {
     props: {
       strategyAddress: address,
       subgraphStrategy: lendingStrategy,
       subgraphPool: pool,
+      oracleInfo: oracleInfo,
     },
   };
 };
@@ -56,6 +82,7 @@ export default function Borrow({
   strategyAddress,
   subgraphStrategy,
   subgraphPool,
+  oracleInfo,
 }: ServerSideProps) {
   const config = useConfig();
   const { data: signer } = useSigner();
@@ -79,6 +106,7 @@ export default function Borrow({
       lendingStrategy={lendingStrategy}
       strategyAddress={strategyAddress}
       pricesData={pricesData}
+      oracleInfo={oracleInfo}
     />
   );
 }

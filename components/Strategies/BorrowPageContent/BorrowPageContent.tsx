@@ -11,17 +11,20 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { getUniqueNFTId } from 'lib/strategies';
 import { useCurrentVault } from 'hooks/useCurrentVault/useCurrentVault';
+import { ReservoirResponseData } from 'lib/oracle/reservoir';
 
 export type BorrowPageProps = {
   strategyAddress: string;
   pricesData: StrategyPricesData | null;
   lendingStrategy: LendingStrategy;
+  oracleInfo: { [key: string]: ReservoirResponseData };
 };
 
 export function BorrowPageContent({
   strategyAddress,
   lendingStrategy,
   pricesData,
+  oracleInfo,
 }: BorrowPageProps) {
   const config = useConfig();
   const { address } = useAccount();
@@ -62,6 +65,7 @@ export function BorrowPageContent({
         userCollectionNFTs={userCollectionNFTs.map((nft) =>
           getUniqueNFTId(nft.address, nft.tokenId),
         )}
+        oracleInfo={oracleInfo}
         nftsSelected={nftsSelected}
         nftsLoading={nftsLoading}
         setNFTsSelected={setNFTsSelected}
@@ -70,6 +74,7 @@ export function BorrowPageContent({
         strategy={lendingStrategy}
         pricesData={pricesData}
         userCollectionNFTs={userCollectionNFTs}
+        oracleInfo={oracleInfo}
         currentVault={currentVault}
         nftsSelected={nftsSelected}
       />

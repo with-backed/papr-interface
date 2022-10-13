@@ -2,7 +2,6 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { PRICE } from 'lib/strategies/constants';
 import { useMemo } from 'react';
 import { TooltipStateReturn } from 'reakit';
 import styles from './tooltips.module.css';
@@ -26,10 +25,11 @@ export function TokenTooltip({ strategy, tooltip }: ToolkitProps) {
   }, [maxLTVPercent]);
   return (
     <Tooltip {...tooltip}>
-      This lending strategy lends to Cryptopunks, lending up to{' '}
-      {formattedMaxLTVPercent} of the value of the Punks floor. The oracle price
-      for Cryptopunks is ${PRICE}. The max loan value is{' '}
-      {formattedMaxLTVPercent} of that: ${PRICE * (maxLTVPercent || 0)}
+      <div className={styles.tooltip}>
+        This lending strategy lends to Cryptopunks, lending up to{' '}
+        {formattedMaxLTVPercent} of the value of the Punks floor.
+        {/* todo think of new design for max borrowable information now that strategy is multi collateral */}
+      </div>
     </Tooltip>
   );
 }

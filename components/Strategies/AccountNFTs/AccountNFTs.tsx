@@ -8,10 +8,13 @@ import { useAccount } from 'wagmi';
 import { Asset } from 'nft-react';
 import { useQuery } from 'urql';
 import { VaultsByOwnerForStrategyDocument } from 'types/generated/graphql/inKindSubgraph';
+import { ReservoirResponseData } from 'lib/oracle/reservoir';
+import { getAddress } from 'ethers/lib/utils';
 
 export type AccountNFTsProps = {
   strategyAddress: string;
   userCollectionNFTs: string[];
+  oracleInfo: { [key: string]: ReservoirResponseData };
   nftsLoading: boolean;
   nftsSelected: string[];
   setNFTsSelected: Dispatch<SetStateAction<string[]>>;
@@ -20,6 +23,7 @@ export type AccountNFTsProps = {
 export function AccountNFTs({
   strategyAddress,
   userCollectionNFTs,
+  oracleInfo,
   nftsLoading,
   nftsSelected,
   setNFTsSelected,
@@ -105,6 +109,7 @@ export function AccountNFTs({
                 </li>
                 {userVaultNFTIds?.map((id, i) => {
                   const [address, tokenId] = deconstructFromId(id);
+
                   return (
                     <li className={styles.row} key={`${address}-${tokenId}`}>
                       <div className={styles.imageTokenId}>
@@ -115,7 +120,7 @@ export function AccountNFTs({
                       </div>
                       <div className={styles.oracleCheckBox}>
                         <div>
-                          <p>$72,188</p>
+                          <p>${oracleInfo[getAddress(address)].price}</p>
                         </div>
                         <div>
                           <input type="checkbox" disabled checked />
@@ -136,7 +141,7 @@ export function AccountNFTs({
                       </div>
                       <div className={styles.oracleCheckBox}>
                         <div>
-                          <p>$72,188</p>
+                          <p>${oracleInfo[getAddress(address)].price}</p>
                         </div>
                         <div>
                           <input

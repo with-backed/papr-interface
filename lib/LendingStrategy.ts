@@ -227,6 +227,17 @@ class LendingStrategyInternal {
       ? this.subgraphPool.token1
       : this.subgraphPool.token0;
   }
+
+  async maxDebt(
+    account: string,
+    collateralValue?: ethers.BigNumber,
+  ): Promise<ethers.BigNumber> {
+    let collateralValueToPass =
+      collateralValue ||
+      (await this._contract.vaultInfo(account)).collateralValue;
+
+    return await this._contract.maxDebt(collateralValueToPass);
+  }
 }
 
 /**

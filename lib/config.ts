@@ -30,10 +30,11 @@ const goerli: Config = {
   network: 'goerli',
   emailSubjectPrefix: '[Testnet]:',
   facilitatorStartBlock: 10550059,
-  strategyAddress: '0x220ed94005aadd6d0d9679bc2049a45ce87b91e0',
+  strategyAddress: '0xcd3f7ef95a4d5e1b9faf47ad5667db90e7de184e',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+  oracleBaseUrl: 'http://localhost:3000',
 };
 
 const ethereum = {
@@ -55,6 +56,7 @@ const ethereum = {
   facilitatorStartBlock: 14636317,
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprMemeSubgraph: 'TODO: update this when we have a prod subgraph',
+  oracleBaseUrl: '',
 };
 
 export const configs = {
