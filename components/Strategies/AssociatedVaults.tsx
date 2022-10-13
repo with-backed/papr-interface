@@ -9,7 +9,6 @@ import { useQuery } from 'urql';
 type Vault = {
   __typename?: 'Vault' | undefined;
   id: string;
-  tokenId: any;
   debt: any;
 };
 
