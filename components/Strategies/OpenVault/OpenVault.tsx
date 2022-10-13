@@ -7,7 +7,6 @@ import {
   getUniqueNFTId,
 } from 'lib/strategies';
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { PRICE } from 'lib/strategies/constants';
 import LendingStrategyABI from 'abis/Strategy.json';
 import {
   ILendingStrategy,
@@ -182,8 +181,8 @@ export function OpenVault({
       const [contractAddress, tokenId] = contractsAndTokenIds[0];
 
       const erc721ReceivedArgs: OnERC721ReceivedArgsStruct = {
-        debt: ethers.BigNumber.from(0),
-        minOut: ethers.BigNumber.from(0),
+        debt: debtToBorrowOrRepay,
+        minOut,
         sqrtPriceLimitX96: ethers.BigNumber.from(0),
         mintDebtOrProceedsTo: address!,
         oracleInfo: await getOraclePayloadFromReservoirObject(
@@ -195,13 +194,11 @@ export function OpenVault({
         (c) => getAddress(c.address) === getAddress(contractAddress),
       )!;
 
-      console.log({ erc721ReceivedArgs });
-
       await collateralContract[
         'safeTransferFrom(address,address,uint256,bytes)'
       ](
         address!,
-        '0xf075ef6915195591ef7da0095fccfe0288b5ccca',
+        strategy.id,
         ethers.BigNumber.from(tokenId),
         ethers.utils.defaultAbiCoder.encode(
           [OnERC721ReceivedArgsEncoderString],
@@ -282,6 +279,17 @@ export function OpenVault({
     [maxDebt, debtToken.decimals, strategy],
   );
 
+  const oracleValueOfCollateral = useMemo(() => {
+    return [
+      ...nftsSelected.map((id) => deconstructFromId(id)[0]),
+      ...(currentVault?.collateral || []).map(
+        (c) => c.contractAddress as string,
+      ),
+    ]
+      .map((address) => oracleInfo[getAddress(address)].price)
+      .reduce((a, b) => a + b, 0);
+  }, [nftsSelected, currentVault, oracleInfo]);
+
   const getMaxDebt = useCallback(async () => {
     const newNorm = await strategy.newNorm();
     const maxLTV = await strategy.maxLTV();
@@ -289,12 +297,23 @@ export function OpenVault({
     const totalNFTsInVault = !currentVault ? 0 : currentVault.collateral.length;
 
     const maxDebt = maxLTV
-      .mul(ethers.utils.parseUnits(PRICE.toString(), underlying.decimals))
+      .mul(
+        ethers.utils.parseUnits(
+          oracleValueOfCollateral.toString(),
+          underlying.decimals,
+        ),
+      )
       .div(newNorm)
       .mul(ethers.BigNumber.from(nftsSelected.length + totalNFTsInVault));
 
     setMaxDebt(maxDebt);
-  }, [strategy, nftsSelected, currentVault, underlying.decimals]);
+  }, [
+    strategy,
+    nftsSelected,
+    oracleValueOfCollateral,
+    currentVault,
+    underlying.decimals,
+  ]);
 
   const maxLTV = useAsyncValue(() => strategy.maxLTVPercent(), [strategy]);
 
@@ -445,6 +464,7 @@ export function OpenVault({
                     maxLTV
                   ).toFixed(2)
             }
+            oracleValue={oracleValueOfCollateral.toFixed(2)}
             quoteForSwap={formattedQuoteForSwap}
             showMath={showMath}
           />

@@ -1,8 +1,6 @@
 import { ethers } from 'ethers';
-import { getOracleValueForStrategy } from 'lib/strategies';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { StrategyPricesData } from 'lib/strategies/charts';
-import { PRICE } from 'lib/strategies/constants';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './OpenVault.module.css';
 import { useAsyncValue } from 'hooks/useAsyncValue';
@@ -11,6 +9,7 @@ import { formatTokenAmount } from 'lib/numberFormat';
 type VaultMathProps = {
   strategy: LendingStrategy;
   pricesData: StrategyPricesData;
+  oracleValue: string;
   quoteForSwap: string;
   inputtedLTV: string;
   showMath: boolean;
@@ -42,31 +41,27 @@ function MathRow({ formula, description, content, even }: MathRowProps) {
 export default function VaultMath({
   strategy,
   pricesData,
+  oracleValue,
   quoteForSwap,
   inputtedLTV,
   showMath,
 }: VaultMathProps) {
-  const [oracleValue, setOracleValue] = useState<string>('');
   const [maxDebt, setMaxDebt] = useState<string>('');
-
-  const updateOracleValue = useCallback(async () => {
-    const value = await getOracleValueForStrategy(strategy);
-    setOracleValue(value.toFixed());
-  }, [strategy]);
 
   const updateMaxDebt = useCallback(async () => {
     const newNorm = await strategy.newNorm();
     const maxLTV = await strategy.maxLTV();
 
-    const maxDebt = maxLTV.mul(ethers.BigNumber.from(PRICE)).div(newNorm);
+    const maxDebt = maxLTV
+      .mul(ethers.utils.parseUnits(oracleValue, strategy.underlying.decimals))
+      .div(newNorm);
 
     setMaxDebt(maxDebt.toString());
-  }, [strategy]);
+  }, [strategy, oracleValue]);
 
   useEffect(() => {
-    updateOracleValue();
     updateMaxDebt();
-  }, [updateMaxDebt, updateOracleValue]);
+  }, [updateMaxDebt]);
 
   const debtTokenMarketPrice = useMemo(
     () => pricesData.markValues[pricesData.markValues.length - 1]?.value || 1.0,

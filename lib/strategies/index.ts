@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
 import { ERC20, ERC721, IQuoter } from 'types/generated/abis';
-import { ONE, PRICE } from './constants';
+import { ONE } from './constants';
 import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -221,10 +221,6 @@ export async function getDebtTokenMarketPrice(strategy: LendingStrategy) {
 
 export async function getDebtTokenStrategyPrice(strategy: LendingStrategy) {
   return await strategy.newNorm();
-}
-
-export async function getOracleValueForStrategy(strategy: LendingStrategy) {
-  return PRICE;
 }
 
 export const getUniqueNFTId = (address: string, tokenId: string): string =>

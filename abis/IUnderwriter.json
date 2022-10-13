@@ -13,6 +13,11 @@
           "type": "address"
         },
         {
+          "internalType": "address",
+          "name": "currencyForPriceAddress",
+          "type": "address"
+        },
+        {
           "internalType": "bytes",
           "name": "data",
           "type": "bytes"

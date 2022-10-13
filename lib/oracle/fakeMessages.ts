@@ -2,10 +2,7 @@ import { ethers } from 'ethers';
 import {
   arrayify,
   defaultAbiCoder,
-  formatBytes32String,
   getAddress,
-  parseBytes32String,
-  toUtf8Bytes,
   _TypedDataEncoder,
 } from 'ethers/lib/utils';
 import { Config } from 'lib/config';
@@ -20,6 +17,32 @@ export const dummyOracleInfoMap = {
   [getAddress('0xb7d7fe7995d1e347916faae8e16cfd6dd21a9bae')]: '21.22',
 };
 
+const EIP712_TYPES = {
+  Message: {
+    Message: [
+      { name: 'id', type: 'bytes32' },
+      { name: 'payload', type: 'bytes' },
+      { name: 'timestamp', type: 'uint256' },
+    ],
+  },
+  ContractWideCollectionPrice: {
+    ContractWideCollectionPrice: [
+      {
+        name: 'kind',
+        type: 'uint8',
+      },
+      {
+        name: 'twapMinutes',
+        type: 'uint256',
+      },
+      {
+        name: 'contract',
+        type: 'address',
+      },
+    ],
+  },
+};
+
 export async function generateDummyOracleMessage(
   collection: string,
   config: Config,
@@ -28,69 +51,38 @@ export async function generateDummyOracleMessage(
     config.jsonRpcProvider,
     config.chainId,
   );
+  const signer = new ethers.Wallet(process.env.SIGNER_KEY!, rpcProvider);
+
   const price = ethers.utils.parseUnits(
     dummyOracleInfoMap[getAddress(collection)],
     USDC_DECIMALS,
   );
 
-  const signer = new ethers.Wallet(process.env.SIGNER_KEY!, rpcProvider);
-  const id = ethers.utils.hexZeroPad(
-    ethers.utils.hexlify(ethers.utils.parseEther('3')),
-    32,
+  const id = _TypedDataEncoder.hashStruct(
+    'ContractWideCollectionPrice',
+    EIP712_TYPES.ContractWideCollectionPrice,
+    {
+      kind: 1,
+      twapMinutes: 43200,
+      contract: collection,
+    },
   );
+
   const payload = defaultAbiCoder.encode(
     ['address', 'uint256'],
-    [
-      '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-      ethers.utils.parseEther('3'),
-    ],
+    ['0x3089b47853df1b82877beef6d904a0ce98a12553', price],
   );
   const timestamp = await rpcProvider.getBlockNumber();
-
-  console.log({ payload });
-
-  const EIP712_TYPES = {
-    Message: {
-      Message: [
-        { name: 'id', type: 'bytes32' },
-        { name: 'payload', type: 'bytes' },
-        { name: 'timestamp', type: 'uint256' },
-      ],
-    },
-    ContractWideCollectionPrice: {
-      ContractWideCollectionPrice: [{}],
-    },
-  };
 
   const signature = await signer.signMessage(
     arrayify(
       _TypedDataEncoder.hashStruct('Message', EIP712_TYPES.Message, {
-        id: '0x40a3a8affd14f3bed0a260ab13b9704476a51b99ebfe9e60ffe47dc4790e2629',
+        id,
         payload,
-        timestamp: 15685783,
+        timestamp,
       }),
     ),
   );
-
-  const split = ethers.utils.splitSignature(signature);
-
-  console.log({
-    split,
-  });
-
-  console.log({
-    signature,
-    recovered: ethers.utils.verifyMessage(
-      arrayify(
-        _TypedDataEncoder.hashStruct('Message', EIP712_TYPES.Message, {
-          id: '0x40a3a8affd14f3bed0a260ab13b9704476a51b99ebfe9e60ffe47dc4790e2629',
-          payload,
-          timestamp: 15685783,
-        }),
-      ),
-      signature,
-    ),
-  });
 
   const signedMessage: ReservoirResponseData = {
     price: parseFloat(ethers.utils.formatUnits(price, USDC_DECIMALS)),
