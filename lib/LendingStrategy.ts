@@ -232,13 +232,9 @@ class LendingStrategyInternal {
     account: string,
     collateralValue?: ethers.BigNumber,
   ): Promise<ethers.BigNumber> {
-    let collateralValueToPass: ethers.BigNumber;
-    if (!collateralValue) {
-      const vaultInfo = await this._contract.vaultInfo(account);
-      collateralValueToPass = vaultInfo.collateralValue;
-    } else {
-      collateralValueToPass = collateralValue;
-    }
+    let collateralValueToPass =
+      collateralValue ||
+      (await this._contract.vaultInfo(account)).collateralValue;
 
     return await this._contract.maxDebt(collateralValueToPass);
   }
