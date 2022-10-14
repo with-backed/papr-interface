@@ -57,6 +57,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     props: {
       vaultId: id,
       subgraphStrategy: lendingStrategy,
+      oracleInfo,
       subgraphPool: pool,
     },
   };
