@@ -1,6 +1,6 @@
 import { Fieldset } from 'components/Fieldset';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { Asset, useAsset } from 'nft-react';
+import { Asset, useCollection } from '@center-inc/react';
 import React, { useMemo } from 'react';
 import styles from './Collateral.module.css';
 import { useConfig } from '../../../hooks/useConfig';
@@ -72,8 +72,8 @@ function Tile({
   totalCollateralValue,
   norm,
 }: TileProps) {
-  const { centerNetwork: network } = useConfig();
-  const result = useAsset({ network: network as any, tokenId, address });
+  const { centerNetwork } = useConfig();
+  const result = useCollection({ network: centerNetwork as any, address });
   const ltv = useMemo(() => {
     if (norm) {
       return formatPercent(
@@ -89,7 +89,7 @@ function Tile({
         <Asset address={address} tokenId={tokenId} preset="small" />
       </TooltipReference>
       <Tooltip {...tooltip}>
-        {result?.collection_name} #{tokenId}
+        {result?.name} #{tokenId}
         <br />
         LTV: {ltv}
       </Tooltip>

@@ -17,7 +17,7 @@ import {
   createClient as createUrqlClient,
   Provider as UrqlProvider,
 } from 'urql';
-import { CenterProvider } from 'nft-react';
+import { CenterProvider } from '@center-inc/react';
 
 const prodChains = [chain.mainnet, chain.polygon, chain.optimism];
 const CHAINS =

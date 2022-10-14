@@ -20,6 +20,7 @@
     "abis:generate": "yarn typechain --target ethers-v5 --out-dir ./types/generated/abis './abis/*.json'"
   },
   "dependencies": {
+    "@center-inc/react": "1.1.5",
     "@pinata/ipfs-gateway-tools": "1.1.6",
     "@pinata/sdk": "^1.1.26",
     "@rainbow-me/rainbowkit": "0.7.1",
@@ -41,7 +42,6 @@
     "lightweight-charts": "^3.8.0",
     "lodash": "4.17.21",
     "next": "12.1.0",
-    "nft-react": "^0.5.10",
     "normalize.css": "8.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",

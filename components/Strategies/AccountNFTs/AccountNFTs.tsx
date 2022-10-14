@@ -5,7 +5,7 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 import styles from './AccountNFTs.module.css';
 import { useAccount } from 'wagmi';
-import { Asset } from 'nft-react';
+import { Asset } from '@center-inc/react';
 import { useQuery } from 'urql';
 import { VaultsByOwnerForStrategyDocument } from 'types/generated/graphql/inKindSubgraph';
 import { getAddress } from 'ethers/lib/utils';
