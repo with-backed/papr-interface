@@ -43,6 +43,14 @@ export function YourPositions({
     address,
   );
 
+  if (!address) {
+    return (
+      <Fieldset legend={LEGEND}>
+        Connect your wallet to see your positions.
+      </Fieldset>
+    );
+  }
+
   if (vaultFetching || balanceFetching) {
     return <Fieldset legend={LEGEND}>Loading...</Fieldset>;
   }
