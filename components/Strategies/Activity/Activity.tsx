@@ -57,8 +57,6 @@ export function Activity({ lendingStrategy }: ActivityProps) {
     }
   }, [allEvents]);
 
-  console.log({ feed, remaining });
-
   if (swapsFetching || activityFetching) {
     return <Fieldset legend="🐝 Activity">Loading...</Fieldset>;
   }
