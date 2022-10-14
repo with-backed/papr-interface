@@ -27,7 +27,7 @@ export function StrategyOverviewContent({
 }: StrategyPageProps) {
   const latestMarketPrice =
     pricesData?.markValues[pricesData?.markValues.length - 1].value;
-  console.log({ latestMarketPrice });
+
   return (
     <div className={styles.wrapper}>
       <YourPositions

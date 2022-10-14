@@ -5,7 +5,11 @@ import { useCurrentVault } from 'hooks/useCurrentVault/useCurrentVault';
 import { useAccount, useContractRead } from 'wagmi';
 import { Fieldset } from 'components/Fieldset';
 import { formatTokenAmount, formatPercent } from 'lib/numberFormat';
-import { computeLtv, convertOneScaledValue } from 'lib/strategies';
+import {
+  computeLiquidationEstimation,
+  computeLtv,
+  convertOneScaledValue,
+} from 'lib/strategies';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { erc20ABI } from 'wagmi';
@@ -33,7 +37,6 @@ export function YourPositions({
     () => ethers.BigNumber.from(rawPaprMEMEBalance || 0),
     [rawPaprMEMEBalance],
   );
-  console.log(paprMemeBalance);
 
   const { currentVault, vaultFetching } = useCurrentVault(
     lendingStrategy,
@@ -69,6 +72,19 @@ type LoanInfoProps = {
   vault: NonNullable<ReturnType<typeof useCurrentVault>['currentVault']>;
 };
 function LoanInfo({ lendingStrategy, vault }: LoanInfoProps) {
+  const { address } = useAccount();
+  const liquidationEstimate = useAsyncValue(async () => {
+    if (!address || !vault) {
+      return null;
+    }
+    const maxDebt = await lendingStrategy.maxDebt(address);
+    const debtBigNumber = ethers.BigNumber.from(vault.debt);
+    return computeLiquidationEstimation(
+      debtBigNumber,
+      maxDebt,
+      lendingStrategy,
+    );
+  }, [address, lendingStrategy, vault]);
   const norm = useAsyncValue(
     () => lendingStrategy.newNorm(),
     [lendingStrategy],
@@ -106,7 +122,8 @@ function LoanInfo({ lendingStrategy, vault }: LoanInfoProps) {
   return (
     <p>
       Your loan of <b>{formattedDebt}</b> is at <b>{formattedLTV}</b> and is
-      projected to reach the {formattedMaxLTV} max in <b>777 days</b>.
+      projected to reach the {formattedMaxLTV} max in{' '}
+      <b>{liquidationEstimate} days</b>.
     </p>
   );
 }
