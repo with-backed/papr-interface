@@ -30,7 +30,6 @@ import {
 type BorrowProps = {
   strategy: LendingStrategy;
   userCollectionNFTs: CenterUserNFTsResponse[];
-  oracleInfo: { [key: string]: ReservoirResponseData };
   nftsSelected: string[];
   currentVault: VaultsByOwnerForStrategyQuery['vaults'][0] | null;
   pricesData: StrategyPricesData;
@@ -69,12 +68,14 @@ export function OpenVault({
   strategy,
   userCollectionNFTs,
   nftsSelected,
-  oracleInfo,
   currentVault,
   pricesData,
 }: BorrowProps) {
   const { address } = useAccount();
 
+  const oracleInfo = useMemo(() => {
+    return strategy.oracleInfo;
+  }, [strategy]);
   const currentVaultDebt = useMemo(() => {
     return ethers.BigNumber.from(currentVault?.debt || 0);
   }, [currentVault]);

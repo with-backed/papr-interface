@@ -11,6 +11,8 @@ import {
   SubgraphPool,
   SubgraphStrategy,
 } from 'lib/LendingStrategy';
+import { ReservoirResponseData } from 'lib/oracle/reservoir';
+import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -23,6 +25,7 @@ import styles from '../strategy.module.css';
 type ServerSideProps = {
   vaultId: string;
   subgraphStrategy: SubgraphStrategy;
+  oracleInfo: { [key: string]: ReservoirResponseData };
   subgraphPool: SubgraphPool;
 };
 
@@ -45,6 +48,10 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   }
 
   const { pool, lendingStrategy } = strategySubgraphData;
+  const oracleInfo = await getOracleInfoFromAllowedCollateral(
+    lendingStrategy.allowedCollateral.map((ac) => ac.contractAddress),
+    network,
+  );
 
   return {
     props: {

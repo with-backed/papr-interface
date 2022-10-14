@@ -1,13 +1,14 @@
 import { Fieldset } from 'components/Fieldset';
 import { Health } from 'components/Strategies/Health';
 import { ethers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { formatThreeFractionDigits } from 'lib/numberFormat';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import Link from 'next/link';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TooltipReference, TooltipStateReturn, useTooltipState } from 'reakit';
 
 import styles from './strategySummary.module.css';
@@ -113,6 +114,15 @@ function SummaryEntry({
         : strategy.token0.totalSupply(),
     [strategy],
   );
+  const strategyNFTValue = useMemo(() => {
+    if (!strategy.vaults || strategy.vaults.length === 0) return 0;
+    return strategy.vaults
+      .map((v) => v.collateral)
+      .flat()
+      .map((collateral) => collateral.contractAddress)
+      .map((collection) => strategy.oracleInfo[getAddress(collection)].price)
+      .reduce((a, b) => a + b, 0);
+  }, [strategy]);
 
   if (!pricesData) return <></>;
 
@@ -123,11 +133,10 @@ function SummaryEntry({
       ?.value || 1.0;
   const markOverNorm = mark / norm;
 
-  const fakeNFTValue = 300000;
   const debtTokenMarketCap =
     parseFloat(ethers.utils.formatEther(debtTokenSupply || 0)) * mark;
 
-  const nftOverCap = fakeNFTValue / debtTokenMarketCap;
+  const nftOverCap = strategyNFTValue / debtTokenMarketCap;
 
   return (
     <tr>
@@ -155,7 +164,7 @@ function SummaryEntry({
         <NFTCapTooltip
           strategy={strategy}
           tooltip={nftCapTooltip}
-          nftMarketCap={fakeNFTValue}
+          nftMarketCap={strategyNFTValue}
           debtTokenMarketCap={debtTokenMarketCap}
         />
       </td>

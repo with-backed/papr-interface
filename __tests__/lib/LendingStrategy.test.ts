@@ -49,6 +49,7 @@ const provider = makeProvider(configs.goerli.jsonRpcProvider, 'goerli');
 let strategyInstance = makeLendingStrategy(
   subgraphStrategy,
   subgraphPool,
+  {},
   provider,
   configs.goerli,
 );

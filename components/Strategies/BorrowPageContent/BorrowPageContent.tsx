@@ -61,11 +61,10 @@ export function BorrowPageContent({
         includeDetails
       />
       <AccountNFTs
-        strategyAddress={lendingStrategy.id}
+        strategy={lendingStrategy}
         userCollectionNFTs={userCollectionNFTs.map((nft) =>
           getUniqueNFTId(nft.address, nft.tokenId),
         )}
-        oracleInfo={oracleInfo}
         nftsSelected={nftsSelected}
         nftsLoading={nftsLoading}
         setNFTsSelected={setNFTsSelected}
@@ -74,7 +73,6 @@ export function BorrowPageContent({
         strategy={lendingStrategy}
         pricesData={pricesData}
         userCollectionNFTs={userCollectionNFTs}
-        oracleInfo={oracleInfo}
         currentVault={currentVault}
         nftsSelected={nftsSelected}
       />
