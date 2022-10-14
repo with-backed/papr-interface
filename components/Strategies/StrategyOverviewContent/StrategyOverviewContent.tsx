@@ -25,9 +25,15 @@ export function StrategyOverviewContent({
   lendingStrategy,
   pricesData,
 }: StrategyPageProps) {
+  const latestMarketPrice =
+    pricesData?.markValues[pricesData?.markValues.length - 1].value;
+  console.log({ latestMarketPrice });
   return (
     <div className={styles.wrapper}>
-      <YourPositions lendingStrategy={lendingStrategy} />
+      <YourPositions
+        lendingStrategy={lendingStrategy}
+        latestMarketPrice={latestMarketPrice}
+      />
       <StrategySummary
         includeDetails={false}
         legend="📈 Token Performance"
