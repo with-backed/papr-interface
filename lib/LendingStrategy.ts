@@ -12,6 +12,7 @@ import {
 import { LendingStrategyByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 import { Config } from './config';
+import { ReservoirResponseData } from './oracle/reservoir';
 import { subgraphStrategyByAddress } from './pAPRSubgraph';
 import { buildToken, convertOneScaledValue } from './strategies';
 import { getPool } from './strategies/uniswap';
@@ -40,12 +41,14 @@ type SignerOrProvider = ethers.Signer | ethers.providers.Provider;
 export function makeLendingStrategy(
   subgraphStrategy: SubgraphStrategy,
   subgraphPool: SubgraphPool,
+  oracleInfo: { [key: string]: ReservoirResponseData },
   signerOrProvider: SignerOrProvider,
   config: Config,
 ): LendingStrategy {
   const instance = new LendingStrategyInternal(
     subgraphStrategy,
     subgraphPool,
+    oracleInfo,
     !!signerOrProvider
       ? signerOrProvider
       : new providers.AlchemyProvider(config.network, config.alchemyId),
@@ -84,6 +87,7 @@ class LendingStrategyInternal {
 
   multicall: Strategy['multicall'];
   subgraphPool: SubgraphPool;
+  oracleInfo: { [key: string]: ReservoirResponseData };
   token0: ERC20;
   token1: ERC20;
   collateralContracts: ERC721[];
@@ -91,11 +95,13 @@ class LendingStrategyInternal {
   constructor(
     subgraphStrategy: SubgraphStrategy,
     subgraphPool: SubgraphPool,
+    oracleInfo: { [key: string]: ReservoirResponseData },
     signerOrProvider: SignerOrProvider,
     config: Config,
   ) {
     this._subgraphStrategy = subgraphStrategy;
     this.subgraphPool = subgraphPool;
+    this.oracleInfo = oracleInfo;
     this._signerOrProvider = signerOrProvider;
     this._contract = Strategy__factory.connect(
       subgraphStrategy.id,
