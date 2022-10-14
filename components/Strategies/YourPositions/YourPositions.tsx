@@ -20,16 +20,20 @@ export function YourPositions({
   lendingStrategy,
   latestMarketPrice,
 }: YourPositionsProps) {
-  //const { address } = useAccount();
-  const address = '0x1813dc5442317e229445109ed8e72e5de4991e17';
-
-  const { data: paprMEMEBalance, isFetching: balanceFetching } =
+  const { address } = useAccount();
+  const { data: rawPaprMEMEBalance, isFetching: balanceFetching } =
     useContractRead({
       addressOrName: lendingStrategy.debtToken.id,
       contractInterface: erc20ABI,
       functionName: 'balanceOf',
       args: [address],
     });
+
+  const paprMemeBalance = useMemo(
+    () => ethers.BigNumber.from(rawPaprMEMEBalance || 0),
+    [rawPaprMEMEBalance],
+  );
+  console.log(paprMemeBalance);
 
   const { currentVault, vaultFetching } = useCurrentVault(
     lendingStrategy,
@@ -42,9 +46,9 @@ export function YourPositions({
 
   return (
     <Fieldset legend={LEGEND}>
-      {!!paprMEMEBalance && (
+      {!paprMemeBalance.eq(0) && (
         <BalanceInfo
-          paprMEMEBalance={ethers.BigNumber.from(paprMEMEBalance)}
+          paprMEMEBalance={paprMemeBalance}
           paprMEMEDecimals={lendingStrategy.debtToken.decimals}
           paprMEMESymbol={lendingStrategy.debtToken.symbol}
           latestMarketPrice={latestMarketPrice}
@@ -52,6 +56,9 @@ export function YourPositions({
       )}
       {!!currentVault && (
         <LoanInfo lendingStrategy={lendingStrategy} vault={currentVault} />
+      )}
+      {paprMemeBalance.eq(0) && !currentVault && (
+        <p>You do not have any positions on this strategy.</p>
       )}
     </Fieldset>
   );
