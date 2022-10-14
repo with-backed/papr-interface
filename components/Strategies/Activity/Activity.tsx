@@ -35,8 +35,6 @@ export function Activity({ lendingStrategy }: ActivityProps) {
   const allEvents = useMemo(() => {
     const unsortedEvents = [
       ...(activityData?.addCollateralEvents || []),
-      ...(activityData?.debtDecreasedEvents || []),
-      ...(activityData?.debtIncreasedEvents || []),
       ...(activityData?.removeCollateralEvents || []),
       ...(swapsData?.swaps || []),
     ];
@@ -58,6 +56,8 @@ export function Activity({ lendingStrategy }: ActivityProps) {
       setRemaining(allEvents.slice(EVENT_INCREMENT));
     }
   }, [allEvents]);
+
+  console.log({ feed, remaining });
 
   if (swapsFetching || activityFetching) {
     return <Fieldset legend="🐝 Activity">Loading...</Fieldset>;
