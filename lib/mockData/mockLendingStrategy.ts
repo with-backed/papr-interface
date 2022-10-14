@@ -3,4 +3,7 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 /**
  * Fill this in as we need certain fields in tests.
  */
-export const mockLendingStrategy = {} as LendingStrategy;
+export const mockLendingStrategy = {
+  id: '0xcd3f7ef95a4d5e1b9faf47ad5667db90e7de184e',
+  debtToken: {},
+} as LendingStrategy;

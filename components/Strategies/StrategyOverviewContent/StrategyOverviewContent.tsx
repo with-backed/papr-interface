@@ -2,11 +2,12 @@ import React from 'react';
 import styles from 'components/Strategies/Strategy.module.css';
 import { StrategyPricesData } from 'lib/strategies/charts';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { Collateral } from '../Collateral';
-import { Activity } from '../Activity';
-import { Loans } from '../Loans';
+import { Collateral } from 'components/Strategies/Collateral';
+import { Activity } from 'components/Strategies/Activity';
+import { Loans } from 'components/Strategies/Loans';
 import StrategySummary from 'components/StrategySummary/StrategySummary';
 import dynamic from 'next/dynamic';
+import { YourPositions } from 'components/Strategies/YourPositions';
 
 /* lightweight-charts uses canvas and cannot be SSRed */
 const Charts = dynamic(() => import('components/Strategies/Charts/Charts'), {
@@ -24,11 +25,18 @@ export function StrategyOverviewContent({
   lendingStrategy,
   pricesData,
 }: StrategyPageProps) {
+  const latestMarketPrice =
+    pricesData?.markValues[pricesData?.markValues.length - 1].value;
+
   return (
     <div className={styles.wrapper}>
+      <YourPositions
+        lendingStrategy={lendingStrategy}
+        latestMarketPrice={latestMarketPrice}
+      />
       <StrategySummary
         includeDetails={false}
-        legend="Token Performance"
+        legend="📈 Token Performance"
         pricesData={{ [lendingStrategy.id]: pricesData }}
         strategies={[lendingStrategy]}
       />

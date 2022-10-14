@@ -35,8 +35,6 @@ export function Activity({ lendingStrategy }: ActivityProps) {
   const allEvents = useMemo(() => {
     const unsortedEvents = [
       ...(activityData?.addCollateralEvents || []),
-      ...(activityData?.debtDecreasedEvents || []),
-      ...(activityData?.debtIncreasedEvents || []),
       ...(activityData?.removeCollateralEvents || []),
       ...(swapsData?.swaps || []),
     ];
