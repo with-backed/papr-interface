@@ -66,6 +66,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 export default function VaultPage({
   vaultId,
   subgraphPool,
+  oracleInfo,
   subgraphStrategy,
 }: ServerSideProps) {
   const [vaultInfo, setVaultInfo] = useState<Vault | null>(null);
@@ -73,8 +74,14 @@ export default function VaultPage({
   const { data: signer } = useSigner();
 
   const lendingStrategy = useMemo(() => {
-    return makeLendingStrategy(subgraphStrategy, subgraphPool, signer!, config);
-  }, [config, signer, subgraphPool, subgraphStrategy]);
+    return makeLendingStrategy(
+      subgraphStrategy,
+      subgraphPool,
+      oracleInfo,
+      signer!,
+      config,
+    );
+  }, [config, signer, subgraphPool, oracleInfo, subgraphStrategy]);
   const { replace } = useRouter();
   const [{ data }] = useQuery({
     query: VaultByIdDocument,
