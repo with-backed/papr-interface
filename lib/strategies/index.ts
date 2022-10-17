@@ -7,6 +7,8 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { getAddress } from 'ethers/lib/utils';
 import { LendingStrategy } from 'lib/LendingStrategy';
+import { configs, SupportedNetwork } from 'lib/config';
+import { ReservoirResponseData } from 'lib/oracle/reservoir';
 
 dayjs.extend(duration);
 
@@ -242,4 +244,30 @@ export function computeLtv(
   if (valueNormRatio.isZero()) return ethers.BigNumber.from(0);
 
   return ethers.BigNumber.from(debt).div(valueNormRatio);
+}
+
+export async function getOracleInfoFromAllowedCollateral(
+  collections: string[],
+  network: SupportedNetwork,
+) {
+  const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
+    collections.map(async (collectionAddress) => {
+      const req = await fetch(
+        `${configs[network].oracleBaseUrl}/api/networks/${network}/oracle/collections/${collectionAddress}`,
+        {
+          method: 'POST',
+        },
+      );
+      return req.json();
+    }),
+  );
+  const oracleInfo = collections.reduce(
+    (prev, current, i) => ({
+      ...prev,
+      [getAddress(current)]: oracleInfoFromAPI[i],
+    }),
+    {},
+  );
+
+  return oracleInfo;
 }

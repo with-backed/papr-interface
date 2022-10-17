@@ -51,7 +51,13 @@ export default function InKindTest({
   const { data: signer } = useSigner();
 
   const lendingStrategy = useMemo(() => {
-    return makeLendingStrategy(subgraphStrategy, subgraphPool, signer!, config);
+    return makeLendingStrategy(
+      subgraphStrategy,
+      subgraphPool,
+      {},
+      signer!,
+      config,
+    );
   }, [config, signer, subgraphPool, subgraphStrategy]);
 
   return <TestPageContent lendingStrategy={lendingStrategy} />;

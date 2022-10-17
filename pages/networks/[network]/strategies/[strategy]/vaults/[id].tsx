@@ -11,6 +11,8 @@ import {
   SubgraphPool,
   SubgraphStrategy,
 } from 'lib/LendingStrategy';
+import { ReservoirResponseData } from 'lib/oracle/reservoir';
+import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -23,6 +25,7 @@ import styles from '../strategy.module.css';
 type ServerSideProps = {
   vaultId: string;
   subgraphStrategy: SubgraphStrategy;
+  oracleInfo: { [key: string]: ReservoirResponseData };
   subgraphPool: SubgraphPool;
 };
 
@@ -45,11 +48,16 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   }
 
   const { pool, lendingStrategy } = strategySubgraphData;
+  const oracleInfo = await getOracleInfoFromAllowedCollateral(
+    lendingStrategy.allowedCollateral.map((ac) => ac.contractAddress),
+    network,
+  );
 
   return {
     props: {
       vaultId: id,
       subgraphStrategy: lendingStrategy,
+      oracleInfo,
       subgraphPool: pool,
     },
   };
@@ -58,6 +66,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 export default function VaultPage({
   vaultId,
   subgraphPool,
+  oracleInfo,
   subgraphStrategy,
 }: ServerSideProps) {
   const [vaultInfo, setVaultInfo] = useState<Vault | null>(null);
@@ -65,8 +74,14 @@ export default function VaultPage({
   const { data: signer } = useSigner();
 
   const lendingStrategy = useMemo(() => {
-    return makeLendingStrategy(subgraphStrategy, subgraphPool, signer!, config);
-  }, [config, signer, subgraphPool, subgraphStrategy]);
+    return makeLendingStrategy(
+      subgraphStrategy,
+      subgraphPool,
+      oracleInfo,
+      signer!,
+      config,
+    );
+  }, [config, signer, subgraphPool, oracleInfo, subgraphStrategy]);
   const { replace } = useRouter();
   const [{ data }] = useQuery({
     query: VaultByIdDocument,

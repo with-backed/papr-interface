@@ -15,12 +15,15 @@ import {
 import { useSigner } from 'wagmi';
 import { useConfig } from 'hooks/useConfig';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { ReservoirResponseData } from 'lib/oracle/reservoir';
+import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
 
 type ServerSideProps = Omit<
   StrategyPageProps,
   'lendingStrategy' | 'pricesData'
 > & {
   subgraphStrategy: SubgraphStrategy;
+  oracleInfo: { [key: string]: ReservoirResponseData };
   subgraphPool: SubgraphPool;
 };
 
@@ -43,10 +46,16 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
   const { pool, lendingStrategy } = strategySubgraphData;
 
+  const oracleInfo = await getOracleInfoFromAllowedCollateral(
+    lendingStrategy.allowedCollateral.map((ac) => ac.contractAddress),
+    network,
+  );
+
   return {
     props: {
       address: address,
       subgraphStrategy: lendingStrategy,
+      oracleInfo,
       subgraphPool: pool,
     },
   };
@@ -55,14 +64,21 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 export default function StrategyPage({
   address,
   subgraphStrategy,
+  oracleInfo,
   subgraphPool,
 }: ServerSideProps) {
   const config = useConfig();
   const { data: signer } = useSigner();
 
   const lendingStrategy = useMemo(() => {
-    return makeLendingStrategy(subgraphStrategy, subgraphPool, signer!, config);
-  }, [config, signer, subgraphPool, subgraphStrategy]);
+    return makeLendingStrategy(
+      subgraphStrategy,
+      subgraphPool,
+      oracleInfo,
+      signer!,
+      config,
+    );
+  }, [config, signer, subgraphPool, oracleInfo, subgraphStrategy]);
 
   const pricesData = useAsyncValue(
     () =>

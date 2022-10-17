@@ -8,22 +8,19 @@ import { useAccount } from 'wagmi';
 import { Asset } from 'nft-react';
 import { useQuery } from 'urql';
 import { VaultsByOwnerForStrategyDocument } from 'types/generated/graphql/inKindSubgraph';
-import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { getAddress } from 'ethers/lib/utils';
 
 export type AccountNFTsProps = {
-  strategyAddress: string;
+  strategy: LendingStrategy;
   userCollectionNFTs: string[];
-  oracleInfo: { [key: string]: ReservoirResponseData };
   nftsLoading: boolean;
   nftsSelected: string[];
   setNFTsSelected: Dispatch<SetStateAction<string[]>>;
 };
 
 export function AccountNFTs({
-  strategyAddress,
+  strategy,
   userCollectionNFTs,
-  oracleInfo,
   nftsLoading,
   nftsSelected,
   setNFTsSelected,
@@ -33,10 +30,13 @@ export function AccountNFTs({
     query: VaultsByOwnerForStrategyDocument,
     variables: {
       owner: address?.toLowerCase(),
-      strategy: strategyAddress.toLowerCase(),
+      strategy: strategy.id.toLowerCase(),
     },
   });
 
+  const oracleInfo = useMemo(() => {
+    return strategy.oracleInfo;
+  }, [strategy]);
   const userVaultNFTIds = useMemo(() => {
     return userVaultsData?.vaults
       .map((vault) =>

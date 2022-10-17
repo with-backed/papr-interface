@@ -61,7 +61,13 @@ export default function OldStrategyPage({
   const { data: signer } = useSigner();
 
   const lendingStrategy = useMemo(() => {
-    return makeLendingStrategy(subgraphStrategy, subgraphPool, signer!, config);
+    return makeLendingStrategy(
+      subgraphStrategy,
+      subgraphPool,
+      {},
+      signer!,
+      config,
+    );
   }, [config, signer, subgraphPool, subgraphStrategy]);
 
   const pricesData = useAsyncValue(
