@@ -410,19 +410,12 @@ export function OpenVault({
             </div>
             <div>{underlying.symbol}</div>
           </div>
-          {isBorrowing && (
-            <div
-              className={styles.showMath}
-              onClick={() => setShowMath(!showMath)}>
-              Show Math
-            </div>
-          )}
 
           {isBorrowing && (
             <div
               className={`${styles.button} ${styles.reviewButton}`}
               onClick={() => setShowMath(true)}>
-              Review
+              Review Math
             </div>
           )}
 
