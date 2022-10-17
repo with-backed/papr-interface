@@ -1,15 +1,16 @@
 import { Fieldset } from 'components/Fieldset';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { Asset, useCollection } from '@center-inc/react';
+import { useCollection } from '@center-inc/react';
 import React, { useMemo } from 'react';
 import styles from './Collateral.module.css';
-import { useConfig } from '../../../hooks/useConfig';
+import { useConfig } from 'hooks/useConfig';
 import { TooltipReference, useTooltipState } from 'reakit';
 import { Tooltip } from 'components/Tooltip';
-import { useAsyncValue } from '../../../hooks/useAsyncValue';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ethers } from 'ethers';
-import { computeLtv, convertOneScaledValue } from '../../../lib/strategies';
-import { formatPercent } from '../../../lib/numberFormat';
+import { computeLtv, convertOneScaledValue } from 'lib/strategies';
+import { formatPercent } from 'lib/numberFormat';
+import { CenterAsset } from 'components/CenterAsset';
 
 type CollateralProps = {
   lendingStrategy: LendingStrategy;
@@ -86,7 +87,7 @@ function Tile({
   return (
     <div className={styles.tile}>
       <TooltipReference {...tooltip}>
-        <Asset address={address} tokenId={tokenId} preset="small" />
+        <CenterAsset address={address} tokenId={tokenId} preset="small" />
       </TooltipReference>
       <Tooltip {...tooltip}>
         {result?.name} #{tokenId}
