@@ -34,7 +34,7 @@ const goerli: Config = {
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
-  oracleBaseUrl: 'http://localhost:3000',
+  oracleBaseUrl: 'https://v2-interface-rosy.vercel.app',
 };
 
 const ethereum = {

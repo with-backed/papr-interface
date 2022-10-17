@@ -51,8 +51,11 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   );
   const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
     collectionAddresses.map(async (collectionAddress) => {
+      const oracleBaseUrl = !!process.env.VERCEL_ENV
+        ? configs[network].oracleBaseUrl
+        : 'http://localhost:3000';
       const req = await fetch(
-        `${configs[network].oracleBaseUrl}/api/networks/${network}/oracle/collections/${collectionAddress}`,
+        `${oracleBaseUrl}/api/networks/${network}/oracle/collections/${collectionAddress}`,
         {
           method: 'POST',
         },
