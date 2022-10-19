@@ -1,14 +1,13 @@
 import { Fieldset } from 'components/Fieldset';
-import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
 import { deconstructFromId, getUniqueNFTId } from 'lib/strategies';
-import { LendingStrategy } from 'lib/LendingStrategy';
 import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 import styles from './AccountNFTs.module.css';
 import { useAccount } from 'wagmi';
-import { Asset } from 'nft-react';
 import { useQuery } from 'urql';
 import { VaultsByOwnerForStrategyDocument } from 'types/generated/graphql/inKindSubgraph';
 import { getAddress } from 'ethers/lib/utils';
+import { CenterAsset } from 'components/CenterAsset';
+import { LendingStrategy } from 'lib/LendingStrategy';
 
 export type AccountNFTsProps = {
   strategy: LendingStrategy;
@@ -114,7 +113,7 @@ export function AccountNFTs({
                     <li className={styles.row} key={`${address}-${tokenId}`}>
                       <div className={styles.imageTokenId}>
                         <div className={styles.thumbnail}>
-                          <Asset address={address} tokenId={tokenId} />
+                          <CenterAsset address={address} tokenId={tokenId} />
                         </div>
                         <div>#{tokenId}</div>
                       </div>
@@ -135,7 +134,7 @@ export function AccountNFTs({
                     <li className={styles.row} key={`${address}-${tokenId}`}>
                       <div className={styles.imageTokenId}>
                         <div className={styles.thumbnail}>
-                          <Asset address={address} tokenId={tokenId} />
+                          <CenterAsset address={address} tokenId={tokenId} />
                         </div>
                         <div>#{tokenId}</div>
                       </div>

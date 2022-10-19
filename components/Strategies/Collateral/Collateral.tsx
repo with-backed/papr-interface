@@ -1,15 +1,16 @@
 import { Fieldset } from 'components/Fieldset';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { Asset, useAsset } from 'nft-react';
+import { useCollection } from '@center-inc/react';
 import React, { useMemo } from 'react';
 import styles from './Collateral.module.css';
-import { useConfig } from '../../../hooks/useConfig';
+import { useConfig } from 'hooks/useConfig';
 import { TooltipReference, useTooltipState } from 'reakit';
 import { Tooltip } from 'components/Tooltip';
-import { useAsyncValue } from '../../../hooks/useAsyncValue';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ethers } from 'ethers';
-import { computeLtv, convertOneScaledValue } from '../../../lib/strategies';
-import { formatPercent } from '../../../lib/numberFormat';
+import { computeLtv, convertOneScaledValue } from 'lib/strategies';
+import { formatPercent } from 'lib/numberFormat';
+import { CenterAsset } from 'components/CenterAsset';
 
 type CollateralProps = {
   lendingStrategy: LendingStrategy;
@@ -72,8 +73,8 @@ function Tile({
   totalCollateralValue,
   norm,
 }: TileProps) {
-  const { centerNetwork: network } = useConfig();
-  const result = useAsset({ network: network as any, tokenId, address });
+  const { centerNetwork } = useConfig();
+  const result = useCollection({ network: centerNetwork as any, address });
   const ltv = useMemo(() => {
     if (norm) {
       return formatPercent(
@@ -86,10 +87,10 @@ function Tile({
   return (
     <div className={styles.tile}>
       <TooltipReference {...tooltip}>
-        <Asset address={address} tokenId={tokenId} preset="small" />
+        <CenterAsset address={address} tokenId={tokenId} preset="small" />
       </TooltipReference>
       <Tooltip {...tooltip}>
-        {result?.collection_name} #{tokenId}
+        {result?.name} #{tokenId}
         <br />
         LTV: {ltv}
       </Tooltip>

@@ -1,0 +1,1 @@
+export { CenterAsset } from './CenterAsset';
