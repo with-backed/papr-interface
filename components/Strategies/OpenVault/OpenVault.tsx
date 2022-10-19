@@ -26,10 +26,7 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { VaultDebtSlider } from './VaultDebtSlider';
 import { VaultsByOwnerForStrategyQuery } from 'types/generated/graphql/inKindSubgraph';
-import {
-  getOraclePayloadFromReservoirObject,
-  ReservoirResponseData,
-} from 'lib/oracle/reservoir';
+import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { Button } from 'components/Button';
 import { ERC721 } from 'types/generated/abis';
 
@@ -491,7 +488,7 @@ function NFTApprovalButtons({
   }, [approvalStatuses, setAllNFTsApproved]);
 
   return (
-    <>
+    <div className={styles['button-container']}>
       {contracts.map((c) => (
         <ApproveNFTButton
           key={c.address}
@@ -501,7 +498,7 @@ function NFTApprovalButtons({
           setApproved={setApproved}
         />
       ))}
-    </>
+    </div>
   );
 }
 

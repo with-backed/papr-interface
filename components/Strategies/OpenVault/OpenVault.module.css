@@ -171,3 +171,8 @@
 .noDisplay {
   display: none;
 }
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+}
