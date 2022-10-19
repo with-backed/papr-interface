@@ -27,7 +27,7 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { VaultDebtSlider } from './VaultDebtSlider';
 import { VaultsByOwnerForStrategyQuery } from 'types/generated/graphql/inKindSubgraph';
 import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
-import { Button } from 'components/Button';
+import { Button, TransactionButton } from 'components/Button';
 import { ERC721 } from 'types/generated/abis';
 
 type BorrowProps = {
@@ -525,7 +525,7 @@ function ApproveNFTButton({
     functionName: 'setApprovalForAll',
     args: [strategyId, true],
   });
-  const { write } = useContractWrite({
+  const { data, write } = useContractWrite({
     ...config,
     onSuccess: (data) => {
       data.wait().then(() => setApproved(collateralContract.address));
@@ -533,10 +533,11 @@ function ApproveNFTButton({
   });
 
   return (
-    <Button
-      kind={approved ? 'secondary' : 'primary'}
-      onClick={approved ? undefined : (write! as any)}>
-      {name ? `Approve ${name}` : '...'}
-    </Button>
+    <TransactionButton
+      onClick={write!}
+      transactionData={data}
+      text={name ? `Approve ${name}` : '...'}
+      completed={approved === true}
+    />
   );
 }

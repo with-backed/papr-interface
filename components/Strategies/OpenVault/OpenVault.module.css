@@ -162,10 +162,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-end;
-}
-
-.approveAndBorrowButtons button {
-  margin: 10px 0;
+  gap: 10px;
 }
 
 .noDisplay {
@@ -175,4 +172,5 @@
 .button-container {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }

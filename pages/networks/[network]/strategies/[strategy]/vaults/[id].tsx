@@ -6,7 +6,6 @@ import { useConfig } from 'hooks/useConfig';
 import { configs, SupportedNetwork } from 'lib/config';
 import {
   fetchSubgraphData,
-  makeLendingStrategy,
   SubgraphPool,
   SubgraphStrategy,
 } from 'lib/LendingStrategy';
@@ -17,10 +16,11 @@ import { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { VaultByIdDocument } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
-import { useAccount, useSigner } from 'wagmi';
+import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import styles from '../strategy.module.css';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useLendingStrategy } from 'hooks/useLendingStrategy';
+import StrategyABI from 'abis/Strategy.json';
 
 type ServerSideProps = {
   vaultId: string;
@@ -130,24 +130,25 @@ export default function VaultPage({
     return ethers.utils.formatUnits(vaultInfo.debt, 18);
   }, [vaultInfo]);
 
-  const [repayHash, setRepayHash] = useState('');
-  const [repayPending, setRepayPending] = useState(false);
-  const repayDebt = useCallback(async () => {
-    if (vaultInfo) {
-      const tx = await lendingStrategy.reduceDebt(
-        ethers.BigNumber.from(vaultId).toHexString(),
-        vaultInfo.debt,
-      );
-      setRepayHash(tx.hash);
-      setRepayPending(true);
+  const prepareRepay = usePrepareContractWrite({
+    addressOrName: lendingStrategy.id,
+    contractInterface: StrategyABI.abi,
+    functionName: 'reduceDebt',
+  });
+  const repay = useContractWrite({
+    ...prepareRepay.config,
+    onSuccess: (data) => {
+      data.wait().then(fetchVaultInfo);
+    },
+  });
 
-      await tx.wait();
-      setRepayPending(false);
-      fetchVaultInfo();
+  const repayDebt = useCallback(async () => {
+    if (vaultInfo && repay.write) {
+      repay.write();
     } else {
       console.error('No vault info, cannot reduce debt');
     }
-  }, [fetchVaultInfo, lendingStrategy, vaultId, vaultInfo]);
+  }, [repay, vaultInfo]);
 
   // TODO: use removeCollateral instead of closeVault
 
@@ -189,8 +190,7 @@ export default function VaultPage({
             <TransactionButton
               text="Repay Debt"
               onClick={repayDebt}
-              txHash={repayHash}
-              isPending={repayPending}
+              transactionData={repay.data}
               disabled={!userIsOwner || vaultInfo.debt.eq(0)}
             />
             <br />
