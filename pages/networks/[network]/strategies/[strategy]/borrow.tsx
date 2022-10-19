@@ -7,16 +7,14 @@ import {
 } from 'components/Strategies/BorrowPageContent';
 import {
   fetchSubgraphData,
-  makeLendingStrategy,
   SubgraphPool,
   SubgraphStrategy,
 } from 'lib/LendingStrategy';
 import { useConfig } from 'hooks/useConfig';
-import { useSigner } from 'wagmi';
-import { useMemo } from 'react';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
+import { useLendingStrategy } from 'hooks/useLendingStrategy';
 
 type ServerSideProps = Omit<
   BorrowPageProps,
@@ -68,17 +66,12 @@ export default function Borrow({
   oracleInfo,
 }: ServerSideProps) {
   const config = useConfig();
-  const { data: signer } = useSigner();
 
-  const lendingStrategy = useMemo(() => {
-    return makeLendingStrategy(
-      subgraphStrategy,
-      subgraphPool,
-      oracleInfo,
-      signer!,
-      config,
-    );
-  }, [config, signer, subgraphPool, oracleInfo, subgraphStrategy]);
+  const lendingStrategy = useLendingStrategy({
+    subgraphStrategy,
+    subgraphPool,
+    oracleInfo,
+  });
 
   const pricesData = useAsyncValue(
     () =>

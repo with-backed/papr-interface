@@ -4,7 +4,6 @@ import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { configs, SupportedNetwork } from 'lib/config';
-import { makeProvider } from 'lib/contracts';
 import {
   fetchSubgraphData,
   makeLendingStrategy,
@@ -15,12 +14,13 @@ import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
 import { getVaultInfo, Vault } from 'lib/strategies/vaults';
 import { GetServerSideProps } from 'next';
-import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { VaultByIdDocument } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 import { useAccount, useSigner } from 'wagmi';
 import styles from '../strategy.module.css';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useLendingStrategy } from 'hooks/useLendingStrategy';
 
 type ServerSideProps = {
   vaultId: string;
@@ -71,29 +71,18 @@ export default function VaultPage({
 }: ServerSideProps) {
   const [vaultInfo, setVaultInfo] = useState<Vault | null>(null);
   const config = useConfig();
-  const { data: signer } = useSigner();
+  const signerOrProvider = useSignerOrProvider();
 
-  const lendingStrategy = useMemo(() => {
-    return makeLendingStrategy(
-      subgraphStrategy,
-      subgraphPool,
-      oracleInfo,
-      signer!,
-      config,
-    );
-  }, [config, signer, subgraphPool, oracleInfo, subgraphStrategy]);
-  const { replace } = useRouter();
+  const lendingStrategy = useLendingStrategy({
+    subgraphStrategy,
+    subgraphPool,
+    oracleInfo,
+  });
+
   const [{ data }] = useQuery({
     query: VaultByIdDocument,
     variables: { id: vaultId },
   });
-
-  const jsonRpcProvider = useMemo(() => {
-    return makeProvider(
-      config.jsonRpcProvider,
-      config.network as SupportedNetwork,
-    );
-  }, [config]);
 
   const { address } = useAccount();
 
@@ -106,10 +95,10 @@ export default function VaultPage({
     const i = await getVaultInfo(
       ethers.BigNumber.from(vaultId),
       lendingStrategy,
-      signer || jsonRpcProvider,
+      signerOrProvider,
     );
     setVaultInfo(i);
-  }, [jsonRpcProvider, lendingStrategy, signer, vaultId]);
+  }, [lendingStrategy, signerOrProvider, vaultId]);
 
   useEffect(() => {
     fetchVaultInfo();
@@ -118,11 +107,11 @@ export default function VaultPage({
   const debtPrice = useAsyncValue(async () => {
     const pool = await lendingStrategy.pool();
     return lendingStrategy.token0IsUnderlying
-      ? await pool.token1Price.toFixed(4)
-      : await pool.token0Price.toFixed(4);
+      ? pool.token1Price.toFixed(4)
+      : pool.token0Price.toFixed(4);
   }, [lendingStrategy]);
 
-  const collateralVaulation = useMemo(() => {
+  const collateralValuation = useMemo(() => {
     if (vaultInfo == null) {
       return '';
     }
@@ -172,13 +161,13 @@ export default function VaultPage({
           <Fieldset legend="ℹ️ Vault Info">
             <p>debt: {debtAmount}</p>
             {/* TODO should fetch underlying decimals */}
-            <p>collateral valuation {collateralVaulation}</p>
+            <p>collateral valuation {collateralValuation}</p>
             {/* Should fetch */}
             <p>max LTV: {maxLTVPercent}%</p>
             <p>
               current LTV:{' '}
               {((parseFloat(debtPrice || '0') * parseFloat(debtAmount)) /
-                parseFloat(collateralVaulation)) *
+                parseFloat(collateralValuation)) *
                 100}
               %
             </p>

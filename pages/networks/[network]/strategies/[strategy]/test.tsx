@@ -1,15 +1,12 @@
 import { TestPageContent } from 'components/Strategies/TestPageContent';
-import { useConfig } from 'hooks/useConfig';
 import { configs, SupportedNetwork } from 'lib/config';
 import {
   fetchSubgraphData,
-  makeLendingStrategy,
   SubgraphPool,
   SubgraphStrategy,
 } from 'lib/LendingStrategy';
 import { GetServerSideProps } from 'next';
-import { useMemo } from 'react';
-import { useSigner } from 'wagmi';
+import { useLendingStrategy } from 'hooks/useLendingStrategy';
 
 export type TestProps = {
   subgraphStrategy: SubgraphStrategy;
@@ -47,18 +44,11 @@ export default function InKindTest({
   subgraphPool,
   subgraphStrategy,
 }: TestProps) {
-  const config = useConfig();
-  const { data: signer } = useSigner();
-
-  const lendingStrategy = useMemo(() => {
-    return makeLendingStrategy(
-      subgraphStrategy,
-      subgraphPool,
-      {},
-      signer!,
-      config,
-    );
-  }, [config, signer, subgraphPool, subgraphStrategy]);
+  const lendingStrategy = useLendingStrategy({
+    subgraphStrategy,
+    subgraphPool,
+    oracleInfo: {},
+  });
 
   return <TestPageContent lendingStrategy={lendingStrategy} />;
 }
