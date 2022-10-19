@@ -5,20 +5,20 @@ import MintERC20 from './MintERC20';
 import MintCollateral from './MintCollateral';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { erc721Contract } from 'lib/contracts';
-import { useSigner } from 'wagmi';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 
 type TestPageContentProps = {
   lendingStrategy: LendingStrategy;
 };
 
 export function TestPageContent({ lendingStrategy }: TestPageContentProps) {
-  const { data: signer } = useSigner();
+  const signerOrProvider = useSignerOrProvider();
   const collateral = useMemo(
     () =>
       lendingStrategy.allowedCollateral.map((ac) =>
-        erc721Contract(ac.contractAddress, signer!),
+        erc721Contract(ac.contractAddress, signerOrProvider),
       ),
-    [lendingStrategy.allowedCollateral, signer],
+    [lendingStrategy.allowedCollateral, signerOrProvider],
   );
   return (
     <div className={strategyStyles.wrapper}>

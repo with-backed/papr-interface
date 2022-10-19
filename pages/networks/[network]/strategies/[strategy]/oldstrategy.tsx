@@ -6,15 +6,13 @@ import {
 } from 'components/Strategies/OldStrategyOverviewContent';
 import {
   fetchSubgraphData,
-  makeLendingStrategy,
   SubgraphPool,
   SubgraphStrategy,
 } from 'lib/LendingStrategy';
 import { useConfig } from 'hooks/useConfig';
-import { useSigner } from 'wagmi';
-import { useMemo } from 'react';
 import { strategyPricesData } from 'lib/strategies/charts';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useLendingStrategy } from 'hooks/useLendingStrategy';
 
 type ServerSideProps = Omit<
   OldStrategyPageProps,
@@ -58,17 +56,12 @@ export default function OldStrategyPage({
   subgraphPool,
 }: ServerSideProps) {
   const config = useConfig();
-  const { data: signer } = useSigner();
 
-  const lendingStrategy = useMemo(() => {
-    return makeLendingStrategy(
-      subgraphStrategy,
-      subgraphPool,
-      {},
-      signer!,
-      config,
-    );
-  }, [config, signer, subgraphPool, subgraphStrategy]);
+  const lendingStrategy = useLendingStrategy({
+    subgraphStrategy,
+    subgraphPool,
+    oracleInfo: {},
+  });
 
   const pricesData = useAsyncValue(
     () =>
