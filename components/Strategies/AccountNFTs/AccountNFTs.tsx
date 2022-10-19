@@ -7,6 +7,7 @@ import { useQuery } from 'urql';
 import { VaultsByOwnerForStrategyDocument } from 'types/generated/graphql/inKindSubgraph';
 import { getAddress } from 'ethers/lib/utils';
 import { CenterAsset } from 'components/CenterAsset';
+import { LendingStrategy } from 'lib/LendingStrategy';
 
 export type AccountNFTsProps = {
   strategy: LendingStrategy;
