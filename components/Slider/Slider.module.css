@@ -22,12 +22,12 @@
 
 .thumb {
   /*color for the thumb */
-  background: var(--greentext);
+  background-image: url('../../public/grabber.svg');
+  background-repeat: no-repeat;
   /* shape of the thumb: circle */
-  width: 8px;
   height: 46px;
   margin-top: -5px;
-  border: 2px white solid;
+  margin-left: -10px;
   border-radius: 4px;
   /* remove default outline when selected */
   outline: none;
@@ -48,7 +48,3 @@
   text-align: center;
 }
 
-.thumb:hover {
-  outline: 2px solid white;
-  border: 2px var(--greentext) solid;
-}
