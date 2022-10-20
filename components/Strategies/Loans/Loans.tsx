@@ -14,6 +14,8 @@ import {
 import { useQuery } from 'urql';
 import { Health } from '../Health';
 import styles from './Loans.module.css';
+import Link from 'next/link';
+import { useConfig } from 'hooks/useConfig';
 
 type LoansProps = {
   lendingStrategy: LendingStrategy;
@@ -120,6 +122,7 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
                 key={v.id}
                 id={v.id}
                 debt={v.debt}
+                strategyId={lendingStrategy.id}
                 decimals={lendingStrategy.underlying.decimals}
                 symbol={lendingStrategy.underlying.symbol}
                 ltv={ltv}
@@ -140,8 +143,18 @@ type VaultRowProps = {
   symbol: string;
   ltv?: number;
   maxLTV: ethers.BigNumber | null;
+  strategyId: string;
 };
-function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
+function VaultRow({
+  id,
+  debt,
+  decimals,
+  symbol,
+  ltv,
+  maxLTV,
+  strategyId,
+}: VaultRowProps) {
+  const { network } = useConfig();
   const [{ data }] = useQuery<DebtIncreasesByVaultQuery>({
     query: DebtIncreasesByVaultDocument,
     variables: { vaultId: id },
@@ -168,7 +181,12 @@ function VaultRow({ id, debt, decimals, symbol, ltv, maxLTV }: VaultRowProps) {
 
   return (
     <tr className={styles.row}>
-      <td>#{id.substring(0, 7)}</td>
+      <td>
+        <Link
+          href={`/networks/${network}/strategies/${strategyId}/vaults/${id}`}>
+          {id.substring(0, 7)}
+        </Link>
+      </td>
       <td className={styles['right-align']}>{formattedDebt}</td>
       <td className={styles['right-align']}>
         {!!createdTimestamp ? timestampDaysAgo(createdTimestamp) : '...'}
