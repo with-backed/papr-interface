@@ -144,7 +144,7 @@ export default function VaultMath({
       <MathRow
         formula="Z = Y/X"
         description="Your LTV"
-        content={`${inputtedLTV}%`}
+        content={`${formatPercent(parseFloat(inputtedLTV))}`}
         even
       />
     </div>
