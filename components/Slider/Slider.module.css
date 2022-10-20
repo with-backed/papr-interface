@@ -21,24 +21,21 @@
 }
 
 .thumb {
-  /*color for the thumb */
-  background-image: url('../../public/grabber.svg');
-  background-repeat: no-repeat;
-  /* shape of the thumb: circle */
-  height: 46px;
+  width: 8px;
   margin-top: -5px;
-  margin-left: -10px;
+  margin-left: -13px;
   border-radius: 4px;
+  height: 46px;
   /* remove default outline when selected */
   outline: none;
-  transition: outline 0.1s;
+}
+.thumb:before {
+  content: url('../../public/grabber.svg');
 }
 
 .thumb > div {
   color: var(--greentext);
   position: relative;
-  bottom: -46px;
-  left: -44px;
   width: 100px;
   transition: 300ms;
 }
