@@ -217,18 +217,6 @@ export function OpenVault({
 
   if (!maxDebt) return <></>;
 
-  console.log({
-    maxDebt: maxDebt?.toString(),
-    maxLTV,
-    chosenDebt: chosenDebt.toString(),
-    result:
-      maxDebt.isZero() || !maxLTV
-        ? '0.00'
-        : (
-            parseFloat(chosenDebt.toString()) / parseFloat(maxDebt.toString())
-          ).toFixed(2),
-  });
-
   return (
     <Fieldset legend="🏦 Set Loan Amount">
       <div className={styles.borrowComponentWrapper}>
