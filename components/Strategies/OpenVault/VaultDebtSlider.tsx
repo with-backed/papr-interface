@@ -39,6 +39,15 @@ export function VaultDebtSlider({
     currentVaultDebtNumber,
   );
 
+  // When NFTs are added/removed, set the slider to equal 50% of the max LTV.
+  useEffect(() => {
+    if (maxDebtNumber > 0) {
+      const defaultDebt = maxDebtNumber / 2;
+      setControlledSliderValue(defaultDebt);
+      handleChosenDebtChanged(defaultDebt.toString());
+    }
+  }, [handleChosenDebtChanged, maxDebtNumber]);
+
   const [indicatorLeftPixels, setIndicatorLeftPixels] = useState<string>('');
   const initIndicatorLeftPixels = useCallback(
     (val: string) => {

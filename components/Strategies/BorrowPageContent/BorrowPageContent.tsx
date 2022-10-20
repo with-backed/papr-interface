@@ -1,5 +1,5 @@
 import { StrategyPricesData } from 'lib/strategies/charts';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import strategyStyles from 'components/Strategies/Strategy.module.css';
 import { AccountNFTs } from 'components/Strategies/AccountNFTs';
 import { OpenVault } from 'components/Strategies/OpenVault';
@@ -49,6 +49,17 @@ export function BorrowPageContent({
     lendingStrategy,
     address,
   );
+
+  // pre-select all the user's compatible NFTs
+  useEffect(() => {
+    if (userCollectionNFTs.length > 0) {
+      setNFTsSelected(
+        userCollectionNFTs.map((nft) =>
+          getUniqueNFTId(nft.address, nft.tokenId),
+        ),
+      );
+    }
+  }, [userCollectionNFTs]);
 
   if (!lendingStrategy || !pricesData || vaultFetching) return <></>;
 
