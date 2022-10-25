@@ -1,0 +1,1 @@
+export { VaultPageContent } from './VaultPageContent';
