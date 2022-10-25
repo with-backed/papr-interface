@@ -3,6 +3,7 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { LoanDetails } from 'components/Strategies/Loans/LoanDetails';
 import strategyStyles from '../Strategy.module.css';
 import { Collateral } from 'components/Strategies/Collateral';
+import { Activity } from 'components/Strategies/Activity';
 
 type VaultPageContentProps = {
   lendingStrategy: LendingStrategy;
@@ -17,6 +18,7 @@ export function VaultPageContent({
     <div className={strategyStyles.wrapper}>
       <LoanDetails vaultId={vaultId} lendingStrategy={lendingStrategy} />
       <Collateral lendingStrategy={lendingStrategy} vaultId={vaultId} />
+      <Activity lendingStrategy={lendingStrategy} vaultId={vaultId} />
     </div>
   );
 }
