@@ -20,11 +20,14 @@ type ArrayElement<ArrayType extends readonly unknown[]> =
 
 type ActivityProps = {
   lendingStrategy: LendingStrategy;
+  // If scoping activity view to just a specific vault
+  // instead of the whole strategy
+  vaultId?: string;
 };
 
 const EVENT_INCREMENT = 5;
 
-export function Activity({ lendingStrategy }: ActivityProps) {
+export function Activity({ lendingStrategy, vaultId }: ActivityProps) {
   const { data: swapsData, fetching: swapsFetching } = useUniswapSwapsByPool(
     lendingStrategy.poolAddress,
   );
@@ -33,13 +36,22 @@ export function Activity({ lendingStrategy }: ActivityProps) {
     useActivityByStrategy(lendingStrategy.id);
 
   const allEvents = useMemo(() => {
-    const unsortedEvents = [
-      ...(activityData?.addCollateralEvents || []),
-      ...(activityData?.removeCollateralEvents || []),
-      ...(swapsData?.swaps || []),
-    ];
+    const unsortedEvents = vaultId
+      ? [
+          ...(activityData?.addCollateralEvents.filter(
+            (e) => e.vault.id === vaultId,
+          ) || []),
+          ...(activityData?.removeCollateralEvents.filter(
+            (e) => e.vault.id === vaultId,
+          ) || []),
+        ]
+      : [
+          ...(activityData?.addCollateralEvents || []),
+          ...(activityData?.removeCollateralEvents || []),
+          ...(swapsData?.swaps || []),
+        ];
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
-  }, [activityData, swapsData]);
+  }, [activityData, swapsData, vaultId]);
 
   const [feed, setFeed] = useState<typeof allEvents>([]);
   const [remaining, setRemaining] = useState<typeof allEvents>([]);

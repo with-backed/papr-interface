@@ -14,24 +14,33 @@ import { CenterAsset } from 'components/CenterAsset';
 
 type CollateralProps = {
   lendingStrategy: LendingStrategy;
+  // If scoping collateral view to just a specific vault
+  // instead of the whole strategy
+  vaultId?: string;
 };
 
-export function Collateral({ lendingStrategy }: CollateralProps) {
+export function Collateral({ lendingStrategy, vaultId }: CollateralProps) {
   const norm = useAsyncValue(
     () => lendingStrategy.newNorm(),
     [lendingStrategy],
   );
-  const collateral = useMemo(
-    () =>
-      lendingStrategy.vaults?.flatMap((v) =>
-        v.collateral.map((c) => ({
-          ...c,
-          debt: v.debt,
-          totalCollateralValue: v.totalCollateralValue,
-        })),
-      ),
-    [lendingStrategy],
-  );
+  const collateral = useMemo(() => {
+    if (vaultId) {
+      const vault = lendingStrategy.vaults?.find((v) => v.id === vaultId);
+      return vault?.collateral.map((c) => ({
+        ...c,
+        debt: vault.debt,
+        totalCollateralValue: vault.totalCollateralValue,
+      }));
+    }
+    return lendingStrategy.vaults?.flatMap((v) =>
+      v.collateral.map((c) => ({
+        ...c,
+        debt: v.debt,
+        totalCollateralValue: v.totalCollateralValue,
+      })),
+    );
+  }, [lendingStrategy, vaultId]);
 
   if (!collateral || collateral.length === 0) {
     return (
