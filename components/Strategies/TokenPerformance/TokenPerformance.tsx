@@ -2,7 +2,6 @@ import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { useConfig } from 'hooks/useConfig';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import {
   formatThreeFractionDigits,
@@ -15,17 +14,23 @@ import React, { useMemo } from 'react';
 
 import styles from './TokenPerformance.module.css';
 import { getTimestampNDaysAgo } from 'lib/duration';
+import { TooltipReference, useTooltipState } from 'reakit';
+import {
+  ContractAPRTooltip,
+  MarketPriceTooltip,
+  NFTCapTooltip,
+  RealizedAPRTooltip,
+  TargetMarketTooltip,
+} from 'components/Strategies/TokenPerformance/Tooltips';
 
 export type StrategySummaryProps = {
   strategies: LendingStrategy[];
   pricesData: { [key: string]: StrategyPricesData | null };
-  includeDetails: boolean;
 };
 
 export function TokenPerformance({
   strategies,
   pricesData,
-  includeDetails,
 }: StrategySummaryProps) {
   return (
     <Fieldset legend="📈 Token Performance">
@@ -66,7 +71,6 @@ export function TokenPerformance({
                 key={strategy.id}
                 pricesData={pricesData[strategy.id]}
                 strategy={strategy}
-                includeDetails={includeDetails}
               />
             ))}
           </tbody>
@@ -79,14 +83,8 @@ export function TokenPerformance({
 type SummaryEntryProps = {
   pricesData: StrategyPricesData | null;
   strategy: LendingStrategy;
-  includeDetails?: boolean;
 };
-function SummaryEntry({
-  strategy,
-  pricesData,
-  includeDetails,
-}: SummaryEntryProps) {
-  const { network } = useConfig();
+function SummaryEntry({ strategy, pricesData }: SummaryEntryProps) {
   const debtTokenSupply = useAsyncValue(
     () =>
       strategy.token0IsUnderlying
@@ -141,6 +139,12 @@ function SummaryEntry({
     return { targetOverMark, change };
   }, [markAndChange, pricesData]);
 
+  const marketPriceTooltip = useTooltipState({ placement: 'bottom-start' });
+  const targetMarketTooltip = useTooltipState({ placement: 'bottom-start' });
+  const contractAPRTooltip = useTooltipState({ placement: 'bottom-start' });
+  const realizedAPRTooltip = useTooltipState({ placement: 'bottom-start' });
+  const nftOverCapTooltip = useTooltipState({ placement: 'bottom-start' });
+
   if (!pricesData) return <></>;
 
   const debtTokenMarketCap =
@@ -153,43 +157,70 @@ function SummaryEntry({
     <tr>
       <td>
         <div>
-          <span>
-            {markAndChange ? formatTokenAmount(markAndChange.mark) : '...'}
-          </span>
-          <span
-            className={
-              (markAndChange?.change || 0) < 0
-                ? styles.negative
-                : styles.positive
-            }>
-            {markAndChange ? formatPercentChange(markAndChange.change) : '...'}
-          </span>
+          <TooltipReference {...marketPriceTooltip}>
+            <span>
+              {markAndChange ? formatTokenAmount(markAndChange.mark) : '...'}
+            </span>
+            <span
+              className={
+                (markAndChange?.change || 0) < 0
+                  ? styles.negative
+                  : styles.positive
+              }>
+              {markAndChange
+                ? formatPercentChange(markAndChange.change)
+                : '...'}
+            </span>
+          </TooltipReference>
+          <MarketPriceTooltip tooltip={marketPriceTooltip} />
         </div>
       </td>
       <td>
-        <div>
-          <span>
-            {targetOverMarketAndChange
-              ? formatThreeFractionDigits(
-                  targetOverMarketAndChange.targetOverMark,
-                )
-              : '...'}
-          </span>
-          <span
-            className={
-              (targetOverMarketAndChange?.change || 0) < 0
-                ? styles.negative
-                : styles.positive
-            }>
-            {targetOverMarketAndChange
-              ? formatPercentChange(targetOverMarketAndChange.change)
-              : '...'}
-          </span>
-        </div>
+        <TooltipReference {...targetMarketTooltip}>
+          <div>
+            <span>
+              {targetOverMarketAndChange
+                ? formatThreeFractionDigits(
+                    targetOverMarketAndChange.targetOverMark,
+                  )
+                : '...'}
+            </span>
+            <span
+              className={
+                (targetOverMarketAndChange?.change || 0) < 0
+                  ? styles.negative
+                  : styles.positive
+              }>
+              {targetOverMarketAndChange
+                ? formatPercentChange(targetOverMarketAndChange.change)
+                : '...'}
+            </span>
+          </div>
+        </TooltipReference>
+        <TargetMarketTooltip tooltip={targetMarketTooltip} />
       </td>
-      <td>{contractAPR ? formatPercent(contractAPR) : '...'}</td>
-      <td>{realizedAPR ? formatPercent(realizedAPR) : '...'}</td>
-      <td>{formatThreeFractionDigits(nftOverCap)}</td>
+      <td>
+        <TooltipReference {...contractAPRTooltip}>
+          {contractAPR ? formatPercent(contractAPR) : '...'}
+        </TooltipReference>
+        <ContractAPRTooltip tooltip={contractAPRTooltip} />
+      </td>
+      <td>
+        <TooltipReference {...realizedAPRTooltip}>
+          {realizedAPR ? formatPercent(realizedAPR) : '...'}
+        </TooltipReference>
+        <RealizedAPRTooltip tooltip={realizedAPRTooltip} />
+      </td>
+      <td>
+        <TooltipReference {...nftOverCapTooltip}>
+          {formatThreeFractionDigits(nftOverCap)}
+        </TooltipReference>
+        <NFTCapTooltip
+          tooltip={nftOverCapTooltip}
+          debtTokenMarketCap={debtTokenMarketCap}
+          nftMarketCap={strategyNFTValue}
+        />
+      </td>
     </tr>
   );
 }
