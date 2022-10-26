@@ -69,7 +69,7 @@ export function SafeTransferFromButton({
     functionName: 'safeTransferFrom',
     args: [
       address as `0x${string}`,
-      strategy.id,
+      strategy.id as `0x${string}`,
       ethers.BigNumber.from(tokenId),
       ethers.utils.defaultAbiCoder.encode(
         [OnERC721ReceivedArgsEncoderString],
