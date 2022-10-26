@@ -27,10 +27,10 @@ export async function getSignedOracleFloorPriceMessage(
   return json;
 }
 
-export async function getOraclePayloadFromReservoirObject(
+export function getOraclePayloadFromReservoirObject(
   oracleFromReservoir: ReservoirResponseData,
-): Promise<ReservoirOracleUnderwriter.OracleInfoStruct> {
-  const { v, r, s } = await ethers.utils.splitSignature(
+): ReservoirOracleUnderwriter.OracleInfoStruct {
+  const { v, r, s } = ethers.utils.splitSignature(
     oracleFromReservoir.message.signature,
   );
 

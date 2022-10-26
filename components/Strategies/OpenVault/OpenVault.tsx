@@ -187,7 +187,7 @@ export function OpenVault({
         minOut,
         sqrtPriceLimitX96: ethers.BigNumber.from(0),
         mintDebtOrProceedsTo: address!,
-        oracleInfo: await getOraclePayloadFromReservoirObject(
+        oracleInfo: getOraclePayloadFromReservoirObject(
           oracleInfo[contractAddress],
         ),
       };
@@ -211,17 +211,16 @@ export function OpenVault({
         },
       );
     } else {
-      const addCollateralArgs: AddCollateralArgsStruct[] = await Promise.all(
-        contractsAndTokenIds.map(async ([contractAddress, tokenId]) => ({
-          oracleInfo: await getOraclePayloadFromReservoirObject(
+      const addCollateralArgs: AddCollateralArgsStruct[] =
+        contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
+          oracleInfo: getOraclePayloadFromReservoirObject(
             oracleInfo[contractAddress],
           ),
           collateral: {
             addr: contractAddress,
             id: ethers.BigNumber.from(tokenId),
           },
-        })),
-      );
+        }));
 
       const lendingStrategyIFace = new ethers.utils.Interface(
         LendingStrategyABI.abi,
@@ -320,10 +319,6 @@ export function OpenVault({
     );
   }, [nftsSelected, allNFTsApproved, currentVault]);
 
-  const approveDisabled = useMemo(() => {
-    return !borrowDisabled || nftsSelected.length < 2;
-  }, [nftsSelected, borrowDisabled]);
-
   if (!maxDebt) return <></>;
 
   return (
@@ -416,16 +411,165 @@ export function OpenVault({
               strategyId={strategy.id}
               setAllNFTsApproved={setAllNFTsApproved}
             />
-            <button
-              className={styles.button}
-              onClick={borrowMore}
-              disabled={borrowDisabled}>
-              Borrow
-            </button>
+            <BorrowButton
+              address={address!}
+              debt={debtToBorrowOrRepay}
+              minOut={ethers.utils.parseUnits(
+                !!quoteForSwap ? quoteForSwap : '0',
+                strategy.underlying.decimals,
+              )}
+              nftsSelected={nftsSelected}
+              strategy={strategy}
+            />
           </div>
         )}
       </div>
     </Fieldset>
+  );
+}
+
+type BorrowButtonProps = {
+  strategy: LendingStrategy;
+  nftsSelected: string[];
+  debt: ethers.BigNumber;
+  minOut: ethers.BigNumber;
+  address: string;
+};
+
+function BorrowButton({
+  strategy,
+  nftsSelected,
+  debt,
+  minOut,
+  address,
+}: BorrowButtonProps) {
+  const safeTransferArgs = useMemo(() => {
+    if (nftsSelected.length !== 1) return [];
+    return [
+      address,
+      strategy.id,
+      ethers.BigNumber.from(deconstructFromId(nftsSelected[0])[1]),
+      ethers.utils.defaultAbiCoder.encode(
+        [OnERC721ReceivedArgsEncoderString],
+        [
+          {
+            debt,
+            minOut,
+            sqrtPriceLimitX96: ethers.BigNumber.from(0),
+            mintDebtOrProceedsTo: address,
+            oracleInfo: getOraclePayloadFromReservoirObject(
+              strategy.oracleInfo[deconstructFromId(nftsSelected[0])[0]],
+            ),
+          },
+        ],
+      ),
+    ];
+  }, [strategy, nftsSelected, debt, minOut, address]);
+  const { config: safeTransferConfig } = usePrepareContractWrite({
+    addressOrName: deconstructFromId(nftsSelected[0])[0],
+    contractInterface: erc721ABI,
+    functionName: 'safeTransferFrom',
+    args: safeTransferArgs,
+  });
+  const { data: safeTransferData, write: safeTransferWrite } = useContractWrite(
+    {
+      ...safeTransferConfig,
+      onSuccess: (data) => {
+        data.wait().then(() => console.log('safe transfer done'));
+      },
+    },
+  );
+
+  const mintAndSellDebtArgs = useMemo(() => {
+    if (nftsSelected.length < 2) return [];
+    return [debt, minOut, ethers.BigNumber.from(0), address];
+  }, [nftsSelected, debt, minOut, address]);
+  const { config: mintAndSellDebtConfig } = usePrepareContractWrite({
+    addressOrName: strategy.id,
+    contractInterface: LendingStrategyABI.abi,
+    functionName: 'mintAndSellDebt',
+    args: mintAndSellDebtArgs,
+  });
+  const { data: mintAndSellDebtData, write: mintAndSellDebtWrite } =
+    useContractWrite({
+      ...mintAndSellDebtConfig,
+      onSuccess: (data) => {
+        data.wait().then(() => console.log('mint and sell debt done'));
+      },
+    });
+
+  const multicallFunctionData = useMemo(() => {
+    const contractsAndTokenIds = nftsSelected.map((id) =>
+      deconstructFromId(id),
+    );
+
+    const addCollateralArgs: AddCollateralArgsStruct[] =
+      contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
+        oracleInfo: getOraclePayloadFromReservoirObject(
+          strategy.oracleInfo[contractAddress],
+        ),
+        collateral: {
+          addr: contractAddress,
+          id: ethers.BigNumber.from(tokenId),
+        },
+      }));
+
+    const lendingStrategyIFace = new ethers.utils.Interface(
+      LendingStrategyABI.abi,
+    );
+
+    const calldata = addCollateralArgs.map((args) =>
+      lendingStrategyIFace.encodeFunctionData(AddCollateralEncoderString, [
+        args.collateral,
+        args.oracleInfo,
+      ]),
+    );
+    const calldataWithSwap = [
+      ...calldata,
+      lendingStrategyIFace.encodeFunctionData(MintAndSwapEncoderString, [
+        debt,
+        minOut,
+        ethers.BigNumber.from(0),
+        address,
+      ]),
+    ];
+
+    return calldataWithSwap;
+  }, [nftsSelected, address, debt, minOut, strategy]);
+
+  const { config: multicallConfig } = usePrepareContractWrite({
+    addressOrName: strategy.id,
+    contractInterface: LendingStrategyABI.abi,
+    functionName: 'multicall',
+    args: [multicallFunctionData],
+  });
+  const { data: multicallData, write: multicallWrite } = useContractWrite({
+    ...multicallConfig,
+    onSuccess: (data) => {
+      data.wait().then(() => console.log('multicall done'));
+    },
+  });
+
+  const data = useMemo(() => {
+    if (nftsSelected.length === 0) return mintAndSellDebtData;
+    else if (nftsSelected.length === 1) return safeTransferData;
+    else return multicallData;
+  }, [nftsSelected, mintAndSellDebtData, safeTransferData, multicallData]);
+
+  const write = useMemo(() => {
+    if (nftsSelected.length === 0) return mintAndSellDebtWrite;
+    else if (nftsSelected.length === 1) return safeTransferWrite;
+    else return multicallWrite;
+  }, [nftsSelected, mintAndSellDebtWrite, safeTransferWrite, multicallWrite]);
+
+  return (
+    <div className={styles.button}>
+      <TransactionButton
+        onClick={write!}
+        transactionData={data}
+        text={'Borrow'}
+      />
+    </div>
   );
 }
 
