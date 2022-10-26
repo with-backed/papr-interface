@@ -92,19 +92,18 @@ export function SafeTransferFromButton({
   const { data, write } = useContractWrite({
     ...config,
     onSuccess: (data: any) => {
+      // TODO: figure out how to use node to live update the vault page
       data.wait().then(() => window.location.reload());
     },
     overrides,
   });
 
   return (
-    <div className={styles['button-container']}>
-      <TransactionButton
-        onClick={write!}
-        transactionData={data}
-        text={'Borrow'}
-      />
-    </div>
+    <TransactionButton
+      onClick={write!}
+      transactionData={data}
+      text={'Borrow'}
+    />
   );
 }
 
@@ -131,18 +130,16 @@ export function MintAndSellDebtButton({
   const { data, write } = useContractWrite({
     ...mintAndSellDebtConfig,
     onSuccess: (data: any) => {
-      data.wait().then(() => console.log('mint and sell debt done'));
+      data.wait().then(() => window.location.reload());
     },
   });
 
   return (
-    <div className={styles['button-container']}>
-      <TransactionButton
-        onClick={write!}
-        transactionData={data}
-        text={'Borrow'}
-      />
-    </div>
+    <TransactionButton
+      onClick={write!}
+      transactionData={data}
+      text={'Borrow'}
+    />
   );
 }
 
@@ -210,17 +207,15 @@ export function MutlicallButton({
   const { data, write } = useContractWrite({
     ...multicallConfig,
     onSuccess: (data: any) => {
-      data.wait().then(() => console.log('multicall done'));
+      data.wait().then(() => window.location.reload());
     },
   });
 
   return (
-    <div className={styles['button-container']}>
-      <TransactionButton
-        onClick={write!}
-        transactionData={data}
-        text={'Borrow'}
-      />
-    </div>
+    <TransactionButton
+      onClick={write!}
+      transactionData={data}
+      text={'Borrow'}
+    />
   );
 }

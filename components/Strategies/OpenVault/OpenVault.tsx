@@ -352,14 +352,6 @@ export function OpenVault({
   );
 }
 
-type BorrowButtonProps = {
-  strategy: LendingStrategy;
-  nftsSelected: string[];
-  debt: ethers.BigNumber;
-  minOut: ethers.BigNumber;
-  address: string;
-};
-
 type NFTApprovalButtonsProps = {
   nftsSelected: string[];
   collateralContracts: ERC721[];
