@@ -24,7 +24,6 @@ export function VaultPageContent({
       <Collateral lendingStrategy={lendingStrategy} vaultId={vaultId} />
       <Activity lendingStrategy={lendingStrategy} vaultId={vaultId} />
       <TokenPerformance
-        includeDetails={false}
         pricesData={{ [lendingStrategy.id]: pricesData }}
         strategies={[lendingStrategy]}
       />

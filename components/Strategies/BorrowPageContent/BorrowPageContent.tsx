@@ -68,7 +68,6 @@ export function BorrowPageContent({
       <TokenPerformance
         strategies={[lendingStrategy]}
         pricesData={{ [lendingStrategy.id]: pricesData }}
-        includeDetails
       />
       <AccountNFTs
         strategy={lendingStrategy}

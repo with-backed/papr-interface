@@ -35,7 +35,6 @@ export function StrategyOverviewContent({
         latestMarketPrice={latestMarketPrice}
       />
       <TokenPerformance
-        includeDetails={false}
         pricesData={{ [lendingStrategy.id]: pricesData }}
         strategies={[lendingStrategy]}
       />
