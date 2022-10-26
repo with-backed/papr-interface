@@ -84,7 +84,7 @@ export function SafeTransferFromButton({
             ),
           },
         ],
-      ),
+      ) as `0x${string}`,
     ],
     overrides,
   });
