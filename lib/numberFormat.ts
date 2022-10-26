@@ -37,3 +37,17 @@ const THREE_FRACTION_DIGIT_FORMATTER = new Intl.NumberFormat(LOCALE, {
 export function formatThreeFractionDigits(n: number) {
   return THREE_FRACTION_DIGIT_FORMATTER.format(n);
 }
+
+const PERCENT_CHANGE_FORMATTER = new Intl.NumberFormat(LOCALE, {
+  style: 'percent',
+  maximumFractionDigits: 2,
+  signDisplay: 'always',
+});
+/**
+ * Formats a number representing a percent change consistent with our design.
+ * @param ratio e.g.: `0.34`, `-0.01`, `-1.5532`
+ * @returns ratio as percentage string, e.g.: `+34%`, `-1%`, `-155.32%`
+ */
+export function formatPercentChange(ratio: number) {
+  return PERCENT_CHANGE_FORMATTER.format(ratio);
+}

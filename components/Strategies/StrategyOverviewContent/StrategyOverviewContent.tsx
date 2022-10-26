@@ -5,7 +5,7 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { Collateral } from 'components/Strategies/Collateral';
 import { Activity } from 'components/Strategies/Activity';
 import { Loans } from 'components/Strategies/Loans';
-import StrategySummary from 'components/StrategySummary/StrategySummary';
+import { TokenPerformance } from 'components/Strategies/TokenPerformance';
 import dynamic from 'next/dynamic';
 import { YourPositions } from 'components/Strategies/YourPositions';
 
@@ -34,9 +34,8 @@ export function StrategyOverviewContent({
         lendingStrategy={lendingStrategy}
         latestMarketPrice={latestMarketPrice}
       />
-      <StrategySummary
+      <TokenPerformance
         includeDetails={false}
-        legend="📈 Token Performance"
         pricesData={{ [lendingStrategy.id]: pricesData }}
         strategies={[lendingStrategy]}
       />

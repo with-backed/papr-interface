@@ -1,0 +1,36 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  color: var(--greentext);
+  text-transform: uppercase;
+  font-size: 12px;
+  font-family: var(--sans);
+  letter-spacing: 0.12rem;
+  text-align: center;
+  font-weight: inherit;
+}
+
+.table td {
+  text-align: center;
+}
+
+.table td div {
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.table tbody tr:nth-child(odd) {
+  background-color: white;
+}
+
+.positive {
+  color: var(--greentext);
+}
+
+.negative {
+  color: var(--highlight-alert-100);
+}
