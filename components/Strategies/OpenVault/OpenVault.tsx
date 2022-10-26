@@ -6,7 +6,6 @@ import {
   deconstructFromId,
 } from 'lib/strategies';
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import LendingStrategyABI from 'abis/Strategy.json';
 import {
   ILendingStrategy,
   ReservoirOracleUnderwriter,
@@ -26,7 +25,6 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { VaultDebtSlider } from './VaultDebtSlider';
 import { VaultsByOwnerForStrategyQuery } from 'types/generated/graphql/inKindSubgraph';
-import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { Button, TransactionButton } from 'components/Button';
 import { ERC721 } from 'types/generated/abis';
 import {
@@ -303,48 +301,50 @@ export function OpenVault({
             className={`${styles.approveAndBorrowButtons} ${
               !showMath && styles.noDisplay
             }`}>
-            <NFTApprovalButtons
-              nftsSelected={nftsSelected}
-              collateralContracts={strategy.collateralContracts}
-              strategyId={strategy.id}
-              setAllNFTsApproved={setAllNFTsApproved}
-            />
-            {nftsSelected.length === 0 && (
-              <MintAndSellDebtButton
-                address={address!}
-                debt={debtToBorrowOrRepay}
-                minOut={ethers.utils.parseUnits(
-                  !!quoteForSwap ? quoteForSwap : '0',
-                  strategy.underlying.decimals,
-                )}
-                strategy={strategy}
-              />
-            )}
-            {nftsSelected.length === 1 && (
-              <SafeTransferFromButton
-                collateralAddress={deconstructFromId(nftsSelected[0])[0]}
-                tokenId={deconstructFromId(nftsSelected[0])[1]}
-                address={address!}
-                debt={debtToBorrowOrRepay}
-                minOut={ethers.utils.parseUnits(
-                  !!quoteForSwap ? quoteForSwap : '0',
-                  strategy.underlying.decimals,
-                )}
-                strategy={strategy}
-              />
-            )}
-            {nftsSelected.length > 1 && (
-              <MutlicallButton
+            <div className={styles['button-container']}>
+              <NFTApprovalButtons
                 nftsSelected={nftsSelected}
-                address={address!}
-                debt={debtToBorrowOrRepay}
-                minOut={ethers.utils.parseUnits(
-                  !!quoteForSwap ? quoteForSwap : '0',
-                  strategy.underlying.decimals,
-                )}
-                strategy={strategy}
+                collateralContracts={strategy.collateralContracts}
+                strategyId={strategy.id}
+                setAllNFTsApproved={setAllNFTsApproved}
               />
-            )}
+              {nftsSelected.length === 0 && (
+                <MintAndSellDebtButton
+                  address={address!}
+                  debt={debtToBorrowOrRepay}
+                  minOut={ethers.utils.parseUnits(
+                    !!quoteForSwap ? quoteForSwap : '0',
+                    strategy.underlying.decimals,
+                  )}
+                  strategy={strategy}
+                />
+              )}
+              {nftsSelected.length === 1 && (
+                <SafeTransferFromButton
+                  collateralAddress={deconstructFromId(nftsSelected[0])[0]}
+                  tokenId={deconstructFromId(nftsSelected[0])[1]}
+                  address={address!}
+                  debt={debtToBorrowOrRepay}
+                  minOut={ethers.utils.parseUnits(
+                    !!quoteForSwap ? quoteForSwap : '0',
+                    strategy.underlying.decimals,
+                  )}
+                  strategy={strategy}
+                />
+              )}
+              {nftsSelected.length > 1 && (
+                <MutlicallButton
+                  nftsSelected={nftsSelected}
+                  address={address!}
+                  debt={debtToBorrowOrRepay}
+                  minOut={ethers.utils.parseUnits(
+                    !!quoteForSwap ? quoteForSwap : '0',
+                    strategy.underlying.decimals,
+                  )}
+                  strategy={strategy}
+                />
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -419,7 +419,7 @@ function NFTApprovalButtons({
   }, [approvalStatuses, setAllNFTsApproved]);
 
   return (
-    <div className={styles['button-container']}>
+    <>
       {contracts.map((c) => (
         <ApproveNFTButton
           key={c.address}
@@ -429,7 +429,7 @@ function NFTApprovalButtons({
           setApproved={setApproved}
         />
       ))}
-    </div>
+    </>
   );
 }
 
@@ -451,14 +451,14 @@ function ApproveNFTButton({
     [collateralContract],
   );
   const { config } = usePrepareContractWrite({
-    addressOrName: collateralContract.address,
-    contractInterface: erc721ABI,
+    address: collateralContract.address,
+    abi: erc721ABI,
     functionName: 'setApprovalForAll',
     args: [strategyId, true],
   });
   const { data, write } = useContractWrite({
     ...config,
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       data.wait().then(() => setApproved(collateralContract.address));
     },
   });

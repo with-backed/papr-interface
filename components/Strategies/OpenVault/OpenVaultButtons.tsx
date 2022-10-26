@@ -5,13 +5,13 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { erc721ABI, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import LendingStrategyABI from 'abis/Strategy.json';
-import ERC721ABI from 'abis/ERC721.json';
 import {
   ILendingStrategy,
   ReservoirOracleUnderwriter,
 } from 'types/generated/abis/Strategy';
 import { useMemo } from 'react';
 import { deconstructFromId } from 'lib/strategies';
+import styles from './OpenVault.module.css';
 
 type SafeTransferFromButtonProps = {
   strategy: LendingStrategy;
@@ -63,10 +63,9 @@ export function SafeTransferFromButton({
   minOut,
   address,
 }: SafeTransferFromButtonProps) {
-  const { data, write } = useContractWrite({
-    mode: 'recklesslyUnprepared',
-    addressOrName: getAddress(collateralAddress),
-    contractInterface: erc721ABI,
+  const { config } = usePrepareContractWrite({
+    address: getAddress(collateralAddress),
+    abi: erc721ABI,
     functionName: 'safeTransferFrom',
     args: [
       address,
@@ -87,18 +86,25 @@ export function SafeTransferFromButton({
         ],
       ),
     ],
-    onSuccess: (data) => {
-      data.wait().then(() => console.log('safe transfer done'));
+    overrides,
+  });
+
+  const { data, write } = useContractWrite({
+    ...config,
+    onSuccess: (data: any) => {
+      data.wait().then(() => window.location.reload());
     },
     overrides,
   });
 
   return (
-    <TransactionButton
-      onClick={write!}
-      transactionData={data}
-      text={'Borrow'}
-    />
+    <div className={styles['button-container']}>
+      <TransactionButton
+        onClick={write!}
+        transactionData={data}
+        text={'Borrow'}
+      />
+    </div>
   );
 }
 
@@ -116,25 +122,27 @@ export function MintAndSellDebtButton({
   address,
 }: MintAndSellDebtButtonProps) {
   const { config: mintAndSellDebtConfig } = usePrepareContractWrite({
-    addressOrName: strategy.id,
-    contractInterface: LendingStrategyABI.abi,
+    address: strategy.id,
+    abi: LendingStrategyABI.abi,
     functionName: 'mintAndSellDebt',
     args: [debt, minOut, ethers.BigNumber.from(0), address],
     overrides,
   });
   const { data, write } = useContractWrite({
     ...mintAndSellDebtConfig,
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       data.wait().then(() => console.log('mint and sell debt done'));
     },
   });
 
   return (
-    <TransactionButton
-      onClick={write!}
-      transactionData={data}
-      text={'Borrow'}
-    />
+    <div className={styles['button-container']}>
+      <TransactionButton
+        onClick={write!}
+        transactionData={data}
+        text={'Borrow'}
+      />
+    </div>
   );
 }
 
@@ -193,24 +201,26 @@ export function MutlicallButton({
   }, [nftsSelected, address, debt, minOut, strategy]);
 
   const { config: multicallConfig } = usePrepareContractWrite({
-    addressOrName: strategy.id,
-    contractInterface: LendingStrategyABI.abi,
+    address: strategy.id,
+    abi: LendingStrategyABI.abi,
     functionName: 'multicall',
     args: [multicallFunctionData],
     overrides,
   });
   const { data, write } = useContractWrite({
     ...multicallConfig,
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       data.wait().then(() => console.log('multicall done'));
     },
   });
 
   return (
-    <TransactionButton
-      onClick={write!}
-      transactionData={data}
-      text={'Borrow'}
-    />
+    <div className={styles['button-container']}>
+      <TransactionButton
+        onClick={write!}
+        transactionData={data}
+        text={'Borrow'}
+      />
+    </div>
   );
 }
