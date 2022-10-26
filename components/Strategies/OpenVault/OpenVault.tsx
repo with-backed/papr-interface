@@ -446,7 +446,7 @@ function ApproveNFTButton({
     address: collateralContract.address,
     abi: erc721ABI,
     functionName: 'setApprovalForAll',
-    args: [strategyId, true],
+    args: [strategyId as '`0x${string}`', true],
   });
   const { data, write } = useContractWrite({
     ...config,
