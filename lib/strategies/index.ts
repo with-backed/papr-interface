@@ -229,7 +229,6 @@ export const getUniqueNFTId = (address: string, tokenId: string): string =>
   `${getAddress(address)}-${tokenId}`;
 
 export const deconstructFromId = (id: string): [string, string] => {
-  if (!id) return ['0x0', '0'];
   const indexOfDash = id.indexOf('-');
   const address = id.substring(0, indexOfDash);
   const tokenId = id.substring(indexOfDash + 1);
