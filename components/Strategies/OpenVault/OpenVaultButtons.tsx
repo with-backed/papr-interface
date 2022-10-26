@@ -68,7 +68,7 @@ export function SafeTransferFromButton({
     abi: erc721ABI,
     functionName: 'safeTransferFrom',
     args: [
-      address as `0x${string}`,
+      address,
       strategy.id,
       ethers.BigNumber.from(tokenId),
       ethers.utils.defaultAbiCoder.encode(
@@ -124,7 +124,7 @@ export function MintAndSellDebtButton({
     address: strategy.id,
     abi: LendingStrategyABI.abi,
     functionName: 'mintAndSellDebt',
-    args: [debt, minOut, ethers.BigNumber.from(0), address as `0x${string}`],
+    args: [debt, minOut, ethers.BigNumber.from(0), address],
     overrides,
   });
   const { data, write } = useContractWrite({
