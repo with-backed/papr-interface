@@ -130,7 +130,7 @@ export function MintAndSellDebtButton({
     onSuccess: (data: any) => {
       data.wait().then(() => window.location.reload());
     },
-  });
+  } as any);
 
   return (
     <TransactionButton
@@ -207,7 +207,7 @@ export function MutlicallButton({
     onSuccess: (data: any) => {
       data.wait().then(() => window.location.reload());
     },
-  });
+  } as any);
 
   return (
     <TransactionButton
