@@ -27,10 +27,10 @@ export function YourPositions({
   const { address } = useAccount();
   const { data: rawPaprMEMEBalance, isFetching: balanceFetching } =
     useContractRead({
-      addressOrName: lendingStrategy.debtToken.id,
-      contractInterface: erc20ABI,
+      address: lendingStrategy.debtToken.id,
+      abi: erc20ABI,
       functionName: 'balanceOf',
-      args: [address],
+      args: [address as `0x${string}`],
     });
 
   const paprMemeBalance = useMemo(
