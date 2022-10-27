@@ -11,7 +11,6 @@ import {
 } from 'types/generated/abis/Strategy';
 import { useMemo } from 'react';
 import { deconstructFromId } from 'lib/strategies';
-import styles from './OpenVault.module.css';
 
 type SafeTransferFromButtonProps = {
   strategy: LendingStrategy;
@@ -23,7 +22,7 @@ type SafeTransferFromButtonProps = {
 };
 
 const overrides = {
-  gasLimit: ethers.utils.hexValue(3000000),
+  gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
 };
 
 const AddCollateralEncoderString =
@@ -95,7 +94,6 @@ export function SafeTransferFromButton({
       // TODO: figure out how to use node to live update the vault page
       data.wait().then(() => window.location.reload());
     },
-    overrides,
   });
 
   return (
