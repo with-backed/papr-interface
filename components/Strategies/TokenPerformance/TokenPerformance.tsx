@@ -138,7 +138,7 @@ function SummaryEntry({ strategy, pricesData }: SummaryEntryProps) {
     const markADayAgo = getValueDaysAgo(markValues, 1).value;
 
     const targetOverMark = norm / mark;
-    const targetOverMarkADayAgo = normADayAgo - markADayAgo;
+    const targetOverMarkADayAgo = normADayAgo / markADayAgo;
     const change = percentChange(targetOverMarkADayAgo, targetOverMark);
     return { targetOverMark, change };
   }, [markAndChange, pricesData]);
