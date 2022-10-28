@@ -1,22 +1,20 @@
 import { Fieldset } from 'components/Fieldset';
-import { StrategyPricesData } from 'lib/strategies/charts';
-import React, { useEffect, useRef } from 'react';
+import { StrategyPricesData, TimeSeriesValue } from 'lib/strategies/charts';
+import React, { useEffect, useMemo, useRef } from 'react';
 import styles from './Charts.module.css';
 import {
   ChartOptions,
   createChart,
   DeepPartial,
   LineSeriesOptions,
-  LineStyle,
   PriceScaleOptions,
   TimeScaleOptions,
-  UTCTimestamp,
 } from 'lightweight-charts';
-import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
+import { percentChangeOverDuration, percentChange } from 'lib/tokenPerformance';
+import { formatPercentChange } from 'lib/numberFormat';
 
-const INDEX_COLOR = '#000000';
-const NORM_COLOR = '#007155';
-const MARK_COLOR = '#0000ee';
+const APR_COLOR = '#0000ee';
+const PRICE_COLOR = '#FF659C';
 
 type ChartsProps = {
   pricesData: StrategyPricesData | null;
@@ -31,166 +29,114 @@ export function Charts({ pricesData }: ChartsProps) {
 
   return (
     <Fieldset legend="💸 Performance">
-      <Legend />
-      <h3 className={styles.header}>Price in USDC</h3>
-      <PriceInUSDC pricesData={pricesData} />
-      <h3 className={styles.header}>Rate of Growth</h3>
       <RateOfGrowth pricesData={pricesData} />
     </Fieldset>
   );
 }
 
-function Legend() {
-  return (
-    <div className={styles.legend}>
-      <LegendItem title={'target'} kind={'index'} />
-      <LegendItem title={'c_pAPR'} kind={'norm'} />
-      <LegendItem title={'pAPR'} kind={'mark'} />
-    </div>
-  );
-}
-
-function LegendItem({ title, kind }: { title: string; kind: string }) {
-  return (
-    <div className={styles['legend-item']}>
-      <div className={styles[`legend-${kind}`]} />
-      <span>{title}</span>
-    </div>
-  );
-}
-
-const BASE_CHART_OPTIONS: DeepPartial<ChartOptions> = {
-  height: 360,
-  grid: { horzLines: { visible: false } },
-  layout: {
-    textColor: '#ffffff',
-    fontFamily: "'GT Maru Regular', Helvetica, sans-serif",
-    fontSize: 12,
-  },
-};
-const BASE_PRICE_SCALE_OPTIONS: DeepPartial<PriceScaleOptions> = {
-  drawTicks: false,
-  borderVisible: false,
-};
 const BASE_TIME_SCALE_OPTIONS: DeepPartial<TimeScaleOptions> = {
-  visible: false,
+  visible: true,
+  tickMarkFormatter: () => '',
 };
 const BASE_LINE_SERIES_OPTIONS: DeepPartial<LineSeriesOptions> = {
   priceLineVisible: false,
-  lineWidth: 3,
+  lineWidth: 2,
+};
+const BASE_PRICE_SCALE_OPTIONS: DeepPartial<PriceScaleOptions> = {
+  borderVisible: false,
+  visible: true,
+};
+const BASE_CHART_OPTIONS: DeepPartial<ChartOptions> = {
+  height: 360,
+  width: 500,
+  grid: { horzLines: { visible: false }, vertLines: { visible: false } },
+  rightPriceScale: {
+    ...BASE_PRICE_SCALE_OPTIONS,
+  },
+  leftPriceScale: {
+    ...BASE_PRICE_SCALE_OPTIONS,
+  },
+  layout: {
+    textColor: 'black',
+    fontFamily: "'GT Maru Regular', Helvetica, sans-serif",
+    fontSize: 12,
+  },
 };
 
 type RateOfGrowthProps = {
   pricesData: StrategyPricesData;
 };
-function RateOfGrowth({
-  pricesData: { normalizationDPRValues, indexDPRValues, markDPRValues },
-}: RateOfGrowthProps) {
+function RateOfGrowth({ pricesData: { markValues } }: RateOfGrowthProps) {
   const chartRef = useRef<HTMLDivElement>(null);
+
+  const contractAPRs: TimeSeriesValue[] = useMemo(
+    () =>
+      markValues.slice(1).map((curr, i) => {
+        const prev = markValues[i];
+        const change = percentChange(prev.value, curr.value);
+        return { value: change, time: curr.time };
+      }),
+    [markValues],
+  );
+
+  const priceChange24h = useMemo(
+    () => percentChangeOverDuration(markValues, 1),
+    [markValues],
+  );
+  const contractAPRChange24h = useMemo(
+    () => percentChangeOverDuration(contractAPRs, 1),
+    [contractAPRs],
+  );
 
   useEffect(() => {
     if (chartRef.current) {
       const chart = createChart(chartRef.current, {
         ...BASE_CHART_OPTIONS,
-        localization: {
-          priceFormatter: (value: string) => formatPercent(parseFloat(value)),
-        },
       });
-      chart.priceScale().applyOptions({ ...BASE_PRICE_SCALE_OPTIONS });
       chart.timeScale().applyOptions({ ...BASE_TIME_SCALE_OPTIONS });
-      const indexSeries = chart.addLineSeries({
-        ...BASE_LINE_SERIES_OPTIONS,
-        lineStyle: LineStyle.SparseDotted,
-        color: INDEX_COLOR,
-      });
-      indexSeries.setData(indexDPRValues);
 
-      const markSeries = chart.addLineSeries({
+      const contractAPRSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
-        color: MARK_COLOR,
+        color: APR_COLOR,
+        priceFormat: { type: 'percent' },
       });
-      markSeries.setData(markDPRValues);
+      contractAPRSeries.setData(contractAPRs);
 
-      const normSeries = chart.addLineSeries({
+      const priceSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
-        color: NORM_COLOR,
+        color: PRICE_COLOR,
+        priceFormat: { type: 'price' },
+        priceScaleId: 'left',
       });
-      normSeries.setData(normalizationDPRValues);
+      priceSeries.setData(markValues);
 
       chart.timeScale().fitContent();
 
       return () => chart.remove();
     }
-  }, [indexDPRValues, markDPRValues, normalizationDPRValues]);
+  }, [contractAPRs, markValues]);
 
-  return <div ref={chartRef} />;
-}
-
-type PriceInUSDCProps = {
-  pricesData: StrategyPricesData;
-};
-function PriceInUSDC({
-  pricesData: {
-    normalizationDPRValues,
-    normalizationValues,
-    indexDPRValues,
-    index,
-    markDPRValues,
-    markValues,
-  },
-}: PriceInUSDCProps) {
-  const chartRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (chartRef.current) {
-      const chart = createChart(chartRef.current, {
-        ...BASE_CHART_OPTIONS,
-        localization: {
-          priceFormatter: (value: string) =>
-            formatTokenAmount(parseFloat(value)) + ' USDC',
-        },
-      });
-      chart.priceScale().applyOptions({ ...BASE_PRICE_SCALE_OPTIONS });
-      chart.timeScale().applyOptions({ ...BASE_TIME_SCALE_OPTIONS });
-      const indexSeries = chart.addLineSeries({
-        ...BASE_LINE_SERIES_OPTIONS,
-        lineStyle: LineStyle.SparseDotted,
-        color: INDEX_COLOR,
-      });
-
-      indexSeries.setData(
-        indexDPRValues.map(({ time }) => ({
-          time,
-          value: index,
-        })),
-      );
-
-      const markSeries = chart.addLineSeries({
-        ...BASE_LINE_SERIES_OPTIONS,
-        color: MARK_COLOR,
-      });
-      markSeries.setData(markValues);
-
-      const normSeries = chart.addLineSeries({
-        ...BASE_LINE_SERIES_OPTIONS,
-        color: NORM_COLOR,
-      });
-      normSeries.setData(normalizationValues);
-
-      chart.timeScale().fitContent();
-
-      return () => chart.remove();
-    }
-  }, [
-    index,
-    indexDPRValues,
-    markDPRValues,
-    markValues,
-    normalizationDPRValues,
-    normalizationValues,
-  ]);
-
-  return <div ref={chartRef} />;
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.label}>
+        <span className={styles['price-label']}>papr price in USDC</span>{' '}
+        <span
+          className={priceChange24h < 0 ? styles.negative : styles.positive}>
+          {formatPercentChange(priceChange24h)}
+        </span>
+      </div>
+      <div className={styles.chart} ref={chartRef} />
+      <div className={styles.label}>
+        <span className={styles['apr-label']}>Contract APR</span>{' '}
+        <span
+          className={
+            contractAPRChange24h < 0 ? styles.negative : styles.positive
+          }>
+          {formatPercentChange(contractAPRChange24h)}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export default Charts;

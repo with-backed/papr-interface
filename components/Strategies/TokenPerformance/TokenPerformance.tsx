@@ -9,11 +9,10 @@ import {
   formatPercent,
   formatPercentChange,
 } from 'lib/numberFormat';
-import { StrategyPricesData, TimeSeriesValue } from 'lib/strategies/charts';
+import { StrategyPricesData } from 'lib/strategies/charts';
 import React, { useMemo } from 'react';
 
 import styles from './TokenPerformance.module.css';
-import { getTimestampNDaysAgo } from 'lib/duration';
 import { TooltipReference, useTooltipState } from 'reakit';
 import {
   ContractAPRTooltip,
@@ -22,6 +21,11 @@ import {
   RealizedAPRTooltip,
   TargetMarketTooltip,
 } from 'components/Strategies/TokenPerformance/Tooltips';
+import {
+  percentChangeOverDuration,
+  getValueDaysAgo,
+  percentChange,
+} from 'lib/tokenPerformance';
 
 export type StrategySummaryProps = {
   strategies: LendingStrategy[];
@@ -105,13 +109,13 @@ function SummaryEntry({ strategy, pricesData }: SummaryEntryProps) {
     if (!pricesData) {
       return null;
     }
-    return deriveAPR(pricesData.normalizationValues, 1);
+    return percentChangeOverDuration(pricesData.normalizationValues, 1);
   }, [pricesData]);
   const realizedAPR = useMemo(() => {
     if (!pricesData) {
       return null;
     }
-    return deriveAPR(pricesData.normalizationValues, 30);
+    return percentChangeOverDuration(pricesData.normalizationValues, 30);
   }, [pricesData]);
   const markAndChange = useMemo(() => {
     if (!pricesData) {
@@ -223,29 +227,4 @@ function SummaryEntry({ strategy, pricesData }: SummaryEntryProps) {
       </td>
     </tr>
   );
-}
-
-function percentChange(v1: number, v2: number) {
-  return (v2 - v1) / v1;
-}
-
-function getValueDaysAgo(values: TimeSeriesValue[], daysAgo: number) {
-  const pastTimestamp = getTimestampNDaysAgo(daysAgo);
-  return values.reduce((prev, curr) => {
-    const prevDiff = Math.abs(pastTimestamp - prev.time);
-    const currDiff = Math.abs(pastTimestamp - curr.time);
-    if (currDiff < prevDiff) {
-      return curr;
-    }
-    return prev;
-  }, values[0]);
-}
-
-function deriveAPR(
-  normalizationValues: TimeSeriesValue[],
-  durationDays: number,
-) {
-  const v1 = getValueDaysAgo(normalizationValues, durationDays);
-  const v2 = normalizationValues[normalizationValues.length - 1];
-  return percentChange(v1.value, v2.value);
 }

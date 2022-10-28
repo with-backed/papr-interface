@@ -41,7 +41,7 @@ export function formatThreeFractionDigits(n: number) {
 const PERCENT_CHANGE_FORMATTER = new Intl.NumberFormat(LOCALE, {
   style: 'percent',
   maximumFractionDigits: 2,
-  signDisplay: 'always',
+  signDisplay: 'exceptZero',
 });
 /**
  * Formats a number representing a percent change consistent with our design.

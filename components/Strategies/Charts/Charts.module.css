@@ -1,36 +1,30 @@
-.header {
+.chart {
+  margin: 0 16px;
+}
+
+.wrapper {
+  display: flex;
+}
+
+.label {
+  writing-mode: vertical-lr;
+  text-orientation: sideways;
+  transform: rotate(180deg);
+  text-align: center;
+}
+
+.price-label {
+  color: #FF659C;
+}
+
+.apr-label {
+  color: #0000ee;
+}
+
+.positive {
   color: var(--greentext);
 }
 
-.chart-label > tspan {
-  fill: var(--greentext);
-  font-family: var(--sans) !important;
-}
-
-.legend-item {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-}
-
-.legend-square {
-  height: 15px;
-  width: 15px;
-}
-.legend-index {
-  composes: legend-square;
-  background-color: #000000;
-}
-.legend-mark {
-  composes: legend-square;
-  background-color: #0000ee;
-}
-.legend-norm {
-  composes: legend-square;
-  background-color: #007155;
-}
-
-.legend {
-  display: flex;
-  gap: 15px;
+.negative {
+  color: var(--highlight-alert-100);
 }
