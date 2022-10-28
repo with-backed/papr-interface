@@ -133,30 +133,6 @@ export function OpenVault({
     }
   }, [strategy, address]);
 
-  const approveUnderlying = useCallback(async () => {
-    const connectedToken = strategy.token0IsUnderlying
-      ? strategy.token0
-      : strategy.token1;
-    connectedToken
-      .approve(strategy.id, ethers.constants.MaxInt256)
-      .then(() => setUnderlyingApproved(true));
-  }, [strategy]);
-
-  const repay = useCallback(async () => {
-    if (!currentVault) return;
-
-    await strategy.buyAndReduceDebt(
-      currentVault.id,
-      ethers.utils.parseUnits(quoteForSwap, strategy.underlying.decimals),
-      chosenDebt,
-      ethers.BigNumber.from(0),
-      address!,
-      {
-        gasLimit: ethers.utils.hexValue(3000000),
-      },
-    );
-  }, [currentVault, strategy, address, chosenDebt, quoteForSwap]);
-
   const handleChosenDebtChanged = useCallback(
     async (value: string) => {
       if (!maxDebt) return;
