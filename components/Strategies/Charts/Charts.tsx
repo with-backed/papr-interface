@@ -66,17 +66,19 @@ const BASE_CHART_OPTIONS: DeepPartial<ChartOptions> = {
 type RateOfGrowthProps = {
   pricesData: StrategyPricesData;
 };
-function RateOfGrowth({ pricesData: { markValues } }: RateOfGrowthProps) {
+function RateOfGrowth({
+  pricesData: { markValues, normalizationValues },
+}: RateOfGrowthProps) {
   const chartRef = useRef<HTMLDivElement>(null);
 
   const contractAPRs: TimeSeriesValue[] = useMemo(
     () =>
-      markValues.slice(1).map((curr, i) => {
-        const prev = markValues[i];
+      normalizationValues.slice(1).map((curr, i) => {
+        const prev = normalizationValues[i];
         const change = percentChange(prev.value, curr.value);
         return { value: change, time: curr.time };
       }),
-    [markValues],
+    [normalizationValues],
   );
 
   const priceChange24h = useMemo(
