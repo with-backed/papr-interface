@@ -243,14 +243,14 @@ export function RepayButton({
       address as `0x${string}`,
     ],
     overrides,
-  } as any);
+  });
 
   const { data, write } = useContractWrite({
     ...config,
     onSuccess: (data: any) => {
       data.wait().then(() => window.location.reload());
     },
-  });
+  } as any);
 
   return (
     <TransactionButton onClick={write!} transactionData={data} text={'Repay'} />
