@@ -217,3 +217,42 @@ export function MutlicallButton({
     />
   );
 }
+
+type RepayButtonProps = {
+  strategy: LendingStrategy;
+  underlyingAmount: ethers.BigNumber;
+  minOut: ethers.BigNumber;
+  address: string;
+};
+
+export function RepayButton({
+  strategy,
+  underlyingAmount,
+  minOut,
+  address,
+}: RepayButtonProps) {
+  const { config } = usePrepareContractWrite({
+    address: strategy.id,
+    abi: LendingStrategyABI.abi,
+    functionName: 'buyAndReduceDebt',
+    args: [
+      address as `0x${string}`,
+      underlyingAmount,
+      minOut,
+      ethers.BigNumber.from(0),
+      address as `0x${string}`,
+    ],
+    overrides,
+  });
+
+  const { data, write } = useContractWrite({
+    ...config,
+    onSuccess: (data: any) => {
+      data.wait().then(() => window.location.reload());
+    },
+  });
+
+  return (
+    <TransactionButton onClick={write!} transactionData={data} text={'Repay'} />
+  );
+}

@@ -11,6 +11,7 @@ import {
   ReservoirOracleUnderwriter,
 } from 'types/generated/abis/Strategy';
 import {
+  erc20ABI,
   erc721ABI,
   useAccount,
   useContractWrite,
@@ -30,6 +31,7 @@ import { ERC721 } from 'types/generated/abis';
 import {
   MintAndSellDebtButton,
   MutlicallButton,
+  RepayButton,
   SafeTransferFromButton,
 } from './OpenVaultButtons';
 
@@ -265,15 +267,23 @@ export function OpenVault({
           )}
 
           {!isBorrowing && (
-            <div className={styles.approveAndBorrowButtons}>
+            <div className={styles['button-container']}>
               {!underlyingApproved && (
-                <button className={styles.button} onClick={approveUnderlying}>
-                  Approve {strategy.underlying.symbol}
-                </button>
+                <ApproveUnderlyingButton
+                  strategy={strategy}
+                  setUnderlyingApproved={setUnderlyingApproved}
+                  underlyingApproved={underlyingApproved}
+                />
               )}
-              <button className={styles.button} onClick={repay}>
-                Repay
-              </button>
+              <RepayButton
+                address={address!}
+                minOut={ethers.utils.parseUnits(
+                  !!quoteForSwap ? quoteForSwap : '0',
+                  strategy.underlying.decimals,
+                )}
+                underlyingAmount={chosenDebt}
+                strategy={strategy}
+              />
             </div>
           )}
         </div>
@@ -422,6 +432,44 @@ function NFTApprovalButtons({
         />
       ))}
     </>
+  );
+}
+
+type ApproveUnderlyingButtonProps = {
+  strategy: LendingStrategy;
+  setUnderlyingApproved: (val: boolean) => void;
+  underlyingApproved: boolean;
+};
+
+export function ApproveUnderlyingButton({
+  strategy,
+  setUnderlyingApproved,
+  underlyingApproved,
+}: ApproveUnderlyingButtonProps) {
+  const underlying = useMemo(() => {
+    return strategy.token0IsUnderlying ? strategy.token0 : strategy.token1;
+  }, [strategy]);
+  const symbol = useAsyncValue(() => underlying.symbol(), [underlying]);
+  const { config } = usePrepareContractWrite({
+    address: underlying.address,
+    abi: erc20ABI,
+    functionName: 'approve',
+    args: [strategy.id as `0x${string}`, ethers.constants.MaxInt256],
+  });
+  const { data, write } = useContractWrite({
+    ...config,
+    onSuccess: (data: any) => {
+      data.wait().then(() => setUnderlyingApproved(true));
+    },
+  });
+
+  return (
+    <TransactionButton
+      onClick={write!}
+      transactionData={data}
+      text={`Approve ${symbol}`}
+      completed={underlyingApproved}
+    />
   );
 }
 
