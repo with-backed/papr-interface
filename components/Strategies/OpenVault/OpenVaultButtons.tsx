@@ -243,7 +243,7 @@ export function RepayButton({
       address as `0x${string}`,
     ],
     overrides,
-  });
+  } as any);
 
   const { data, write } = useContractWrite({
     ...config,
