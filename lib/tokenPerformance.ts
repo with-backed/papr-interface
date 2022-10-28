@@ -11,7 +11,7 @@ export function percentChange(v1: number, v2: number) {
  * @param haystack
  * @param needle
  */
-export function findClosestIndex(haystack: number[], needle: number) {
+export function findIndexOfClosest(haystack: number[], needle: number) {
   // binary search to find the lowest index where this value would be inserted
   // in a sorted list
   const index = sortedIndex(haystack, needle);
@@ -38,7 +38,7 @@ export function findClosestIndex(haystack: number[], needle: number) {
 export function getValueDaysAgo(values: TimeSeriesValue[], daysAgo: number) {
   const timestamps = values.map((v) => v.time);
   const pastTimestamp = getTimestampNDaysAgo(daysAgo);
-  const indexOfClosest = findClosestIndex(timestamps, pastTimestamp);
+  const indexOfClosest = findIndexOfClosest(timestamps, pastTimestamp);
 
   return values[indexOfClosest];
 }

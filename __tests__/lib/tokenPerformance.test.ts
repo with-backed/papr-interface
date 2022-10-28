@@ -1,17 +1,17 @@
-import { findClosestIndex } from 'lib/tokenPerformance';
+import { findIndexOfClosest } from 'lib/tokenPerformance';
 
 describe('token performance utilities', () => {
-  describe('findClosest', () => {
+  describe('findIndexOfClosest', () => {
     it('handles a value lower than lowest current value', () => {
       const haystack = [2, 3, 4];
       const needle = 1;
-      expect(findClosestIndex(haystack, needle)).toEqual(0);
+      expect(findIndexOfClosest(haystack, needle)).toEqual(0);
     });
 
     it('handles a higher lower than highest current value', () => {
       const haystack = [2, 3, 4];
       const needle = 5;
-      expect(findClosestIndex(haystack, needle)).toEqual(2);
+      expect(findIndexOfClosest(haystack, needle)).toEqual(2);
     });
 
     it.each([
@@ -22,7 +22,7 @@ describe('token performance utilities', () => {
     ])(
       'given %p as the haystack and %p as the needle, returns index %p',
       (haystack, needle, expectedResult) => {
-        expect(findClosestIndex(haystack, needle)).toEqual(expectedResult);
+        expect(findIndexOfClosest(haystack, needle)).toEqual(expectedResult);
       },
     );
   });
