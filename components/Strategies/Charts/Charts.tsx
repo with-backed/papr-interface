@@ -108,7 +108,7 @@ function RateOfGrowth({
       const priceSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
         color: PRICE_COLOR,
-        priceFormat: { type: 'price' },
+        priceFormat: { type: 'price', minMove: 0.001, precision: 3 },
         priceScaleId: 'left',
       });
       priceSeries.setData(markValues);
@@ -123,20 +123,10 @@ function RateOfGrowth({
     <div className={styles.wrapper}>
       <div className={styles.label}>
         <span className={styles['price-label']}>papr price in USDC</span>{' '}
-        <span
-          className={priceChange24h < 0 ? styles.negative : styles.positive}>
-          {formatPercentChange(priceChange24h)}
-        </span>
       </div>
       <div className={styles.chart} ref={chartRef} />
       <div className={styles.label}>
         <span className={styles['apr-label']}>Contract APR</span>{' '}
-        <span
-          className={
-            contractAPRChange24h < 0 ? styles.negative : styles.positive
-          }>
-          {formatPercentChange(contractAPRChange24h)}
-        </span>
       </div>
     </div>
   );
