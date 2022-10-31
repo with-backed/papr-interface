@@ -75,7 +75,8 @@ function RateOfGrowth({
     () =>
       normalizationValues.slice(1).map((curr, i) => {
         const prev = normalizationValues[i];
-        const change = percentChange(prev.value, curr.value);
+        // lightweight-charts expects percentages as the actual value, not a ratio
+        const change = percentChange(prev.value, curr.value) * 100;
         return { value: change, time: curr.time };
       }),
     [normalizationValues],
