@@ -52,6 +52,10 @@ const BASE_CHART_OPTIONS: DeepPartial<ChartOptions> = {
   grid: { horzLines: { visible: false }, vertLines: { visible: false } },
   rightPriceScale: {
     ...BASE_PRICE_SCALE_OPTIONS,
+    scaleMargins: {
+      top: 0.499,
+      bottom: 0.499,
+    },
   },
   leftPriceScale: {
     ...BASE_PRICE_SCALE_OPTIONS,
