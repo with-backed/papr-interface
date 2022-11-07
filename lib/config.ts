@@ -30,7 +30,7 @@ const goerli: Config = {
   network: 'goerli',
   emailSubjectPrefix: '[Testnet]:',
   facilitatorStartBlock: 10550059,
-  strategyAddress: '0xc7483594651b15db97b37d3aafc40d7edb1f6852',
+  strategyAddress: '0xF478340769a200f20fEa385dEEA6D42550DD8986',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
