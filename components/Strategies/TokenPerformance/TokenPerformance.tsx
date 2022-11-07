@@ -26,6 +26,7 @@ import {
   getValueDaysAgo,
   percentChange,
 } from 'lib/tokenPerformance';
+import { Table } from 'components/Table';
 
 export type StrategySummaryProps = {
   strategies: LendingStrategy[];
@@ -39,7 +40,7 @@ export function TokenPerformance({
   return (
     <Fieldset legend="📈 Token Performance">
       <div className={styles.strategies}>
-        <table className={styles.table}>
+        <Table className={styles.table}>
           <thead>
             <tr>
               <th>
@@ -78,7 +79,7 @@ export function TokenPerformance({
               />
             ))}
           </tbody>
-        </table>
+        </Table>
       </div>
     </Fieldset>
   );

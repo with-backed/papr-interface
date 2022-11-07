@@ -11,7 +11,7 @@
   height: 30px;
 }
 
-.table tr td:first-child {
+.table tr td:first-child, .table tr th:first-child {
   padding-left: 12px;
 }
 

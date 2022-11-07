@@ -1,8 +1,12 @@
-.right-align {
+.table th {
+  text-align: left;
+}
+
+.table .right-align {
   text-align: right;
 }
 
-.center-align {
+.table .center-align {
   text-align: center;
 }
 

@@ -35,7 +35,7 @@ export function LoanDetails({ lendingStrategy, vaultId }: LoanDetailsProps) {
   }, [vault, norm]);
   return (
     <Fieldset legend={'💸 Loan Details'}>
-      <Table>
+      <Table className={styles.table}>
         <thead>
           <tr>
             <th>Loan</th>
