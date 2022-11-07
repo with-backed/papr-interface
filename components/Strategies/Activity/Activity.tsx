@@ -14,6 +14,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityByStrategyQuery } from 'types/generated/graphql/inKindSubgraph';
 import { SwapsByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
 import styles from './Activity.module.css';
+import { Table } from 'components/Table';
 
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -79,7 +80,7 @@ export function Activity({ lendingStrategy, vaultId }: ActivityProps) {
 
   return (
     <Fieldset legend="🐝 Activity">
-      <table className={styles.table}>
+      <Table>
         <tbody>
           {feed.map((event) => {
             switch (event.__typename) {
@@ -116,7 +117,7 @@ export function Activity({ lendingStrategy, vaultId }: ActivityProps) {
             }
           })}
         </tbody>
-      </table>
+      </Table>
       {remaining.length > 0 && (
         <div className={styles['button-container']}>
           <TextButton kind="clickable" onClick={handleShowMore}>

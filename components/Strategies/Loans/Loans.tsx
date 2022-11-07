@@ -10,6 +10,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Health } from '../Health';
 import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
+import { Table } from 'components/Table';
 
 type LoansProps = {
   lendingStrategy: LendingStrategy;
@@ -74,7 +75,7 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
 
   return (
     <Fieldset legend="💸 Loans">
-      <table className={styles.table}>
+      <Table>
         <thead>
           <tr>
             <th>Total</th>
@@ -97,12 +98,12 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
             </td>
           </tr>
         </tbody>
-      </table>
-      <table className={styles.table}>
+      </Table>
+      <Table>
         <thead>
           <tr>
             <th>Loan</th>
-            <th className={styles['right-align']}>Amount</th>
+            <th className={styles['left-align']}>Amount</th>
             <th className={styles['right-align']}>Days</th>
             <th className={styles['right-align']}>LTV</th>
             <th className={styles['center-align']}>Health</th>
@@ -125,7 +126,7 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
             );
           })}
         </tbody>
-      </table>
+      </Table>
     </Fieldset>
   );
 }
