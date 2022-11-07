@@ -3,6 +3,11 @@
   border-collapse: collapse;
 }
 
+.table-fixed {
+  composes: table;
+  table-layout: fixed;
+}
+
 .table td {
   padding: 0;
 }

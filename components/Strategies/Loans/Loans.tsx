@@ -75,7 +75,7 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
 
   return (
     <Fieldset legend="💸 Loans">
-      <Table className={styles.table}>
+      <Table className={styles.table} fixed>
         <thead>
           <tr>
             <th>Total</th>
@@ -99,7 +99,7 @@ export function Loans({ lendingStrategy, pricesData }: LoansProps) {
           </tr>
         </tbody>
       </Table>
-      <Table className={styles.table}>
+      <Table className={styles.table} fixed>
         <thead>
           <tr>
             <th>Loan</th>
