@@ -6,7 +6,7 @@ import { OpenVault } from 'components/Strategies/OpenVault';
 import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
 import { useCenterNFTs } from 'hooks/useCenterNFTs';
-import StrategySummary from 'components/StrategySummary/StrategySummary';
+import { TokenPerformance } from 'components/Strategies/TokenPerformance/TokenPerformance';
 import { LendingStrategy } from 'lib/LendingStrategy';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { getUniqueNFTId } from 'lib/strategies';
@@ -65,11 +65,9 @@ export function BorrowPageContent({
 
   return (
     <div className={strategyStyles.wrapper}>
-      <StrategySummary
-        legend={`Borrow: $papr_${lendingStrategy.debtToken.symbol}${maxLTVPercent}`}
+      <TokenPerformance
         strategies={[lendingStrategy]}
         pricesData={{ [lendingStrategy.id]: pricesData }}
-        includeDetails
       />
       <AccountNFTs
         strategy={lendingStrategy}

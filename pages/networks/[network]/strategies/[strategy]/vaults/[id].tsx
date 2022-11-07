@@ -11,6 +11,8 @@ import { GetServerSideProps } from 'next';
 import styles from '../strategy.module.css';
 import { useLendingStrategy } from 'hooks/useLendingStrategy';
 import { VaultPageContent } from 'components/Strategies/VaultPageContent';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { strategyPricesData } from 'lib/strategies/charts';
 
 type ServerSideProps = {
   vaultId: string;
@@ -64,14 +66,28 @@ export default function VaultPage({
     subgraphPool,
     oracleInfo,
   });
-  const { network } = useConfig();
+  const { network, uniswapSubgraph } = useConfig();
+
+  const pricesData = useAsyncValue(
+    () =>
+      strategyPricesData(
+        lendingStrategy,
+        network as SupportedNetwork,
+        uniswapSubgraph,
+      ),
+    [lendingStrategy, network, uniswapSubgraph],
+  );
 
   return (
     <div className={styles.column}>
       <a href={`/networks/${network}/strategies/${lendingStrategy.id}`}>
         ⬅ strategy
       </a>
-      <VaultPageContent lendingStrategy={lendingStrategy} vaultId={vaultId} />
+      <VaultPageContent
+        lendingStrategy={lendingStrategy}
+        vaultId={vaultId}
+        pricesData={pricesData}
+      />
     </div>
   );
 }
