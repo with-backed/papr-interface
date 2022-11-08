@@ -5,6 +5,7 @@
   line-height: 1.6;
   cursor: pointer;
   font-size: var(--font-large);
+  min-height: 48px;
 }
 
 .dark {
@@ -87,7 +88,8 @@
 }
 
 .quaternary:hover {
-  background: var(--highlight-active-20);
+  transition: background-color 200ms ease;
+  background: var(--background-faded-green);
 }
 
 .highlight {
