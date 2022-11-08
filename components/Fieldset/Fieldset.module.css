@@ -1,5 +1,5 @@
 .standard-fieldset {
-  border: thin var(--greentext) solid;
+  border: thin black solid;
   width: 100%;
   padding: var(--padding-container);
   word-break: normal;
@@ -11,6 +11,6 @@
   line-height: 0;
   font-size: var(--font-large);
   text-transform: uppercase;
-  color: var(--greentext);
+  color: black;
   padding: 0 4px;
 }

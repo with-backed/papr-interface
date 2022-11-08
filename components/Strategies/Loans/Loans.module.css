@@ -1,12 +1,4 @@
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
 .table th {
-  text-transform: uppercase;
-  color: var(--greentext);
   text-align: left;
 }
 
@@ -18,37 +10,9 @@
   text-align: center;
 }
 
-.table th,
-.table td {
-  padding-left: 1rem;
-}
-
-.table:first-of-type {
-  margin-bottom: 2rem;
-}
-
-.row {
-  width: 100%;
-  height: 30px;
-  background-color: var(--background-white);
-}
-
-.row:nth-child(even) {
-  background-color: transparent;
-}
-
-.header-row th {
-  text-align: left;
-}
-
 .loan {
   width: auto;
   white-space: nowrap;
-}
-
-.row td {
-  padding-top: 0;
-  padding-bottom: 0;
 }
 
 .indicator-danger {

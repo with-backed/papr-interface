@@ -1,0 +1,37 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-fixed {
+  composes: table;
+  table-layout: fixed;
+}
+
+.table td {
+  padding: 0;
+}
+
+.table tr {
+  height: 30px;
+}
+
+.table tr td:first-child, .table tr th:first-child {
+  padding-left: 12px;
+}
+
+.table tr td:last-child {
+  padding-right: 12px;
+}
+
+.table th {
+  text-transform: uppercase;
+  font-size: 12px;
+  font-family: var(--sans);
+  letter-spacing: 0.12rem;
+  font-weight: inherit;
+}
+
+.table tbody tr:nth-child(odd) {
+  background-color: var(--background-faded-green);
+}

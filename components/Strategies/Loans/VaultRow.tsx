@@ -58,7 +58,7 @@ export function VaultRow({
   }, [debt, decimals, symbol]);
 
   return (
-    <tr className={styles.row}>
+    <tr>
       <td>
         <Link
           href={`/networks/${network}/strategies/${strategyId}/vaults/${id}`}>

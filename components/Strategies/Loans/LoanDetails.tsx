@@ -5,6 +5,7 @@ import { LendingStrategy } from 'lib/LendingStrategy';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import styles from './Loans.module.css';
 import { computeLtv, convertOneScaledValue } from 'lib/strategies';
+import { Table } from 'components/Table';
 
 type LoanDetailsProps = {
   vaultId: string;
@@ -34,7 +35,7 @@ export function LoanDetails({ lendingStrategy, vaultId }: LoanDetailsProps) {
   }, [vault, norm]);
   return (
     <Fieldset legend={'💸 Loan Details'}>
-      <table className={styles.table}>
+      <Table className={styles.table}>
         <thead>
           <tr>
             <th>Loan</th>
@@ -55,7 +56,7 @@ export function LoanDetails({ lendingStrategy, vaultId }: LoanDetailsProps) {
             expanded={false}
           />
         </tbody>
-      </table>
+      </Table>
     </Fieldset>
   );
 }
