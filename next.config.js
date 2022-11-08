@@ -12,6 +12,7 @@ const moduleExports = {
   images: {
     domains: ['nftpawnshop.mypinata.cloud'],
   },
+  optimizeFonts: false,
   async redirects() {
     return [
       {

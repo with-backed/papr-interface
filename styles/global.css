@@ -96,7 +96,7 @@ body {
 
 h1 {
   font-size: var(--font-huge);
-  font-weight: var(--weight-light);
+  font-weight: var(--weight-regular);
 }
 
 h2,
