@@ -1,14 +1,27 @@
 import React from 'react';
+import LandingPageScale from 'public/landingpage-scale.png';
+import { LandingPageDiagram } from './LandingPageDiagram';
 import styles from './LandingPageContent.module.css';
+import Image from 'next/image';
+import { Tables } from './Tables';
+import { DashedLine } from './DashedLine';
+import { Whitepaper } from './Whitepaper';
 
 export function LandingPageContent() {
   return (
-    <div className={styles.wrapper}>
+    <>
       <h1 className={styles.heading}>
         NFT lending
         <br />
         powered by Uniswap V3.
       </h1>
-    </div>
+      <Image src={LandingPageScale} alt="" width={640} height={460} />
+      <div className={styles.wrapper}>
+        <DashedLine />
+        <Tables />
+        <LandingPageDiagram />
+        <Whitepaper />
+      </div>
+    </>
   );
 }

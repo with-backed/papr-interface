@@ -38,7 +38,7 @@
   --line-height: 1.6;
 
   /* padding and gaps */
-  --padding-button: 0.3rem 1rem;
+  --padding-button: 16px 22px;
   --padding-container: 2.5rem;
   --padding-loan-card: 7px 21px 14px 21px;
   --gap: 2.5rem;
@@ -51,6 +51,7 @@
   --background-lighter-dark: #383838;
   --background-faded-green: #eaf8f5;
   --background-blue-paper: #d4e5ff;
+  --background-orange-paper: #ffcc00;
 
   /* shadows */
   --box-shadow: 0 0 20px 0px rgb(171 155 150 / 20%);
@@ -59,7 +60,7 @@
 
   /* border styles */
   --border-radius-small: 0.3rem;
-  --border-radius-large: 0.86rem;
+  --border-radius-large: 1.5rem;
 
   /* font styles */
   --serif: 'Times New Roman', Times, serif;
@@ -71,7 +72,7 @@
   --font-small: 11px;
   --font-medium: 12px;
   --font-large: 16px;
-  --font-huge: 2.6rem;
+  --font-huge: 2rem;
 
   /* component specific dimensions */
   --modal-width-narrow: 460px;
