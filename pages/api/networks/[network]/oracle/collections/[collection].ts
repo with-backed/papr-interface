@@ -12,14 +12,23 @@ async function handler(
 ) {
   try {
     validateNetwork(req.query);
-    const { network, collection } = req.query as {
+    const { network, collection, heroes } = req.query as {
       network: SupportedNetwork;
       collection: string;
+      heroes: string;
     };
-    if (network === 'ethereum') {
+    const isHeroes = heroes === 'true';
+
+    if (network === 'ethereum' || isHeroes) {
       return res
         .status(200)
-        .json(await getSignedOracleFloorPriceMessage(collection));
+        .json(
+          await getSignedOracleFloorPriceMessage(
+            collection,
+            configs[network],
+            isHeroes,
+          ),
+        );
     } else {
       return res
         .status(200)

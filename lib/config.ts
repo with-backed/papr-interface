@@ -34,7 +34,17 @@ const goerli: Config = {
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
-  oracleBaseUrl: 'https://v2-interface-rosy.vercel.app',
+  oracleBaseUrl: 'http://localhost:3000',
+  paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
+  reservoirAPI: 'https://api-goerli.reservoir.tools',
+  paprHeroesUSDC: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
+  paprHeroesCollateral: [
+    '0x0593cd2238d1b143bd1c67cd7fa98eee32a260ea',
+    '0xd4e652bbfcf616c966e1b1e8ed37599d81f11889',
+    '0x4770646fe8635fa9ed3cb72ed4b7ef6386a06827',
+    '0xabe17952e7fe468711826c26b04b047c0da53b86',
+  ],
+  reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
 };
 
 const ethereum = {
@@ -56,7 +66,12 @@ const ethereum = {
   facilitatorStartBlock: 14636317,
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprMemeSubgraph: 'TODO: update this when we have a prod subgraph',
+  paprUnderlyingAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   oracleBaseUrl: '',
+  reservoirAPI: 'https://api.reservoir.tools',
+  paprHeroesUSDC: '',
+  paprHeroesCollateral: [''],
+  reservoirMarketplace: '',
 };
 
 export const configs = {

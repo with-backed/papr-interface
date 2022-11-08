@@ -249,11 +249,12 @@ export function computeLtv(
 export async function getOracleInfoFromAllowedCollateral(
   collections: string[],
   network: SupportedNetwork,
+  isHeroes: boolean = false,
 ) {
   const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
     collections.map(async (collectionAddress) => {
       const req = await fetch(
-        `${configs[network].oracleBaseUrl}/api/networks/${network}/oracle/collections/${collectionAddress}`,
+        `${configs[network].oracleBaseUrl}/api/networks/${network}/oracle/collections/${collectionAddress}?heroes=${isHeroes}`,
         {
           method: 'POST',
         },
@@ -264,7 +265,7 @@ export async function getOracleInfoFromAllowedCollateral(
   const oracleInfo = collections.reduce(
     (prev, current, i) => ({
       ...prev,
-      [getAddress(current)]: oracleInfoFromAPI[i],
+      [getAddress(current)]: oracleInfoFromAPI[i] as ReservoirResponseData,
     }),
     {},
   );

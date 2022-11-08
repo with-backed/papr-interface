@@ -1,4 +1,5 @@
 import { ethers } from 'ethers';
+import { Config } from 'lib/config';
 import { ReservoirOracleUnderwriter } from 'types/generated/abis/Strategy';
 
 export type ReservoirResponseData = {
@@ -12,16 +13,19 @@ export type ReservoirResponseData = {
   data: string;
 };
 
-export const USDC_CONTRACT = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
-export const USDC_DECIMALS = 6;
-export const THIRTY_DAYS_IN_SECONDS = 2592000;
-export const BASE_RESERVOIR_URL = 'https://api.reservoir.tools';
+export const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 3600;
 
 export async function getSignedOracleFloorPriceMessage(
   collection: string,
+  config: Config,
+  isHeroes: boolean = false,
 ): Promise<ReservoirResponseData> {
   const reservoirReq = await fetch(
-    `${BASE_RESERVOIR_URL}/oracle/collections/${collection}/floor-ask/v3?kind=twap&currency=${USDC_CONTRACT}&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,
+    `${
+      config.reservoirAPI
+    }/oracle/collections/${collection}/floor-ask/v3?kind=twap&currency=${
+      isHeroes ? config.paprHeroesUSDC : config.paprUnderlyingAddress
+    }&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,
   );
   const json = await reservoirReq.json();
   return json;
