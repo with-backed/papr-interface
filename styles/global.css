@@ -64,7 +64,7 @@
   /* font styles */
   --serif: 'Times New Roman', Times, serif;
   --sans: 'GT Maru Regular', Helvetica, sans-serif;
-  --mono: 'GT Maru Mono', monospace;
+  --mono: 'Courier Prime', 'Courier New', monospace;
   --weight-light: 300;
   --weight-regular: 400;
   --weight-semibold: 600;
