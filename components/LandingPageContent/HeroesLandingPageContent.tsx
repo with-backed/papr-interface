@@ -6,12 +6,18 @@ import styles from './HeroesLandingPageContent.module.css';
 import { ERC721__factory } from 'types/generated/abis';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { useAccount } from 'wagmi';
+import {
+  useAccount,
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+} from 'wagmi';
 import { CenterAsset } from 'components/CenterAsset';
 import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import Link from 'next/link';
+import { Table } from 'components/Table';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
@@ -126,26 +132,46 @@ function PHUSDC() {
     return valueBigNumber.sub(stakeInfo[0]);
   }, [value, stakeInfo, decimals]);
 
-  const stake = useCallback(async () => {
-    if (!amountToStake) return;
-
-    await erc20.stake(amountToStake, {
+  const { config: stakeConfig } = usePrepareContractWrite({
+    address: configs.goerli.paprHeroesUSDC,
+    abi: PHUSDC__factory.abi,
+    functionName: 'stake',
+    args: [amountToStake],
+    overrides: {
       gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
-    });
-  }, [amountToStake, erc20]);
+    },
+  });
 
-  const withdraw = useCallback(async () => {
-    await erc20.unstake({
+  const { data: stakeData, write: stake } = useContractWrite({
+    ...stakeConfig,
+    onSuccess: (data: any) => {
+      data.wait().then(() => window.location.reload());
+    },
+  });
+
+  const { config: withdrawConfig } = usePrepareContractWrite({
+    address: configs.goerli.paprHeroesUSDC,
+    abi: PHUSDC__factory.abi,
+    functionName: 'unstake',
+    args: [],
+    overrides: {
       gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
-    });
-  }, [erc20]);
+    },
+  });
+
+  const { data: withdrawData, write: withdraw } = useContractWrite({
+    ...withdrawConfig,
+    onSuccess: (data: any) => {
+      data.wait().then(() => window.location.reload());
+    },
+  });
 
   if (!decimals) return <></>;
 
   return (
     <Fieldset legend="🪙 phUSDC">
       {!!address && (
-        <table className={`${styles.table} ${styles.phUSDCTable}`}>
+        <Table className={`${styles.table} ${styles.phUSDCTable}`}>
           <thead>
             <tr>
               <th className={styles.yourBalance}>
@@ -190,18 +216,22 @@ function PHUSDC() {
                 </p>
               </td>
               <td className={styles.buyOrSell}>
-                <button className={styles.button} onClick={stake}>
+                <button
+                  className={styles.button}
+                  onClick={stake! as () => void}>
                   Stake{' '}
                   {amountToStake &&
                     ethers.utils.formatUnits(amountToStake, decimals)}
                 </button>
-                <button className={styles.button} onClick={withdraw}>
+                <button
+                  className={styles.button}
+                  onClick={withdraw! as () => void}>
                   Withdraw all
                 </button>
               </td>
             </tr>
           </tbody>
-        </table>
+        </Table>
       )}
       {!address && <p>Connect wallet to see phUSDC info</p>}
     </Fieldset>
@@ -238,7 +268,7 @@ function AllowedCollateral({
           <p>Testnet {name}</p>
         </div>
       }>
-      <table className={`${styles.table} ${styles.allowedCollateralTable}`}>
+      <Table className={`${styles.table} ${styles.allowedCollateralTable}`}>
         <thead>
           <tr>
             <th className={styles.yourBalance}>
@@ -269,7 +299,7 @@ function AllowedCollateral({
             </td>
           </tr>
         </tbody>
-      </table>
+      </Table>
     </Fieldset>
   );
 }
