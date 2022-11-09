@@ -29,16 +29,6 @@
   table-layout: fixed;
 }
 
-.table th {
-  color: var(--greentext);
-  text-transform: uppercase;
-  font-size: 12px;
-  font-family: var(--sans);
-  letter-spacing: 0.12rem;
-  text-align: center;
-  font-weight: inherit;
-}
-
 .table th,
 .table td {
   padding-left: 1rem;
@@ -54,11 +44,11 @@
 }
 
 .phUSDCTable thead tr th {
-  width: 20%;
+  width: 22%;
 }
 
 .phUSDCTable .buyOrSell {
-  width: 60%;
+  width: 34%;
   text-align: center;
 }
 
@@ -107,6 +97,7 @@
 }
 
 .legendNFT p {
+  margin: 0px;
   margin-left: 12px;
 }
 
@@ -138,3 +129,6 @@
   margin: 3%;
 }
   
+.leaderboard {
+  font-size: var(--font-large);
+}

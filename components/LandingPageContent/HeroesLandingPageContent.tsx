@@ -55,20 +55,23 @@ export function HeroesLandingPageContent({
             NFTs (as calculated by the floor price of the collection)
           </p>
         </Fieldset>
+
         <Fieldset legend="leaderboard">
-          {rankedPlayers.map((p, i) => (
-            <LeaderboardEntry
-              address={p[0]}
-              worth={p[1]}
-              position={i + 1}
-              key={p[0]}
-            />
-          ))}
-          <div className={styles.userWalletValue}>
-            <p>
-              Your wallet value...............$
-              {rankedPlayers.find((p) => p[0] === address)?.[1]} phUSDC
-            </p>
+          <div className={styles.leaderboard}>
+            {rankedPlayers.map((p, i) => (
+              <LeaderboardEntry
+                address={p[0]}
+                worth={p[1]}
+                position={i + 1}
+                key={p[0]}
+              />
+            ))}
+            <div className={styles.userWalletValue}>
+              <p>
+                Your wallet value...............$
+                {rankedPlayers.find((p) => p[0] === address)?.[1]} phUSDC
+              </p>
+            </div>
           </div>
         </Fieldset>
         <PHUSDC />
