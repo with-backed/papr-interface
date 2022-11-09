@@ -140,14 +140,14 @@ function PHUSDC() {
     overrides: {
       gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
     },
-  } as any);
+  });
 
   const { data: stakeData, write: stake } = useContractWrite({
     ...stakeConfig,
     onSuccess: (data: any) => {
       data.wait().then(() => window.location.reload());
     },
-  });
+  } as any);
 
   const { config: withdrawConfig } = usePrepareContractWrite({
     address: configs.goerli.paprHeroesUSDC,
@@ -157,14 +157,14 @@ function PHUSDC() {
     overrides: {
       gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
     },
-  } as any);
+  });
 
   const { data: withdrawData, write: withdraw } = useContractWrite({
     ...withdrawConfig,
     onSuccess: (data: any) => {
       data.wait().then(() => window.location.reload());
     },
-  });
+  } as any);
 
   if (!decimals) return <></>;
 
