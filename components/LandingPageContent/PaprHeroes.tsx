@@ -1,10 +1,8 @@
-import Image from 'next/image';
 import React from 'react';
 import PaprHeroesLogo from 'public/logos/paprHeroes.png';
 import styles from './LandingPageContent.module.css';
 import { ButtonLink } from 'components/Button';
-
-const Background = () => <div className={styles['papr-heroes-background']} />;
+import { Disclosure } from 'components/Disclosure';
 
 const Logo = () => <img src={PaprHeroesLogo.src} alt="" />;
 
@@ -31,22 +29,24 @@ function Leaderboard() {
   );
 }
 
+function Rules() {
+  return <Disclosure title="Rules of the game">Rules go here tbqh</Disclosure>;
+}
+
 export function PaprHeroes() {
   return (
-    <div className={styles.layered}>
-      <Background />
-      <div className={styles['papr-heroes-container']}>
-        <Logo />
-        <h2>
-          A trading competition on testnet, with fake money
-          <br />
-          and Goerli versions of CC0 NFTs.
-        </h2>
-        <ButtonLink kind="primary" href="">
-          Join the game
-        </ButtonLink>
-        <Leaderboard />
-      </div>
+    <div className={styles['papr-heroes-container']}>
+      <Logo />
+      <h2>
+        A trading competition on testnet, with fake money
+        <br />
+        and Goerli versions of CC0 NFTs.
+      </h2>
+      <ButtonLink kind="primary" href="">
+        Join the game
+      </ButtonLink>
+      <Leaderboard />
+      <Rules />
     </div>
   );
 }

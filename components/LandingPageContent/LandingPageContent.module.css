@@ -140,30 +140,19 @@
 }
 
 /* papr heroes */
-.papr-heroes-background {
-  height: 950px;
-  background: url('/graph-dense.png'), var(--background-orange-paper);
-  width: 100%;
-  position: absolute;
-  z-index: 0;
-  margin-top: 100px;
-}
-
 .papr-heroes-container {
+  background: url('/graph-dense.png'), var(--background-orange-paper);
   display: flex;
   flex-direction: column;
   width: 100%;
   align-items: center;
   gap: 2rem;
   margin-top: 100px;
-  height: 950px;
-  z-index: 6;
+  padding-top: 110px;
 }
 
 .papr-heroes-container img {
   width: 319px;
-  height: 70px;
-  margin-top: 110px;
 }
 
 .papr-heroes-container h2 {
