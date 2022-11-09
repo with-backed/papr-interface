@@ -1,6 +1,6 @@
 .nav {
   width: 100%;
-  background: url('/graph-square.png'), #d7efea;
+  background: url('/graph-square.png'), var(--background-blue-paper);
   padding: 20px 0;
   height: 151px;
 }
@@ -8,14 +8,11 @@
 .content {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  align-items: flex-end;
+  align-items: center;
   max-width: var(--max-width);
   margin: 0 auto;
   width: 100%;
-}
-
-.desktop-header {
-  composes: content;
+  height: 100%;
 }
 
 .left-side {
@@ -60,7 +57,7 @@
 
 .link {
   padding: 5px 15px;
-  height: 46px;
+  height: 48px;
   display: flex;
   flex-direction: row;
   white-space: nowrap;
@@ -71,20 +68,23 @@
 .link,
 .link:visited {
   color: black;
-  font-weight: var(--weight-semibold);
   transition: color 200ms ease;
 }
 
 .link:hover {
   transition: background-color 200ms ease;
-  background-color: #eaf8f5;
+  background-color: var(--background-faded-green);
 }
 
 .link-active {
   composes: link;
-  background-color: #eaf8f5;
+  background-color: var(--background-faded-green);
 }
 
 .link-active:visited {
   color: black;
+}
+
+.logo {
+  height: 48px;
 }

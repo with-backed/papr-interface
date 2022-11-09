@@ -2,10 +2,12 @@ import { ConnectWallet } from 'components/ConnectWallet';
 import { PaprMEME } from 'components/Icons/PaprMEME';
 import { Logo } from 'components/Logo';
 import { useConfig } from 'hooks/useConfig';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 import styles from './Header.module.css';
+import paprLogo from 'public/logos/papr-logo.png';
 
 type Page = {
   name: string;
@@ -18,10 +20,9 @@ type Page = {
 };
 const prodPages = (strategyAddress: string): Page[] => [
   {
-    name: 'Swap ↗',
-    route:
-      'https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=0x3089b47853df1b82877beef6d904a0ce98a12553&outputCurrency=0xb5e5f51e3e112634975fb44e6351380413f653ac',
-    externalRedirect: true,
+    name: 'Performance',
+    route: `strategies/${strategyAddress}`,
+    matcher: 'strategies/[strategy]',
   },
   {
     name: 'Borrow',
@@ -29,15 +30,17 @@ const prodPages = (strategyAddress: string): Page[] => [
     matcher: 'strategies/[strategy]/borrow',
   },
   {
+    name: 'Swap ↗',
+    route:
+      'https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=0x3089b47853df1b82877beef6d904a0ce98a12553&outputCurrency=0xb5e5f51e3e112634975fb44e6351380413f653ac',
+    externalRedirect: true,
+  },
+
+  {
     name: 'LP ↗',
     route:
       'https://app.uniswap.org/#/add/0x3089B47853df1b82877bEef6D904a0ce98a12553/0x4a783cb0adb6403a739f907131f8788b40dc7678/10000?chain=goerli',
     externalRedirect: true,
-  },
-  {
-    name: 'Details',
-    route: `strategies/${strategyAddress}`,
-    matcher: 'strategies/[strategy]',
   },
 ];
 
@@ -98,29 +101,11 @@ function NavLinks({ activeRoute }: NavLinksProps) {
 
 function LogoLink() {
   const { network } = useConfig();
-  const { pathname } = useRouter();
-
-  const isErrorPage = useMemo(
-    () => pathname === '/404' || pathname === '/500',
-    [pathname],
-  );
 
   return (
     <Link href={`/networks/${network}/`} passHref>
-      <a title="Backed">
-        <Logo error={isErrorPage} />
-      </a>
-    </Link>
-  );
-}
-
-function PaprLink() {
-  const { network } = useConfig();
-
-  return (
-    <Link href={`/networks/${network}/`} passHref>
-      <a title="paprMEME">
-        <PaprMEME />
+      <a title="papr">
+        <img className={styles.logo} src={paprLogo.src} alt="" />
       </a>
     </Link>
   );
@@ -147,7 +132,6 @@ export function Header() {
           <LogoLink />
         </div>
         <div className={styles.center}>
-          <PaprLink />
           <NavLinks activeRoute={activeRoute} />
         </div>
         <div className={styles['right-side']}>
