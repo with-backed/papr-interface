@@ -29,7 +29,7 @@ export function HeroesLandingPageContent({
   return (
     <div className={styles.wrapper}>
       <div className={styles.fieldsetsWrapper}>
-        <Fieldset legend="what is papr heroes">
+        <Fieldset legend="🧮 join the game">
           <p>
             Papr Hero is a PVP competition where players compete to see who can
             end up with the most <i>phUSDC</i>. Every player starts with a fixed
@@ -115,13 +115,27 @@ function PHUSDC() {
 
   const decimals = useAsyncValue(() => erc20.decimals(), [erc20]);
 
-  const stake = useCallback(async () => {
-    if (!decimals) return;
+  const amountToStake = useMemo(() => {
+    if (!value || !stakeInfo || !decimals) return null;
+    const valueBigNumber = ethers.utils.parseUnits(value, decimals);
+    if (valueBigNumber.lte(stakeInfo[0])) return null;
 
-    await erc20.stake(ethers.utils.parseUnits(value, decimals), {
+    return valueBigNumber.sub(stakeInfo[0]);
+  }, [value, stakeInfo, decimals]);
+
+  const stake = useCallback(async () => {
+    if (!amountToStake) return;
+
+    await erc20.stake(amountToStake, {
       gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
     });
-  }, [erc20, value, decimals]);
+  }, [amountToStake, erc20]);
+
+  const withdraw = useCallback(async () => {
+    await erc20.unstake({
+      gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
+    });
+  }, [erc20]);
 
   if (!decimals) return <></>;
 
@@ -152,11 +166,15 @@ function PHUSDC() {
                 </p>
               </td>
               <td>
-                <p>
-                  {!!stakeInfo
-                    ? ethers.utils.formatUnits(stakeInfo[0], decimals)
-                    : 'N/A'}
-                </p>
+                <input
+                  value={
+                    !!value
+                      ? value
+                      : !!stakeInfo
+                      ? ethers.utils.formatUnits(stakeInfo[0], decimals)
+                      : 0
+                  }
+                  onChange={(e) => setValue(e.target.value)}></input>
               </td>
               <td>
                 <p>
@@ -169,8 +187,14 @@ function PHUSDC() {
                 </p>
               </td>
               <td className={styles.buyOrSell}>
-                <button className={styles.button}>Stake</button>
-                <button className={styles.button}>Withdraw</button>
+                <button className={styles.button} onClick={stake}>
+                  Stake{' '}
+                  {amountToStake &&
+                    ethers.utils.formatUnits(amountToStake, decimals)}
+                </button>
+                <button className={styles.button} onClick={withdraw}>
+                  Withdraw all
+                </button>
               </td>
             </tr>
           </tbody>

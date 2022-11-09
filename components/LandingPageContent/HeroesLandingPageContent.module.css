@@ -57,6 +57,14 @@
   text-align: center;
 }
 
+.phUSDCTable tbody td input {
+  border: none;
+  background-color: white;
+  border-radius: 10px;
+  width: 80%;
+  padding: 12px;
+}
+
 .buyOrSell button {
   margin: 0 4px;
 }
@@ -105,7 +113,7 @@
 }
 
 .fieldsetsWrapper fieldset {
-    margin: 2%;
+    margin: 1%;
     width: 50%;
 }
 
