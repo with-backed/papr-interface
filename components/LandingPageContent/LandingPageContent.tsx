@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Tables } from './Tables';
 import { DashedLine } from './DashedLine';
 import { Whitepaper } from './Whitepaper';
+import { PaprHeroes } from './PaprHeroes';
 
 export function LandingPageContent() {
   return (
@@ -21,6 +22,7 @@ export function LandingPageContent() {
         <Tables />
         <LandingPageDiagram />
         <Whitepaper />
+        <PaprHeroes />
       </div>
     </>
   );
