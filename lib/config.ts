@@ -34,7 +34,7 @@ const goerli: Config = {
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
-  oracleBaseUrl: 'http://localhost:3000',
+  oracleBaseUrl: 'https://v2-interface-git-heroes-landing-backed.vercel.app',
   paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   paprHeroesUSDC: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
