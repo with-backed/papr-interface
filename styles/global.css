@@ -51,7 +51,11 @@
   --background-lighter-dark: #383838;
   --background-faded-green: #eaf8f5;
   --background-blue-paper: #d4e5ff;
-  --background-orange-paper: #ffcc00;
+  --background-orange-paper: linear-gradient(
+    160deg,
+    rgba(255, 92, 0, 0.4) 0%,
+    rgba(255, 214, 0, 0.4) 100%
+  );
 
   /* shadows */
   --box-shadow: 0 0 20px 0px rgb(171 155 150 / 20%);
