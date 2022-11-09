@@ -30,8 +30,13 @@
 }
 
 .table th {
+  color: var(--greentext);
   text-transform: uppercase;
+  font-size: 12px;
+  font-family: var(--sans);
+  letter-spacing: 0.12rem;
   text-align: center;
+  font-weight: inherit;
 }
 
 .table th,
@@ -70,7 +75,7 @@
 }
 
 .allowedCollateralTable thead tr th.yourBalance {
-  width: 10%;
+  width: 20%;
 }
 
 .allowedCollateralTable thead tr th {
