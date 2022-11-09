@@ -140,7 +140,7 @@ function PHUSDC() {
     overrides: {
       gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
     },
-  });
+  } as any);
 
   const { data: stakeData, write: stake } = useContractWrite({
     ...stakeConfig,
@@ -157,7 +157,7 @@ function PHUSDC() {
     overrides: {
       gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
     },
-  });
+  } as any);
 
   const { data: withdrawData, write: withdraw } = useContractWrite({
     ...withdrawConfig,
