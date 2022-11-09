@@ -65,6 +65,7 @@
 
 .table th {
   font-size: var(--font-huge);
+  letter-spacing: 0.1em;
 }
 
 .table td {
