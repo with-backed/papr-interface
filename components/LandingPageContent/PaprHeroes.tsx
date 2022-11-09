@@ -1,8 +1,10 @@
 import React from 'react';
 import PaprHeroesLogo from 'public/logos/paprHeroes.png';
+import Heroes from 'public/heroes.png';
 import styles from './LandingPageContent.module.css';
 import { ButtonLink } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
+import Image from 'next/image';
 
 const Logo = () => <img src={PaprHeroesLogo.src} alt="" />;
 
@@ -30,7 +32,11 @@ function Leaderboard() {
 }
 
 function Rules() {
-  return <Disclosure title="Rules of the game">Rules go here tbqh</Disclosure>;
+  return (
+    <div className={styles.rules}>
+      <Disclosure title="Rules of the game">Rules go here tbqh</Disclosure>
+    </div>
+  );
 }
 
 export function PaprHeroes() {
@@ -45,6 +51,7 @@ export function PaprHeroes() {
       <ButtonLink kind="primary" href="">
         Join the game
       </ButtonLink>
+      <Image src={Heroes} alt="Examples of collections used in paprHERO" />
       <Leaderboard />
       <Rules />
     </div>

@@ -1,12 +1,20 @@
-.disclosure {
+.box {
   color: black;
+  background: var(--background-white);
+  padding: 16px 24px;
+  border: 2px black solid;
+  font-size: var(--font-large);
+  line-height: var(--font-large);
+  width: 100%;
+}
+
+.disclosure {
+  composes: box;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: var(--background-white);
-  padding: 16px 24px;
-  border: 2px black solid;
+  justify-content: space-between;
 }
 
 .disclosure > svg {
@@ -20,8 +28,14 @@
 
 .currently-open {
   composes: opened;
+  border-bottom: none;
 }
 
 .currently-open > svg {
   transform: rotate(0deg);
+}
+
+.content {
+  composes: box;
+  border-top: none;
 }

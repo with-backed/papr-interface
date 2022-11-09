@@ -149,7 +149,7 @@
   align-items: center;
   gap: 2rem;
   margin-top: 100px;
-  padding-top: 110px;
+  padding: 110px 0;
 }
 
 .papr-heroes-container img {
@@ -181,4 +181,9 @@
 
 .leaderboard dd {
   margin: 0;
+}
+
+.rules {
+  width: 100%;
+  max-width: 610px;
 }

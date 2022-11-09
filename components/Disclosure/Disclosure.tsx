@@ -30,14 +30,14 @@ export function Disclosure({ children, subtitle, title }: DisclosureProps) {
   }, [hasBeenOpened, isOpen]);
 
   return (
-    <div>
+    <>
       <ReakitDisclosure
         onClick={handleClick}
         as="div"
         className={className}
         {...disclosure}>
-        <Chevron />
         {title}
+        <Chevron />
       </ReakitDisclosure>
       {!isOpen && !!subtitle && (
         <span className={styles.subtitle}>{subtitle}</span>
@@ -45,6 +45,6 @@ export function Disclosure({ children, subtitle, title }: DisclosureProps) {
       <DisclosureContent className={styles.content} {...disclosure}>
         {children}
       </DisclosureContent>
-    </div>
+    </>
   );
 }
