@@ -141,24 +141,28 @@
 }
 
 /* papr heroes */
-.papr-heroes-container {
-  background: url('/graph-dense.png'), var(--background-orange-paper);
+.product-container {
   display: flex;
   flex-direction: column;
   width: 100%;
   align-items: center;
   gap: 2rem;
-  margin-top: 100px;
   padding: 110px 0;
+}
+
+.product-container h2 {
+  text-align: center;
+  font-size: 20px;
+}
+
+.papr-heroes-container {
+  composes: product-container;
+  background: url('/graph-dense.png'), var(--background-orange-paper);
+  margin-top: 100px;
 }
 
 .papr-heroes-container img {
   width: 319px;
-}
-
-.papr-heroes-container h2 {
-  text-align: center;
-  font-size: 20px;
 }
 
 .leaderboard {
@@ -186,4 +190,25 @@
 .rules {
   width: 100%;
   max-width: 610px;
+}
+
+.rules div[aria-expanded]:not(:first-child) {
+  margin-top: 15px;
+}
+
+/* paprMEME */
+.papr-meme-container {
+  composes: product-container;
+  background: url('/graph-denser.png'), var(--background-green-paper);
+}
+
+/* FAQ */
+.faq-container {
+  composes: product-container;
+  background: url('/graph-square.png'), var(--background-green-paper);
+}
+
+.faq-container h2 {
+  background: var(--background-white);
+  padding: 10px 20px;
 }

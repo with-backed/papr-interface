@@ -56,6 +56,11 @@
     rgba(255, 92, 0, 0.4) 0%,
     rgba(255, 214, 0, 0.4) 100%
   );
+  --background-green-paper: radial-gradient(
+    124.1% 1463.12% at 1.55% -61.48%,
+    rgba(61, 138, 181, 0.2) 0%,
+    rgba(17, 209, 169, 0.2) 100%
+  );
 
   /* shadows */
   --box-shadow: 0 0 20px 0px rgb(171 155 150 / 20%);

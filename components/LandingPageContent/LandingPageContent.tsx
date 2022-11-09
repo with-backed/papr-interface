@@ -7,6 +7,8 @@ import { Tables } from './Tables';
 import { DashedLine } from './DashedLine';
 import { Whitepaper } from './Whitepaper';
 import { PaprHeroes } from './PaprHeroes';
+import { PaprMeme } from './PaprMeme';
+import { FAQ } from './FAQ';
 
 export function LandingPageContent() {
   return (
@@ -23,6 +25,8 @@ export function LandingPageContent() {
         <LandingPageDiagram />
         <Whitepaper />
         <PaprHeroes />
+        <PaprMeme />
+        <FAQ />
       </div>
     </>
   );
