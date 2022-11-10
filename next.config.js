@@ -21,6 +21,11 @@ const moduleExports = {
         }`,
         permanent: false,
       },
+      {
+        source: '/tokens/paprHero',
+        destination: '/tokens/paprHero/contest',
+        permanent: false,
+      },
     ];
   },
 };
