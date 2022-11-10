@@ -19,7 +19,7 @@ function Leaderboard() {
         </dt>
         <dd>18,239 USDC</dd>
         <dt>
-          sbf.eth<span aria-hidden>..........................</span>
+          adamgobes<span aria-hidden>.........................</span>
         </dt>
         <dd>17,267 USDC</dd>
         <dt>
