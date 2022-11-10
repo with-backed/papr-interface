@@ -18,6 +18,35 @@ export type SupportedNetwork = 'ethereum' | 'goerli';
 // Limited Alchemy API key for use on localdev only. Prod ones can only be used from our prod site's location.
 const developmentAlchemyKey = 'BtHbvji7nhBOC943JJB2XoXMSJAh64g-';
 
+const paprTrash: Config = {
+  ...baseConfig,
+  tokenName: 'paprTrash',
+  centerNetwork: 'ethereum-goerli',
+  chainId: 5,
+  jsonRpcProvider:
+    'https://eth-goerli.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
+  alchemyId: developmentAlchemyKey,
+  openSeaUrl: 'https://testnets.opensea.io',
+  etherscanUrl: 'https://goerli.etherscan.io',
+  siteUrl: 'https://staging.withbacked.xyz',
+  network: 'goerli',
+  strategyAddress: '0xF478340769a200f20fEa385dEEA6D42550DD8986',
+  uniswapSubgraph:
+    'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
+  paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+  oracleBaseUrl: 'http://localhost:3000',
+  paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
+  reservoirAPI: 'https://api-goerli.reservoir.tools',
+  paprHeroesUSDC: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
+  paprHeroesCollateral: [
+    '0x0593cd2238d1b143bd1c67cd7fa98eee32a260ea',
+    '0xd4e652bbfcf616c966e1b1e8ed37599d81f11889',
+    '0x4770646fe8635fa9ed3cb72ed4b7ef6386a06827',
+    '0xabe17952e7fe468711826c26b04b047c0da53b86',
+  ],
+  reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
+};
+
 const paprHero: Config = {
   ...baseConfig,
   tokenName: 'paprHero',
@@ -74,13 +103,14 @@ const paprMeme = {
 };
 
 export const configs = {
-  paprMeme,
+  paprTrash,
   paprHero,
+  paprMeme,
 };
 
 export const prodConfigs = [];
 
-export const devConfigs = [paprHero];
+export const devConfigs = [paprTrash, paprHero];
 
 const SUPPORTED_TOKENS = new Set(Object.keys(configs));
 

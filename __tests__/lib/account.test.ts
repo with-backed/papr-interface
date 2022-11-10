@@ -30,7 +30,7 @@ describe('account utilities', () => {
     it('returns the value the provider resolves', async () => {
       const value = await resolveEns(
         '0xaddress',
-        configs.paprHero.jsonRpcProvider,
+        configs.paprTrash.jsonRpcProvider,
       );
       expect(value).toEqual('address.eth');
     });

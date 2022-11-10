@@ -10,11 +10,13 @@ type ImageDirectory = {
   [key in SupportedToken]: StaticImageData;
 };
 const ERROR_LOGOS: ImageDirectory = {
+  paprTrash: borkedBunny,
   paprHero: borkedBunny,
   paprMeme: borkedBunny,
 };
 
 const NORMAL_LOGOS: ImageDirectory = {
+  paprTrash: backedBunny,
   paprHero: backedBunny,
   paprMeme: backedBunny,
 };

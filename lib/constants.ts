@@ -21,6 +21,7 @@ export const GITHUB_URL = 'https://github.com/with-backed';
 export const FAQ_URL =
   'https://with-backed.notion.site/FAQ-df65a5002100406eb6c5211fb8e105cf';
 export const BUNNY_IMG_URL_MAP = {
+  paprTrash: '/logos/backed-bunny.png',
   paprHero: '/logos/backed-bunny.png',
   paprMeme: '/logos/backed-bunny.png',
 };

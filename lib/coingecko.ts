@@ -32,7 +32,7 @@ export async function getUnitPriceForCoin(
 ): Promise<number | undefined> {
   const network = configs[token].network;
   // TODO: does coingecko support goerli?
-  if (network === 'paprHero') {
+  if (network === 'goerli') {
     return 1.01;
   }
 
