@@ -53,8 +53,8 @@
   --background-blue-paper: #d4e5ff;
   --background-orange-paper: linear-gradient(
     160deg,
-    rgba(255, 92, 0, 0.4) 0%,
-    rgba(255, 214, 0, 0.4) 100%
+    rgba(255, 92, 0, 0.3) 0%,
+    rgba(255, 214, 0, 0.3) 100%
   );
   --background-green-paper: radial-gradient(
     124.1% 1463.12% at 1.55% -61.48%,
@@ -81,7 +81,7 @@
   --font-small: 11px;
   --font-medium: 12px;
   --font-large: 16px;
-  --font-huge: 2rem;
+  --font-huge: 20px;
 
   /* component specific dimensions */
   --modal-width-narrow: 460px;
@@ -132,4 +132,8 @@ p {
  */
 div[role='tooltip'] {
   z-index: 3 !important;
+}
+
+th {
+  font-weight: var(--weight-regular);
 }

@@ -2,7 +2,7 @@
   border: none;
   border-radius: var(--border-radius-large);
   padding: var(--padding-button);
-  line-height: 32px;
+  line-height: 30px;
   cursor: pointer;
   font-size: var(--font-huge);
   min-height: 63px;
