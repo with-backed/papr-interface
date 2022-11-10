@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { SupportedNetwork } from 'lib/config';
+import { SupportedToken } from 'lib/config';
 import { LendingStrategy, SubgraphStrategy } from 'lib/LendingStrategy';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { UTCTimestamp } from 'lightweight-charts';
@@ -24,7 +24,7 @@ export interface StrategyPricesData {
 
 export async function strategyPricesData(
   strategy: LendingStrategy | SubgraphStrategy,
-  network: SupportedNetwork,
+  token: SupportedToken,
   uniswapSubgraphUrl: string,
 ): Promise<StrategyPricesData> {
   const now = Math.floor(Date.now() / 1000);
@@ -47,7 +47,7 @@ export async function strategyPricesData(
     );
   }
 
-  const [norms, normDPRs] = await normValues(now, strategy, network);
+  const [norms, normDPRs] = await normValues(now, strategy, token);
 
   // add a starting data point all on target
   markDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });

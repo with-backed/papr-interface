@@ -16,5 +16,5 @@ global.TextDecoder = TextDecoder;
 
 jest.mock('./hooks/useConfig', () => ({
   ...jest.requireActual('./hooks/useConfig'),
-  useConfig: jest.fn(() => configs.goerli),
+  useConfig: jest.fn(() => configs.paprHero),
 }));

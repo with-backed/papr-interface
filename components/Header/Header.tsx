@@ -62,7 +62,7 @@ type NavLinksProps = {
   activeRoute: string;
 };
 function NavLinks({ activeRoute }: NavLinksProps) {
-  const { network, strategyAddress } = useConfig();
+  const { tokenName, strategyAddress } = useConfig();
 
   const pages = useMemo(() => {
     if (process.env.VERCEL_ENV === 'production') {
@@ -81,7 +81,7 @@ function NavLinks({ activeRoute }: NavLinksProps) {
                 ? `/${p.route}`
                 : p.externalRedirect
                 ? p.route
-                : `/networks/${network}/${p.route}`
+                : `/tokens/${tokenName}/${p.route}`
             }>
             <a
               className={
@@ -100,10 +100,10 @@ function NavLinks({ activeRoute }: NavLinksProps) {
 }
 
 function LogoLink() {
-  const { network } = useConfig();
+  const { tokenName } = useConfig();
 
   return (
-    <Link href={`/networks/${network}/`} passHref>
+    <Link href={`/tokens/${tokenName}/`} passHref>
       <a title="papr">
         <img className={styles.logo} src={paprLogo.src} alt="" />
       </a>

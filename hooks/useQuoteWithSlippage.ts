@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { SupportedNetwork } from 'lib/config';
+import { SupportedToken } from 'lib/config';
 import { Quoter } from 'lib/contracts';
 import { computeSlippageForSwap, getQuoteForSwap } from 'lib/strategies';
 import { LendingStrategy } from 'lib/LendingStrategy';
@@ -11,14 +11,14 @@ export function useQuoteWithSlippage(
   amount: ethers.BigNumber,
   swapForUnderlying: boolean,
 ) {
-  const { network, jsonRpcProvider } = useConfig();
+  const { tokenName, jsonRpcProvider } = useConfig();
   const [quoteForSwap, setQuoteForSwap] = useState<string>('');
   const [quoteLoading, setQuoteLoading] = useState<boolean>(true);
 
   const [priceImpact, setPriceImpact] = useState<string>('');
   const [priceImpactLoading, setPriceImpactLoading] = useState<boolean>(true);
 
-  const quoter = Quoter(jsonRpcProvider, network as SupportedNetwork);
+  const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
 
   const tokenOut = useMemo(() => {
     if (swapForUnderlying) {

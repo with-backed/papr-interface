@@ -10,15 +10,15 @@ export async function calculateNetPhUSDCBalance(
   address: string,
   oracleInfo: { [key: string]: ReservoirResponseData },
 ): Promise<ethers.BigNumber> {
-  const provider = makeProvider(configs.goerli.jsonRpcProvider, 'goerli');
-  const connectedERC721 = configs.goerli.paprHeroesCollateral.map((c) =>
+  const provider = makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero');
+  const connectedERC721 = configs.paprHero.paprHeroesCollateral.map((c) =>
     ERC721__factory.connect(
       c,
-      makeProvider(configs.goerli.jsonRpcProvider, 'goerli'),
+      makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero'),
     ),
   );
   const connectedPhUSDC = PHUSDC__factory.connect(
-    configs.goerli.paprHeroesUSDC,
+    configs.paprHero.paprHeroesUSDC,
     provider,
   );
   const decimals = await connectedPhUSDC.decimals();

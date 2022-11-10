@@ -1,4 +1,4 @@
-import { configs, SupportedNetwork, validateNetwork } from 'lib/config';
+import { configs, SupportedToken, validateToken } from 'lib/config';
 import { generateDummyOracleMessage } from 'lib/oracle/fakeMessages';
 import {
   getSignedOracleFloorPriceMessage,
@@ -11,28 +11,28 @@ async function handler(
   res: NextApiResponse<ReservoirResponseData | null>,
 ) {
   try {
-    validateNetwork(req.query);
-    const { network, collection, heroes } = req.query as {
-      network: SupportedNetwork;
+    validateToken(req.query);
+    const { token, collection, heroes } = req.query as {
+      token: SupportedToken;
       collection: string;
       heroes: string;
     };
     const isHeroes = heroes === 'true';
 
-    if (network === 'ethereum' || isHeroes) {
+    if (configs[token].tokenName === 'paprMeme' || isHeroes) {
       return res
         .status(200)
         .json(
           await getSignedOracleFloorPriceMessage(
             collection,
-            configs[network],
+            configs[token],
             isHeroes,
           ),
         );
     } else {
       return res
         .status(200)
-        .json(await generateDummyOracleMessage(collection, configs[network]));
+        .json(await generateDummyOracleMessage(collection, configs[token]));
     }
   } catch (e) {
     return res.status(400).json(null);

@@ -100,7 +100,7 @@ function PHUSDC() {
 
   const erc20 = useMemo(() => {
     return PHUSDC__factory.connect(
-      configs.goerli.paprHeroesUSDC,
+      configs.paprHero.paprHeroesUSDC,
       signerOrProvider,
     );
   }, [signerOrProvider]);
@@ -133,7 +133,7 @@ function PHUSDC() {
   }, [value, stakeInfo, decimals]);
 
   const { config: stakeConfig } = usePrepareContractWrite({
-    address: configs.goerli.paprHeroesUSDC,
+    address: configs.paprHero.paprHeroesUSDC,
     abi: PHUSDC__factory.abi,
     functionName: 'stake',
     args: [amountToStake],
@@ -150,7 +150,7 @@ function PHUSDC() {
   } as any);
 
   const { config: withdrawConfig } = usePrepareContractWrite({
-    address: configs.goerli.paprHeroesUSDC,
+    address: configs.paprHero.paprHeroesUSDC,
     abi: PHUSDC__factory.abi,
     functionName: 'unstake',
     args: [],
@@ -292,7 +292,7 @@ function AllowedCollateral({
             </td>
             <td>
               <Link
-                href={`${configs.goerli.reservoirMarketplace}/collections/${contractAddress}`}
+                href={`${configs.paprHero.reservoirMarketplace}/collections/${contractAddress}`}
                 passHref={true}>
                 <button className={styles.button}>Buy or Sell</button>
               </Link>

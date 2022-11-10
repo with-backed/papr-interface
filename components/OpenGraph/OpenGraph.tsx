@@ -1,5 +1,5 @@
 import { useConfig } from 'hooks/useConfig';
-import { SupportedNetwork } from 'lib/config';
+import { SupportedToken } from 'lib/config';
 import {
   BUNNY_IMG_URL_MAP,
   OPENGRAPH_DEFAULT_DESCRIPTION,
@@ -20,9 +20,9 @@ export function OpenGraph({
   type = 'website',
   description = OPENGRAPH_DEFAULT_DESCRIPTION,
 }: OpenGraphProps) {
-  const { siteUrl, network } = useConfig();
+  const { siteUrl, tokenName } = useConfig();
   const { pathname } = useRouter();
-  let img = imageUrl || BUNNY_IMG_URL_MAP[network as SupportedNetwork];
+  let img = imageUrl || BUNNY_IMG_URL_MAP[tokenName as SupportedToken];
   return (
     <Head>
       <meta property="og:title" content={title} />

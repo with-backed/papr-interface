@@ -40,7 +40,7 @@ type LoadedProps = {
   vaults: Vault[];
 };
 function Loaded({ strategy, vaults }: LoadedProps) {
-  const { network } = useConfig();
+  const { tokenName } = useConfig();
   if (vaults.length === 0) {
     return <p>No vaults associated with this strategy</p>;
   }
@@ -51,7 +51,7 @@ function Loaded({ strategy, vaults }: LoadedProps) {
         return (
           <li key={v.id}>
             <Link
-              href={`/networks/${network}/in-kind/strategies/${strategy}/vaults/${ethers.BigNumber.from(
+              href={`/tokens/${tokenName}/in-kind/strategies/${strategy}/vaults/${ethers.BigNumber.from(
                 v.id,
               )}`}>
               <a>{v.id.substring(0, 16)}...</a>

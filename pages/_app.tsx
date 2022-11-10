@@ -8,20 +8,20 @@ import { Footer } from 'components/Footer';
 import { ConfigProvider } from 'hooks/useConfig';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { SupportedNetwork, prodConfigs, devConfigs } from 'lib/config';
+import { SupportedToken, prodConfigs, devConfigs } from 'lib/config';
 import { ApplicationProviders } from 'components/ApplicationProviders';
 import { Header } from 'components/Header';
 import { ErrorBanners } from 'components/ErrorBanners';
 
 const networks = (
   process.env.NEXT_PUBLIC_ENV === 'production'
-    ? prodConfigs.map(({ network }) => network)
-    : [...prodConfigs, ...devConfigs].map(({ network }) => network)
-) as SupportedNetwork[];
+    ? prodConfigs.map(({ tokenName }) => tokenName)
+    : [...prodConfigs, ...devConfigs].map(({ tokenName }) => tokenName)
+) as SupportedToken[];
 
-const NETWORK_FROM_PATH_REGEXP = /\/networks\/([^\/]+)/;
-function networkFromPath(path: string) {
-  const match = path.match(NETWORK_FROM_PATH_REGEXP);
+const TOKEN_FROM_PATH_REGEXP = /\/tokens\/([^\/]+)/;
+function tokenFromPath(path: string) {
+  const match = path.match(TOKEN_FROM_PATH_REGEXP);
   if (match) {
     return match[1];
   }
@@ -30,19 +30,19 @@ function networkFromPath(path: string) {
 
 export default function App({ Component, pageProps }: AppProps) {
   const { asPath } = useRouter();
-  const [network, setNetwork] = useState<SupportedNetwork>(
-    networkFromPath(asPath) as SupportedNetwork,
+  const [token, setToken] = useState<SupportedToken>(
+    tokenFromPath(asPath) as SupportedToken,
   );
 
   useEffect(() => {
-    const newPath = networkFromPath(asPath);
-    if (newPath !== network) {
-      setNetwork(newPath as SupportedNetwork);
+    const newPath = tokenFromPath(asPath);
+    if (newPath !== token) {
+      setToken(newPath as SupportedToken);
     }
-  }, [asPath, network]);
+  }, [asPath, token]);
 
   return (
-    <ConfigProvider network={network}>
+    <ConfigProvider token={token}>
       <ApplicationProviders>
         <AppWrapper>
           <ErrorBanners />

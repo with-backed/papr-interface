@@ -3,24 +3,24 @@ import React from 'react';
 import backedBunny from '../../public/logos/backed-bunny.png';
 import borkedBunny from './borked-bunny.png';
 import pepe from './pepe-bunny-line.png';
-import { SupportedNetwork } from 'lib/config';
+import { SupportedToken } from 'lib/config';
 import styles from './Logo.module.css';
 
 type ImageDirectory = {
-  [key in SupportedNetwork]: StaticImageData;
+  [key in SupportedToken]: StaticImageData;
 };
 const ERROR_LOGOS: ImageDirectory = {
-  ethereum: borkedBunny,
-  goerli: borkedBunny,
+  paprHero: borkedBunny,
+  paprMeme: borkedBunny,
 };
 
 const NORMAL_LOGOS: ImageDirectory = {
-  ethereum: backedBunny,
-  goerli: backedBunny,
+  paprHero: backedBunny,
+  paprMeme: backedBunny,
 };
 
 export function getLogo(
-  network: SupportedNetwork,
+  network: SupportedToken,
   error?: boolean,
   codeActive?: boolean,
 ) {
@@ -40,11 +40,11 @@ type LogoProps = {
   codeActive?: boolean;
 };
 export const Logo = ({ error, codeActive }: LogoProps) => {
-  const { network } = useConfig();
+  const { tokenName } = useConfig();
   return (
     <img
       className={styles.image}
-      src={getLogo(network as SupportedNetwork, error, codeActive).src}
+      src={getLogo(tokenName as SupportedToken, error, codeActive).src}
       alt="Backed logo"
     />
   );

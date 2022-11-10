@@ -44,14 +44,14 @@ const subgraphPool: SubgraphPool = {
   __typename: 'Pool',
 };
 
-const provider = makeProvider(configs.goerli.jsonRpcProvider, 'goerli');
+const provider = makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero');
 
 let strategyInstance = makeLendingStrategy(
   subgraphStrategy,
   subgraphPool,
   {},
   provider,
-  configs.goerli,
+  configs.paprHero,
 );
 
 describe('LendingStrategy', () => {

@@ -30,7 +30,7 @@ describe('account utilities', () => {
     it('returns the value the provider resolves', async () => {
       const value = await resolveEns(
         '0xaddress',
-        configs.goerli.jsonRpcProvider,
+        configs.paprHero.jsonRpcProvider,
       );
       expect(value).toEqual('address.eth');
     });

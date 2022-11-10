@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import React from 'react';
 import { captureException } from '@sentry/nextjs';
-import { SupportedNetwork, validateNetwork } from 'lib/config';
+import { SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import capitalize from 'lodash/capitalize';
 
@@ -9,8 +9,8 @@ export const getServerSideProps: GetServerSideProps<LPProps> = async (
   context,
 ) => {
   try {
-    validateNetwork(context.params!);
-    const network = context.params?.network as SupportedNetwork;
+    validateToken(context.params!);
+    const network = context.params?.token as SupportedToken;
 
     return {
       props: {
@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps<LPProps> = async (
 };
 
 type LPProps = {
-  network: SupportedNetwork;
+  network: SupportedToken;
 };
 export default function LP({ network }: LPProps) {
   return (
