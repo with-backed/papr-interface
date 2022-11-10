@@ -2,10 +2,10 @@
   border: none;
   border-radius: var(--border-radius-large);
   padding: var(--padding-button);
-  line-height: 1.6;
+  line-height: 30px;
   cursor: pointer;
-  font-size: var(--font-large);
-  min-height: 48px;
+  font-size: var(--font-huge);
+  min-height: 63px;
 }
 
 .dark {
@@ -16,12 +16,9 @@
 
 .primary {
   composes: button;
-  background: linear-gradient(
-    180deg,
-    var(--highlight-clickable-5) 50%,
-    var(--highlight-clickable-7) 100%
-  );
-  color: var(--highlight-clickable-100);
+  background: var(--background-white);
+  color: var(--neutral-100);
+  border: 2px black solid;
 }
 
 .primary:hover,

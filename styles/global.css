@@ -38,7 +38,7 @@
   --line-height: 1.6;
 
   /* padding and gaps */
-  --padding-button: 0.3rem 1rem;
+  --padding-button: 16px 22px;
   --padding-container: 2.5rem;
   --padding-loan-card: 7px 21px 14px 21px;
   --gap: 2.5rem;
@@ -51,6 +51,16 @@
   --background-lighter-dark: #383838;
   --background-faded-green: #eaf8f5;
   --background-blue-paper: #d4e5ff;
+  --background-orange-paper: linear-gradient(
+    160deg,
+    rgba(255, 92, 0, 0.3) 0%,
+    rgba(255, 214, 0, 0.3) 100%
+  );
+  --background-green-paper: radial-gradient(
+    124.1% 1463.12% at 1.55% -61.48%,
+    rgba(61, 138, 181, 0.2) 0%,
+    rgba(17, 209, 169, 0.2) 100%
+  );
 
   /* shadows */
   --box-shadow: 0 0 20px 0px rgb(171 155 150 / 20%);
@@ -59,19 +69,19 @@
 
   /* border styles */
   --border-radius-small: 0.3rem;
-  --border-radius-large: 0.86rem;
+  --border-radius-large: 1.5rem;
 
   /* font styles */
   --serif: 'Times New Roman', Times, serif;
   --sans: 'GT Maru Regular', Helvetica, sans-serif;
-  --mono: 'GT Maru Mono', monospace;
+  --mono: 'Courier Prime', 'Courier New', monospace;
   --weight-light: 300;
   --weight-regular: 400;
   --weight-semibold: 600;
   --font-small: 11px;
   --font-medium: 12px;
   --font-large: 16px;
-  --font-huge: 2.6rem;
+  --font-huge: 20px;
 
   /* component specific dimensions */
   --modal-width-narrow: 460px;
@@ -95,7 +105,7 @@ body {
 
 h1 {
   font-size: var(--font-huge);
-  font-weight: var(--weight-light);
+  font-weight: var(--weight-regular);
 }
 
 h2,
@@ -122,4 +132,8 @@ p {
  */
 div[role='tooltip'] {
   z-index: 3 !important;
+}
+
+th {
+  font-weight: var(--weight-regular);
 }

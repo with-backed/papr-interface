@@ -1,29 +1,41 @@
+.box {
+  color: black;
+  background: var(--background-white);
+  padding: 16px 24px;
+  border: 2px black solid;
+  font-size: var(--font-large);
+  line-height: var(--font-large);
+  width: 100%;
+}
+
 .disclosure {
-  color: var(--highlight-clickable-100);
+  composes: box;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 1rem;
+  justify-content: space-between;
 }
 
 .disclosure > svg {
-  stroke: var(--highlight-clickable-100);
+  stroke: black;
   transform: rotate(-90deg);
 }
 
 .opened {
   composes: disclosure;
-  color: var(--highlight-visited-100);
-}
-
-.opened > svg {
-  stroke: var(--highlight-visited-100);
 }
 
 .currently-open {
   composes: opened;
+  border-bottom: none;
 }
 
 .currently-open > svg {
   transform: rotate(0deg);
+}
+
+.content {
+  composes: box;
+  border-top: none;
 }

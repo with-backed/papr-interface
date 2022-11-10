@@ -1,0 +1,25 @@
+import { ButtonLink } from 'components/Button';
+import React from 'react';
+import styles from './LandingPageContent.module.css';
+
+export function Whitepaper() {
+  return (
+    <div className={styles.whitepaper}>
+      <p className={styles.highlight}>The FREE MARKET sets the price</p>
+      <p>
+        The CONTRACT uses MARKET PRICE to determine INTEREST owed by BORROWERS,
+        <br />
+        which is paid in the form of appreciation in the price of papr tokens.
+        <br />
+        This impacts SUPPLY and DEMAND and the price of papr on UNISWAP, forming
+        a perpetual
+        <br />
+        feedback loop for discovering the optimal APR for loans.
+      </p>
+      <p className={styles.highlight}>papr = perpetual APR</p>
+      <ButtonLink kind="primary" href="">
+        Read the whitepaper
+      </ButtonLink>
+    </div>
+  );
+}
