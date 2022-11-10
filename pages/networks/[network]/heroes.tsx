@@ -3,7 +3,7 @@ import React from 'react';
 import { captureException } from '@sentry/nextjs';
 import { configs, SupportedNetwork, validateNetwork } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
-import { HeroesLandingPageContent } from 'components/LandingPageContent/HeroesLandingPageContent';
+import { HeroesLandingPageContent } from 'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent';
 import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { calculateNetPhUSDCBalance } from 'lib/paprHeroes';
