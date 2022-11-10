@@ -16,13 +16,6 @@ const moduleExports = {
   async redirects() {
     return [
       {
-        source: '/',
-        destination: `/tokens/${
-          process.env.NEXT_PUBLIC_ENV === 'preview' ? 'paprHero' : 'paprMeme'
-        }`,
-        permanent: false,
-      },
-      {
         source: '/tokens/paprHero',
         destination: '/tokens/paprHero/contest',
         permanent: false,
