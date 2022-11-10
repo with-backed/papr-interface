@@ -1,0 +1,128 @@
+.wrapper {
+    padding-top: 47px;
+}
+
+.wrapper h1,
+.wrapper h2 {
+  text-align: center;
+  margin: 0;
+}
+
+.wrapper h1 {
+  text-transform: uppercase;
+  margin-top: 40px;
+}
+
+.wrapper h1 {
+  margin-bottom: 40px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th,
+.table td {
+  padding-left: 1rem;
+  text-align: center;
+}
+
+.table:first-of-type {
+  margin-bottom: 2rem;
+}
+
+.table tbody tr {
+  background-color: var(--heroes-red) !important;
+}
+
+.phUSDCTable thead tr th {
+  width: 22%;
+}
+
+.phUSDCTable .buyOrSell {
+  width: 34%;
+  text-align: center;
+}
+
+.phUSDCTable tbody td input {
+  border: none;
+  background-color: white;
+  border-radius: 10px;
+  width: 80%;
+  padding: 12px;
+}
+
+.buyOrSell button {
+  margin: 0 4px;
+}
+
+.allowedCollateralTable thead tr th.yourBalance {
+  width: 20%;
+}
+
+.allowedCollateralTable thead tr th {
+  width: 30%;
+}
+
+.button {
+  cursor: pointer;
+  background-color: white;
+  padding: 10px;
+  color: var(--highlight-clickable-100);
+  border: none;
+  border-radius: 10px;
+}
+
+.legendNFT {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 500px;
+}
+
+.legendNFT div {
+  width: 20px !important;
+}
+.legendNFT img {
+  width: 100%;
+}
+
+.legendNFT p {
+  margin: 0px;
+  margin-left: 12px;
+}
+
+.fieldsetsWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.fieldsetsWrapper fieldset {
+    margin: 1%;
+    width: 50%;
+}
+
+.fieldsetsWrapper fieldset p {
+  padding: 0;
+}
+
+.userWalletValue {
+  background-color: var(--heroes-red);
+}
+
+.userWalletValue p {
+  padding: 10px !important;
+}
+
+.phUSDCWrapper {
+  margin: 3%;
+}
+  
+.leaderboard {
+  font-size: var(--font-large);
+}
