@@ -7,7 +7,7 @@
 }
 
 .dashed-line {
-  background-image: url('../../public/dashedline.svg');
+  background-image: url('/dashedline.svg');
   background-repeat: no-repeat;
   background-position: center;
   width: 100%;
