@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { getAddress } from 'ethers/lib/utils';
 import { LendingStrategy } from 'lib/LendingStrategy';
-import { configs, SupportedNetwork } from 'lib/config';
+import { configs, SupportedToken } from 'lib/config';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
 
 dayjs.extend(duration);
@@ -248,13 +248,13 @@ export function computeLtv(
 
 export async function getOracleInfoFromAllowedCollateral(
   collections: string[],
-  network: SupportedNetwork,
+  token: SupportedToken,
   isHeroes: boolean = false,
 ) {
   const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
     collections.map(async (collectionAddress) => {
       const req = await fetch(
-        `${configs[network].oracleBaseUrl}/api/networks/${network}/oracle/collections/${collectionAddress}?heroes=${isHeroes}`,
+        `${configs[token].oracleBaseUrl}/api/tokens/${token}/oracle/collections/${collectionAddress}?heroes=${isHeroes}`,
         {
           method: 'POST',
         },

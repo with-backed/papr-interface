@@ -1,8 +1,8 @@
 import { captureException } from '@sentry/nextjs';
-import { SupportedNetwork } from './config';
+import { configs, SupportedToken } from './config';
 
 // based on output from https://api.coingecko.com/api/v3/asset_platforms
-const networkMap = {
+const networkMap: { [key: string]: string } = {
   optimism: 'optimistic-ethereum',
   ethereum: 'ethereum',
   goerli: 'goerli',
@@ -28,8 +28,9 @@ export async function getUnitPriceForEth(toCurrency: string) {
 export async function getUnitPriceForCoin(
   tokenAddress: string,
   toCurrency: string,
-  network?: SupportedNetwork,
+  token: SupportedToken,
 ): Promise<number | undefined> {
+  const network = configs[token].network;
   // TODO: does coingecko support goerli?
   if (network === 'goerli') {
     return 1.01;

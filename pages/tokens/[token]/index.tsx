@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import React from 'react';
 import { captureException } from '@sentry/nextjs';
-import { SupportedNetwork, validateNetwork } from 'lib/config';
+import { SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import capitalize from 'lodash/capitalize';
 import { LandingPageContent } from 'components/LandingPageContent';
@@ -10,12 +10,12 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
   context,
 ) => {
   try {
-    validateNetwork(context.params!);
-    const network = context.params?.network as SupportedNetwork;
+    validateToken(context.params!);
+    const token = context.params?.token as SupportedToken;
 
     return {
       props: {
-        network,
+        token,
       },
     };
   } catch (e) {
@@ -27,12 +27,12 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async (
 };
 
 type HomeProps = {
-  network: SupportedNetwork;
+  token: SupportedToken;
 };
-export default function Home({ network }: HomeProps) {
+export default function Home({ token }: HomeProps) {
   return (
     <>
-      <OpenGraph title={`Backed | ${capitalize(network)} | Home`} />
+      <OpenGraph title={`Backed | ${capitalize(token)} | Home`} />
       <LandingPageContent />
     </>
   );

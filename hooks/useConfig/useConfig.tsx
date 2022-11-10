@@ -1,17 +1,18 @@
-import { Config, configs, SupportedNetwork } from 'lib/config';
+import { Config, configs, SupportedToken } from 'lib/config';
 import { createContext, FunctionComponent, useContext } from 'react';
 
 const ConfigContext = createContext<Config | null>(null);
 
 type ConfigProviderProps = {
-  network: SupportedNetwork;
+  token: SupportedToken;
 };
+
 export const ConfigProvider: FunctionComponent<ConfigProviderProps> = ({
   children,
-  network,
+  token,
 }) => {
   return (
-    <ConfigContext.Provider value={configs[network]}>
+    <ConfigContext.Provider value={configs[token]}>
       {children}
     </ConfigContext.Provider>
   );

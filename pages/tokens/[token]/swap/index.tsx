@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import React from 'react';
 import { captureException } from '@sentry/nextjs';
-import { SupportedNetwork, validateNetwork } from 'lib/config';
+import { SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import capitalize from 'lodash/capitalize';
 
@@ -9,12 +9,12 @@ export const getServerSideProps: GetServerSideProps<SwapProps> = async (
   context,
 ) => {
   try {
-    validateNetwork(context.params!);
-    const network = context.params?.network as SupportedNetwork;
+    validateToken(context.params!);
+    const token = context.params?.token as SupportedToken;
 
     return {
       props: {
-        network,
+        token,
       },
     };
   } catch (e) {
@@ -26,12 +26,12 @@ export const getServerSideProps: GetServerSideProps<SwapProps> = async (
 };
 
 type SwapProps = {
-  network: SupportedNetwork;
+  token: SupportedToken;
 };
-export default function Swap({ network }: SwapProps) {
+export default function Swap({ token }: SwapProps) {
   return (
     <>
-      <OpenGraph title={`Backed | ${capitalize(network)} | Swap`} />
+      <OpenGraph title={`Backed | ${capitalize(token)} | Swap`} />
       <h1>under construction</h1>
     </>
   );

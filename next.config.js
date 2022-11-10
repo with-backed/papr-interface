@@ -16,9 +16,14 @@ const moduleExports = {
     return [
       {
         source: '/',
-        destination: `/networks/${
-          process.env.NEXT_PUBLIC_ENV === 'preview' ? 'goerli' : 'ethereum'
+        destination: `/tokens/${
+          process.env.NEXT_PUBLIC_ENV === 'preview' ? 'paprHero' : 'paprMeme'
         }`,
+        permanent: false,
+      },
+      {
+        source: '/tokens/paprHero',
+        destination: '/tokens/paprHero/contest',
         permanent: false,
       },
     ];

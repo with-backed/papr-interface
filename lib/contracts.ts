@@ -6,15 +6,12 @@ import {
   IQuoter__factory,
   Strategy__factory,
 } from 'types/generated/abis';
-import { configs, SupportedNetwork } from './config';
+import { configs, SupportedToken } from './config';
 
-export function makeProvider(
-  jsonRpcProvider: string,
-  network: SupportedNetwork,
-) {
+export function makeProvider(jsonRpcProvider: string, token: SupportedToken) {
   return new ethers.providers.JsonRpcProvider(
     jsonRpcProvider,
-    configs[network].chainId,
+    configs[token].chainId,
   );
 }
 
@@ -29,7 +26,7 @@ export function web3Erc721Contract(address: string, signer: Signer) {
 export function jsonRpcERC721Contract(
   address: string,
   jsonRpcProvider: string,
-  network: SupportedNetwork,
+  network: SupportedToken,
 ): ERC721 {
   const provider = makeProvider(jsonRpcProvider, network);
   return erc721Contract(address, provider);
@@ -38,7 +35,7 @@ export function jsonRpcERC721Contract(
 export function jsonRpcERC20Contract(
   address: string,
   jsonRpcProvider: string,
-  network: SupportedNetwork,
+  network: SupportedToken,
 ) {
   const provider = makeProvider(jsonRpcProvider, network);
   return erc20Contract(address, provider);
@@ -63,14 +60,14 @@ export function erc721Contract(
 export function jsonRpcStrategyContract(
   address: string,
   jsonRpcProvider: string,
-  network: SupportedNetwork,
+  network: SupportedToken,
 ) {
   const provider = makeProvider(jsonRpcProvider, network);
   return Strategy__factory.connect(address, provider);
 }
 
-export function Quoter(jsonRpcProvider: string, network: SupportedNetwork) {
-  const provider = makeProvider(jsonRpcProvider, network);
+export function Quoter(jsonRpcProvider: string, token: SupportedToken) {
+  const provider = makeProvider(jsonRpcProvider, token);
   return IQuoter__factory.connect(
     process.env.NEXT_PUBLIC_QUOTER as string,
     provider,
@@ -80,7 +77,7 @@ export function Quoter(jsonRpcProvider: string, network: SupportedNetwork) {
 export function strategyContract(
   address: string,
   jsonRpcProvider: string,
-  network: SupportedNetwork,
+  network: SupportedToken,
 ) {
   const provider = makeProvider(jsonRpcProvider, network);
   return Strategy__factory.connect(address, provider);

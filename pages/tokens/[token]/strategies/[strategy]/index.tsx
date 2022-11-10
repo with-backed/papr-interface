@@ -1,10 +1,10 @@
-import { configs, SupportedNetwork } from 'lib/config';
-import { strategyPricesData } from 'lib/strategies/charts';
 import { GetServerSideProps } from 'next';
+import { strategyPricesData } from 'lib/strategies/charts';
+import { configs, SupportedToken } from 'lib/config';
 import {
-  BorrowPageContent,
-  BorrowPageProps,
-} from 'components/Strategies/BorrowPageContent';
+  StrategyOverviewContent,
+  StrategyPageProps,
+} from 'components/Strategies/StrategyOverviewContent';
 import {
   fetchSubgraphData,
   SubgraphPool,
@@ -17,23 +17,23 @@ import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
 import { useLendingStrategy } from 'hooks/useLendingStrategy';
 
 type ServerSideProps = Omit<
-  BorrowPageProps,
+  StrategyPageProps,
   'lendingStrategy' | 'pricesData'
 > & {
   subgraphStrategy: SubgraphStrategy;
-  subgraphPool: SubgraphPool;
   oracleInfo: { [key: string]: ReservoirResponseData };
+  subgraphPool: SubgraphPool;
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
   const address = (context.params?.strategy as string).toLowerCase();
-  const network = context.params?.network as SupportedNetwork;
+  const token = context.params?.token as SupportedToken;
 
   const strategySubgraphData = await fetchSubgraphData(
     address,
-    configs[network].uniswapSubgraph,
+    configs[token].uniswapSubgraph,
   );
 
   if (!strategySubgraphData) {
@@ -46,27 +46,26 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
   const oracleInfo = await getOracleInfoFromAllowedCollateral(
     lendingStrategy.allowedCollateral.map((ac) => ac.contractAddress),
-    network,
+    token,
   );
 
   return {
     props: {
-      strategyAddress: address,
+      address: address,
       subgraphStrategy: lendingStrategy,
+      oracleInfo,
       subgraphPool: pool,
-      oracleInfo: oracleInfo,
     },
   };
 };
 
-export default function Borrow({
-  strategyAddress,
+export default function StrategyPage({
+  address,
   subgraphStrategy,
-  subgraphPool,
   oracleInfo,
+  subgraphPool,
 }: ServerSideProps) {
   const config = useConfig();
-
   const lendingStrategy = useLendingStrategy({
     subgraphStrategy,
     subgraphPool,
@@ -77,18 +76,17 @@ export default function Borrow({
     () =>
       strategyPricesData(
         lendingStrategy,
-        config.network as SupportedNetwork,
+        config.tokenName as SupportedToken,
         config.uniswapSubgraph,
       ),
     [config, lendingStrategy],
   );
 
   return (
-    <BorrowPageContent
+    <StrategyOverviewContent
+      address={address}
       lendingStrategy={lendingStrategy}
-      strategyAddress={strategyAddress}
       pricesData={pricesData}
-      oracleInfo={oracleInfo}
     />
   );
 }

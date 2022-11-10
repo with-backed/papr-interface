@@ -1,7 +1,7 @@
 import { GetServerSideProps } from 'next';
 import React from 'react';
 import { captureException } from '@sentry/nextjs';
-import { configs, SupportedNetwork, validateNetwork } from 'lib/config';
+import { configs, SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import { HeroesLandingPageContent } from 'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent';
 import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
@@ -13,12 +13,12 @@ export const getServerSideProps: GetServerSideProps<
   HeroesLandingPageProps
 > = async (context) => {
   try {
-    validateNetwork(context.params!);
-    const network = context.params?.network as SupportedNetwork;
+    validateToken(context.params!);
+    const token = context.params?.token as SupportedToken;
 
     const oracleInfo = await getOracleInfoFromAllowedCollateral(
-      configs[network].paprHeroesCollateral,
-      network,
+      configs[token].paprHeroesCollateral,
+      token,
       true,
     );
 
@@ -41,7 +41,7 @@ export const getServerSideProps: GetServerSideProps<
 
     return {
       props: {
-        network,
+        token,
         oracleInfo,
         rankedPlayers,
       },
@@ -55,12 +55,12 @@ export const getServerSideProps: GetServerSideProps<
 };
 
 type HeroesLandingPageProps = {
-  network: SupportedNetwork;
+  token: SupportedToken;
   oracleInfo: { [key: string]: ReservoirResponseData };
   rankedPlayers: string[][];
 };
 export default function HeroesLandingPage({
-  network,
+  token,
   oracleInfo,
   rankedPlayers,
 }: HeroesLandingPageProps) {
@@ -68,7 +68,7 @@ export default function HeroesLandingPage({
     <>
       <OpenGraph title={`Backed | Papr Heroes | Home`} />
       <HeroesLandingPageContent
-        collateral={configs[network].paprHeroesCollateral}
+        collateral={configs[token].paprHeroesCollateral}
         oracleInfo={oracleInfo}
         rankedPlayers={rankedPlayers}
       />

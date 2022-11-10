@@ -1,5 +1,5 @@
 import { TestPageContent } from 'components/Strategies/TestPageContent';
-import { configs, SupportedNetwork } from 'lib/config';
+import { configs, SupportedToken } from 'lib/config';
 import {
   fetchSubgraphData,
   SubgraphPool,
@@ -17,11 +17,11 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
   context,
 ) => {
   const address = (context.params?.strategy as string).toLowerCase();
-  const network = context.params?.network as SupportedNetwork;
+  const token = context.params?.token as SupportedToken;
 
   const strategySubgraphData = await fetchSubgraphData(
     address,
-    configs[network].uniswapSubgraph,
+    configs[token].uniswapSubgraph,
   );
 
   if (!strategySubgraphData) {

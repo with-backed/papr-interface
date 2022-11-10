@@ -32,7 +32,7 @@ export function VaultRow({
   strategyId,
   expanded = true,
 }: VaultRowProps) {
-  const { network } = useConfig();
+  const { tokenName } = useConfig();
   const [{ data }] = useQuery<DebtIncreasesByVaultQuery>({
     query: DebtIncreasesByVaultDocument,
     variables: { vaultId: id },
@@ -61,7 +61,7 @@ export function VaultRow({
     <tr>
       <td>
         <Link
-          href={`/networks/${network}/strategies/${strategyId}/vaults/${id}`}>
+          href={`/tokens/${tokenName}/strategies/${strategyId}/vaults/${id}`}>
           {id.substring(0, 7)}
         </Link>
       </td>
