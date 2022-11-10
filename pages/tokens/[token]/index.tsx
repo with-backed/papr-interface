@@ -4,7 +4,7 @@ import { captureException } from '@sentry/nextjs';
 import { SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import capitalize from 'lodash/capitalize';
-import { LandingPageContent } from 'components/LandingPageContent';
+import { LandingPageContent } from 'components/LandingPageContent/MainLandingPage';
 
 export const getServerSideProps: GetServerSideProps<HomeProps> = async (
   context,
