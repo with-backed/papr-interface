@@ -85,25 +85,34 @@ function LoanInfo({ paprController, vault }: LoanInfoProps) {
     if (!address || !vault) {
       return null;
     }
-    const maxDebt = await paprController.maxDebt(address);
+    // TODO fix with real oracle price
+    const maxDebt = await paprController.maxDebt(
+      address,
+      vault.collateralContract,
+      ethers.BigNumber.from(1),
+    );
     const debtBigNumber = ethers.BigNumber.from(vault.debt);
     return computeLiquidationEstimation(debtBigNumber, maxDebt, paprController);
   }, [address, paprController, vault]);
-  const norm = useAsyncValue(() => paprController.newNorm(), [paprController]);
+  const target = useAsyncValue(
+    () => paprController.newTarget(),
+    [paprController],
+  );
   const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
   const formattedLTV = useMemo(() => {
-    if (!norm) {
+    if (!target) {
       return '... LTV';
     }
     return (
       formatPercent(
         convertOneScaledValue(
-          computeLtv(vault.debt, vault.totalCollateralValue, norm),
+          // TODO fix when we have up to date oracle price
+          computeLtv(vault.debt, 1, target),
           4,
         ),
       ) + ' LTV'
     );
-  }, [norm, vault]);
+  }, [target, vault]);
   const formattedDebt = useMemo(() => {
     return (
       formatTokenAmount(

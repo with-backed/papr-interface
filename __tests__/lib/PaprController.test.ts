@@ -10,11 +10,9 @@ import {
 const subgraphController: SubgraphController = {
   id: '0x41739c3547992ca3f2a40d110ad33afeb582eb7c',
   createdAt: '1663869096',
-  name: 'APE Loans',
-  symbol: 'AP',
   poolAddress: '0xcf93a7655d76b43313a69f15f01a39ea6ada5aea',
   underlying: '0x3089b47853df1b82877beef6d904a0ce98a12553',
-  norm: '1000000000000000000',
+  target: '1000000000000000000',
   vaults: [],
   allowedCollateral: [
     {

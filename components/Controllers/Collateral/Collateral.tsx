@@ -20,7 +20,10 @@ type CollateralProps = {
 };
 
 export function Collateral({ paprController, vaultId }: CollateralProps) {
-  const norm = useAsyncValue(() => paprController.newNorm(), [paprController]);
+  const norm = useAsyncValue(
+    () => paprController.newTarget(),
+    [paprController],
+  );
   const collateral = useMemo(() => {
     if (vaultId) {
       const vault = paprController.vaults?.find((v) => v.id === vaultId);

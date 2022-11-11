@@ -5,7 +5,7 @@ import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { UTCTimestamp } from 'lightweight-charts';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
 import { markValues } from './mark';
-import { normValues } from './norm';
+import { targetValues } from './target';
 
 export interface TimeSeriesValue {
   value: number;
@@ -13,11 +13,11 @@ export interface TimeSeriesValue {
 }
 
 export interface ControllerPricesData {
-  normalizationDPRValues: TimeSeriesValue[];
+  targetDPRValues: TimeSeriesValue[];
   markDPRValues: TimeSeriesValue[];
   indexDPRValues: TimeSeriesValue[];
   markValues: TimeSeriesValue[];
-  normalizationValues: TimeSeriesValue[];
+  targetValues: TimeSeriesValue[];
   index: number;
   indexDPR: number;
 }
@@ -47,26 +47,26 @@ export async function controllerPricesData(
     );
   }
 
-  const [norms, normDPRs] = await normValues(now, controller, token);
+  const [targets, targetDPRs] = await targetValues(now, controller, token);
 
   // add a starting data point all on target
   markDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });
-  normDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });
+  targetDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });
 
   // each unique timestamp from the datasets, sorted ascending. Use this to
   // make sure we have an index entry for each other value
   const timestamps = Array.from(
     new Set([
       ...markDPRs.map(({ time }) => time),
-      ...normDPRs.map(({ time }) => time),
+      ...targetDPRs.map(({ time }) => time),
     ]),
   ).sort((a, b) => a - b);
 
   return {
     indexDPR: 0,
     index: parseFloat(ethers.utils.formatEther(index)),
-    normalizationDPRValues: normDPRs,
-    normalizationValues: norms,
+    targetDPRValues: targetDPRs,
+    targetValues: targets,
     markValues: marks,
     markDPRValues: markDPRs,
     indexDPRValues: indexValues(0, timestamps),

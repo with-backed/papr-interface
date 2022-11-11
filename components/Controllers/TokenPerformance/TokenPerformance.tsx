@@ -110,13 +110,13 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
     if (!pricesData) {
       return null;
     }
-    return percentChangeOverDuration(pricesData.normalizationValues, 1);
+    return percentChangeOverDuration(pricesData.targetValues, 1);
   }, [pricesData]);
   const realizedAPR = useMemo(() => {
     if (!pricesData) {
       return null;
     }
-    return percentChangeOverDuration(pricesData.normalizationValues, 30);
+    return percentChangeOverDuration(pricesData.targetValues, 30);
   }, [pricesData]);
   const markAndChange = useMemo(() => {
     if (!pricesData) {
@@ -132,10 +132,10 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
     if (!pricesData || !markAndChange) {
       return null;
     }
-    const { markValues, normalizationValues } = pricesData;
+    const { markValues, targetValues } = pricesData;
     const { mark } = markAndChange;
-    const norm = normalizationValues[normalizationValues.length - 1].value;
-    const normADayAgo = getValueDaysAgo(normalizationValues, 1).value;
+    const norm = targetValues[targetValues.length - 1].value;
+    const normADayAgo = getValueDaysAgo(targetValues, 1).value;
     const markADayAgo = getValueDaysAgo(markValues, 1).value;
 
     const targetOverMark = norm / mark;

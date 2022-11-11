@@ -16,7 +16,10 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
   const vault = useMemo(() => {
     return paprController.vaults?.find((v) => v.id === vaultId);
   }, [paprController, vaultId]);
-  const norm = useAsyncValue(() => paprController.newNorm(), [paprController]);
+  const norm = useAsyncValue(
+    () => paprController.newTarget(),
+    [paprController],
+  );
   const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
   const ltv = useMemo(() => {
     if (vault && norm) {

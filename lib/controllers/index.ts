@@ -99,7 +99,7 @@ export async function multiplier(
 ) {
   const lastUpdated = await controller.lastUpdated();
   const PERIOD = ethers.BigNumber.from(28 * SECONDS_IN_A_DAY);
-  const prevNorm = await controller.normalization();
+  const prevNorm = await controller.target();
 
   const period = now.sub(lastUpdated);
   const periodRatio = period.mul(ONE).div(PERIOD);
@@ -222,7 +222,7 @@ export async function getDebtTokenMarketPrice(controller: PaprController) {
 }
 
 export async function getDebtTokenControllerPrice(controller: PaprController) {
-  return await controller.newNorm();
+  return await controller.newTarget();
 }
 
 export const getUniqueNFTId = (address: string, tokenId: string): string =>

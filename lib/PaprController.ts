@@ -146,11 +146,11 @@ class PaprControllerInternal {
     return this._contract.multiplier();
   }
 
-  newNorm() {
+  newTarget() {
     return this._contract.newTarget();
   }
 
-  normalization() {
+  target() {
     return this._contract.target();
   }
 

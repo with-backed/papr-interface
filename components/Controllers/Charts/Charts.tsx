@@ -71,19 +71,19 @@ type RateOfGrowthProps = {
   pricesData: ControllerPricesData;
 };
 function RateOfGrowth({
-  pricesData: { markValues, normalizationValues },
+  pricesData: { markValues, targetValues },
 }: RateOfGrowthProps) {
   const chartRef = useRef<HTMLDivElement>(null);
 
   const contractAPRs: TimeSeriesValue[] = useMemo(
     () =>
-      normalizationValues.slice(1).map((curr, i) => {
-        const prev = normalizationValues[i];
+      targetValues.slice(1).map((curr, i) => {
+        const prev = targetValues[i];
         // lightweight-charts expects percentages as the actual value, not a ratio
         const change = percentChange(prev.value, curr.value) * 100;
         return { value: change, time: curr.time };
       }),
-    [normalizationValues],
+    [targetValues],
   );
 
   const priceChange24h = useMemo(

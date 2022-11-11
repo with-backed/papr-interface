@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { Config } from 'lib/config';
-import { ReservoirOracleUnderwriter } from 'types/generated/abis/Controller';
+import { ReservoirOracleUnderwriter } from 'types/generated/abis/PaprController';
 
 export type ReservoirResponseData = {
   price: number;

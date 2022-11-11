@@ -49,12 +49,12 @@ export default function VaultMath({
   const [maxDebt, setMaxDebt] = useState<string>('');
 
   const updateMaxDebt = useCallback(async () => {
-    const newNorm = await controller.newNorm();
+    const newTarget = await controller.newTarget();
     const maxLTV = await controller.maxLTV();
 
     const maxDebt = maxLTV
       .mul(ethers.utils.parseUnits(oracleValue, controller.underlying.decimals))
-      .div(newNorm);
+      .div(newTarget);
 
     setMaxDebt(maxDebt.toString());
   }, [controller, oracleValue]);
@@ -69,8 +69,7 @@ export default function VaultMath({
   );
   const debtTokenControllerPrice = useMemo(
     () =>
-      pricesData.normalizationValues[pricesData.normalizationValues.length - 1]
-        ?.value || 1.0,
+      pricesData.targetValues[pricesData.targetValues.length - 1]?.value || 1.0,
     [pricesData],
   );
 

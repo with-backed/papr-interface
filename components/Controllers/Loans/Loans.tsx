@@ -19,11 +19,13 @@ type LoansProps = {
 
 export function Loans({ paprController, pricesData }: LoansProps) {
   const [ltvs, setLtvs] = useState<{ [key: string]: number }>({});
-  const norm = useAsyncValue(() => paprController.newNorm(), [paprController]);
+  const norm = useAsyncValue(
+    () => paprController.newTarget(),
+    [paprController],
+  );
   const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
   const activeVaults = useMemo(
-    () =>
-      paprController.vaults?.filter((v) => v.totalCollateralValue > 0) || [],
+    () => paprController.vaults?.filter((v) => v.debt > 0) || [],
     [paprController],
   );
   const avgLtv = useMemo(() => {
@@ -61,7 +63,8 @@ export function Loans({ paprController, pricesData }: LoansProps) {
       return;
     }
     const calculatedLtvs = activeVaults.reduce((prev, v) => {
-      const l = computeLtv(v.debt, v.totalCollateralValue, norm);
+      // TODO fix after we decide how get up to date oracle quote
+      const l = computeLtv(v.debt, 1, norm);
       return { ...prev, [v.id]: convertOneScaledValue(l, 4) };
     }, {} as { [key: string]: number });
     setLtvs(calculatedLtvs);

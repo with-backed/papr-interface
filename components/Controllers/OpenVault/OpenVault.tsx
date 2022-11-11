@@ -177,7 +177,13 @@ export function OpenVault({
     );
 
     setMaxDebt(maxDebt);
-  }, [controller, address, oracleValueOfCollateral, underlying.decimals]);
+  }, [
+    controller,
+    currentVault,
+    address,
+    oracleValueOfCollateral,
+    underlying.decimals,
+  ]);
 
   const maxLTV = useAsyncValue(() => controller.maxLTVPercent(), [controller]);
 

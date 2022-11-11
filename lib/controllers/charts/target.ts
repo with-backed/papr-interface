@@ -4,27 +4,27 @@ import { ONE } from 'lib/constants';
 import { TimeSeriesValue } from '.';
 import { PaprController, SubgraphController } from 'lib/PaprController';
 import { clientFromUrl } from 'lib/urql';
-import { Controller__factory } from 'types/generated/abis';
+import { PaprController__factory } from 'types/generated/abis';
 import {
-  NormalizationUpdatesByControllerDocument,
-  NormalizationUpdatesByControllerQuery,
+  TargetUpdatesByControllerDocument,
+  TargetUpdatesByControllerQuery,
 } from 'types/generated/graphql/inKindSubgraph';
 import { computeRate, RatePeriod } from '..';
 import { UTCTimestamp } from 'lightweight-charts';
 
-interface NormUpdate {
-  newNorm: string;
+interface TargetUpdate {
+  newTarget: string;
   timestamp: string;
 }
 
-export async function normValues(
+export async function targetValues(
   now: number,
   controller: PaprController | SubgraphController,
   token: SupportedToken,
 ): Promise<[TimeSeriesValue[], TimeSeriesValue[]]> {
   const result = await subgraphNormalizationUpdatesForController(controller.id);
 
-  const sortedNorms: NormUpdate[] =
+  const sortedNorms: TargetUpdate[] =
     result?.targetUpdates.sort(
       (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
     ) || [];
@@ -32,7 +32,7 @@ export async function normValues(
   // get what norm would be if updated at this moment and add to array
   if (sortedNorms.length > 0) {
     sortedNorms.push({
-      newNorm: await getNewNorm(controller.id, token),
+      newTarget: await getNewNorm(controller.id, token),
       timestamp: now.toString(),
     });
   }
@@ -45,8 +45,8 @@ export async function normValues(
     const current = sortedNorms[i];
     const t = parseInt(current.timestamp);
     const dpr = computeRate(
-      ethers.BigNumber.from(prev.newNorm),
-      ethers.BigNumber.from(current.newNorm),
+      ethers.BigNumber.from(prev.newTarget),
+      ethers.BigNumber.from(current.newTarget),
       parseInt(prev.timestamp),
       t,
       RatePeriod.Daily,
@@ -58,7 +58,7 @@ export async function normValues(
     });
     formattedNorms.push({
       value: parseFloat(
-        ethers.utils.formatEther(ethers.BigNumber.from(current.newNorm)),
+        ethers.utils.formatEther(ethers.BigNumber.from(current.newTarget)),
       ),
       time: t as UTCTimestamp,
     });
@@ -74,8 +74,8 @@ async function getNewNorm(
   const provider = new ethers.providers.JsonRpcProvider(
     configs[token].jsonRpcProvider,
   );
-  const s = Controller__factory.connect(controllerAddress, provider);
-  return (await s.newNorm()).toString();
+  const s = PaprController__factory.connect(controllerAddress, provider);
+  return (await s.newTarget()).toString();
 }
 
 async function subgraphNormalizationUpdatesForController(controller: string) {
@@ -84,10 +84,9 @@ async function subgraphNormalizationUpdatesForController(controller: string) {
     'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
   );
   const { data, error } = await client
-    .query<NormalizationUpdatesByControllerQuery>(
-      NormalizationUpdatesByControllerDocument,
-      { controller },
-    )
+    .query<TargetUpdatesByControllerQuery>(TargetUpdatesByControllerDocument, {
+      controller,
+    })
     .toPromise();
 
   if (error) {

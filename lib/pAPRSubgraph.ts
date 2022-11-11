@@ -1,6 +1,6 @@
 import {
-  LendingStrategiesDocument,
-  LendingStrategiesQuery,
+  PaprControllersDocument,
+  PaprControllersQuery,
   PaprControllerByIdDocument,
   PaprControllerByIdQuery,
   VaultsByOwnerForControllerDocument,
@@ -31,7 +31,7 @@ export async function getAllStrategies(): Promise<SubgraphController[]> {
     'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
   );
   const { data, error } = await client
-    .query<LendingStrategiesQuery>(LendingStrategiesDocument, {})
+    .query<PaprControllersQuery>(PaprControllersDocument, {})
     .toPromise();
 
   if (error) {
@@ -39,5 +39,5 @@ export async function getAllStrategies(): Promise<SubgraphController[]> {
     return [];
   }
 
-  return data?.lendingStrategies || [];
+  return data?.paprControllers || [];
 }

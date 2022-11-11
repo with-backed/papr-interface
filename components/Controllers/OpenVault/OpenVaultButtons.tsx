@@ -4,11 +4,11 @@ import { getAddress } from 'ethers/lib/utils';
 import { PaprController } from 'lib/PaprController';
 import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { erc721ABI, useContractWrite, usePrepareContractWrite } from 'wagmi';
-import PaprControllerABI from 'abis/Controller.json';
+import PaprControllerABI from 'abis/PaprController.json';
 import {
   IPaprController,
   ReservoirOracleUnderwriter,
-} from 'types/generated/abis/Controller';
+} from 'types/generated/abis/PaprController';
 import { useMemo } from 'react';
 import { deconstructFromId } from 'lib/controllers';
 
