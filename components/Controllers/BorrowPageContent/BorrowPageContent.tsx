@@ -66,7 +66,7 @@ export function BorrowPageContent({
   return (
     <div className={controllerStyles.wrapper}>
       <TokenPerformance
-        strategies={[paprController]}
+        controllers={[paprController]}
         pricesData={{ [paprController.id]: pricesData }}
       />
       <AccountNFTs

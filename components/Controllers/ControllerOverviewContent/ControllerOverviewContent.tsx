@@ -36,7 +36,7 @@ export function ControllerOverviewContent({
       />
       <TokenPerformance
         pricesData={{ [paprController.id]: pricesData }}
-        strategies={[paprController]}
+        controllers={[paprController]}
       />
       <Collateral paprController={paprController} />
       <Activity paprController={paprController} />

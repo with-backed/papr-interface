@@ -29,17 +29,17 @@ import {
 import { Table } from 'components/Table';
 
 export type ControllerSummaryProps = {
-  strategies: PaprController[];
+  controllers: PaprController[];
   pricesData: { [key: string]: ControllerPricesData | null };
 };
 
 export function TokenPerformance({
-  strategies,
+  controllers,
   pricesData,
 }: ControllerSummaryProps) {
   return (
     <Fieldset legend="📈 Token Performance">
-      <div className={styles.strategies}>
+      <div className={styles.controllers}>
         <Table className={styles.table}>
           <thead>
             <tr>
@@ -71,7 +71,7 @@ export function TokenPerformance({
             </tr>
           </thead>
           <tbody>
-            {strategies.map((controller, i) => (
+            {controllers.map((controller, i) => (
               <SummaryEntry
                 key={controller.id}
                 pricesData={pricesData[controller.id]}

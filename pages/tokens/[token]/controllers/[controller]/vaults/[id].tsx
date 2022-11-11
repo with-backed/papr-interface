@@ -80,7 +80,7 @@ export default function VaultPage({
 
   return (
     <div className={styles.column}>
-      <a href={`/tokens/${tokenName}/strategies/${paprController.id}`}>
+      <a href={`/tokens/${tokenName}/controllers/${paprController.id}`}>
         ⬅ controller
       </a>
       <VaultPageContent

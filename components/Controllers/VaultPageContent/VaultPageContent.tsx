@@ -25,7 +25,7 @@ export function VaultPageContent({
       <Activity paprController={paprController} vaultId={vaultId} />
       <TokenPerformance
         pricesData={{ [paprController.id]: pricesData }}
-        strategies={[paprController]}
+        controllers={[paprController]}
       />
     </div>
   );

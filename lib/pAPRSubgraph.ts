@@ -26,7 +26,7 @@ export async function subgraphControllerByAddress(id: string) {
   return data || null;
 }
 
-export async function getAllStrategies(): Promise<SubgraphController[]> {
+export async function getAllPaprControllers(): Promise<SubgraphController[]> {
   const client = clientFromUrl(
     'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
   );
