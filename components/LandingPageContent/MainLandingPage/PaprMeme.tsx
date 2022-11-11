@@ -21,7 +21,7 @@ export function PaprMeme() {
     <div className={styles['papr-meme-container']}>
       <Image src={PaprMemeLogo} alt="" />
       <h2>Lends to crypto-twitter&apos;s 9 favorite, meme-ish collections.</h2>
-      <ButtonLink href="" kind="primary">
+      <ButtonLink href="" kind="outline" theme="meme">
         Coming Soon!
       </ButtonLink>
       <Image src={Memes} alt="Examples of collections used by paprMEME" />

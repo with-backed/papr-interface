@@ -48,7 +48,7 @@ export function PaprHeroes() {
         <br />
         and Goerli versions of CC0 NFTs.
       </h2>
-      <ButtonLink kind="primary" href="">
+      <ButtonLink kind="outline" theme="hero" href="">
         Join the game
       </ButtonLink>
       <Image src={Heroes} alt="Examples of collections used in paprHERO" />

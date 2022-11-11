@@ -17,7 +17,7 @@ export function Whitepaper() {
         feedback loop for discovering the optimal APR for loans.
       </p>
       <p className={styles.highlight}>papr = perpetual APR</p>
-      <ButtonLink kind="primary" href="">
+      <ButtonLink kind="outline" theme="papr" href="">
         Read the whitepaper
       </ButtonLink>
     </div>
