@@ -1,8 +1,0 @@
-query lendingStrategyById($id: ID!) {
-  lendingStrategy(id: $id) {
-    ...allLendingStrategyProperties
-    vaults {
-      ...allVaultProperties
-    }
-  }
-}

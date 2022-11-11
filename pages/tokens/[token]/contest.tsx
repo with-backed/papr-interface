@@ -4,7 +4,7 @@ import { captureException } from '@sentry/nextjs';
 import { configs, SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import { HeroesLandingPageContent } from 'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent';
-import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
+import { getOracleInfoFromAllowedCollateral } from 'lib/controllers';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { calculateNetPhUSDCBalance } from 'lib/paprHeroes';
 import { ethers } from 'ethers';

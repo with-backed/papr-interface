@@ -5,7 +5,7 @@ const pinata = pinataSDK(
   process.env.PINATA_SECRET_KEY!,
 );
 
-export async function postStrategyIPFS(
+export async function postControllerIPFS(
   name: string,
   description: string,
   root: string,

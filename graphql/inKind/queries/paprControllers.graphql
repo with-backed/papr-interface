@@ -1,0 +1,8 @@
+query paprControllers {
+  paprControllers {
+    ...allPaprControllerProperties
+    vaults {
+      ...allVaultProperties
+    }
+  }
+}

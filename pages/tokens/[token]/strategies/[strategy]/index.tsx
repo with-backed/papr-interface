@@ -1,26 +1,26 @@
 import { GetServerSideProps } from 'next';
-import { strategyPricesData } from 'lib/strategies/charts';
+import { controllerPricesData } from 'lib/controllers/charts';
 import { configs, SupportedToken } from 'lib/config';
 import {
-  StrategyOverviewContent,
-  StrategyPageProps,
-} from 'components/Strategies/StrategyOverviewContent';
+  ControllerOverviewContent,
+  ControllerPageProps,
+} from 'components/Controllers/ControllerOverviewContent';
 import {
   fetchSubgraphData,
   SubgraphPool,
-  SubgraphStrategy,
-} from 'lib/LendingStrategy';
+  SubgraphController,
+} from 'lib/PaprController';
 import { useConfig } from 'hooks/useConfig';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
-import { getOracleInfoFromAllowedCollateral } from 'lib/strategies';
-import { useLendingStrategy } from 'hooks/useLendingStrategy';
+import { getOracleInfoFromAllowedCollateral } from 'lib/controllers';
+import { usePaprController } from 'hooks/usePaprController';
 
 type ServerSideProps = Omit<
-  StrategyPageProps,
-  'lendingStrategy' | 'pricesData'
+  ControllerPageProps,
+  'paprController' | 'pricesData'
 > & {
-  subgraphStrategy: SubgraphStrategy;
+  subgraphController: SubgraphController;
   oracleInfo: { [key: string]: ReservoirResponseData };
   subgraphPool: SubgraphPool;
 };
@@ -28,64 +28,64 @@ type ServerSideProps = Omit<
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
-  const address = (context.params?.strategy as string).toLowerCase();
+  const address = (context.params?.controller as string).toLowerCase();
   const token = context.params?.token as SupportedToken;
 
-  const strategySubgraphData = await fetchSubgraphData(
+  const controllerSubgraphData = await fetchSubgraphData(
     address,
     configs[token].uniswapSubgraph,
   );
 
-  if (!strategySubgraphData) {
+  if (!controllerSubgraphData) {
     return {
       notFound: true,
     };
   }
 
-  const { pool, lendingStrategy } = strategySubgraphData;
+  const { pool, paprController } = controllerSubgraphData;
 
   const oracleInfo = await getOracleInfoFromAllowedCollateral(
-    lendingStrategy.allowedCollateral.map((ac) => ac.contractAddress),
+    paprController.allowedCollateral.map((ac) => ac.contractAddress),
     token,
   );
 
   return {
     props: {
       address: address,
-      subgraphStrategy: lendingStrategy,
+      subgraphController: paprController,
       oracleInfo,
       subgraphPool: pool,
     },
   };
 };
 
-export default function StrategyPage({
+export default function ControllerPage({
   address,
-  subgraphStrategy,
+  subgraphController,
   oracleInfo,
   subgraphPool,
 }: ServerSideProps) {
   const config = useConfig();
-  const lendingStrategy = useLendingStrategy({
-    subgraphStrategy,
+  const paprController = usePaprController({
+    subgraphController,
     subgraphPool,
     oracleInfo,
   });
 
   const pricesData = useAsyncValue(
     () =>
-      strategyPricesData(
-        lendingStrategy,
+      controllerPricesData(
+        paprController,
         config.tokenName as SupportedToken,
         config.uniswapSubgraph,
       ),
-    [config, lendingStrategy],
+    [config, paprController],
   );
 
   return (
-    <StrategyOverviewContent
+    <ControllerOverviewContent
       address={address}
-      lendingStrategy={lendingStrategy}
+      paprController={paprController}
       pricesData={pricesData}
     />
   );

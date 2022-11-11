@@ -9,8 +9,8 @@ const baseConfig = {
 export type Config = {
   // things that aren't guaranteed to exist in all configs should be declared here
   // TODO: when we move to prod, these should be in each config and not optional
-  strategyAddress?: string;
-} & Omit<typeof paprMeme, 'strategyAddress'>;
+  controllerAddress?: string;
+} & Omit<typeof paprMeme, 'controllerAddress'>;
 
 export type SupportedToken = keyof typeof configs;
 export type SupportedNetwork = 'ethereum' | 'goerli';
@@ -30,7 +30,7 @@ const paprTrash: Config = {
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
-  strategyAddress: '0xF478340769a200f20fEa385dEEA6D42550DD8986',
+  controllerAddress: '0x9b2dc6841af58b6c3e7bb07970df8f44bc9b0e05',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
@@ -59,7 +59,7 @@ const paprHero: Config = {
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
-  strategyAddress: '0xF478340769a200f20fEa385dEEA6D42550DD8986',
+  controllerAddress: '0xF478340769a200f20fEa385dEEA6D42550DD8986',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',

@@ -1,0 +1,15 @@
+fragment allPaprControllerProperties on PaprController {
+  id
+  createdAt
+  poolAddress
+  underlying
+  target
+  allowedCollateral(where: { allowed: true }) {
+    id
+    contractAddress
+    allowed
+  }
+  vaults {
+    ...allVaultProperties
+  }
+}

@@ -1,40 +1,40 @@
-import { TestPageContent } from 'components/Strategies/TestPageContent';
+import { TestPageContent } from 'components/Controllers/TestPageContent';
 import { configs, SupportedToken } from 'lib/config';
 import {
   fetchSubgraphData,
   SubgraphPool,
-  SubgraphStrategy,
-} from 'lib/LendingStrategy';
+  SubgraphController,
+} from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
-import { useLendingStrategy } from 'hooks/useLendingStrategy';
+import { usePaprController } from 'hooks/usePaprController';
 
 export type TestProps = {
-  subgraphStrategy: SubgraphStrategy;
+  subgraphController: SubgraphController;
   subgraphPool: SubgraphPool;
 };
 
 export const getServerSideProps: GetServerSideProps<TestProps> = async (
   context,
 ) => {
-  const address = (context.params?.strategy as string).toLowerCase();
+  const address = (context.params?.controller as string).toLowerCase();
   const token = context.params?.token as SupportedToken;
 
-  const strategySubgraphData = await fetchSubgraphData(
+  const controllerSubgraphData = await fetchSubgraphData(
     address,
     configs[token].uniswapSubgraph,
   );
 
-  if (!strategySubgraphData) {
+  if (!controllerSubgraphData) {
     return {
       notFound: true,
     };
   }
 
-  const { pool, lendingStrategy } = strategySubgraphData;
+  const { pool, paprController } = controllerSubgraphData;
 
   return {
     props: {
-      subgraphStrategy: lendingStrategy,
+      subgraphController: paprController,
       subgraphPool: pool,
     },
   };
@@ -42,13 +42,13 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
 
 export default function InKindTest({
   subgraphPool,
-  subgraphStrategy,
+  subgraphController,
 }: TestProps) {
-  const lendingStrategy = useLendingStrategy({
-    subgraphStrategy,
+  const paprController = usePaprController({
+    subgraphController,
     subgraphPool,
     oracleInfo: {},
   });
 
-  return <TestPageContent lendingStrategy={lendingStrategy} />;
+  return <TestPageContent paprController={paprController} />;
 }

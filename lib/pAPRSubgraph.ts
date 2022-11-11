@@ -1,21 +1,21 @@
 import {
   LendingStrategiesDocument,
   LendingStrategiesQuery,
-  LendingStrategyByIdDocument,
-  LendingStrategyByIdQuery,
-  VaultsByOwnerForStrategyDocument,
-  VaultsByOwnerForStrategyQuery,
+  PaprControllerByIdDocument,
+  PaprControllerByIdQuery,
+  VaultsByOwnerForControllerDocument,
+  VaultsByOwnerForControllerQuery,
 } from 'types/generated/graphql/inKindSubgraph';
-import { LendingStrategy, SubgraphStrategy } from './LendingStrategy';
+import { PaprController, SubgraphController } from './PaprController';
 import { clientFromUrl } from './urql';
 
-export async function subgraphStrategyByAddress(id: string) {
+export async function subgraphControllerByAddress(id: string) {
   // TODO: dynamic client address
   const client = clientFromUrl(
     'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
   );
   const { data, error } = await client
-    .query<LendingStrategyByIdQuery>(LendingStrategyByIdDocument, { id })
+    .query<PaprControllerByIdQuery>(PaprControllerByIdDocument, { id })
     .toPromise();
 
   if (error) {
@@ -26,7 +26,7 @@ export async function subgraphStrategyByAddress(id: string) {
   return data || null;
 }
 
-export async function getAllStrategies(): Promise<SubgraphStrategy[]> {
+export async function getAllStrategies(): Promise<SubgraphController[]> {
   const client = clientFromUrl(
     'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
   );

@@ -1,1 +1,0 @@
-export { useActivityByStrategy } from './useActivityByStrategy';

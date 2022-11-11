@@ -1,0 +1,8 @@
+query paprControllerById($id: ID!) {
+  paprController(id: $id) {
+    ...allPaprControllerProperties
+    vaults {
+      ...allVaultProperties
+    }
+  }
+}

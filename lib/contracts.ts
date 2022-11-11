@@ -4,7 +4,7 @@ import {
   ERC721,
   ERC721__factory,
   IQuoter__factory,
-  Strategy__factory,
+  Controller__factory,
 } from 'types/generated/abis';
 import { configs, SupportedToken } from './config';
 
@@ -55,15 +55,15 @@ export function erc721Contract(
   return ERC721__factory.connect(address, provider);
 }
 
-////// strategy code /////
+////// controller code /////
 
-export function jsonRpcStrategyContract(
+export function jsonRpcControllerContract(
   address: string,
   jsonRpcProvider: string,
   network: SupportedToken,
 ) {
   const provider = makeProvider(jsonRpcProvider, network);
-  return Strategy__factory.connect(address, provider);
+  return Controller__factory.connect(address, provider);
 }
 
 export function Quoter(jsonRpcProvider: string, token: SupportedToken) {
@@ -74,11 +74,11 @@ export function Quoter(jsonRpcProvider: string, token: SupportedToken) {
   );
 }
 
-export function strategyContract(
+export function controllerContract(
   address: string,
   jsonRpcProvider: string,
   network: SupportedToken,
 ) {
   const provider = makeProvider(jsonRpcProvider, network);
-  return Strategy__factory.connect(address, provider);
+  return Controller__factory.connect(address, provider);
 }

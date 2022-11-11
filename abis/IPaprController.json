@@ -1,0 +1,71 @@
+{
+  "abi": [
+    {
+      "inputs": [],
+      "name": "AccountHasNoDebt",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "vaultDebt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxDebt",
+          "type": "uint256"
+        }
+      ],
+      "name": "ExceedsMaxDebt",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidCollateral",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidCollateralAccountPair",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidCollateralVaultIDCombination",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "MinAuctionSpacing",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotLiquidatable",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "OnlyCollateralOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "minOut",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "actualOut",
+          "type": "uint256"
+        }
+      ],
+      "name": "TooLittleOut",
+      "type": "error"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+query vaultsByController($controller: String) {
+  vaults(where: { controller: $controller }) {
+    ...allVaultProperties
+  }
+}

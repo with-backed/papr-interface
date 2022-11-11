@@ -1,0 +1,44 @@
+query activityByController($controllerId: String) {
+  addCollateralEvents(where: { controller: $controllerId }) {
+    id
+    timestamp
+    vault {
+      id
+    }
+    collateral {
+      id
+      contractAddress
+      tokenId
+      symbol
+    }
+  }
+  removeCollateralEvents(where: { controller: $controllerId }) {
+    id
+    timestamp
+    vault {
+      id
+    }
+    collateral {
+      id
+      contractAddress
+      tokenId
+      symbol
+    }
+  }
+  debtDecreasedEvents(where: { controller: $controllerId }) {
+    id
+    timestamp
+    vault {
+      id
+    }
+    amount
+  }
+  debtIncreasedEvents(where: { controller: $controllerId }) {
+    id
+    timestamp
+    vault {
+      id
+    }
+    amount
+  }
+}
