@@ -1,11 +1,24 @@
 .button {
   border: none;
   border-radius: var(--border-radius-large);
-  padding: var(--padding-button);
   line-height: 31px;
   cursor: pointer;
+}
+
+.button:hover {
+  transition: background-color 200ms ease;
+}
+
+.big {
+  padding: var(--padding-button-big);
   font-size: var(--font-huge);
   min-height: 63px;
+}
+
+.small {
+  padding: var(--padding-button-small);
+  font-size: var(--font-large);
+  min-height: 48px;
 }
 
 .regular {
@@ -42,6 +55,16 @@
   background: var(--button-outline-meme);
 }
 
+.regular.white {
+  background-color: white;
+  color: black;
+}
+
+.regular.white:hover,
+.regular.white:focus {
+  background: var(--highlight-clickable-10);
+}
+
 .outline {
   composes: button;
   background-color: white;
@@ -75,6 +98,16 @@
 .outline.hero:hover,
 .outline.hero:focus {
   background: var(--button-fill-hero);
+}
+
+.outline.white {
+  border: 2px black solid;
+  color: black;
+}
+
+.outline.white:hover,
+.outline.white:focus {
+  background: var(--highlight-clickable-10);
 }
 
 .button:disabled {

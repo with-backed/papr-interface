@@ -4,62 +4,29 @@ import { Disclosure } from 'reakit/Disclosure';
 import styles from './Button.module.css';
 
 export type ButtonKind = 'regular' | 'outline';
-export type ButtonTheme = 'papr' | 'hero' | 'meme';
+export type ButtonTheme = 'papr' | 'hero' | 'meme' | 'white';
+export type ButtonSize = 'big' | 'small';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   kind?: ButtonKind;
   theme?: ButtonTheme;
+  size?: ButtonSize;
 }
 
 export function Button({
   children,
   kind = 'regular',
   theme = 'papr',
+  size = 'big',
   ...props
 }: ButtonProps) {
   const className = useMemo(
-    () => [styles[kind], styles[theme]].join(' '),
-    [kind, theme],
+    () => [styles[kind], styles[theme], styles[size]].join(' '),
+    [kind, theme, size],
   );
   return (
     <button className={className} {...props}>
       {children}
     </button>
-  );
-}
-
-interface DialogDisclosureButtonProps
-  extends ComponentProps<typeof DialogDisclosure> {
-  kind?: ButtonKind;
-}
-
-export function DialogDisclosureButton({
-  children,
-  kind = 'regular',
-  ...props
-}: DialogDisclosureButtonProps) {
-  return (
-    <DialogDisclosure {...props} className={styles[kind]}>
-      {children}
-    </DialogDisclosure>
-  );
-}
-
-interface DisclosureButtonProps extends ComponentProps<typeof Disclosure> {}
-
-export function DisclosureButton({
-  children,
-  visible,
-  ...rest
-}: DisclosureButtonProps) {
-  return (
-    <Disclosure
-      as={'button'}
-      role={'disclosure'}
-      className={styles['regular']}
-      visible={visible}
-      {...rest}>
-      {children}
-    </Disclosure>
   );
 }

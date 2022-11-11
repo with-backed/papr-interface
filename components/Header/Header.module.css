@@ -74,12 +74,12 @@
 
 .link:hover {
   transition: background-color 200ms ease;
-  background-color: var(--background-faded-green);
+  background-color: var(--highlight-clickable-10);
 }
 
 .link-active {
   composes: link;
-  background-color: var(--background-faded-green);
+  background-color: var(--highlight-clickable-10);
 }
 
 .link-active:visited {

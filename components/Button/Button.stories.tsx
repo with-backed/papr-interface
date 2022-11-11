@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { Button, ButtonKind, ButtonTheme } from './Button';
+import { Button, ButtonKind, ButtonSize, ButtonTheme } from './Button';
 import { ButtonLink } from './ButtonLink';
 import { TextButton, ButtonKind as TextButtonKind } from './TextButton';
 import { TransactionButton } from './TransactionButton';
@@ -11,18 +11,35 @@ const Wrapper: FunctionComponent = ({ children }) => (
       flexDirection: 'column',
       gap: '2rem',
       width: 'max-content',
+      backgroundColor: 'var(--neutral-5)',
+      padding: '2rem',
     }}>
     {children}
   </div>
 );
 
 const buttonKinds: ButtonKind[] = ['regular', 'outline'];
-const buttonThemes: ButtonTheme[] = ['papr', 'meme', 'hero'];
-export const Buttons = () => (
+const buttonThemes: ButtonTheme[] = ['papr', 'meme', 'hero', 'white'];
+export const BigButtons = () => (
   <Wrapper>
     {buttonKinds.flatMap((kind) =>
       buttonThemes.map((theme) => (
-        <Button kind={kind} theme={theme} key={kind + theme}>
+        <Button size="big" kind={kind} theme={theme} key={kind + theme}>
+          Hello
+        </Button>
+      )),
+    )}
+    <Button size="big" kind="regular" theme="papr" disabled>
+      Hello
+    </Button>
+  </Wrapper>
+);
+
+export const SmallButtons = () => (
+  <Wrapper>
+    {buttonKinds.flatMap((kind) =>
+      buttonThemes.map((theme) => (
+        <Button size={'small'} kind={kind} theme={theme} key={kind + theme}>
           Hello
         </Button>
       )),

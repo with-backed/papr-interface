@@ -44,7 +44,8 @@
   --line-height: 1.6;
 
   /* padding and gaps */
-  --padding-button: 16px 25px;
+  --padding-button-big: 16px 25px;
+  --padding-button-small: 8px 32px;
   --padding-container: 2.5rem;
   --padding-loan-card: 7px 21px 14px 21px;
   --gap: 2.5rem;
