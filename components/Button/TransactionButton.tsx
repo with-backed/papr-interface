@@ -9,6 +9,7 @@ interface TransactionButtonProps extends ButtonProps {
   text: string;
   transactionData?: SendTransactionResult;
   disabled?: boolean;
+  onClick?: () => void;
   // when ordinarily we would show a TransactionButton, but we don't
   // need to (e.g., token already approved in the past)
   completed?: boolean;
