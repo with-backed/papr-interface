@@ -16,11 +16,11 @@ export const ConnectWallet = () => {
               openConnectModal();
             }}
             type="button"
-            kind="quaternary">
+            kind="regular">
             🥕 Connect
           </Button>
         ) : (
-          <Button onClick={openAccountModal} kind="quaternary">
+          <Button onClick={openAccountModal} kind="regular">
             <span className={styles.address}>
               🔓 <DisplayAddress address={account.address} />
             </span>

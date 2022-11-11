@@ -8,7 +8,6 @@ import { SendTransactionResult } from '@wagmi/core';
 interface TransactionButtonProps extends ButtonProps {
   text: string;
   transactionData?: SendTransactionResult;
-  onClick: () => void;
   disabled?: boolean;
   // when ordinarily we would show a TransactionButton, but we don't
   // need to (e.g., token already approved in the past)

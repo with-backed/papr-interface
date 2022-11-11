@@ -28,8 +28,14 @@
   --optimistic-red-100: #fe0420;
   --polygon-purple-10: #f8f5ff;
   --polygon-purple-100: #7b3fe4;
-  --heroes-red: #FFE7E0;
+  --heroes-red: #ffe7e0;
   --greentext: #007155;
+  --button-outline-papr: #2675ee;
+  --button-fill-papr: #f1f6ff;
+  --button-outline-hero: #e03400;
+  --button-fill-hero: #fff2ee;
+  --button-outline-meme: #06846f;
+  --button-fill-meme: #f3fcfb;
 
   /* layout */
   --max-width-header: 1224px;
@@ -38,7 +44,7 @@
   --line-height: 1.6;
 
   /* padding and gaps */
-  --padding-button: 16px 22px;
+  --padding-button: 16px 25px;
   --padding-container: 2.5rem;
   --padding-loan-card: 7px 21px 14px 21px;
   --gap: 2.5rem;
@@ -101,6 +107,7 @@ body {
 
 * {
   box-sizing: border-box;
+  font-family: var(--mono);
 }
 
 h1 {

@@ -1,26 +1,28 @@
-import React, { ButtonHTMLAttributes, ComponentProps } from 'react';
+import React, { ButtonHTMLAttributes, ComponentProps, useMemo } from 'react';
 import { DialogDisclosure } from 'reakit/Dialog';
 import { Disclosure } from 'reakit/Disclosure';
 import styles from './Button.module.css';
 
-export type ButtonKind =
-  | 'primary'
-  | 'primary-dark-bg'
-  | 'secondary'
-  | 'tertiary'
-  | 'quaternary'
-  | 'highlight'
-  | 'white'
-  | 'circle'
-  | 'dark';
+export type ButtonKind = 'regular' | 'outline';
+export type ButtonTheme = 'papr' | 'hero' | 'meme';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   kind?: ButtonKind;
+  theme?: ButtonTheme;
 }
 
-export function Button({ children, kind = 'primary', ...props }: ButtonProps) {
+export function Button({
+  children,
+  kind = 'regular',
+  theme = 'papr',
+  ...props
+}: ButtonProps) {
+  const className = useMemo(
+    () => [styles[kind], styles[theme]].join(' '),
+    [kind, theme],
+  );
   return (
-    <button className={styles[kind]} {...props}>
+    <button className={className} {...props}>
       {children}
     </button>
   );
@@ -33,7 +35,7 @@ interface DialogDisclosureButtonProps
 
 export function DialogDisclosureButton({
   children,
-  kind = 'primary',
+  kind = 'regular',
   ...props
 }: DialogDisclosureButtonProps) {
   return (
@@ -54,7 +56,7 @@ export function DisclosureButton({
     <Disclosure
       as={'button'}
       role={'disclosure'}
-      className={styles[visible ? 'secondary' : 'primary']}
+      className={styles['regular']}
       visible={visible}
       {...rest}>
       {children}
