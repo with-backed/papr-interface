@@ -100,10 +100,8 @@ function NavLinks({ activeRoute }: NavLinksProps) {
 }
 
 function LogoLink() {
-  const { tokenName } = useConfig();
-
   return (
-    <Link href={`/tokens/${tokenName}/`} passHref>
+    <Link href={`/`} passHref>
       <a title="papr">
         <img className={styles.logo} src={paprLogo.src} alt="" />
       </a>
