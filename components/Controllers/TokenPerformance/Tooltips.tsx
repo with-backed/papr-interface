@@ -4,7 +4,7 @@ import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import { useMemo } from 'react';
 import { TooltipStateReturn } from 'reakit';
-import styles from 'components/Strategies/TokenPerformance/tooltips.module.css';
+import styles from 'components/Controllers/TokenPerformance/tooltips.module.css';
 import { Tooltip } from 'components/Tooltip';
 
 export type TooltipProps = {

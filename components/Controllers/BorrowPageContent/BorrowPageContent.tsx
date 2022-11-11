@@ -1,6 +1,6 @@
 import { ControllerPricesData } from 'lib/controllers/charts';
 import React, { useEffect, useMemo, useState } from 'react';
-import controllerStyles from 'components/Strategies/Controller.module.css';
+import controllerStyles from 'components/Controllers/Controller.module.css';
 import { AccountNFTs } from 'components/Controllers/AccountNFTs';
 import { OpenVault } from 'components/Controllers/OpenVault';
 import { useConfig } from 'hooks/useConfig';

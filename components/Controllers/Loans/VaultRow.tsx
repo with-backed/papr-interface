@@ -61,7 +61,7 @@ export function VaultRow({
     <tr>
       <td>
         <Link
-          href={`/tokens/${tokenName}/strategies/${controllerId}/vaults/${id}`}>
+          href={`/tokens/${tokenName}/controllers/${controllerId}/vaults/${id}`}>
           {id.substring(0, 7)}
         </Link>
       </td>

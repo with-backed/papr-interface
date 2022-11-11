@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from 'components/Strategies/Controller.module.css';
+import styles from 'components/Controllers/Controller.module.css';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import { PaprController } from 'lib/PaprController';
 import { Collateral } from 'components/Controllers/Collateral';
