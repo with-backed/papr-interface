@@ -1,7 +1,0 @@
-query normalizationUpdatesByStrategy($strategy: String) {
-  normalizationUpdates(where: { strategy: $strategy }) {
-    id
-    timestamp
-    newNorm
-  }
-}

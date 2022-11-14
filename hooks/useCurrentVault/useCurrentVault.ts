@@ -1,17 +1,17 @@
-import { LendingStrategy } from 'lib/LendingStrategy';
+import { PaprController } from 'lib/PaprController';
 import { useMemo } from 'react';
-import { VaultsByOwnerForStrategyDocument } from 'types/generated/graphql/inKindSubgraph';
+import { VaultsByOwnerForControllerDocument } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
 export function useCurrentVault(
-  strategy: LendingStrategy,
+  controller: PaprController,
   user: string | undefined,
 ) {
   const [{ data: vaultsData, fetching: vaultFetching }] = useQuery({
-    query: VaultsByOwnerForStrategyDocument,
+    query: VaultsByOwnerForControllerDocument,
     variables: {
       owner: user?.toLowerCase(),
-      strategy: strategy.id.toLowerCase(),
+      controller: controller.id.toLowerCase(),
     },
     pause: !user,
   });

@@ -18,16 +18,16 @@ type Page = {
   isNetworkSpecialCase?: boolean;
   externalRedirect?: boolean;
 };
-const prodPages = (strategyAddress: string): Page[] => [
+const prodPages = (controllerAddress: string): Page[] => [
   {
     name: 'Performance',
-    route: `strategies/${strategyAddress}`,
-    matcher: 'strategies/[strategy]',
+    route: `controllers/${controllerAddress}`,
+    matcher: 'controllers/[controller]',
   },
   {
     name: 'Borrow',
-    route: `strategies/${strategyAddress}/borrow`,
-    matcher: 'strategies/[strategy]/borrow',
+    route: `controllers/${controllerAddress}/borrow`,
+    matcher: 'controllers/[controller]/borrow',
   },
   {
     name: 'Swap ↗',
@@ -62,14 +62,14 @@ type NavLinksProps = {
   activeRoute: string;
 };
 function NavLinks({ activeRoute }: NavLinksProps) {
-  const { tokenName, strategyAddress } = useConfig();
+  const { tokenName, controllerAddress } = useConfig();
 
   const pages = useMemo(() => {
     if (process.env.VERCEL_ENV === 'production') {
-      return prodPages(strategyAddress!);
+      return prodPages(controllerAddress!);
     }
-    return [...prodPages(strategyAddress!), ...stagingPages];
-  }, [strategyAddress]);
+    return [...prodPages(controllerAddress!), ...stagingPages];
+  }, [controllerAddress]);
 
   return (
     <ul className={styles.links}>

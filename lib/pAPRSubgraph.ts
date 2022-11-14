@@ -1,21 +1,21 @@
 import {
-  LendingStrategiesDocument,
-  LendingStrategiesQuery,
-  LendingStrategyByIdDocument,
-  LendingStrategyByIdQuery,
-  VaultsByOwnerForStrategyDocument,
-  VaultsByOwnerForStrategyQuery,
+  PaprControllersDocument,
+  PaprControllersQuery,
+  PaprControllerByIdDocument,
+  PaprControllerByIdQuery,
+  VaultsByOwnerForControllerDocument,
+  VaultsByOwnerForControllerQuery,
 } from 'types/generated/graphql/inKindSubgraph';
-import { LendingStrategy, SubgraphStrategy } from './LendingStrategy';
+import { PaprController, SubgraphController } from './PaprController';
 import { clientFromUrl } from './urql';
 
-export async function subgraphStrategyByAddress(id: string) {
+export async function subgraphControllerByAddress(id: string) {
   // TODO: dynamic client address
   const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerl/0.1.0/gn',
   );
   const { data, error } = await client
-    .query<LendingStrategyByIdQuery>(LendingStrategyByIdDocument, { id })
+    .query<PaprControllerByIdQuery>(PaprControllerByIdDocument, { id })
     .toPromise();
 
   if (error) {
@@ -26,12 +26,12 @@ export async function subgraphStrategyByAddress(id: string) {
   return data || null;
 }
 
-export async function getAllStrategies(): Promise<SubgraphStrategy[]> {
+export async function getAllPaprControllers(): Promise<SubgraphController[]> {
   const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerl/0.1.0/gn',
   );
   const { data, error } = await client
-    .query<LendingStrategiesQuery>(LendingStrategiesDocument, {})
+    .query<PaprControllersQuery>(PaprControllersDocument, {})
     .toPromise();
 
   if (error) {
@@ -39,5 +39,5 @@ export async function getAllStrategies(): Promise<SubgraphStrategy[]> {
     return [];
   }
 
-  return data?.lendingStrategies || [];
+  return data?.paprControllers || [];
 }

@@ -1,13 +1,13 @@
 import { ethers } from 'ethers';
 import { SupportedToken } from 'lib/config';
 import { Quoter } from 'lib/contracts';
-import { computeSlippageForSwap, getQuoteForSwap } from 'lib/strategies';
-import { LendingStrategy } from 'lib/LendingStrategy';
+import { computeSlippageForSwap, getQuoteForSwap } from 'lib/controllers';
+import { PaprController } from 'lib/PaprController';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useConfig } from './useConfig';
 
 export function useQuoteWithSlippage(
-  strategy: LendingStrategy,
+  controller: PaprController,
   amount: ethers.BigNumber,
   swapForUnderlying: boolean,
 ) {
@@ -22,26 +22,26 @@ export function useQuoteWithSlippage(
 
   const tokenOut = useMemo(() => {
     if (swapForUnderlying) {
-      return strategy.token0IsUnderlying
-        ? strategy.subgraphPool.token0
-        : strategy.subgraphPool.token1;
+      return controller.token0IsUnderlying
+        ? controller.subgraphPool.token0
+        : controller.subgraphPool.token1;
     } else {
-      return strategy.token0IsUnderlying
-        ? strategy.subgraphPool.token1
-        : strategy.subgraphPool.token0;
+      return controller.token0IsUnderlying
+        ? controller.subgraphPool.token1
+        : controller.subgraphPool.token0;
     }
-  }, [strategy, swapForUnderlying]);
+  }, [controller, swapForUnderlying]);
   const tokenIn = useMemo(() => {
     if (swapForUnderlying) {
-      return strategy.token0IsUnderlying
-        ? strategy.subgraphPool.token1
-        : strategy.subgraphPool.token0;
+      return controller.token0IsUnderlying
+        ? controller.subgraphPool.token1
+        : controller.subgraphPool.token0;
     } else {
-      return strategy.token0IsUnderlying
-        ? strategy.subgraphPool.token0
-        : strategy.subgraphPool.token1;
+      return controller.token0IsUnderlying
+        ? controller.subgraphPool.token0
+        : controller.subgraphPool.token1;
     }
-  }, [strategy, swapForUnderlying]);
+  }, [controller, swapForUnderlying]);
 
   const getQuoteAndPriceImpactForSwap = useCallback(async () => {
     let q: ethers.BigNumber;

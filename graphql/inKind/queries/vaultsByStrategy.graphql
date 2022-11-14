@@ -1,5 +1,0 @@
-query vaultsByStrategy($strategy: String) {
-  vaults(where: { strategy: $strategy }) {
-    ...allVaultProperties
-  }
-}

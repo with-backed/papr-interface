@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { YourPositions } from 'components/Strategies/YourPositions';
-import { mockLendingStrategy } from 'lib/mockData/mockLendingStrategy';
+import { YourPositions } from 'components/Controllers/YourPositions';
+import { mockPaprController } from 'lib/mockData/mockPaprController';
 import { useAccount, useContractRead } from 'wagmi';
 import { ethers } from 'ethers';
 import { useCurrentVault } from 'hooks/useCurrentVault/useCurrentVault';
@@ -46,7 +46,7 @@ describe('Activity', () => {
     const { getByText } = render(
       <YourPositions
         latestMarketPrice={latestMarketPrice}
-        lendingStrategy={mockLendingStrategy}
+        paprController={mockPaprController}
       />,
     );
     getByText('Connect your wallet to see your positions.');
@@ -63,7 +63,7 @@ describe('Activity', () => {
     const { getByText } = render(
       <YourPositions
         latestMarketPrice={latestMarketPrice}
-        lendingStrategy={mockLendingStrategy}
+        paprController={mockPaprController}
       />,
     );
     getByText('Loading...');

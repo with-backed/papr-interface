@@ -1,4 +1,4 @@
-import { TimeSeriesValue } from 'lib/strategies/charts';
+import { TimeSeriesValue } from 'lib/controllers/charts';
 import { getTimestampNDaysAgo } from 'lib/duration';
 import sortedIndex from 'lodash/sortedIndex';
 

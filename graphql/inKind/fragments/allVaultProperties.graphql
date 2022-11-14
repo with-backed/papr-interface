@@ -1,11 +1,12 @@
 fragment allVaultProperties on Vault {
   id
   debt
+  collateralContract
   collateral {
     id
     contractAddress
     tokenId
     symbol
   }
-  totalCollateralValue
+  collateralCount
 }
