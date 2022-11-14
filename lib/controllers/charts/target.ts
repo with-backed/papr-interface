@@ -22,27 +22,29 @@ export async function targetValues(
   controller: PaprController | SubgraphController,
   token: SupportedToken,
 ): Promise<[TimeSeriesValue[], TimeSeriesValue[]]> {
-  const result = await subgraphNormalizationUpdatesForController(controller.id);
+  const result = await subgraphTargetalizationUpdatesForController(
+    controller.id,
+  );
 
-  const sortedNorms: TargetUpdate[] =
+  const sortedTargets: TargetUpdate[] =
     result?.targetUpdates.sort(
       (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
     ) || [];
 
-  // get what norm would be if updated at this moment and add to array
-  if (sortedNorms.length > 0) {
-    sortedNorms.push({
-      newTarget: await getNewNorm(controller.id, token),
+  // get what target would be if updated at this moment and add to array
+  if (sortedTargets.length > 0) {
+    sortedTargets.push({
+      newTarget: await getNewTarget(controller.id, token),
       timestamp: now.toString(),
     });
   }
 
-  const normDPRs: TimeSeriesValue[] = [];
-  const formattedNorms: TimeSeriesValue[] = [];
+  const targetDPRs: TimeSeriesValue[] = [];
+  const formattedTargets: TimeSeriesValue[] = [];
 
-  for (let i = 1; i < sortedNorms.length; i++) {
-    const prev = sortedNorms[i - 1];
-    const current = sortedNorms[i];
+  for (let i = 1; i < sortedTargets.length; i++) {
+    const prev = sortedTargets[i - 1];
+    const current = sortedTargets[i];
     const t = parseInt(current.timestamp);
     const dpr = computeRate(
       ethers.BigNumber.from(prev.newTarget),
@@ -52,11 +54,11 @@ export async function targetValues(
       RatePeriod.Daily,
     );
 
-    normDPRs.push({
+    targetDPRs.push({
       value: dpr,
       time: t as UTCTimestamp,
     });
-    formattedNorms.push({
+    formattedTargets.push({
       value: parseFloat(
         ethers.utils.formatEther(ethers.BigNumber.from(current.newTarget)),
       ),
@@ -64,10 +66,10 @@ export async function targetValues(
     });
   }
 
-  return [formattedNorms, normDPRs];
+  return [formattedTargets, targetDPRs];
 }
 
-async function getNewNorm(
+async function getNewTarget(
   controllerAddress: string,
   token: SupportedToken,
 ): Promise<string> {
@@ -78,7 +80,7 @@ async function getNewNorm(
   return (await s.newTarget()).toString();
 }
 
-async function subgraphNormalizationUpdatesForController(controller: string) {
+async function subgraphTargetalizationUpdatesForController(controller: string) {
   // TODO: dynamic client address
   const client = clientFromUrl(
     'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerl/0.1.0/gn',
