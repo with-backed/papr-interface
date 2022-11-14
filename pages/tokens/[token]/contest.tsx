@@ -8,6 +8,7 @@ import { getOracleInfoFromAllowedCollateral } from 'lib/controllers';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { calculateNetPhUSDCBalance } from 'lib/paprHeroes';
 import { ethers } from 'ethers';
+import { fetchSubgraphData } from 'lib/PaprController';
 
 export const getServerSideProps: GetServerSideProps<
   HeroesLandingPageProps
@@ -16,10 +17,25 @@ export const getServerSideProps: GetServerSideProps<
     validateToken(context.params!);
     const token = context.params?.token as SupportedToken;
 
+    const controllerSubgraphData = await fetchSubgraphData(
+      configs[token].controllerAddress,
+      configs[token].uniswapSubgraph,
+    );
+
+    if (!controllerSubgraphData) {
+      return {
+        notFound: true,
+      };
+    }
+
+    const { paprController } = controllerSubgraphData;
+    const allowedCollateral = paprController.allowedCollateral.map(
+      (ac: any) => ac.contractAddress,
+    );
+
     const oracleInfo = await getOracleInfoFromAllowedCollateral(
-      configs[token].paprHeroesCollateral,
+      allowedCollateral,
       token,
-      true,
     );
 
     // TODO(adamgobes): figure out a way to get all participating players, probably from subgraph
@@ -29,7 +45,7 @@ export const getServerSideProps: GetServerSideProps<
       participatingPlayers.map(async (p) => [
         p,
         ethers.utils.formatUnits(
-          await calculateNetPhUSDCBalance(p, oracleInfo),
+          await calculateNetPhUSDCBalance(p, allowedCollateral, oracleInfo),
           6,
         ),
       ]),
@@ -42,6 +58,7 @@ export const getServerSideProps: GetServerSideProps<
     return {
       props: {
         token,
+        allowedCollateral,
         oracleInfo,
         rankedPlayers,
       },
@@ -56,11 +73,13 @@ export const getServerSideProps: GetServerSideProps<
 
 type HeroesLandingPageProps = {
   token: SupportedToken;
+  allowedCollateral: string[];
   oracleInfo: { [key: string]: ReservoirResponseData };
   rankedPlayers: string[][];
 };
 export default function HeroesLandingPage({
   token,
+  allowedCollateral,
   oracleInfo,
   rankedPlayers,
 }: HeroesLandingPageProps) {
@@ -68,7 +87,7 @@ export default function HeroesLandingPage({
     <>
       <OpenGraph title={`Backed | Papr Heroes | Home`} />
       <HeroesLandingPageContent
-        collateral={configs[token].paprHeroesCollateral}
+        collateral={allowedCollateral}
         oracleInfo={oracleInfo}
         rankedPlayers={rankedPlayers}
       />

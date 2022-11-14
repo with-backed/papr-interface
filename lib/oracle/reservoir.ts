@@ -18,14 +18,10 @@ export const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 3600;
 export async function getSignedOracleFloorPriceMessage(
   collection: string,
   config: Config,
-  isHeroes: boolean = false,
+  kind: string,
 ): Promise<ReservoirResponseData> {
   const reservoirReq = await fetch(
-    `${
-      config.reservoirAPI
-    }/oracle/collections/${collection}/floor-ask/v3?kind=twap&currency=${
-      isHeroes ? config.paprHeroesUSDC : config.paprUnderlyingAddress
-    }&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,
+    `${config.reservoirAPI}/oracle/collections/${collection}/floor-ask/v3?kind=${kind}&currency=${config.paprUnderlyingAddress}&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,
   );
   const json = await reservoirReq.json();
   return json;
