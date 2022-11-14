@@ -19,7 +19,7 @@ export function LandingPageContent() {
         powered by Uniswap V3.
       </h1>
       <div className={styles['scale-container']}>
-        <Image src={LandingPageScale} alt="" />
+        <Image src={LandingPageScale} alt="" priority />
       </div>
       <div className={styles.wrapper}>
         <DashedLine />
