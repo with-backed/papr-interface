@@ -15,12 +15,17 @@ export const ConnectWallet = () => {
               pirsch('Wallet connection modal opened', {});
               openConnectModal();
             }}
-            type="button"
-            kind="quaternary">
+            kind="regular"
+            theme="white"
+            size="small">
             🥕 Connect
           </Button>
         ) : (
-          <Button onClick={openAccountModal} kind="quaternary">
+          <Button
+            onClick={openAccountModal}
+            kind="regular"
+            theme="white"
+            size="small">
             <span className={styles.address}>
               🔓 <DisplayAddress address={account.address} />
             </span>

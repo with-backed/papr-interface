@@ -1,122 +1,145 @@
 .button {
   border: none;
   border-radius: var(--border-radius-large);
-  padding: var(--padding-button);
-  line-height: 30px;
+  line-height: 31px;
   cursor: pointer;
+}
+
+.button:hover {
+  transition: background-color 200ms ease;
+}
+
+.big {
+  padding: var(--padding-button-big);
   font-size: var(--font-huge);
   min-height: 63px;
 }
 
-.dark {
+.small {
+  padding: var(--padding-button-small);
+  font-size: var(--font-large);
+  min-height: 48px;
+}
+
+.regular {
   composes: button;
-  background: var(--background-lighter-dark);
+}
+
+.regular.papr {
+  background-color: var(--button-outline-papr);
   color: white;
 }
 
-.primary {
-  composes: button;
-  background: var(--background-white);
-  color: var(--neutral-100);
-  border: 2px black solid;
+.regular.papr:hover,
+.regular.papr:focus {
+  background: var(--button-outline-papr);
 }
 
-.primary:hover,
-.primary:focus {
+.regular.hero {
+  background-color: var(--button-outline-hero);
+  color: white;
+}
+
+.regular.hero:hover,
+.regular.hero:focus {
+  background: var(--button-outline-hero);
+}
+
+.regular.meme {
+  background-color: var(--button-outline-meme);
+  color: white;
+}
+
+.regular.meme:hover,
+.regular.meme:focus {
+  background: var(--button-outline-meme);
+}
+
+.regular.white {
+  background-color: white;
+  color: black;
+}
+
+.regular.white:hover,
+.regular.white:focus {
   background: var(--highlight-clickable-10);
 }
 
-.circle {
-  composes: primary;
-  height: 36px;
-  width: 36px;
-  padding: 0;
-  border-radius: 36px;
-}
-
-.primary-dark-bg {
+.outline {
   composes: button;
-  background: linear-gradient(
-    180deg,
-    var(--highlight-clickable-7) 50%,
-    var(--highlight-clickable-10) 100%
-  );
-  color: var(--highlight-clickable-100);
+  background-color: white;
 }
 
-.primary-dark-bg:hover,
-.primary-dark-bg:focus {
-  background: var(--highlight-clickable-20);
-}
-.secondary {
-  composes: button;
-  background: linear-gradient(
-    180deg,
-    var(--highlight-visited-5) 50%,
-    var(--highlight-visited-7) 100%
-  );
-  color: var(--highlight-visited-100);
+.outline-transparent {
+  composes: outline;
+  background-color: transparent;
 }
 
-.secondary:hover,
-.secondary:focus {
-  background: var(--highlight-visited-10);
+.outline-transparent:disabled {
+  background-color: transparent;
 }
 
-.tertiary {
-  composes: button;
-  background: linear-gradient(
-    180deg,
-    var(--neutral-5) 50%,
-    var(--neutral-10) 100%
-  );
-  color: var(--neutral-100);
+.outline.papr {
+  border: 2px var(--button-outline-papr) solid;
+  color: var(--button-outline-papr);
 }
 
-.tertiary:hover,
-.tertiary:focus {
-  background: var(--neutral-10);
+.outline.papr:hover,
+.outline.papr:focus {
+  background: var(--button-fill-papr);
 }
 
-.quaternary {
-  composes: button;
-  background: var(--background-white);
-  color: var(--neutral-100);
+.outline.meme {
+  border: 2px var(--button-outline-meme) solid;
+  color: var(--button-outline-meme);
 }
 
-.quaternary:hover {
-  transition: background-color 200ms ease;
-  background: var(--background-faded-green);
+.outline.meme:hover,
+.outline.meme:focus {
+  background: var(--button-fill-meme);
 }
 
-.highlight {
-  composes: button;
-  background: linear-gradient(
-    180deg,
-    var(--highlight-active-5) 50%,
-    var(--highlight-active-10) 100%
-  );
-  background: var(--highlight-active-10);
+.outline.hero {
+  border: 2px var(--button-outline-hero) solid;
+  color: var(--button-outline-hero);
 }
 
-.highlight:hover {
-  background: var(--highlight-active-20);
+.outline.hero:hover,
+.outline.hero:focus {
+  background: var(--button-fill-hero);
 }
 
-.white {
-  composes: button;
-  background: var(--background-white);
+.outline.white {
+  border: 2px black solid;
+  color: black;
 }
 
-.highlight:hover,
-.highlight:focus {
-  background: var(--highlight-active-20);
+.outline.white:hover,
+.outline.white:focus {
+  background: var(--highlight-clickable-10);
 }
 
 .button:disabled {
-  color: var(--neutral-50);
-  background: var(--neutral-5);
   cursor: not-allowed;
+  color: #aaaaaa;
+}
+
+.button.papr:disabled {
+  background: var(--button-fill-papr);
+}
+
+.button.hero:disabled {
+  background: var(--button-fill-hero);
+}
+
+.button.meme:disabled {
+  background: var(--button-fill-meme);
+}
+
+.button.outline-transparent:disabled,
+.button.outline-transparent:disabled:hover,
+.button.outline-transparent:disabled:focus {
+  background: transparent;
 }
 
 .button-completed {
@@ -130,6 +153,7 @@
   font-size: var(--font-large);
   border-radius: var(--border-radius-large);
   position: relative;
+  background: var(--highlight-visited-5);
 }
 
 .button-completed-message {
@@ -154,10 +178,10 @@
 .button-link {
   text-align: center;
   display: inline-block;
-  line-height: 32px;
+  line-height: 31px;
 }
 
-.primary.button-link:visited {
+.regular.button-link:visited {
   color: var(--highlight-clickable-100);
 }
 

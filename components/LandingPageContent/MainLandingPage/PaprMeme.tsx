@@ -3,7 +3,7 @@ import React from 'react';
 import PaprMemeLogo from 'public/logos/paprMeme.png';
 import Memes from 'public/memes.png';
 import styles from './LandingPageContent.module.css';
-import { ButtonLink } from 'components/Button';
+import { Button } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
 
 function FAQ() {
@@ -21,9 +21,9 @@ export function PaprMeme() {
     <div className={styles['papr-meme-container']}>
       <Image src={PaprMemeLogo} alt="" />
       <h2>Lends to crypto-twitter&apos;s 9 favorite, meme-ish collections.</h2>
-      <ButtonLink href="" kind="primary">
+      <Button kind="outline-transparent" theme="meme" disabled>
         Coming Soon!
-      </ButtonLink>
+      </Button>
       <Image src={Memes} alt="Examples of collections used by paprMEME" />
       <FAQ />
     </div>

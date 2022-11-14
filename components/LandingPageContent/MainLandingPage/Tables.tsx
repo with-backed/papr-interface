@@ -49,7 +49,7 @@ function BorrowerTable() {
           ))}
         </tbody>
       </table>
-      <ButtonLink href="" kind="primary">
+      <ButtonLink href="" kind="outline" theme="papr">
         Get a loan
       </ButtonLink>
     </div>
@@ -67,7 +67,7 @@ function LPTable() {
           ))}
         </tbody>
       </table>
-      <ButtonLink href="" kind="primary">
+      <ButtonLink href="" kind="outline" theme="papr">
         Swap for papr
       </ButtonLink>
     </div>

@@ -64,6 +64,7 @@
   white-space: nowrap;
   align-items: center;
   border-radius: 10px;
+  line-height: 31px;
 }
 
 .link,
@@ -74,12 +75,12 @@
 
 .link:hover {
   transition: background-color 200ms ease;
-  background-color: var(--background-faded-green);
+  background-color: var(--highlight-clickable-10);
 }
 
 .link-active {
   composes: link;
-  background-color: var(--background-faded-green);
+  background-color: var(--highlight-clickable-10);
 }
 
 .link-active:visited {

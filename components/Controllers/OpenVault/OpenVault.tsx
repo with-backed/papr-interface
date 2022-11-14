@@ -242,11 +242,12 @@ export function OpenVault({
           </div>
 
           {isBorrowing && (
-            <div
-              className={`${styles.button} ${styles.reviewButton}`}
+            <Button
+              size="small"
+              kind="outline"
               onClick={() => setShowMath(true)}>
               Review Math
-            </div>
+            </Button>
           )}
 
           {!isBorrowing && (
