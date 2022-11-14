@@ -21,6 +21,9 @@ export function TransactionButton({
   type,
   transactionData,
   completed,
+  kind = 'regular',
+  theme = 'papr',
+  size = 'big',
   ...props
 }: TransactionButtonProps) {
   const [status, setStatus] = useState<'ready' | 'pending' | 'complete'>(
@@ -39,6 +42,7 @@ export function TransactionButton({
         buttonText={text}
         success={true}
         message={<span>Done</span>}
+        size={size}
       />
     );
   }
@@ -54,6 +58,7 @@ export function TransactionButton({
       <CompletedButton
         buttonText={text}
         success={status === 'complete'}
+        size={size}
         message={
           <span>
             {message} {transactionLink}
@@ -64,7 +69,13 @@ export function TransactionButton({
   }
 
   return (
-    <Button type={type} disabled={disabled} {...props}>
+    <Button
+      type={type}
+      disabled={disabled}
+      kind={kind}
+      theme={theme}
+      size={size}
+      {...props}>
       {text}
     </Button>
   );
