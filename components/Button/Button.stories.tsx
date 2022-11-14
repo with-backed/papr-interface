@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { Button, ButtonKind, ButtonSize, ButtonTheme } from './Button';
+import { Button, ButtonKind, ButtonTheme } from './Button';
 import { ButtonLink } from './ButtonLink';
 import { TextButton, ButtonKind as TextButtonKind } from './TextButton';
 import { TransactionButton } from './TransactionButton';
@@ -29,9 +29,6 @@ export const BigButtons = () => (
         </Button>
       )),
     )}
-    <Button size="big" kind="regular" theme="papr" disabled>
-      Hello
-    </Button>
   </Wrapper>
 );
 
@@ -40,6 +37,23 @@ export const SmallButtons = () => (
     {buttonKinds.flatMap((kind) =>
       buttonThemes.map((theme) => (
         <Button size={'small'} kind={kind} theme={theme} key={kind + theme}>
+          Hello
+        </Button>
+      )),
+    )}
+  </Wrapper>
+);
+
+export const DisabledButtons = () => (
+  <Wrapper>
+    {buttonKinds.flatMap((kind) =>
+      buttonThemes.map((theme) => (
+        <Button
+          size="big"
+          kind={kind}
+          theme={theme}
+          key={kind + theme}
+          disabled>
           Hello
         </Button>
       )),

@@ -120,13 +120,20 @@
 }
 
 .button:disabled {
-  background: var(--neutral-5);
   cursor: not-allowed;
+  color: #aaaaaa;
 }
 
-.button:disabled:hover,
-.button:disabled:focus {
-  background: var(--neutral-5);
+.button.papr:disabled {
+  background: var(--button-fill-papr);
+}
+
+.button.hero:disabled {
+  background: var(--button-fill-hero);
+}
+
+.button.meme:disabled {
+  background: var(--button-fill-meme);
 }
 
 .button.outline-transparent:disabled,
