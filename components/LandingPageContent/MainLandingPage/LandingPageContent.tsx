@@ -1,6 +1,5 @@
 import React from 'react';
 import LandingPageScale from 'public/landingpage-scale.png';
-import { LandingPageDiagram } from './LandingPageDiagram';
 import styles from './LandingPageContent.module.css';
 import Image from 'next/image';
 import { Tables } from './Tables';
@@ -9,6 +8,7 @@ import { Whitepaper } from './Whitepaper';
 import { PaprHeroes } from './PaprHeroes';
 import { PaprMeme } from './PaprMeme';
 import { FAQ } from './FAQ';
+import { LandingPageDiagram } from './LandingPageDiagram';
 
 export function LandingPageContent() {
   return (
