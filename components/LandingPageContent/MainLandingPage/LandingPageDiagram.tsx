@@ -11,7 +11,7 @@ export const LandingPageDiagram = () => (
   <div className={styles.layered}>
     <DiagramBackground />
     <div className={styles['diagram-container']}>
-      <Image src={Diagram} alt="" />
+      <Image src={Diagram} alt="" placeholder="blur" />
     </div>
   </div>
 );
