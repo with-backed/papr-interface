@@ -81,7 +81,7 @@ async function getNewNorm(
 async function subgraphNormalizationUpdatesForController(controller: string) {
   // TODO: dynamic client address
   const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerl/0.1.0/gn',
   );
   const { data, error } = await client
     .query<TargetUpdatesByControllerQuery>(TargetUpdatesByControllerDocument, {

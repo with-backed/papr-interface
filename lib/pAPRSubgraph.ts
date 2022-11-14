@@ -12,7 +12,7 @@ import { clientFromUrl } from './urql';
 export async function subgraphControllerByAddress(id: string) {
   // TODO: dynamic client address
   const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerl/0.1.0/gn',
   );
   const { data, error } = await client
     .query<PaprControllerByIdQuery>(PaprControllerByIdDocument, { id })
@@ -28,7 +28,7 @@ export async function subgraphControllerByAddress(id: string) {
 
 export async function getAllPaprControllers(): Promise<SubgraphController[]> {
   const client = clientFromUrl(
-    'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerl/0.1.0/gn',
   );
   const { data, error } = await client
     .query<PaprControllersQuery>(PaprControllersDocument, {})

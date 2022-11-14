@@ -62,7 +62,8 @@ const paprHero: Config = {
   controllerAddress: '0xF478340769a200f20fEa385dEEA6D42550DD8986',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
-  paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+  paprMemeSubgraph:
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerl/0.1.0/gn',
   oracleBaseUrl: 'https://v2-interface-rosy.vercel.app',
   paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
