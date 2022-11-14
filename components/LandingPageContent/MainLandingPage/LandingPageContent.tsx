@@ -18,7 +18,9 @@ export function LandingPageContent() {
         <br />
         powered by Uniswap V3.
       </h1>
-      <Image src={LandingPageScale} alt="" width={640} height={460} />
+      <div className={styles['scale-container']}>
+        <Image src={LandingPageScale} alt="" />
+      </div>
       <div className={styles.wrapper}>
         <DashedLine />
         <Tables />

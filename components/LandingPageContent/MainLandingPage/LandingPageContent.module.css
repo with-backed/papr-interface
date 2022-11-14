@@ -31,6 +31,11 @@
   position: relative;
 }
 
+.scale-container {
+  position: relative;
+  max-width: 640px;
+}
+
 /* Diagram */
 .diagram {
   padding-top: 110px;
