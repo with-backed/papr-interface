@@ -70,6 +70,15 @@
   background-color: white;
 }
 
+.outline-transparent {
+  composes: outline;
+  background-color: transparent;
+}
+
+.outline-transparent:disabled {
+  background-color: transparent;
+}
+
 .outline.papr {
   border: 2px var(--button-outline-papr) solid;
   color: var(--button-outline-papr);
@@ -111,15 +120,19 @@
 }
 
 .button:disabled {
-  color: var(--neutral-50);
   background: var(--neutral-5);
   cursor: not-allowed;
 }
 
 .button:disabled:hover,
 .button:disabled:focus {
-  color: var(--neutral-50);
   background: var(--neutral-5);
+}
+
+.button.outline-transparent:disabled,
+.button.outline-transparent:disabled:hover,
+.button.outline-transparent:disabled:focus {
+  background: transparent;
 }
 
 .button-completed {

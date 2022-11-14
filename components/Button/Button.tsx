@@ -1,9 +1,7 @@
-import React, { ButtonHTMLAttributes, ComponentProps, useMemo } from 'react';
-import { DialogDisclosure } from 'reakit/Dialog';
-import { Disclosure } from 'reakit/Disclosure';
+import React, { ButtonHTMLAttributes, useMemo } from 'react';
 import styles from './Button.module.css';
 
-export type ButtonKind = 'regular' | 'outline';
+export type ButtonKind = 'regular' | 'outline' | 'outline-transparent';
 export type ButtonTheme = 'papr' | 'hero' | 'meme' | 'white';
 export type ButtonSize = 'big' | 'small';
 

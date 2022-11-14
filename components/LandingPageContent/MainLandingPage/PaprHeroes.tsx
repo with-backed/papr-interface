@@ -2,7 +2,7 @@ import React from 'react';
 import PaprHeroesLogo from 'public/logos/paprHeroes.png';
 import Heroes from 'public/heroes.png';
 import styles from './LandingPageContent.module.css';
-import { ButtonLink } from 'components/Button';
+import { Button } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
 import Image from 'next/image';
 
@@ -48,9 +48,9 @@ export function PaprHeroes() {
         <br />
         and Goerli versions of CC0 NFTs.
       </h2>
-      <ButtonLink kind="outline" theme="hero" href="">
-        Join the game
-      </ButtonLink>
+      <Button kind="outline-transparent" theme="hero" disabled>
+        Coming soon!
+      </Button>
       <Image src={Heroes} alt="Examples of collections used in paprHERO" />
       <Leaderboard />
       <Rules />
