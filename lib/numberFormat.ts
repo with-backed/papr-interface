@@ -1,6 +1,8 @@
+import { ethers } from 'ethers';
+
 const LOCALE = 'en-US';
 const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
-  notation: 'compact',
+  notation: 'standard',
   minimumSignificantDigits: 3,
   maximumSignificantDigits: 3,
 });
@@ -9,6 +11,14 @@ const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
  * @param amount e.g., the result of `parseFloat(ethers.utils.formatUnits(...))`
  * @returns amount as string, e.g.: `939`, `2.34k`
  */
+
+export function formatBigNum(
+  num: ethers.BigNumber,
+  decimals: ethers.BigNumberish,
+): string {
+  return parseFloat(ethers.utils.formatUnits(num, decimals)).toFixed(3);
+}
+
 export function formatTokenAmount(amount: number) {
   return USDC_FORMATTER.format(amount);
 }

@@ -248,15 +248,14 @@ class PaprControllerInternal {
   }
 
   async maxDebt(
-    collateralAssets: CenterUserNFTsResponse[],
-    oracleInfo: OracleInfo | null,
+    collateralAssets: string[],
+    oracleInfo: OracleInfo,
   ): Promise<ethers.BigNumber> {
-    if (!oracleInfo) return ethers.BigNumber.from(0);
     const totalDebtPerCollateral = await Promise.all(
       collateralAssets
         .map((asset) =>
           ethers.utils.parseUnits(
-            oracleInfo[asset.address].price.toString(),
+            oracleInfo[asset].price.toString(),
             this.underlying.decimals,
           ),
         )

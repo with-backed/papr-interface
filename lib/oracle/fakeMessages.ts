@@ -15,11 +15,11 @@ export const dummyOracleInfoMap = {
   ],
   [getAddress('0x6ef2c9cb23f03014d18d7e4ceeaec497db00247c')]: [917.4, 1000.0],
   [getAddress('0x8232c5fd480c2a74d2f25d3362f262ff3511ce49')]: [
-    10248.32, 10290.21,
+    1024.32, 1029.21,
   ],
   [getAddress('0x91036a17098a16a113fc0afe5967889e776eeee0')]: [234.21, 250.01],
   [getAddress('0xb7d7fe7995d1e347916faae8e16cfd6dd21a9bae')]: [
-    14259.22, 14300.21,
+    1425.22, 1430.21,
   ],
 };
 

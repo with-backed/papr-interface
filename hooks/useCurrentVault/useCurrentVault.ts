@@ -33,6 +33,7 @@ export function useCurrentVaults(
   controller: PaprController,
   user: string | undefined,
 ) {
+  console.log(controller.id);
   const [{ data: vaultsData, fetching: vaultsFetching }] = useQuery({
     query: VaultsByOwnerForControllerDocument,
     variables: {
@@ -43,6 +44,7 @@ export function useCurrentVaults(
   });
 
   const currentVaults = useMemo(() => {
+    console.log({ vaultsData });
     if (vaultsFetching || !vaultsData?.vaults) return null;
     if (vaultsData.vaults.length === 0) return null;
 

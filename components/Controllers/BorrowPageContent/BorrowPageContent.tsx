@@ -10,7 +10,6 @@ import { TokenPerformance } from 'components/Controllers/TokenPerformance/TokenP
 import { PaprController } from 'lib/PaprController';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { getUniqueNFTId } from 'lib/controllers';
-import { useCurrentVault } from 'hooks/useCurrentVault/useCurrentVault';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { YourBorrowPositions } from 'components/YourBorrowPositions/YourBorrowPositions';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
@@ -47,11 +46,6 @@ export function BorrowPageContent({
     [paprController],
   );
 
-  const { currentVault, vaultFetching } = useCurrentVault(
-    paprController,
-    address,
-  );
-
   // pre-select all the user's compatible NFTs
   useEffect(() => {
     if (userCollectionNFTs.length > 0) {
@@ -63,7 +57,7 @@ export function BorrowPageContent({
     }
   }, [userCollectionNFTs]);
 
-  if (!paprController || !pricesData || vaultFetching) return <></>;
+  if (!paprController || !pricesData) return <></>;
 
   return (
     <OracleInfoProvider

@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react';
 
-const ORACLE_POLL_INTERVAL = 1200;
+const ORACLE_POLL_INTERVAL = 1.2e6;
 
 export type OracleInfo = { [key: string]: ReservoirResponseData };
 

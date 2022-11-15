@@ -1,0 +1,11 @@
+.vaultTable {
+    margin: 16px 0;
+}
+
+.vaultTable thead tr th {
+    text-align: center;
+}
+
+.vaultTable tbody tr td {
+    text-align: center;
+}
