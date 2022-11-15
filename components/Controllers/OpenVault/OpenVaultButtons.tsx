@@ -3,7 +3,12 @@ import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { PaprController } from 'lib/PaprController';
 import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
-import { erc721ABI, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import {
+  erc721ABI,
+  useAccount,
+  useContractWrite,
+  usePrepareContractWrite,
+} from 'wagmi';
 import PaprControllerABI from 'abis/PaprController.json';
 import {
   IPaprController,
@@ -18,7 +23,6 @@ type SafeTransferFromButtonProps = {
   tokenId: string;
   debt: ethers.BigNumber;
   minOut: ethers.BigNumber;
-  address: string;
 };
 
 const overrides = {
@@ -60,14 +64,14 @@ export function SafeTransferFromButton({
   tokenId,
   debt,
   minOut,
-  address,
 }: SafeTransferFromButtonProps) {
+  const { address } = useAccount();
   const { config } = usePrepareContractWrite({
     address: getAddress(collateralAddress),
     abi: erc721ABI,
     functionName: 'safeTransferFrom',
     args: [
-      address as `0x${string}`,
+      address,
       controller.id as `0x${string}`,
       ethers.BigNumber.from(tokenId),
       ethers.utils.defaultAbiCoder.encode(
@@ -109,20 +113,19 @@ type MintAndSellDebtButtonProps = {
   controller: PaprController;
   debt: ethers.BigNumber;
   minOut: ethers.BigNumber;
-  address: string;
 };
 
 export function MintAndSellDebtButton({
   controller,
   debt,
   minOut,
-  address,
 }: MintAndSellDebtButtonProps) {
+  const { address } = useAccount();
   const { config: mintAndSellDebtConfig } = usePrepareContractWrite({
     address: controller.id,
     abi: PaprControllerABI.abi,
     functionName: 'mintAndSellDebt',
-    args: [debt, minOut, ethers.BigNumber.from(0), address as `0x${string}`],
+    args: [debt, minOut, ethers.BigNumber.from(0), address],
     overrides,
   });
   const { data, write } = useContractWrite({
@@ -146,7 +149,6 @@ type MulticallButtonProps = {
   controller: PaprController;
   debt: ethers.BigNumber;
   minOut: ethers.BigNumber;
-  address: string;
 };
 
 export function MutlicallButton({
@@ -154,8 +156,8 @@ export function MutlicallButton({
   controller,
   debt,
   minOut,
-  address,
 }: MulticallButtonProps) {
+  const { address } = useAccount();
   const multicallFunctionData = useMemo(() => {
     const contractsAndTokenIds = nftsSelected.map((id) =>
       deconstructFromId(id),
@@ -222,25 +224,24 @@ type RepayButtonProps = {
   controller: PaprController;
   underlyingAmount: ethers.BigNumber;
   minOut: ethers.BigNumber;
-  address: string;
 };
 
 export function RepayButton({
   controller,
   underlyingAmount,
   minOut,
-  address,
 }: RepayButtonProps) {
+  const { address } = useAccount();
   const { config } = usePrepareContractWrite({
     address: controller.id,
     abi: PaprControllerABI.abi,
     functionName: 'buyAndReduceDebt',
     args: [
-      address as `0x${string}`,
+      address,
       underlyingAmount,
       minOut,
       ethers.BigNumber.from(0),
-      address as `0x${string}`,
+      address,
     ],
     overrides,
   });

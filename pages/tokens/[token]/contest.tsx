@@ -55,6 +55,8 @@ export const getServerSideProps: GetServerSideProps<
       (a, b) => parseInt(b[1]) - parseInt(a[1]),
     );
 
+    console.log('here');
+
     return {
       props: {
         token,
@@ -64,6 +66,7 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   } catch (e) {
+    console.log({ e });
     captureException(e);
     return {
       notFound: true,

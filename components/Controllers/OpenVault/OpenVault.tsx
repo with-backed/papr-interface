@@ -122,11 +122,14 @@ export function OpenVault({
   }, [quoteForSwap]);
 
   const initializeUnderlyingApproved = useCallback(async () => {
+    if (!address) {
+      return;
+    }
     const connectedToken = controller.token0IsUnderlying
       ? controller.token0
       : controller.token1;
     if (
-      (await connectedToken.allowance(address!, controller.id)) >
+      (await connectedToken.allowance(address, controller.id)) >
       ethers.BigNumber.from(0)
     ) {
       setUnderlyingApproved(true);
@@ -167,8 +170,11 @@ export function OpenVault({
   }, [nftsSelected, currentVault, oracleInfo]);
 
   const getMaxDebt = useCallback(async () => {
+    if (!address) {
+      return;
+    }
     const maxDebt = await controller.maxDebt(
-      address!,
+      address,
       currentVault?.collateralContract,
       ethers.utils.parseUnits(
         oracleValueOfCollateral.toString(),
@@ -191,14 +197,6 @@ export function OpenVault({
     initializeUnderlyingApproved();
     getMaxDebt();
   }, [initializeUnderlyingApproved, getMaxDebt]);
-
-  const borrowDisabled = useMemo(() => {
-    if (!!currentVault && nftsSelected.length === 0) return false;
-    return (
-      (!allNFTsApproved && nftsSelected.length !== 1) ||
-      nftsSelected.length === 0
-    );
-  }, [nftsSelected, allNFTsApproved, currentVault]);
 
   if (!maxDebt) return <></>;
 
@@ -260,7 +258,6 @@ export function OpenVault({
                 />
               )}
               <RepayButton
-                address={address!}
                 minOut={ethers.utils.parseUnits(
                   !!quoteForSwap ? quoteForSwap : '0',
                   controller.underlying.decimals,
@@ -304,7 +301,6 @@ export function OpenVault({
               />
               {nftsSelected.length === 0 && (
                 <MintAndSellDebtButton
-                  address={address!}
                   debt={debtToBorrowOrRepay}
                   minOut={ethers.utils.parseUnits(
                     !!quoteForSwap ? quoteForSwap : '0',
@@ -317,7 +313,6 @@ export function OpenVault({
                 <SafeTransferFromButton
                   collateralAddress={deconstructFromId(nftsSelected[0])[0]}
                   tokenId={deconstructFromId(nftsSelected[0])[1]}
-                  address={address!}
                   debt={debtToBorrowOrRepay}
                   minOut={ethers.utils.parseUnits(
                     !!quoteForSwap ? quoteForSwap : '0',
@@ -329,7 +324,6 @@ export function OpenVault({
               {nftsSelected.length > 1 && (
                 <MutlicallButton
                   nftsSelected={nftsSelected}
-                  address={address!}
                   debt={debtToBorrowOrRepay}
                   minOut={ethers.utils.parseUnits(
                     !!quoteForSwap ? quoteForSwap : '0',
