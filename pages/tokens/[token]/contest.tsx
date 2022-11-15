@@ -55,8 +55,6 @@ export const getServerSideProps: GetServerSideProps<
       (a, b) => parseInt(b[1]) - parseInt(a[1]),
     );
 
-    console.log('here');
-
     return {
       props: {
         token,
