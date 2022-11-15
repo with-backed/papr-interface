@@ -6,27 +6,7 @@ const baseConfig = {
   nftPortApiKey: '39de5023-b9ef-42cf-a730-ce98537d2d8d',
 };
 
-export type Config = {
-  centerCode: string;
-  infuraId: string;
-  nftPortApiKey: string;
-  tokenName: string;
-  centerNetwork: string;
-  chainId: number;
-  jsonRpcProvider: string;
-  alchemyId: string;
-  openSeaUrl: string;
-  etherscanUrl: string;
-  siteUrl: string;
-  network: string;
-  controllerAddress: string;
-  uniswapSubgraph: string;
-  paprMemeSubgraph: string;
-  oracleBaseUrl: string;
-  paprUnderlyingAddress: string;
-  reservoirAPI: string;
-  reservoirMarketplace: string;
-};
+export type Config = typeof paprMeme;
 
 export type SupportedToken = keyof typeof configs;
 export type SupportedNetwork = 'ethereum' | 'goerli';

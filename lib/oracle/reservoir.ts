@@ -2,6 +2,13 @@ import { ethers } from 'ethers';
 import { Config } from 'lib/config';
 import { ReservoirOracleUnderwriter } from 'types/generated/abis/PaprController';
 
+export enum OracleType {
+  spot = 'spot',
+  lower = 'lower',
+  twap = 'twap',
+  upper = 'upper',
+}
+
 export type ReservoirResponseData = {
   price: number;
   message: {
@@ -18,7 +25,7 @@ export const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 3600;
 export async function getSignedOracleFloorPriceMessage(
   collection: string,
   config: Config,
-  kind: string,
+  kind: OracleType,
 ): Promise<ReservoirResponseData> {
   const reservoirReq = await fetch(
     `${config.reservoirAPI}/oracle/collections/${collection}/floor-ask/v3?kind=${kind}&currency=${config.paprUnderlyingAddress}&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,

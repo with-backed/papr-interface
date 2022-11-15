@@ -2,6 +2,7 @@ import { configs, SupportedToken, validateToken } from 'lib/config';
 import { generateDummyOracleMessage } from 'lib/oracle/fakeMessages';
 import {
   getSignedOracleFloorPriceMessage,
+  OracleType,
   ReservoirResponseData,
 } from 'lib/oracle/reservoir';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -15,7 +16,7 @@ async function handler(
     const { token, collection, kind } = req.query as {
       token: SupportedToken;
       collection: string;
-      kind: string;
+      kind: OracleType;
     };
 
     if (token === 'paprTrash') {
