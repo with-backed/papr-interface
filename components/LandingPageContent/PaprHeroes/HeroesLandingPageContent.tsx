@@ -4,14 +4,9 @@ import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import styles from './HeroesLandingPageContent.module.css';
 import { ERC721__factory } from 'types/generated/abis';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import {
-  useAccount,
-  useContractRead,
-  useContractWrite,
-  usePrepareContractWrite,
-} from 'wagmi';
+import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { CenterAsset } from 'components/CenterAsset';
 import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
 import { ethers } from 'ethers';
@@ -106,19 +101,21 @@ function PHUSDC() {
   }, [signerOrProvider]);
 
   const currentBalance = useAsyncValue(
-    () => erc20.balanceOf(address!),
+    () => (address ? erc20.balanceOf(address) : (async () => null)()),
     [erc20, address],
   );
   const stakeInfo = useAsyncValue(
-    () => erc20.stakeInfo(address!),
+    () => (address ? erc20.stakeInfo(address) : (async () => null)()),
     [erc20, address],
   );
   const totalWithInterest = useAsyncValue(
     () =>
-      erc20.stakedBalance({
-        amount: stakeInfo?.[0] || 0,
-        depositedAt: stakeInfo?.[1] || 0,
-      }),
+      stakeInfo
+        ? erc20.stakedBalance({
+            amount: stakeInfo[0],
+            depositedAt: stakeInfo[1],
+          })
+        : (async () => null)(),
     [stakeInfo, erc20],
   );
 
@@ -256,7 +253,7 @@ function AllowedCollateral({
 
   const name = useAsyncValue(() => erc721.name(), [erc721]);
   const currentBalance = useAsyncValue(
-    () => erc721.balanceOf(address!),
+    () => (address ? erc721.balanceOf(address) : (async () => null)()),
     [erc721, address],
   );
 
