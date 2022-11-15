@@ -71,7 +71,7 @@ export function SafeTransferFromButton({
     abi: erc721ABI,
     functionName: 'safeTransferFrom',
     args: [
-      address,
+      address as `0x${string}`,
       controller.id as `0x${string}`,
       ethers.BigNumber.from(tokenId),
       ethers.utils.defaultAbiCoder.encode(
