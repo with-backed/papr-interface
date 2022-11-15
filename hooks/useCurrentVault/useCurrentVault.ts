@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { VaultsByOwnerForControllerDocument } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
+// TODO(adamgobes): remove useCurrentVault and utilize useCurrentVaults everywhere
+// the below hook should be considered deprecated, DO NOT USE
 export function useCurrentVault(
   controller: PaprController,
   user: string | undefined,
@@ -33,7 +35,6 @@ export function useCurrentVaults(
   controller: PaprController,
   user: string | undefined,
 ) {
-  console.log(controller.id);
   const [{ data: vaultsData, fetching: vaultsFetching }] = useQuery({
     query: VaultsByOwnerForControllerDocument,
     variables: {

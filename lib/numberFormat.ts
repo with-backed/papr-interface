@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 
 const LOCALE = 'en-US';
 const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
-  notation: 'standard',
+  notation: 'compact',
   minimumSignificantDigits: 3,
   maximumSignificantDigits: 3,
 });
