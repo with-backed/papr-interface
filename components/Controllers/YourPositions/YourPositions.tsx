@@ -86,11 +86,8 @@ function LoanInfo({ paprController, vault }: LoanInfoProps) {
       return null;
     }
     // TODO fix with real oracle price
-    const maxDebt = await paprController.maxDebt(
-      address,
-      vault.collateralContract,
-      ethers.BigNumber.from(1),
-    );
+    // TODO we no longer have liquidation estimates -- remove this once redo of this component goes in
+    const maxDebt = ethers.BigNumber.from(0); // TODO update with real max debt
     const debtBigNumber = ethers.BigNumber.from(vault.debt);
     return computeLiquidationEstimation(debtBigNumber, maxDebt, paprController);
   }, [address, paprController, vault]);
