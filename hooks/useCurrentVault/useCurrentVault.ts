@@ -28,3 +28,29 @@ export function useCurrentVault(
     vaultFetching,
   };
 }
+
+export function useCurrentVaults(
+  controller: PaprController,
+  user: string | undefined,
+) {
+  const [{ data: vaultsData, fetching: vaultsFetching }] = useQuery({
+    query: VaultsByOwnerForControllerDocument,
+    variables: {
+      owner: user?.toLowerCase(),
+      controller: controller.id.toLowerCase(),
+    },
+    pause: !user,
+  });
+
+  const currentVaults = useMemo(() => {
+    if (vaultsFetching || !vaultsData?.vaults) return null;
+    if (vaultsData.vaults.length === 0) return null;
+
+    return vaultsData.vaults;
+  }, [vaultsFetching, vaultsData]);
+
+  return {
+    currentVaults,
+    vaultsFetching,
+  };
+}

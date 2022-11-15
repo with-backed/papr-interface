@@ -12,6 +12,8 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { getUniqueNFTId } from 'lib/controllers';
 import { useCurrentVault } from 'hooks/useCurrentVault/useCurrentVault';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
+import { YourBorrowPositions } from 'components/YourBorrowPositions/YourBorrowPositions';
+import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 
 export type BorrowPageProps = {
   controllerAddress: string;
@@ -64,27 +66,14 @@ export function BorrowPageContent({
   if (!paprController || !pricesData || vaultFetching) return <></>;
 
   return (
-    <div className={controllerStyles.wrapper}>
-      <TokenPerformance
-        controllers={[paprController]}
-        pricesData={{ [paprController.id]: pricesData }}
-      />
-      <AccountNFTs
-        controller={paprController}
-        userCollectionNFTs={userCollectionNFTs.map((nft) =>
-          getUniqueNFTId(nft.address, nft.tokenId),
-        )}
-        nftsSelected={nftsSelected}
-        nftsLoading={nftsLoading}
-        setNFTsSelected={setNFTsSelected}
-      />
-      <OpenVault
-        controller={paprController}
-        pricesData={pricesData}
-        userCollectionNFTs={userCollectionNFTs}
-        currentVault={currentVault}
-        nftsSelected={nftsSelected}
-      />
-    </div>
+    <OracleInfoProvider
+      collections={userCollectionNFTs.map((nft) => nft.address)}>
+      <div className={controllerStyles.wrapper}>
+        <YourBorrowPositions
+          userNFTs={userCollectionNFTs}
+          paprController={paprController}
+        />
+      </div>
+    </OracleInfoProvider>
   );
 }
