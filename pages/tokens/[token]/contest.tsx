@@ -64,7 +64,6 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   } catch (e) {
-    console.log({ e });
     captureException(e);
     return {
       notFound: true,
