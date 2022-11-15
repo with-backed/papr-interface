@@ -8,7 +8,7 @@ import duration from 'dayjs/plugin/duration';
 import { getAddress } from 'ethers/lib/utils';
 import { PaprController } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
-import { ReservoirResponseData } from 'lib/oracle/reservoir';
+import { OracleType, ReservoirResponseData } from 'lib/oracle/reservoir';
 
 dayjs.extend(duration);
 
@@ -249,12 +249,12 @@ export function computeLtv(
 export async function getOracleInfoFromAllowedCollateral(
   collections: string[],
   token: SupportedToken,
-  isHeroes: boolean = false,
+  kind: OracleType = OracleType.lower,
 ) {
   const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
     collections.map(async (collectionAddress) => {
       const req = await fetch(
-        `${configs[token].oracleBaseUrl}/api/tokens/${token}/oracle/collections/${collectionAddress}?heroes=${isHeroes}`,
+        `${configs[token].oracleBaseUrl}/api/tokens/${token}/oracle/collections/${collectionAddress}?kind=${kind}`,
         {
           method: 'POST',
         },

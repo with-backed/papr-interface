@@ -6,11 +6,7 @@ const baseConfig = {
   nftPortApiKey: '39de5023-b9ef-42cf-a730-ce98537d2d8d',
 };
 
-export type Config = {
-  // things that aren't guaranteed to exist in all configs should be declared here
-  // TODO: when we move to prod, these should be in each config and not optional
-  controllerAddress?: string;
-} & Omit<typeof paprMeme, 'controllerAddress'>;
+export type Config = typeof paprMeme;
 
 export type SupportedToken = keyof typeof configs;
 export type SupportedNetwork = 'ethereum' | 'goerli';
@@ -37,13 +33,6 @@ const paprTrash: Config = {
   oracleBaseUrl: 'https://v2-interface-rosy.vercel.app',
   paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
-  paprHeroesUSDC: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
-  paprHeroesCollateral: [
-    '0x0593cd2238d1b143bd1c67cd7fa98eee32a260ea',
-    '0xd4e652bbfcf616c966e1b1e8ed37599d81f11889',
-    '0x4770646fe8635fa9ed3cb72ed4b7ef6386a06827',
-    '0xabe17952e7fe468711826c26b04b047c0da53b86',
-  ],
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
 };
 
@@ -65,15 +54,8 @@ const paprHero: Config = {
   paprMemeSubgraph:
     'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.0/gn',
   oracleBaseUrl: 'https://v2-interface-rosy.vercel.app',
-  paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
+  paprUnderlyingAddress: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
-  paprHeroesUSDC: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
-  paprHeroesCollateral: [
-    '0x0593cd2238d1b143bd1c67cd7fa98eee32a260ea',
-    '0xd4e652bbfcf616c966e1b1e8ed37599d81f11889',
-    '0x4770646fe8635fa9ed3cb72ed4b7ef6386a06827',
-    '0xabe17952e7fe468711826c26b04b047c0da53b86',
-  ],
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
 };
 
@@ -93,13 +75,12 @@ const paprMeme = {
   alchemyId: 'De3LMv_8CYuN9WzVEgoOI5w7ltnGIhnH',
   siteUrl: 'https://withbacked.xyz',
   network: 'ethereum',
+  controllerAddress: 'TODO update this when we have a papr controller',
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprMemeSubgraph: 'TODO: update this when we have a prod subgraph',
   paprUnderlyingAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   oracleBaseUrl: '',
   reservoirAPI: 'https://api.reservoir.tools',
-  paprHeroesUSDC: '',
-  paprHeroesCollateral: [''],
   reservoirMarketplace: '',
 };
 

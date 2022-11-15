@@ -2,6 +2,7 @@ import { configs, SupportedToken, validateToken } from 'lib/config';
 import { generateDummyOracleMessage } from 'lib/oracle/fakeMessages';
 import {
   getSignedOracleFloorPriceMessage,
+  OracleType,
   ReservoirResponseData,
 } from 'lib/oracle/reservoir';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -12,27 +13,26 @@ async function handler(
 ) {
   try {
     validateToken(req.query);
-    const { token, collection, heroes } = req.query as {
+    const { token, collection, kind } = req.query as {
       token: SupportedToken;
       collection: string;
-      heroes: string;
+      kind: OracleType;
     };
-    const isHeroes = heroes === 'true';
 
-    if (configs[token].tokenName === 'paprMeme' || isHeroes) {
+    if (token === 'paprTrash') {
+      return res
+        .status(200)
+        .json(await generateDummyOracleMessage(collection, configs[token]));
+    } else {
       return res
         .status(200)
         .json(
           await getSignedOracleFloorPriceMessage(
             collection,
             configs[token],
-            isHeroes,
+            kind,
           ),
         );
-    } else {
-      return res
-        .status(200)
-        .json(await generateDummyOracleMessage(collection, configs[token]));
     }
   } catch (e) {
     return res.status(400).json(null);

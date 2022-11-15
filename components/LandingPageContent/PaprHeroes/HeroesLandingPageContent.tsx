@@ -100,7 +100,7 @@ function PHUSDC() {
 
   const erc20 = useMemo(() => {
     return PHUSDC__factory.connect(
-      configs.paprHero.paprHeroesUSDC,
+      configs.paprHero.paprUnderlyingAddress,
       signerOrProvider,
     );
   }, [signerOrProvider]);
@@ -133,7 +133,7 @@ function PHUSDC() {
   }, [value, stakeInfo, decimals]);
 
   const { config: stakeConfig } = usePrepareContractWrite({
-    address: configs.paprHero.paprHeroesUSDC,
+    address: configs.paprHero.paprUnderlyingAddress,
     abi: PHUSDC__factory.abi,
     functionName: 'stake',
     args: [amountToStake],
@@ -150,7 +150,7 @@ function PHUSDC() {
   } as any);
 
   const { config: withdrawConfig } = usePrepareContractWrite({
-    address: configs.paprHero.paprHeroesUSDC,
+    address: configs.paprHero.paprUnderlyingAddress,
     abi: PHUSDC__factory.abi,
     functionName: 'unstake',
     args: [],

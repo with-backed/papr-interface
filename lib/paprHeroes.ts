@@ -8,17 +8,18 @@ import { ReservoirResponseData } from './oracle/reservoir';
 
 export async function calculateNetPhUSDCBalance(
   address: string,
+  allowedCollateral: string[],
   oracleInfo: { [key: string]: ReservoirResponseData },
 ): Promise<ethers.BigNumber> {
   const provider = makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero');
-  const connectedERC721 = configs.paprHero.paprHeroesCollateral.map((c) =>
+  const connectedERC721 = allowedCollateral.map((c) =>
     ERC721__factory.connect(
       c,
       makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero'),
     ),
   );
   const connectedPhUSDC = PHUSDC__factory.connect(
-    configs.paprHero.paprHeroesUSDC,
+    configs.paprHero.paprUnderlyingAddress,
     provider,
   );
   const decimals = await connectedPhUSDC.decimals();
