@@ -1,6 +1,9 @@
 import React from 'react';
 import PaprHeroesLogo from 'public/logos/paprHeroes.png';
-import Heroes from 'public/heroes.png';
+import Hero1 from 'public/landing-page-nfts/hero-1.png';
+import Hero2 from 'public/landing-page-nfts/hero-2.png';
+import Hero3 from 'public/landing-page-nfts/hero-3.png';
+import Hero4 from 'public/landing-page-nfts/hero-4.png';
 import styles from './LandingPageContent.module.css';
 import { Button } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
@@ -73,7 +76,12 @@ export function PaprHeroes() {
       <Button kind="outline-transparent" theme="hero" disabled>
         Coming soon!
       </Button>
-      <Image src={Heroes} alt="Examples of collections used in paprHERO" />
+      <div className={styles.heroes}>
+        <Image src={Hero1} alt="" />
+        <Image src={Hero2} alt="" />
+        <Image src={Hero3} alt="" />
+        <Image src={Hero4} alt="" />
+      </div>
       {/* <Leaderboard /> */}
       <Rules />
     </div>

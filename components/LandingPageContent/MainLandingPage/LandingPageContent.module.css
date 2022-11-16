@@ -201,6 +201,11 @@
   padding: 110px 30px 0;
 }
 
+.heroes {
+  display: flex;
+  gap: 1rem;
+}
+
 .product-container h2 {
   text-align: center;
   font-size: var(--font-huge);
@@ -275,6 +280,11 @@
 .papr-meme-container {
   composes: product-container;
   background: url('/graph-denser.png'), var(--background-green-paper);
+}
+
+.memes {
+  display: flex;
+  gap: 1rem;
 }
 
 /* FAQ */

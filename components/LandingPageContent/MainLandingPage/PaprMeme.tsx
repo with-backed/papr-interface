@@ -1,7 +1,14 @@
 import Image from 'next/image';
 import React from 'react';
 import PaprMemeLogo from 'public/logos/paprMeme.png';
-import Memes from 'public/memes.png';
+import Meme1 from 'public/landing-page-nfts/meme-1.png';
+import Meme2 from 'public/landing-page-nfts/meme-2.png';
+import Meme3 from 'public/landing-page-nfts/meme-3.png';
+import Meme4 from 'public/landing-page-nfts/meme-4.png';
+import Meme5 from 'public/landing-page-nfts/meme-5.png';
+import Meme6 from 'public/landing-page-nfts/meme-6.png';
+import Meme7 from 'public/landing-page-nfts/meme-7.png';
+import Meme8 from 'public/landing-page-nfts/meme-8.png';
 import styles from './LandingPageContent.module.css';
 import { Button } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
@@ -28,7 +35,16 @@ export function PaprMeme() {
       <Button kind="outline-transparent" theme="meme" disabled>
         Coming Soon!
       </Button>
-      <Image src={Memes} alt="Examples of collections used by paprMEME" />
+      <div className={styles.memes}>
+        <Image src={Meme1} alt="" />
+        <Image src={Meme2} alt="" />
+        <Image src={Meme3} alt="" />
+        <Image src={Meme4} alt="" />
+        <Image src={Meme5} alt="" />
+        <Image src={Meme6} alt="" />
+        <Image src={Meme7} alt="" />
+        <Image src={Meme8} alt="" />
+      </div>
       <FAQ />
     </div>
   );
