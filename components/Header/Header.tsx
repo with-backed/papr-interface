@@ -126,7 +126,7 @@ export function Header() {
   return (
     <nav className={styles.nav}>
       <div className={styles['desktop-content']}>
-        <div className={styles['left-side']}>
+        <div className={styles.center}>
           <LogoLink />
         </div>
         {/* <div className={styles.center}>
@@ -137,7 +137,7 @@ export function Header() {
         </div> */}
       </div>
       <div className={styles['mobile-content']}>
-        <div className={styles['left-side']}>
+        <div className={styles.center}>
           <LogoLink />
         </div>
         {/* <div className={styles.center}>
