@@ -49,9 +49,9 @@ function BorrowerTable() {
           ))}
         </tbody>
       </table>
-      <ButtonLink href="" kind="outline" theme="papr">
+      {/* <ButtonLink href="" kind="outline" theme="papr">
         Get a loan
-      </ButtonLink>
+      </ButtonLink> */}
     </div>
   );
 }
@@ -67,9 +67,9 @@ function LPTable() {
           ))}
         </tbody>
       </table>
-      <ButtonLink href="" kind="outline" theme="papr">
-        Swap for papr
-      </ButtonLink>
+      {/* <ButtonLink href="" kind="outline" theme="papr">
+        Buy papr
+      </ButtonLink> */}
     </div>
   );
 }
