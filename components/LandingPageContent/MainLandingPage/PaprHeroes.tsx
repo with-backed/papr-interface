@@ -14,11 +14,20 @@ function Leaderboard() {
     <div className={styles.leaderboard}>
       <h3>LEADERBOARD</h3>
       <dl>
-        <dt>superdude.eth</dt>
+        <dt>
+          superdude.eth
+          <div className={styles.dotted} />
+        </dt>
         <dd>18,239 USDC</dd>
-        <dt>vitalik.eth</dt>
+        <dt>
+          vitalik.eth
+          <div className={styles.dotted} />
+        </dt>
         <dd>17,267 USDC</dd>
-        <dt>0xa47381e</dt>
+        <dt>
+          0xa47381e
+          <div className={styles.dotted} />
+        </dt>
         <dd>17,221 USDC</dd>
       </dl>
     </div>

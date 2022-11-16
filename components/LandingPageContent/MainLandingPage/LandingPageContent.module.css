@@ -194,6 +194,19 @@
   background-color: var(--background-white);
   border: 2px black solid;
   padding: 20px 39px;
+  width: 100%;
+  max-width: 750px;
+}
+
+.leaderboard dt {
+  display: flex;
+}
+
+.dotted {
+  width: 100%;
+  border-bottom: 3px black dotted;
+  height: 26px;
+  margin: 0 0.5rem;
 }
 
 .leaderboard h3 {
