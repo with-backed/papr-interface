@@ -8,7 +8,7 @@ export default function Home() {
       <OpenGraph
         title="Papr"
         description="NFT lending powered by Uniswap V3."
-        imageUrl="/landingpage-scale.png"
+        imageUrl="/papr-scale-og.png"
       />
       <LandingPageContent />
     </>
