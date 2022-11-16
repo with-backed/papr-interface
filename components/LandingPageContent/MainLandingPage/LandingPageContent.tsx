@@ -12,7 +12,7 @@ import { LandingPageDiagram } from './LandingPageDiagram';
 
 export function LandingPageContent() {
   return (
-    <>
+    <div className={styles.wrapper}>
       <h1 className={styles.heading}>
         NFT lending
         <br />
@@ -30,6 +30,6 @@ export function LandingPageContent() {
         <PaprMeme />
         <FAQ />
       </div>
-    </>
+    </div>
   );
 }
