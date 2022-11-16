@@ -26,7 +26,7 @@ const paprTrash: Config = {
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
-  controllerAddress: '0x9b2dc6841af58b6c3e7bb07970df8f44bc9b0e05',
+  controllerAddress: '0xd2ccc7970501f2802783acd750ee350fcf758349',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',

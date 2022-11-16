@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export function useAsyncValue<T>(
-  callback: () => Promise<T>,
+  callback: () => Promise<T | null>,
   deps: any[],
 ): T | null {
   const [value, setValue] = useState<T | null>(null);

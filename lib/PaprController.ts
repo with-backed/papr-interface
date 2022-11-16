@@ -18,6 +18,8 @@ import { subgraphControllerByAddress } from './pAPRSubgraph';
 import { buildToken, convertOneScaledValue } from './controllers';
 import { getPool } from './controllers/uniswap';
 import { subgraphUniswapPoolById } from './uniswapSubgraph';
+import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 
 export type PaprController = SubgraphController & PaprControllerInternal;
 export type SubgraphController = NonNullable<
@@ -246,13 +248,21 @@ class PaprControllerInternal {
   }
 
   async maxDebt(
-    account: string,
-    collateralAsset: string,
-    collateralValue: ethers.BigNumber,
+    collateralAssets: string[],
+    oracleInfo: OracleInfo,
   ): Promise<ethers.BigNumber> {
-    let info = await this._contract.vaultInfo(account, collateralAsset);
+    const totalDebtPerCollateral = await Promise.all(
+      collateralAssets
+        .map((asset) =>
+          ethers.utils.parseUnits(
+            oracleInfo[asset].price.toString(),
+            this.underlying.decimals,
+          ),
+        )
+        .map(async (oraclePrice) => await this._contract.maxDebt(oraclePrice)),
+    );
 
-    return await this._contract.maxDebt(collateralValue.mul(info.count));
+    return totalDebtPerCollateral.reduce((a, b) => a.add(b));
   }
 }
 

@@ -170,26 +170,10 @@ export function OpenVault({
   }, [nftsSelected, currentVault, oracleInfo]);
 
   const getMaxDebt = useCallback(async () => {
-    if (!address) {
-      return;
-    }
-    const maxDebt = await controller.maxDebt(
-      address,
-      currentVault?.collateralContract,
-      ethers.utils.parseUnits(
-        oracleValueOfCollateral.toString(),
-        underlying.decimals,
-      ),
-    );
+    const maxDebt = ethers.BigNumber.from(0); // TODO(adamgobes): fix this once redo of OpenVault components is done
 
     setMaxDebt(maxDebt);
-  }, [
-    controller,
-    currentVault,
-    address,
-    oracleValueOfCollateral,
-    underlying.decimals,
-  ]);
+  }, []);
 
   const maxLTV = useAsyncValue(() => controller.maxLTVPercent(), [controller]);
 
