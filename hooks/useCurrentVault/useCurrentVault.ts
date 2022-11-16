@@ -45,7 +45,6 @@ export function useCurrentVaults(
   });
 
   const currentVaults = useMemo(() => {
-    console.log({ vaultsData });
     if (vaultsFetching || !vaultsData?.vaults) return null;
     if (vaultsData.vaults.length === 0) return null;
 

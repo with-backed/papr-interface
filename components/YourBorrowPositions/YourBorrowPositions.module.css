@@ -2,6 +2,10 @@
     margin: 16px 0;
 }
 
+.vaultTable p {
+    margin: 0;
+}
+
 .vaultTable thead tr th {
     text-align: center;
 }
