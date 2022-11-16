@@ -5,7 +5,11 @@ import { LandingPageContent } from 'components/LandingPageContent/MainLandingPag
 export default function Home() {
   return (
     <>
-      <OpenGraph title={`Papr | Home`} />
+      <OpenGraph
+        title="Papr"
+        description="NFT lending powered by Uniswap V3."
+        imageUrl="/landingpage-scale.png"
+      />
       <LandingPageContent />
     </>
   );
