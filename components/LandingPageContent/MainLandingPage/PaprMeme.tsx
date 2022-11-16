@@ -10,7 +10,11 @@ function FAQ() {
   return (
     <div className={styles.rules}>
       <Disclosure title="Why these NFTs in particular?">
-        Rules go here tbqh
+        These 8 collections have large community followings. As memes they have
+        stood the test of time and continue to trade with consistent value, but
+        not for double-digit ETH values. They examples of NFTs that clearly have
+        borrow and lending demand, but are underserved but the current product
+        offerings.
       </Disclosure>
     </div>
   );
