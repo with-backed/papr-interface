@@ -47,9 +47,8 @@ export function PaprHeroes() {
     <div className={styles['papr-heroes-container']}>
       <Logo />
       <h2>
-        A trading competition on testnet, with fake money
-        <br />
-        and Goerli versions of CC0 NFTs.
+        A trading competition on testnet, with fake money and Goerli versions of
+        CC0 NFTs.
       </h2>
       <Button kind="outline-transparent" theme="hero" disabled>
         Coming soon!

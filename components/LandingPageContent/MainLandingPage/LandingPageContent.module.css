@@ -208,6 +208,10 @@
   margin-top: 100px;
 }
 
+.papr-heroes-container h2 {
+  max-width: 590px;
+}
+
 .papr-heroes-container img {
   width: 319px;
 }
