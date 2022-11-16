@@ -16,6 +16,12 @@
   z-index: 2;
 }
 
+@media screen and (max-width: 780px) {
+  .dashed-line {
+    display: none;
+  }
+}
+
 .heading {
   text-align: center;
   font-size: 35px;
@@ -91,6 +97,16 @@
 
 .table-wrapper button {
   width: max-content;
+}
+
+.table-layered {
+  composes: layered;
+}
+
+@media screen and (max-width: 780px) {
+  .table-layered {
+    display: none;
+  }
 }
 
 .table-background {

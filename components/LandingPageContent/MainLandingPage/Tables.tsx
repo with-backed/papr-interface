@@ -76,7 +76,7 @@ function LPTable() {
 
 export function Tables() {
   return (
-    <div className={styles.layered}>
+    <div className={styles['table-layered']}>
       <Background />
       <div className={styles['tables-container']}>
         <BorrowerTable />
