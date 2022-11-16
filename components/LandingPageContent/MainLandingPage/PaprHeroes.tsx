@@ -35,9 +35,29 @@ function Leaderboard() {
 }
 
 function Rules() {
+  const currencyName = <i>phUSDC</i>;
   return (
     <div className={styles.rules}>
-      <Disclosure title="Rules of the game">Rules go here tbqh</Disclosure>
+      <Disclosure title="Rules of the game">
+        <p>
+          Papr Hero is a PVP competition where players compete to see who can
+          end up with the most {currencyName}. Every player starts with a fixed
+          amount of {currencyName} and eligible NFTs. Players can perform one or
+          more of the following actions to increase their {currencyName}{' '}
+          balance:
+        </p>
+        <ol>
+          <li>Lock NFTs as collateral and borrow {currencyName}</li>
+          <li>Stake {currencyName} for 10% APR</li>
+          <li>Sell their NFTs for {currencyName}</li>
+          <li>Buy NFTs with their {currencyName}</li>
+        </ol>
+        <p>
+          At the end of the competition, a users final {currencyName} score is
+          the sum of their {currencyName} balance as well as the value of their
+          NFTs (as calculated by the floor price of the collection)
+        </p>
+      </Disclosure>
     </div>
   );
 }
