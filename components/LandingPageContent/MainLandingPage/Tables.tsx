@@ -76,12 +76,18 @@ function LPTable() {
 
 export function Tables() {
   return (
-    <div className={styles['table-layered']}>
-      <Background />
-      <div className={styles['tables-container']}>
+    <>
+      <div className={styles['table-layered']}>
+        <Background />
+        <div className={styles['tables-container']}>
+          <BorrowerTable />
+          <LPTable />
+        </div>
+      </div>
+      <div className={styles['table-mobile']}>
         <BorrowerTable />
         <LPTable />
       </div>
-    </div>
+    </>
   );
 }

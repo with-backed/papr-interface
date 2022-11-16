@@ -103,8 +103,31 @@
   composes: layered;
 }
 
+.table-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 32px;
+  padding: 32px 0;
+  background: url('/graph-square.png'), var(--background-orange-paper);
+  width: 100%;
+  height: 100%;
+}
+
 @media screen and (max-width: 780px) {
   .table-layered {
+    display: none;
+  }
+  .table-mobile {
+    display: flex;
+  }
+}
+
+@media screen and (min-width: 781px) {
+  .table-layered {
+    display: flex;
+  }
+  .table-mobile {
     display: none;
   }
 }
