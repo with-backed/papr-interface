@@ -13,6 +13,15 @@
   margin: 0 auto;
   width: 100%;
   height: 100%;
+  padding: 0 1rem;
+}
+
+.desktop-content {
+  composes: content;
+}
+
+.mobile-content {
+  composes: content;
 }
 
 .left-side {
@@ -89,4 +98,21 @@
 
 .logo {
   height: 48px;
+}
+
+@media screen and (max-device-width: 750px) {
+  .mobile-content {
+    display: grid;
+  }
+  .desktop-content {
+    display: none;
+  }
+}
+@media screen and (min-device-width: 751px) {
+  .mobile-content {
+    display: none;
+  }
+  .desktop-content {
+    display: grid;
+  }
 }
