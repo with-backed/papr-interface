@@ -4,15 +4,17 @@ import styles from './LandingPageContent.module.css';
 
 const BORROWER_ENTRIES = [
   ['💰', 'USDC loans, instantly'],
-  ['⏱', 'unlimited duration'],
-  ['🔮', 'no surprise liquidations'],
-  ['💸', 'borrow more when the floor goes up'],
+  ['💸', 'Borrow and repay as you go'],
+  ['⏱', 'Unlimited duration'],
+  ['👜', 'Borrow with many NFTs in a single tx'],
+  ['🐌', 'Loans liquidate one NFT at a time'],
 ];
 
 const LP_ENTRIES = [
-  ['🌈', 'exposure across many loans and collections'],
-  ['🛌', 'zero management or unused captial'],
-  ['💎', 'set and forget simply by buying and holding'],
+  ['🌈', 'Exposure across many loans and collections'],
+  ['💎', 'Low maintenance, just buy and hold'],
+  ['🛌', 'Zero unused capital'],
+  ['🪙', 'Convert back to USDC whenever you want, no lockups'],
 ];
 
 type RowProps = {
