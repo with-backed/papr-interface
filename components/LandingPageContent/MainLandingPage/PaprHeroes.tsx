@@ -74,7 +74,7 @@ export function PaprHeroes() {
         Coming soon!
       </Button>
       <Image src={Heroes} alt="Examples of collections used in paprHERO" />
-      <Leaderboard />
+      {/* <Leaderboard /> */}
       <Rules />
     </div>
   );
