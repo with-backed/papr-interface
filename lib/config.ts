@@ -90,7 +90,7 @@ export const configs = {
   paprMeme,
 };
 
-export const prodConfigs = [];
+export const prodConfigs = [paprMeme];
 
 export const devConfigs = [paprTrash, paprHero];
 
