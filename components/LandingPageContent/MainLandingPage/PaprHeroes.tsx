@@ -83,7 +83,6 @@ export function PaprHeroes() {
         <Image src={Hero4} alt="" />
       </div>
       {/* <Leaderboard /> */}
-      <Rules />
     </div>
   );
 }
