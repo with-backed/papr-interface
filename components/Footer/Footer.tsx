@@ -9,22 +9,22 @@ type Link = {
 };
 
 const LINKS: Link[] = [
-  {
-    title: '🤝 Terms of Service',
-    href: '/legal/terms-of-service.pdf',
-  },
+  // {
+  //   title: '🤝 Terms of Service',
+  //   href: '/legal/terms-of-service.pdf',
+  // },
   {
     title: '🔒 Privacy Policy',
     href: '/legal/privacy-policy.pdf',
   },
-  {
-    title: '💼 Contract Audits',
-    href: 'https://code4rena.com/reports/2022-04-backed/',
-  },
-  {
-    title: '⚙️ GitHub',
-    href: GITHUB_URL,
-  },
+  // {
+  //   title: '💼 Contract Audits',
+  //   href: 'https://code4rena.com/reports/2022-04-backed/',
+  // },
+  // {
+  //   title: '⚙️ GitHub',
+  //   href: GITHUB_URL,
+  // },
   {
     title: '🐦 Twitter',
     href: TWITTER_URL,
