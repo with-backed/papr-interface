@@ -14,6 +14,13 @@
   position: absolute;
   height: 1360px;
   z-index: 2;
+  margin-top: -45px;
+}
+
+@media screen and (max-width: 780px) {
+  .dashed-line {
+    display: none;
+  }
 }
 
 .heading {
@@ -34,12 +41,15 @@
 .scale-container {
   position: relative;
   max-width: 640px;
+  padding: 0 30px;
 }
 
 /* Diagram */
 .diagram-container {
   padding-top: 110px;
   padding-bottom: 135px;
+  padding-left: 30px;
+  padding-right: 30px;
   z-index: 5;
   max-width: 770px;
 }
@@ -93,6 +103,39 @@
   width: max-content;
 }
 
+.table-layered {
+  composes: layered;
+}
+
+.table-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 32px;
+  padding: 32px 0;
+  background: url('/graph-square.png'), var(--background-orange-paper);
+  width: 100%;
+  height: 100%;
+}
+
+@media screen and (max-width: 780px) {
+  .table-layered {
+    display: none;
+  }
+  .table-mobile {
+    display: flex;
+  }
+}
+
+@media screen and (min-width: 781px) {
+  .table-layered {
+    display: flex;
+  }
+  .table-mobile {
+    display: none;
+  }
+}
+
 .table-background {
   display: flex;
   margin-top: 100px;
@@ -130,6 +173,7 @@
   flex-direction: column;
   align-items: center;
   gap: 4rem;
+  padding: 0 30px;
 }
 
 .whitepaper p {
@@ -137,6 +181,7 @@
   line-height: 40px;
   text-align: center;
   margin: 0;
+  max-width: 700px;
 }
 
 .highlight {
@@ -154,7 +199,13 @@
   width: 100%;
   align-items: center;
   gap: 4rem;
-  padding: 110px 0;
+  padding: 110px 30px;
+}
+
+.heroes {
+  display: flex;
+  gap: 3rem;
+  max-width: 850px;
 }
 
 .product-container h2 {
@@ -169,6 +220,10 @@
   margin-top: 100px;
 }
 
+.papr-heroes-container h2 {
+  max-width: 590px;
+}
+
 .papr-heroes-container img {
   width: 319px;
 }
@@ -178,6 +233,25 @@
   background-color: var(--background-white);
   border: 2px black solid;
   padding: 20px 39px;
+  width: 100%;
+  max-width: 750px;
+}
+
+@media screen and (max-width: 500px) {
+  .leaderboard {
+    font-size: 16px;
+  }
+}
+
+.leaderboard dt {
+  display: flex;
+}
+
+.dotted {
+  width: 100%;
+  border-bottom: 3px black dotted;
+  height: 26px;
+  margin: 0 0.5rem;
 }
 
 .leaderboard h3 {
@@ -208,6 +282,11 @@
 .papr-meme-container {
   composes: product-container;
   background: url('/graph-denser.png'), var(--background-green-paper);
+}
+
+.memes {
+  display: flex;
+  gap: 2%;
 }
 
 /* FAQ */

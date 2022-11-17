@@ -125,16 +125,27 @@ export function Header() {
 
   return (
     <nav className={styles.nav}>
-      <div className={styles.content}>
-        <div className={styles['left-side']}>
+      <div className={styles['desktop-content']}>
+        <div className={styles.center}>
           <LogoLink />
         </div>
-        <div className={styles.center}>
+        {/* <div className={styles.center}>
           <NavLinks activeRoute={activeRoute} />
         </div>
         <div className={styles['right-side']}>
           <ConnectWallet />
+        </div> */}
+      </div>
+      <div className={styles['mobile-content']}>
+        <div className={styles.center}>
+          <LogoLink />
         </div>
+        {/* <div className={styles.center}>
+          <NavLinks activeRoute={activeRoute} />
+        </div>
+        <div className={styles['right-side']}>
+          <ConnectWallet />
+        </div> */}
       </div>
     </nav>
   );

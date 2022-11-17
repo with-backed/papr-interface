@@ -8,16 +8,18 @@ export function Whitepaper() {
       <p className={styles.highlight}>The FREE MARKET sets the price</p>
       <p>
         The CONTRACT uses MARKET PRICE to determine INTEREST owed by BORROWERS,
-        <br />
         which is paid in the form of appreciation in the price of papr tokens.
-        <br />
+      </p>
+      <p>
         This impacts SUPPLY and DEMAND and the price of papr on UNISWAP, forming
-        a perpetual
-        <br />
-        feedback loop for discovering the optimal APR for loans.
+        a perpetual feedback loop for discovering the optimal APR for loans.
       </p>
       <p className={styles.highlight}>papr = perpetual APR</p>
-      <ButtonLink kind="outline" theme="papr" href="">
+      <ButtonLink
+        kind="outline"
+        theme="papr"
+        href="https://backed.mirror.xyz/8SslPvU8of0h-fxoo6AybCpm51f30nd0qxPST8ep08c"
+        newTab>
         Read the whitepaper
       </ButtonLink>
     </div>

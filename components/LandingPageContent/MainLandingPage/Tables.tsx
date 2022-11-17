@@ -4,15 +4,17 @@ import styles from './LandingPageContent.module.css';
 
 const BORROWER_ENTRIES = [
   ['💰', 'USDC loans, instantly'],
-  ['⏱', 'unlimited duration'],
-  ['🔮', 'no surprise liquidations'],
-  ['💸', 'borrow more when the floor goes up'],
+  ['💸', 'Borrow and repay as you go'],
+  ['⏱', 'Unlimited duration'],
+  ['👜', 'Borrow with many NFTs in a single tx'],
+  ['🐌', 'Loans liquidate one NFT at a time'],
 ];
 
 const LP_ENTRIES = [
-  ['🌈', 'exposure across many loans and collections'],
-  ['🛌', 'zero management or unused captial'],
-  ['💎', 'set and forget simply by buying and holding'],
+  ['🌈', 'Exposure across many loans and collections'],
+  ['💎', 'Low maintenance, just buy and hold'],
+  ['🛌', 'Zero unused capital'],
+  ['🪙', 'Convert back to USDC whenever you want, no lockups'],
 ];
 
 type RowProps = {
@@ -49,9 +51,9 @@ function BorrowerTable() {
           ))}
         </tbody>
       </table>
-      <ButtonLink href="" kind="outline" theme="papr">
+      {/* <ButtonLink href="" kind="outline" theme="papr">
         Get a loan
-      </ButtonLink>
+      </ButtonLink> */}
     </div>
   );
 }
@@ -67,21 +69,27 @@ function LPTable() {
           ))}
         </tbody>
       </table>
-      <ButtonLink href="" kind="outline" theme="papr">
-        Swap for papr
-      </ButtonLink>
+      {/* <ButtonLink href="" kind="outline" theme="papr">
+        Buy papr
+      </ButtonLink> */}
     </div>
   );
 }
 
 export function Tables() {
   return (
-    <div className={styles.layered}>
-      <Background />
-      <div className={styles['tables-container']}>
+    <>
+      <div className={styles['table-layered']}>
+        <Background />
+        <div className={styles['tables-container']}>
+          <BorrowerTable />
+          <LPTable />
+        </div>
+      </div>
+      <div className={styles['table-mobile']}>
         <BorrowerTable />
         <LPTable />
       </div>
-    </div>
+    </>
   );
 }

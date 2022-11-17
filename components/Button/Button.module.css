@@ -142,6 +142,16 @@
   background: transparent;
 }
 
+.button.hero.outline-transparent:disabled {
+  color: var(--button-outline-hero);
+}
+.button.meme.outline-transparent:disabled {
+  color: var(--button-outline-meme);
+}
+.button.papr.outline-transparent:disabled {
+  color: var(--button-outline-papr);
+}
+
 .button-completed {
   display: flex;
   flex-direction: column;
