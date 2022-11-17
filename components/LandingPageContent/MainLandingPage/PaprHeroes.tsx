@@ -8,6 +8,8 @@ import styles from './LandingPageContent.module.css';
 import { ButtonLink } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
 import Image from 'next/image';
+import { useTooltipState, TooltipReference } from 'reakit/Tooltip';
+import { Tooltip } from 'components/Tooltip';
 
 const Logo = () => <img src={PaprHeroesLogo.src} alt="" />;
 
@@ -66,6 +68,10 @@ function Rules() {
 }
 
 export function PaprHeroes() {
+  const tooltip1 = useTooltipState();
+  const tooltip2 = useTooltipState();
+  const tooltip3 = useTooltipState();
+  const tooltip4 = useTooltipState();
   return (
     <div className={styles['papr-heroes-container']}>
       <Logo />
@@ -79,10 +85,54 @@ export function PaprHeroes() {
         Coming soon! Subscribe for updates ↗
       </ButtonLink>
       <div className={styles.heroes}>
-        <Image src={Hero1} alt="" />
-        <Image src={Hero2} alt="" />
-        <Image src={Hero3} alt="" />
-        <Image src={Hero4} alt="" />
+        <TooltipReference {...tooltip1}>
+          <Image src={Hero1} alt="" />
+        </TooltipReference>
+        <Tooltip {...tooltip1}>
+          <div className={styles.tooltip}>
+            CryptoToadz
+            <br />
+            Floor Price: 1.385 ETH
+            <br />
+            Max Loan: 837.23 USDC
+          </div>
+        </Tooltip>
+        <TooltipReference {...tooltip2}>
+          <Image src={Hero2} alt="" />
+        </TooltipReference>
+        <Tooltip {...tooltip2}>
+          <div className={styles.tooltip}>
+            Moonbirds
+            <br />
+            Floor Price: 7.35 ETH
+            <br />
+            Max Loan: 4,443.08 USDC
+          </div>
+        </Tooltip>
+        <TooltipReference {...tooltip3}>
+          <Image src={Hero3} alt="" />
+        </TooltipReference>
+        <Tooltip {...tooltip3}>
+          <div className={styles.tooltip}>
+            Tiny Dinos
+            <br />
+            Floor Price: 0.0489 ETH
+            <br />
+            Max Loan: 29.56 USDC
+          </div>
+        </Tooltip>
+        <TooltipReference {...tooltip4}>
+          <Image src={Hero4} alt="" />
+        </TooltipReference>
+        <Tooltip {...tooltip4}>
+          <div className={styles.tooltip}>
+            Blitmap
+            <br />
+            Floor Price: 3.149 ETH
+            <br />
+            Max Loan: 1,903.57 USDC
+          </div>
+        </Tooltip>
       </div>
       {/* <Leaderboard /> */}
     </div>
