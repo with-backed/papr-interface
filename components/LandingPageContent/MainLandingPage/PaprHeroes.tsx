@@ -75,7 +75,8 @@ export function PaprHeroes() {
       <ButtonLink
         kind="outline"
         theme="hero"
-        href="https://backed.mirror.xyz/8SslPvU8of0h-fxoo6AybCpm51f30nd0qxPST8ep08c">
+        href="https://backed.mirror.xyz/8SslPvU8of0h-fxoo6AybCpm51f30nd0qxPST8ep08c"
+        newTab>
         Coming soon! Subscribe for updates ↗
       </ButtonLink>
       <div className={styles.heroes}>

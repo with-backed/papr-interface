@@ -7,6 +7,7 @@ interface ButtonLinkProps extends ComponentProps<typeof Link> {
   kind?: ButtonKind;
   theme?: ButtonTheme;
   size?: ButtonSize;
+  newTab?: boolean;
 }
 
 export function ButtonLink({
@@ -14,6 +15,7 @@ export function ButtonLink({
   kind = 'regular',
   theme = 'papr',
   size = 'big',
+  newTab = false,
   ...props
 }: ButtonLinkProps) {
   const className = [
@@ -24,7 +26,9 @@ export function ButtonLink({
   ].join(' ');
   return (
     <Link {...props}>
-      <a className={className}>{children}</a>
+      <a className={className} target={newTab ? '_blank' : undefined}>
+        {children}
+      </a>
     </Link>
   );
 }
