@@ -1,6 +1,9 @@
 import { PaprController } from 'lib/PaprController';
 import { useMemo } from 'react';
-import { VaultsByOwnerForControllerDocument } from 'types/generated/graphql/inKindSubgraph';
+import {
+  CollateralVaultByOwnerForControllerDocument,
+  VaultsByOwnerForControllerDocument,
+} from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
 // TODO(adamgobes): remove useCurrentVault and utilize useCurrentVaults everywhere
@@ -54,5 +57,33 @@ export function useCurrentVaults(
   return {
     currentVaults,
     vaultsFetching,
+  };
+}
+
+export function useVault(
+  controller: PaprController,
+  collateralContract: string,
+  user: string | undefined,
+) {
+  const [{ data: vaultsData, fetching: vaultFetching }] = useQuery({
+    query: CollateralVaultByOwnerForControllerDocument,
+    variables: {
+      owner: user?.toLowerCase(),
+      controller: controller.id.toLowerCase(),
+      collateralContract: collateralContract.toLowerCase(),
+    },
+    pause: !user,
+  });
+
+  const vault = useMemo(() => {
+    if (vaultFetching || !vaultsData?.vaults) return null;
+    if (vaultsData.vaults.length === 0) return null;
+
+    return vaultsData.vaults[0];
+  }, [vaultFetching, vaultsData]);
+
+  return {
+    vault,
+    vaultFetching,
   };
 }

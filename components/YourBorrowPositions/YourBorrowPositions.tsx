@@ -23,20 +23,17 @@ import { formatBigNum } from 'lib/numberFormat';
 export type YourBorrowPositionsProps = {
   paprController: PaprController;
   userNFTs: CenterUserNFTsResponse[];
+  currentVaults: VaultsByOwnerForControllerQuery['vaults'];
 };
 
 export function YourBorrowPositions({
   paprController,
   userNFTs,
+  currentVaults,
 }: YourBorrowPositionsProps) {
   const { address } = useAccount();
   const { jsonRpcProvider, tokenName } = useConfig();
   const oracleInfo = useOracleInfo();
-
-  const { currentVaults, vaultsFetching } = useCurrentVaults(
-    paprController,
-    address,
-  );
 
   const uniqueCollections = useMemo(() => {
     return userNFTs
@@ -86,7 +83,7 @@ export function YourBorrowPositions({
     totalPaprMemeDebt,
   ]);
 
-  if (vaultsFetching || !oracleInfo) return <></>;
+  if (!oracleInfo) return <></>;
 
   return (
     <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>

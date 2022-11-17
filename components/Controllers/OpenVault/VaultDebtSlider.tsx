@@ -55,17 +55,32 @@ export function VaultDebtSlider({
     },
     [indicatorLeftPixels],
   );
-  const [blackTrackWidth, setBlackTrackWidth] = useState<string>('');
+  const [blackTrackWidth, setBlackTrackWidth] = useState<[string, number]>([
+    '',
+    maxDebtNumber,
+  ]);
 
   const initBlackTrackWidth = useCallback(
     (val: string) => {
-      if (!blackTrackWidth && val !== '0px') setBlackTrackWidth(val);
+      if (!blackTrackWidth[0] && val !== '0px')
+        setBlackTrackWidth([val, maxDebtNumber]);
     },
-    [blackTrackWidth],
+    [blackTrackWidth, maxDebtNumber],
   );
 
+  useEffect(() => {
+    if (maxDebtNumber !== blackTrackWidth[1]) {
+      const newBlackTrackPosition =
+        (currentVaultDebtNumber / maxDebtNumber) * 100 * 5.7;
+      setBlackTrackWidth([`${newBlackTrackPosition}px`, maxDebtNumber]);
+    }
+  }, [maxDebtNumber, blackTrackWidth, currentVaultDebtNumber]);
+
   return (
-    <div className={styles.sliderWrapper}>
+    <div>
+      <p className={styles.totalLTVLabel}>
+        Max: {!!maxLTV && formatPercent(maxLTV)} LTV
+      </p>
       <Slider
         min={0}
         max={maxDebtNumber}
@@ -106,34 +121,9 @@ export function VaultDebtSlider({
 
           return (
             <>
-              {currentVaultDebtNumber !== 0 && (
-                <div
-                  className={styles.currentIndicator}
-                  style={{
-                    left: indicatorLeftPixels,
-                  }}>
-                  <div>
-                    <p>
-                      Current LTV:{' '}
-                      {formatPercent(
-                        (currentVaultDebtNumber / maxDebtNumber) * maxLTV,
-                      )}
-                    </p>
-                  </div>
-                  <div>
-                    <p>↓</p>
-                  </div>
-                </div>
-              )}
-
               <div {...props}>
                 <div className={`${styles.sliderLabel} ${pushedClassName}`}>
-                  {state.index === 0 && (
-                    <>
-                      <p>Loan Amount</p>
-                      <p>{formatPercent(currentLTV)} LTV</p>
-                    </>
-                  )}
+                  <p>{formatPercent(currentLTV)} LTV</p>
                 </div>
               </div>
             </>
@@ -143,12 +133,9 @@ export function VaultDebtSlider({
           initBlackTrackWidth(`${props.style.left}px`);
           return <div {...props}></div>;
         }}
-        blackTrackWidth={blackTrackWidth}
+        blackTrackWidth={blackTrackWidth[0]}
         hideBlackTrack={currentVaultDebtNumber === 0}
       />
-      <p className={styles.sliderLabel}>
-        Max Loan {!!maxLTV && formatPercent(maxLTV)} LTV
-      </p>
     </div>
   );
 }

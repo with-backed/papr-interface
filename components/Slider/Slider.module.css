@@ -37,6 +37,7 @@
   color: var(--greentext);
   position: relative;
   width: 100px;
+  bottom: 76px;
   transition: 300ms;
 }
 
