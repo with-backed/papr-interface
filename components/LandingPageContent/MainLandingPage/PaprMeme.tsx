@@ -12,8 +12,6 @@ import Meme8 from 'public/landing-page-nfts/meme-8.png';
 import styles from './LandingPageContent.module.css';
 import { Button } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
-import { Tooltip } from 'components/Tooltip';
-import { useTooltipState, TooltipReference } from 'reakit/Tooltip';
 
 function FAQ() {
   return (
@@ -32,14 +30,6 @@ function FAQ() {
 }
 
 export function PaprMeme() {
-  const tooltip1 = useTooltipState();
-  const tooltip2 = useTooltipState();
-  const tooltip3 = useTooltipState();
-  const tooltip4 = useTooltipState();
-  const tooltip5 = useTooltipState();
-  const tooltip6 = useTooltipState();
-  const tooltip7 = useTooltipState();
-  const tooltip8 = useTooltipState();
   return (
     <div className={styles['papr-meme-container']}>
       <Image src={PaprMemeLogo} alt="" />
@@ -48,42 +38,9 @@ export function PaprMeme() {
         Coming Soon!
       </Button>
       <div className={styles.memes}>
-        <TooltipReference {...tooltip1}>
-          <Image src={Meme1} alt="" />
-        </TooltipReference>
-        <Tooltip {...tooltip1}>
-          <div className={styles.tooltip}>
-            mfers
-            <br />
-            Floor: 0.881 ETH
-            <br />
-            Max Loan: 532.56 USDC
-          </div>
-        </Tooltip>
-        <TooltipReference {...tooltip2}>
-          <Image src={Meme2} alt="" />
-        </TooltipReference>
-        <Tooltip {...tooltip2}>
-          <div className={styles.tooltip}>
-            Dickbutts
-            <br />
-            Floor: 2 ETH
-            <br />
-            Max Loan: 1,209.00 USDC
-          </div>
-        </Tooltip>
-        <TooltipReference {...tooltip3}>
-          <Image src={Meme3} alt="" />
-        </TooltipReference>
-        <Tooltip {...tooltip3}>
-          <div className={styles.tooltip}>
-            CryptoToadz
-            <br />
-            Floor: 1.385 ETH
-            <br />
-            Max Loan: 837.23 USDC
-          </div>
-        </Tooltip>
+        <Image src={Meme1} alt="" />
+        <Image src={Meme2} alt="" />
+        <Image src={Meme3} alt="" />
         <Image src={Meme4} alt="" />
         <Image src={Meme5} alt="" />
         <Image src={Meme6} alt="" />
