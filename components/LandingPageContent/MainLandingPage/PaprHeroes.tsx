@@ -5,7 +5,7 @@ import Hero2 from 'public/landing-page-nfts/hero-2.png';
 import Hero3 from 'public/landing-page-nfts/hero-3.png';
 import Hero4 from 'public/landing-page-nfts/hero-4.png';
 import styles from './LandingPageContent.module.css';
-import { Button } from 'components/Button';
+import { ButtonLink } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
 import Image from 'next/image';
 
@@ -72,9 +72,12 @@ export function PaprHeroes() {
       <h2>
         A testnet competition, with fake money and Goerli versions of CC0 NFTs.
       </h2>
-      <Button kind="outline-transparent" theme="hero" disabled>
+      <ButtonLink
+        kind="outline"
+        theme="hero"
+        href="https://backed.mirror.xyz/8SslPvU8of0h-fxoo6AybCpm51f30nd0qxPST8ep08c">
         Coming soon! Subscribe for updates ↗
-      </Button>
+      </ButtonLink>
       <div className={styles.heroes}>
         <Image src={Hero1} alt="" />
         <Image src={Hero2} alt="" />
