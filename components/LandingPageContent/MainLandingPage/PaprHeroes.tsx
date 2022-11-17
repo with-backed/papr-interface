@@ -73,7 +73,7 @@ export function PaprHeroes() {
         A testnet competition, with fake money and Goerli versions of CC0 NFTs.
       </h2>
       <Button kind="outline-transparent" theme="hero" disabled>
-        Coming soon!
+        Coming soon! Subscribe for updates ↗
       </Button>
       <div className={styles.heroes}>
         <Image src={Hero1} alt="" />
