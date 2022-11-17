@@ -79,10 +79,10 @@ export function PaprHeroes() {
         Coming soon! Subscribe for updates ↗
       </ButtonLink>
       <div className={styles.heroes}>
-        <Image src={Hero1} alt="" />
-        <Image src={Hero2} alt="" />
-        <Image src={Hero3} alt="" />
-        <Image src={Hero4} alt="" />
+        <Image src={Hero1} alt="" quality={100} />
+        <Image src={Hero2} alt="" quality={100} />
+        <Image src={Hero3} alt="" quality={100} />
+        <Image src={Hero4} alt="" quality={100} />
       </div>
       {/* <Leaderboard /> */}
     </div>

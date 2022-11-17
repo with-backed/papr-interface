@@ -38,14 +38,14 @@ export function PaprMeme() {
         Coming Soon!
       </Button>
       <div className={styles.memes}>
-        <Image src={Meme1} alt="" />
-        <Image src={Meme2} alt="" />
-        <Image src={Meme3} alt="" />
-        <Image src={Meme4} alt="" />
-        <Image src={Meme5} alt="" />
-        <Image src={Meme6} alt="" />
-        <Image src={Meme7} alt="" />
-        <Image src={Meme8} alt="" />
+        <Image src={Meme1} alt="" quality={100} />
+        <Image src={Meme2} alt="" quality={100} />
+        <Image src={Meme3} alt="" quality={100} />
+        <Image src={Meme4} alt="" quality={100} />
+        <Image src={Meme5} alt="" quality={100} />
+        <Image src={Meme6} alt="" quality={100} />
+        <Image src={Meme7} alt="" quality={100} />
+        <Image src={Meme8} alt="" quality={100} />
       </div>
       <FAQ />
     </div>
