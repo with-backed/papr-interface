@@ -1,0 +1,18 @@
+query auctions {
+  auctions {
+    id
+    vault {
+      id
+    }
+    auctionAssetID
+    auctionAssetContract
+    startedBy
+    startPrice
+    endPrice
+    startTime
+    endTime
+    paymentAsset
+    secondsInPeriod
+    perPeriodDecayPercentWad
+  }
+}
