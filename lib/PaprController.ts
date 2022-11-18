@@ -256,7 +256,10 @@ class PaprControllerInternal {
         .map(async (oraclePrice) => await this._contract.maxDebt(oraclePrice)),
     );
 
-    return totalDebtPerCollateral.reduce((a, b) => a.add(b));
+    return totalDebtPerCollateral.reduce(
+      (a, b) => a.add(b),
+      ethers.BigNumber.from(0),
+    );
   }
 }
 

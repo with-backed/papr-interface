@@ -26,6 +26,7 @@ export function OracleInfoProvider({
 
   useEffect(() => {
     const setLatestOracleInfo = async () => {
+      console.log('this is running');
       const oracleInfo = await getOracleInfoFromAllowedCollateral(
         collections,
         tokenName as SupportedToken,

@@ -179,6 +179,12 @@ export function VaultOverview({
     );
   }, [paprController, vaultInfo, oracleInfo]);
 
+  if (
+    ethers.BigNumber.from(vaultInfo.debt).isZero() &&
+    vaultInfo.collateral.length === 0
+  )
+    return <></>;
+
   return (
     <Table className={styles.vaultTable}>
       <thead>

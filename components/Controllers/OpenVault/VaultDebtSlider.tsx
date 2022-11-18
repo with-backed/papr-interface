@@ -7,46 +7,38 @@ import styles from './OpenVault.module.css';
 
 type VaultDebtSliderProps = {
   controller: PaprController;
-  maxDebt: ethers.BigNumber;
-  currentVaultDebt: ethers.BigNumber;
+  maxDebtNumber: number;
+  currentVaultDebtNumber: number;
   maxLTV: number | null;
+  controlledSliderValue: number;
+  setControlledSliderValue: (val: number) => void;
   handleChosenDebtChanged: (val: string) => void;
-  isBorrowing: boolean;
   setIsBorrowing: (val: boolean) => void;
 };
 
 export function VaultDebtSlider({
   controller,
-  maxDebt,
-  currentVaultDebt,
+  maxDebtNumber,
+  currentVaultDebtNumber,
   maxLTV,
+  controlledSliderValue,
+  setControlledSliderValue,
   handleChosenDebtChanged,
-  isBorrowing,
   setIsBorrowing,
 }: VaultDebtSliderProps) {
-  const maxDebtNumber = useMemo(() => {
-    return parseInt(
-      ethers.utils.formatUnits(maxDebt, controller.debtToken.decimals),
-    );
-  }, [maxDebt, controller.debtToken.decimals]);
-  const currentVaultDebtNumber = useMemo(() => {
-    return parseFloat(
-      ethers.utils.formatUnits(currentVaultDebt, controller.debtToken.decimals),
-    );
-  }, [currentVaultDebt, controller.debtToken.decimals]);
-
-  const [controlledSliderValue, setControlledSliderValue] = useState<number>(
-    currentVaultDebtNumber,
-  );
-
   // When NFTs are added/removed, set the slider to equal 50% of the max LTV.
   useEffect(() => {
-    if (maxDebtNumber > 0 && currentVaultDebt.isZero()) {
+    if (maxDebtNumber > 0 && currentVaultDebtNumber === 0) {
       const defaultDebt = maxDebtNumber / 2;
       setControlledSliderValue(defaultDebt);
       handleChosenDebtChanged(defaultDebt.toString());
     }
-  }, [handleChosenDebtChanged, maxDebtNumber, currentVaultDebt]);
+  }, [
+    handleChosenDebtChanged,
+    maxDebtNumber,
+    currentVaultDebtNumber,
+    setControlledSliderValue,
+  ]);
 
   const [indicatorLeftPixels, setIndicatorLeftPixels] = useState<string>('');
   const initIndicatorLeftPixels = useCallback(
@@ -71,7 +63,7 @@ export function VaultDebtSlider({
   useEffect(() => {
     if (maxDebtNumber !== blackTrackWidth[1]) {
       const newBlackTrackPosition =
-        (currentVaultDebtNumber / maxDebtNumber) * 100 * 5.7;
+        Math.min(1, currentVaultDebtNumber / maxDebtNumber) * 100 * 5.7;
       setBlackTrackWidth([`${newBlackTrackPosition}px`, maxDebtNumber]);
     }
   }, [maxDebtNumber, blackTrackWidth, currentVaultDebtNumber]);
@@ -99,7 +91,7 @@ export function VaultDebtSlider({
             return null;
           }
           let currentLTV: number;
-          if (maxDebt.isZero()) {
+          if (maxDebtNumber === 0) {
             currentLTV = 0;
           } else {
             currentLTV = Math.min(

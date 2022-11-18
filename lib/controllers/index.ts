@@ -132,6 +132,22 @@ export async function getQuoteForSwap(
   return q;
 }
 
+export async function getQuoteForSwapOutput(
+  quoter: IQuoter,
+  amount: ethers.BigNumber,
+  tokenIn: string,
+  tokenOut: string,
+) {
+  const q = await quoter.callStatic.quoteExactOutputSingle(
+    tokenIn,
+    tokenOut,
+    ethers.BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
+    amount,
+    0,
+  );
+  return q;
+}
+
 export async function computeLiquidationEstimation(
   debt: ethers.BigNumber,
   max: ethers.BigNumber,

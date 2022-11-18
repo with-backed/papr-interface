@@ -104,3 +104,14 @@
     width: 100%;
     text-align: right;
 }
+
+.approveButtons {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.updateLoanButtonWrapper {
+    margin-top: 20px;
+    width: 100%;
+    text-align: right;
+}

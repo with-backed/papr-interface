@@ -186,7 +186,7 @@ export function OpenVault({
   return (
     <Fieldset legend="🏦 Set Loan Amount">
       <div className={styles.borrowComponentWrapper}>
-        <VaultDebtSlider
+        {/* <VaultDebtSlider
           controller={controller}
           currentVaultDebt={currentVaultDebt!}
           maxDebt={maxDebt}
@@ -194,7 +194,7 @@ export function OpenVault({
           maxLTV={maxLTV}
           isBorrowing={isBorrowing}
           setIsBorrowing={setIsBorrowing}
-        />
+        /> */}
         <div className={`${styles.mathWrapper} ${styles.priceImpactWrapper}`}>
           <div className={`${styles.mathRow} ${styles.even}`}>
             <div>
