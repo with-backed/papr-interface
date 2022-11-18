@@ -21,7 +21,7 @@ function FAQ() {
           These 8 collections have large community followings. As memes they
           have stood the test of time and continue to trade with consistent
           value, but not for double-digit ETH values. They are examples of NFTs
-          that clearly have borrow and lending demand, but are underserved but
+          that clearly have borrow and lending demand, but are underserved by
           the current product offerings.
         </p>
       </Disclosure>
