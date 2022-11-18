@@ -1,9 +1,9 @@
 import { ethers } from 'ethers';
-import { currentPrice } from 'lib/auctions';
+import { currentPrice, WAD } from 'lib/auctions';
 
 const oneDayInSeconds = ethers.BigNumber.from(60 * 60 * 24);
 const startPrice = ethers.BigNumber.from(10).pow(18);
-const perPeriodDecayPercentWad = ethers.BigNumber.from(9).pow(18);
+const perPeriodDecayPercentWad = WAD.mul(9).div(10);
 
 describe('auction library', () => {
   describe('currentPrice', () => {
