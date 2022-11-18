@@ -20,9 +20,9 @@ function FAQ() {
         <p>
           These 8 collections have large community followings. As memes they
           have stood the test of time and continue to trade with consistent
-          value, but not for double-digit ETH values. They examples of NFTs that
-          clearly have borrow and lending demand, but are underserved but the
-          current product offerings.
+          value, but not for double-digit ETH values. They are examples of NFTs
+          that clearly have borrow and lending demand, but are underserved but
+          the current product offerings.
         </p>
       </Disclosure>
     </div>
