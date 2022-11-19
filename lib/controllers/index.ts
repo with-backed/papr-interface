@@ -9,6 +9,7 @@ import { getAddress } from 'ethers/lib/utils';
 import { PaprController } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
 import { OracleType, ReservoirResponseData } from 'lib/oracle/reservoir';
+import { Quoter } from 'lib/contracts';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 
 dayjs.extend(duration);
@@ -117,11 +118,12 @@ export async function multiplier(
 }
 
 export async function getQuoteForSwap(
-  quoter: IQuoter,
   amount: ethers.BigNumber,
   tokenIn: string,
   tokenOut: string,
+  tokenName: SupportedToken,
 ) {
+  const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   const q = await quoter.callStatic.quoteExactInputSingle(
     tokenIn,
     tokenOut,
@@ -133,11 +135,12 @@ export async function getQuoteForSwap(
 }
 
 export async function getQuoteForSwapOutput(
-  quoter: IQuoter,
   amount: ethers.BigNumber,
   tokenIn: string,
   tokenOut: string,
+  tokenName: SupportedToken,
 ) {
+  const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   const q = await quoter.callStatic.quoteExactOutputSingle(
     tokenIn,
     tokenOut,
@@ -193,15 +196,28 @@ export async function computeSlippageForSwap(
   tokenIn: ERC20Token,
   tokenOut: ERC20Token,
   amount: ethers.BigNumber,
-  quoter: IQuoter,
+  useExactInput: boolean,
+  tokenName: SupportedToken,
 ) {
-  const quoteWithoutSlippage = await quoter.callStatic.quoteExactInputSingle(
-    tokenIn.id,
-    tokenOut.id,
-    ethers.BigNumber.from(10).pow(4),
-    ethers.utils.parseUnits('1', tokenIn.decimals),
-    0,
-  );
+  const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
+  let quoteWithoutSlippage: ethers.BigNumber;
+  if (useExactInput) {
+    quoteWithoutSlippage = await quoter.callStatic.quoteExactInputSingle(
+      tokenIn.id,
+      tokenOut.id,
+      ethers.BigNumber.from(10).pow(4),
+      ethers.utils.parseUnits('1', tokenIn.decimals),
+      0,
+    );
+  } else {
+    quoteWithoutSlippage = await quoter.callStatic.quoteExactOutputSingle(
+      tokenIn.id,
+      tokenOut.id,
+      ethers.BigNumber.from(10).pow(4),
+      ethers.utils.parseUnits('1', tokenIn.decimals),
+      0,
+    );
+  }
 
   const quoteWithSlippageFloat = parseFloat(
     ethers.utils.formatUnits(
@@ -223,8 +239,10 @@ export async function computeSlippageForSwap(
       ethers.utils.formatUnits(amount, ethers.BigNumber.from(tokenIn.decimals)),
     );
 
+  console.log({ quoteWithoutSlippageScaled, quoteWithSlippageFloat });
+
   const priceImpact =
-    (quoteWithoutSlippageScaled - quoteWithSlippageFloat) /
+    Math.abs(quoteWithoutSlippageScaled - quoteWithSlippageFloat) /
     ((quoteWithoutSlippageScaled + quoteWithSlippageFloat) / 2);
 
   return priceImpact * 100;

@@ -11,7 +11,7 @@ import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { Quoter } from 'lib/contracts';
 import { SupportedToken } from 'lib/config';
 import { useConfig } from 'hooks/useConfig';
-import { getQuoteForSwap } from 'lib/controllers';
+import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import { Table } from 'components/Table';
 import { ERC721__factory } from 'types/generated/abis';
@@ -24,16 +24,16 @@ export type YourBorrowPositionsProps = {
   paprController: PaprController;
   userNFTs: CenterUserNFTsResponse[];
   currentVaults: VaultsByOwnerForControllerQuery['vaults'];
+  oracleInfo: OracleInfo;
 };
 
 export function YourBorrowPositions({
   paprController,
   userNFTs,
   currentVaults,
+  oracleInfo,
 }: YourBorrowPositionsProps) {
-  const { address } = useAccount();
-  const { jsonRpcProvider, tokenName } = useConfig();
-  const oracleInfo = useOracleInfo();
+  const { tokenName } = useConfig();
 
   const uniqueCollections = useMemo(() => {
     return userNFTs
@@ -42,19 +42,17 @@ export function YourBorrowPositions({
   }, [userNFTs]);
 
   const maxLoanAmountInUnderlying = useAsyncValue(async () => {
-    if (!oracleInfo) return null;
     const maxLoanInDebtTokens = await paprController.maxDebt(
       userNFTs.map((nft) => nft.address),
       oracleInfo,
     );
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
     return getQuoteForSwap(
-      quoter,
       maxLoanInDebtTokens,
       paprController.debtToken.id,
       paprController.underlying.id,
+      tokenName as SupportedToken,
     );
-  }, [jsonRpcProvider, tokenName, paprController, oracleInfo, userNFTs]);
+  }, [tokenName, paprController, oracleInfo, userNFTs]);
 
   const totalPaprMemeDebt = useMemo(() => {
     if (!currentVaults) return ethers.BigNumber.from(0);
@@ -68,15 +66,13 @@ export function YourBorrowPositions({
 
   const totalPaprMemeDebtInUnderlying = useAsyncValue(async () => {
     if (totalPaprMemeDebt.isZero()) return null;
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
     return getQuoteForSwap(
-      quoter,
       totalPaprMemeDebt,
       paprController.debtToken.id,
       paprController.underlying.id,
+      tokenName as SupportedToken,
     );
   }, [
-    jsonRpcProvider,
     tokenName,
     paprController.debtToken.id,
     paprController.underlying.id,
@@ -147,7 +143,7 @@ export function VaultOverview({
   oracleInfo,
   vaultInfo,
 }: VaultOverviewProps) {
-  const { jsonRpcProvider, tokenName } = useConfig();
+  const { tokenName } = useConfig();
   const signerOrProvider = useSignerOrProvider();
   const connectedNFT = useMemo(() => {
     return ERC721__factory.connect(
@@ -156,17 +152,17 @@ export function VaultOverview({
     );
   }, [vaultInfo.collateralContract, signerOrProvider]);
   const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
-  const costToClose = useAsyncValue(() => {
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
-    return getQuoteForSwap(
-      quoter,
+  const costToClose = useAsyncValue(async () => {
+    if (ethers.BigNumber.from(vaultInfo.debt).isZero())
+      return ethers.BigNumber.from(0);
+    return getQuoteForSwapOutput(
       ethers.BigNumber.from(vaultInfo.debt),
-      paprController.debtToken.id,
       paprController.underlying.id,
+      paprController.debtToken.id,
+      tokenName as SupportedToken,
     );
   }, [
     vaultInfo.debt,
-    jsonRpcProvider,
     tokenName,
     paprController.debtToken.id,
     paprController.underlying.id,

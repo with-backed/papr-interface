@@ -15,6 +15,10 @@
   line-height: 20px;
 }
 
+.hidden {
+  color: white;
+}
+
 .sliderLabelPushedRight {
   left: -28px !important;
 }

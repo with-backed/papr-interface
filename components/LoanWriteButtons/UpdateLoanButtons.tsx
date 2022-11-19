@@ -5,7 +5,7 @@ import {
   ReservoirOracleUnderwriter,
 } from 'types/generated/abis/PaprController';
 import PaprControllerABI from 'abis/PaprController.json';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import {
   erc20ABI,
   erc721ABI,
@@ -45,6 +45,7 @@ type BorrowOrRepayPerpetualButtonProps = {
   depositNFTs: string[];
   withdrawNFTs: string[];
   amount: ethers.BigNumber | null;
+  oracleInfo: OracleInfo;
 };
 
 export function BorrowPerpetualButton({
@@ -53,9 +54,9 @@ export function BorrowPerpetualButton({
   depositNFTs,
   withdrawNFTs,
   amount,
+  oracleInfo,
 }: BorrowOrRepayPerpetualButtonProps) {
   const { address } = useAccount();
-  const oracleInfo = useOracleInfo();
 
   const { addCollateralCalldata, removeCollateralCalldata } =
     useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
@@ -104,7 +105,7 @@ export function BorrowPerpetualButton({
 
 const reduceDebtEncoderString = `reduceDebt(address account, address asset, uint256 amount)`;
 
-interface ReduceDebtArgsString {
+interface ReduceDebtArgsStruct {
   account: string;
   asset: string;
   amount: ethers.BigNumber;
@@ -116,9 +117,9 @@ export function RepayPerpetualButton({
   depositNFTs,
   withdrawNFTs,
   amount,
+  oracleInfo,
 }: BorrowOrRepayPerpetualButtonProps) {
   const { address } = useAccount();
-  const oracleInfo = useOracleInfo();
 
   const { addCollateralCalldata, removeCollateralCalldata } =
     useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
@@ -126,7 +127,7 @@ export function RepayPerpetualButton({
   const borrowPerpetualCalldata = useMemo(() => {
     if (!amount || amount.isZero()) return '';
 
-    const args: ReduceDebtArgsString = {
+    const args: ReduceDebtArgsStruct = {
       account: address!,
       asset: collateralContractAddress,
       amount,
@@ -180,6 +181,7 @@ type BorrowOrRepayWithSwapButtonProps = {
   withdrawNFTs: string[];
   amount: ethers.BigNumber | null;
   quote: ethers.BigNumber | null;
+  oracleInfo: OracleInfo;
 };
 
 export function RepayWithSwapButton({
@@ -189,9 +191,9 @@ export function RepayWithSwapButton({
   withdrawNFTs,
   amount,
   quote,
+  oracleInfo,
 }: BorrowOrRepayWithSwapButtonProps) {
   const { address } = useAccount();
-  const oracleInfo = useOracleInfo();
 
   const { addCollateralCalldata, removeCollateralCalldata } =
     useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
@@ -221,8 +223,8 @@ export function RepayWithSwapButton({
     () =>
       [
         ...addCollateralCalldata,
-        ...removeCollateralCalldata,
         repayWithSwapCalldata,
+        ...removeCollateralCalldata,
       ].filter((c) => !!c),
     [addCollateralCalldata, removeCollateralCalldata, repayWithSwapCalldata],
   );
@@ -258,9 +260,9 @@ export function BorrowWithSwapButton({
   withdrawNFTs,
   amount,
   quote,
+  oracleInfo,
 }: BorrowOrRepayWithSwapButtonProps) {
   const { address } = useAccount();
-  const oracleInfo = useOracleInfo();
 
   const { addCollateralCalldata, removeCollateralCalldata } =
     useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
@@ -323,6 +325,8 @@ export function ApproveTokenButton({
   const { address } = useAccount();
 
   const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
+  const [underlyingApprovedLoading, setUnderlyingApprovedLoading] =
+    useState<boolean>(true);
 
   const initializeUnderlyingApproved = useCallback(async () => {
     if (!address) {
@@ -337,6 +341,7 @@ export function ApproveTokenButton({
     ) {
       setUnderlyingApproved(true);
     }
+    setUnderlyingApprovedLoading(false);
   }, [controller, address]);
 
   useEffect(() => {
@@ -357,10 +362,12 @@ export function ApproveTokenButton({
     },
   });
 
-  if (underlyingApproved) return <></>;
+  if (underlyingApproved || underlyingApprovedLoading || !symbol) return <></>;
 
   return (
     <TransactionButton
+      kind="regular"
+      size="small"
       onClick={write!}
       transactionData={data}
       text={`Approve ${symbol}`}

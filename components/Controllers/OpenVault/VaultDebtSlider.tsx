@@ -26,27 +26,7 @@ export function VaultDebtSlider({
   handleChosenDebtChanged,
   setIsBorrowing,
 }: VaultDebtSliderProps) {
-  // When NFTs are added/removed, set the slider to equal 50% of the max LTV.
-  useEffect(() => {
-    if (maxDebtNumber > 0 && currentVaultDebtNumber === 0) {
-      const defaultDebt = maxDebtNumber / 2;
-      setControlledSliderValue(defaultDebt);
-      handleChosenDebtChanged(defaultDebt.toString());
-    }
-  }, [
-    handleChosenDebtChanged,
-    maxDebtNumber,
-    currentVaultDebtNumber,
-    setControlledSliderValue,
-  ]);
-
-  const [indicatorLeftPixels, setIndicatorLeftPixels] = useState<string>('');
-  const initIndicatorLeftPixels = useCallback(
-    (val: string) => {
-      if (!indicatorLeftPixels && val !== '0px') setIndicatorLeftPixels(val);
-    },
-    [indicatorLeftPixels],
-  );
+  const [hideMaxLTV, setHideMaxLTV] = useState<boolean>(false);
   const [blackTrackWidth, setBlackTrackWidth] = useState<[string, number]>([
     '',
     maxDebtNumber,
@@ -70,7 +50,10 @@ export function VaultDebtSlider({
 
   return (
     <div>
-      <p className={styles.totalLTVLabel}>
+      <p
+        className={`${styles.totalLTVLabel} ${
+          hideMaxLTV ? styles.hidden : ''
+        }`}>
         Max: {!!maxLTV && formatPercent(maxLTV)} LTV
       </p>
       <Slider
@@ -98,6 +81,11 @@ export function VaultDebtSlider({
               (state.valueNow / maxDebtNumber) * maxLTV,
               maxLTV,
             );
+            if (currentLTV >= 0.38) {
+              setHideMaxLTV(true);
+            } else {
+              setHideMaxLTV(false);
+            }
           }
 
           let pushedClassName: string;
@@ -108,8 +96,6 @@ export function VaultDebtSlider({
           } else {
             pushedClassName = '';
           }
-
-          initIndicatorLeftPixels(props.style.left);
 
           return (
             <>

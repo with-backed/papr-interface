@@ -22,6 +22,7 @@ import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { SupportedToken } from 'lib/config';
 import { Quoter } from 'lib/contracts';
 import {
+  computeSlippageForSwap,
   deconstructFromId,
   getQuoteForSwap,
   getQuoteForSwapOutput,
@@ -44,40 +45,33 @@ import styles from './VaultDebtPicker.module.css';
 
 type VaultDebtPickerProps = {
   paprController: PaprController;
+  oracleInfo: OracleInfo;
   vault: VaultsByOwnerForControllerQuery['vaults']['0'] | undefined;
   collateralContractAddress: string;
   userNFTsForVault: CenterUserNFTsResponse[];
-  depositNFTs: string[];
-  withdrawNFTs: string[];
-  setDepositNFTs: Dispatch<SetStateAction<string[]>>;
-  setWithdrawNFTs: Dispatch<SetStateAction<string[]>>;
-  setTotalDebtDesired: Dispatch<
-    SetStateAction<{ [key: string]: ethers.BigNumber }>
-  >;
 };
 
 export function VaultDebtPicker({
   paprController,
+  oracleInfo,
   vault,
   collateralContractAddress,
   userNFTsForVault,
-  depositNFTs,
-  withdrawNFTs,
-  setDepositNFTs,
-  setWithdrawNFTs,
-  setTotalDebtDesired,
 }: VaultDebtPickerProps) {
   // init hooks
-  const { jsonRpcProvider, tokenName } = useConfig();
+  const { tokenName } = useConfig();
   const signerOrProvider = useSignerOrProvider();
-  const oracleInfo = useOracleInfo();
-  const { address } = useAccount();
+
+  // nft variables
+  const [depositNFTs, setDepositNFTs] = useState<string[]>([]);
+  const [withdrawNFTs, setWithdrawNFTs] = useState<string[]>([]);
 
   const numCollateralForMaxDebt = useMemo(() => {
     return (
       (vault?.collateral.length || 0) + depositNFTs.length - withdrawNFTs.length
     );
   }, [vault?.collateral.length, depositNFTs, withdrawNFTs]);
+
   const userAndVaultNFTs = useMemo(() => {
     return userNFTsForVault
       .map((nft) => ({
@@ -96,36 +90,45 @@ export function VaultDebtPicker({
 
   // debt variables
   const maxDebtPerNFTInPerpetual = useAsyncValue(async () => {
-    if (!oracleInfo) return null;
     return paprController.maxDebt([collateralContractAddress], oracleInfo);
   }, [paprController, collateralContractAddress, oracleInfo]);
 
   const maxDebtPerNFTInUnderlying = useAsyncValue(async () => {
     if (!oracleInfo || !maxDebtPerNFTInPerpetual) return null;
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
     return getQuoteForSwap(
-      quoter,
       maxDebtPerNFTInPerpetual,
       paprController.debtToken.id,
       paprController.underlying.id,
+      tokenName as SupportedToken,
     );
-  }, [
-    maxDebtPerNFTInPerpetual,
-    jsonRpcProvider,
-    tokenName,
-    paprController,
-    oracleInfo,
-  ]);
+  }, [maxDebtPerNFTInPerpetual, tokenName, paprController, oracleInfo]);
 
   const maxDebt = useMemo(() => {
-    if (!maxDebtPerNFTInPerpetual) return ethers.BigNumber.from(0);
+    if (!maxDebtPerNFTInPerpetual) return null;
     return maxDebtPerNFTInPerpetual.mul(numCollateralForMaxDebt);
   }, [maxDebtPerNFTInPerpetual, numCollateralForMaxDebt]);
   const maxDebtNumber = useMemo(() => {
+    if (!maxDebt) return null;
     return parseFloat(
       ethers.utils.formatUnits(maxDebt, paprController.debtToken.decimals),
     );
   }, [maxDebt, paprController.debtToken.decimals]);
+
+  const vaultHasDebt = useMemo(() => {
+    if (!vault) return false;
+    return !ethers.BigNumber.from(vault.debt).isZero();
+  }, [vault]);
+  const vaultHasCollateral = useMemo(() => {
+    if (!vault) return false;
+    return vault.collateral.length > 0;
+  }, [vault]);
+
+  useEffect(() => {
+    if (!!maxDebt && maxDebt.isZero()) {
+      setChosenDebt(ethers.BigNumber.from(0));
+      setControlledSliderValue(0);
+    }
+  }, [maxDebt]);
 
   const currentVaultDebt = useMemo(() => {
     return ethers.BigNumber.from(vault?.debt || 0);
@@ -148,15 +151,13 @@ export function VaultDebtPicker({
 
   const loanAmountInUnderlying = useAsyncValue(async () => {
     if (chosenDebt.isZero()) return ethers.BigNumber.from(0);
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
     return getQuoteForSwap(
-      quoter,
       chosenDebt,
       paprController.debtToken.id,
       paprController.underlying.id,
+      tokenName as SupportedToken,
     );
   }, [
-    jsonRpcProvider,
     tokenName,
     paprController.debtToken.id,
     paprController.underlying.id,
@@ -175,12 +176,11 @@ export function VaultDebtPicker({
   const underlyingToBorrow = useAsyncValue(async () => {
     if (debtToBorrowOrRepay.isZero() || usingPerpetual || !isBorrowing)
       return ethers.BigNumber.from(0);
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
     return getQuoteForSwap(
-      quoter,
       debtToBorrowOrRepay,
       paprController.debtToken.id,
       paprController.underlying.id,
+      tokenName as SupportedToken,
     );
   }, [
     usingPerpetual,
@@ -188,19 +188,34 @@ export function VaultDebtPicker({
     debtToBorrowOrRepay,
     paprController.debtToken.id,
     paprController.underlying.id,
-    jsonRpcProvider,
+    tokenName,
+  ]);
+  const slippageForBorrow = useAsyncValue(async () => {
+    if (!underlyingToBorrow || underlyingToBorrow.isZero()) return 0;
+    return computeSlippageForSwap(
+      underlyingToBorrow,
+      paprController.debtToken,
+      paprController.underlying,
+      debtToBorrowOrRepay,
+      true,
+      tokenName as SupportedToken,
+    );
+  }, [
+    underlyingToBorrow,
+    paprController.debtToken,
+    paprController.underlying,
+    debtToBorrowOrRepay,
     tokenName,
   ]);
 
   const underlyingToRepay = useAsyncValue(async () => {
     if (usingPerpetual || isBorrowing || debtToBorrowOrRepay.isZero())
       return ethers.BigNumber.from(0);
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
     return getQuoteForSwapOutput(
-      quoter,
       debtToBorrowOrRepay,
       paprController.underlying.id,
       paprController.debtToken.id,
+      tokenName as SupportedToken,
     );
   }, [
     isBorrowing,
@@ -208,7 +223,25 @@ export function VaultDebtPicker({
     debtToBorrowOrRepay,
     paprController.debtToken.id,
     paprController.underlying.id,
-    jsonRpcProvider,
+    tokenName,
+  ]);
+  const slippageForRepay = useAsyncValue(async () => {
+    if (!underlyingToRepay || underlyingToRepay.isZero()) {
+      return 0;
+    }
+    return computeSlippageForSwap(
+      underlyingToRepay,
+      paprController.underlying,
+      paprController.debtToken,
+      debtToBorrowOrRepay,
+      false,
+      tokenName as SupportedToken,
+    );
+  }, [
+    underlyingToRepay,
+    paprController.debtToken,
+    paprController.underlying,
+    debtToBorrowOrRepay,
     tokenName,
   ]);
 
@@ -225,19 +258,14 @@ export function VaultDebtPicker({
     debtToBorrowOrRepay,
   ]);
 
+  useEffect(() => {
+    if (chosenDebt.lt(currentVaultDebt)) setIsBorrowing(false);
+  }, [chosenDebt, currentVaultDebt]);
+
   const connectedNFT = useMemo(() => {
     return ERC721__factory.connect(collateralContractAddress, signerOrProvider);
   }, [collateralContractAddress, signerOrProvider]);
   const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
-
-  const vaultHasDebt = useMemo(() => {
-    if (!vault) return false;
-    return !ethers.BigNumber.from(vault.debt).isZero();
-  }, [vault]);
-  const vaultHasCollateral = useMemo(() => {
-    if (!vault) return false;
-    return vault.collateral.length > 0;
-  }, [vault]);
 
   const maxLTV = useAsyncValue(
     () => paprController.maxLTVPercent(),
@@ -255,15 +283,6 @@ export function VaultDebtPicker({
     },
     [paprController.debtToken.decimals],
   );
-
-  useEffect(() => {
-    setTotalDebtDesired((prev) => ({
-      ...prev,
-      [collateralContractAddress]: chosenDebt,
-    }));
-  }, [chosenDebt, setTotalDebtDesired, collateralContractAddress]);
-
-  if (!oracleInfo) return <></>;
 
   return (
     <Fieldset legend={`💸 ${nftSymbol}`}>
@@ -313,11 +332,11 @@ export function VaultDebtPicker({
         </tbody>
       </Table>
       <div className={styles.slider}>
-        {!!maxDebtPerNFTInPerpetual && (
+        {!!maxDebtPerNFTInPerpetual && maxDebt && (
           <VaultDebtSlider
             controller={paprController}
             currentVaultDebtNumber={currentVaultDebtNumber}
-            maxDebtNumber={maxDebtNumber}
+            maxDebtNumber={maxDebtNumber!}
             controlledSliderValue={controlledSliderValue}
             setControlledSliderValue={setControlledSliderValue}
             handleChosenDebtChanged={handleChosenDebtChanged}
@@ -353,10 +372,15 @@ export function VaultDebtPicker({
       <div className={styles.editLoanForm}>
         <div>
           <Toggle
-            leftText="Borrow More"
+            leftText="Borrow"
             rightText="Repay"
+            hideRightText={currentVaultDebt.isZero()}
             checked={isBorrowing}
-            onChange={() => null}
+            onChange={() => {
+              setChosenDebt(currentVaultDebt);
+              setControlledSliderValue(currentVaultDebtNumber);
+              setIsBorrowing(!isBorrowing);
+            }}
           />
         </div>
         <div>
@@ -380,6 +404,18 @@ export function VaultDebtPicker({
             />
           )}
         </div>
+      </div>
+      <div className={styles.slippage}>
+        {(!!slippageForBorrow || !!slippageForRepay) && (
+          <p>
+            Slippage:{' '}
+            {isBorrowing ? (
+              <span>{slippageForBorrow?.toFixed(3)}%</span>
+            ) : (
+              <span>{slippageForRepay?.toFixed(3)}%</span>
+            )}
+          </p>
+        )}
       </div>
       <div className={styles.approveButtons}>
         <ApproveNFTButton
@@ -415,6 +451,7 @@ export function VaultDebtPicker({
             depositNFTs={depositNFTs}
             withdrawNFTs={withdrawNFTs}
             paprController={paprController}
+            oracleInfo={oracleInfo}
           />
         )}
         {usingPerpetual && !isBorrowing && (
@@ -424,6 +461,7 @@ export function VaultDebtPicker({
             depositNFTs={depositNFTs}
             withdrawNFTs={withdrawNFTs}
             paprController={paprController}
+            oracleInfo={oracleInfo}
           />
         )}
         {!usingPerpetual && !isBorrowing && (
@@ -434,6 +472,7 @@ export function VaultDebtPicker({
             depositNFTs={depositNFTs}
             withdrawNFTs={withdrawNFTs}
             paprController={paprController}
+            oracleInfo={oracleInfo}
           />
         )}
         {!usingPerpetual && isBorrowing && (
@@ -444,12 +483,10 @@ export function VaultDebtPicker({
             depositNFTs={depositNFTs}
             withdrawNFTs={withdrawNFTs}
             paprController={paprController}
+            oracleInfo={oracleInfo}
           />
         )}
       </div>
-      {/* <div className={styles.slippage}>
-        <p>Slippage: 5.03%</p>
-      </div> */}
     </Fieldset>
   );
 }
@@ -473,7 +510,7 @@ function AmountToBorrowOrRepayInput({
   setControlledSliderValue,
   setChosenDebt,
 }: AmountToBorrowOrRepayInputProps) {
-  const { jsonRpcProvider, tokenName } = useConfig();
+  const { tokenName } = useConfig();
   const decimals = useMemo(
     () =>
       usingPerpetual
@@ -509,12 +546,11 @@ function AmountToBorrowOrRepayInput({
 
       let debtDelta: ethers.BigNumber;
       if (!usingPerpetual) {
-        const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
         debtDelta = await getQuoteForSwapOutput(
-          quoter,
           ethers.utils.parseUnits(val, decimals),
           paprController.underlying.id,
           paprController.debtToken.id,
+          tokenName as SupportedToken,
         );
       } else {
         debtDelta = ethers.utils.parseUnits(val, decimals);
@@ -536,7 +572,6 @@ function AmountToBorrowOrRepayInput({
       paprController.debtToken.id,
       isBorrowing,
       currentVaultDebt,
-      jsonRpcProvider,
       tokenName,
       usingPerpetual,
     ],
@@ -552,6 +587,7 @@ function AmountToBorrowOrRepayInput({
     <input
       value={inputValue}
       onChange={(e) => handleInputValueChanged(e.target.value)}
+      disabled={amountToBorrowOrRepay.isZero()}
       onFocus={() => setEditingInput(true)}
       onBlur={() => setEditingInput(false)}
     />

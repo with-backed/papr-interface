@@ -10,7 +10,7 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import PaprControllerABI from 'abis/PaprController.json';
 import { useConfig } from 'hooks/useConfig';
 import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { SupportedToken } from 'lib/config';
 import { Quoter } from 'lib/contracts';
 import {
@@ -35,6 +35,7 @@ type CreateOrRepayLoanProps = {
   withdrawNFTs: string[];
   totalVaultsDebt: ethers.BigNumber;
   debtDesired: ethers.BigNumber;
+  oracleInfo: OracleInfo;
 };
 
 export function CreateOrRepayLoan({
@@ -43,6 +44,7 @@ export function CreateOrRepayLoan({
   withdrawNFTs,
   totalVaultsDebt,
   debtDesired,
+  oracleInfo,
 }: CreateOrRepayLoanProps) {
   return (
     <Fieldset legend="💸 borrow">
@@ -51,6 +53,7 @@ export function CreateOrRepayLoan({
           paprController={paprController}
           depositNFTs={depositNFTs}
           debtDesired={debtDesired}
+          oracleInfo={oracleInfo}
         />
       )}
       {totalVaultsDebt.gt(ethers.BigNumber.from(0)) && (
@@ -58,6 +61,7 @@ export function CreateOrRepayLoan({
           paprController={paprController}
           withdrawNFTs={withdrawNFTs}
           totalVaultsDebt={totalVaultsDebt}
+          oracleInfo={oracleInfo}
         />
       )}
     </Fieldset>
@@ -68,16 +72,17 @@ type CreateLoanButtonProps = {
   paprController: PaprController;
   depositNFTs: string[];
   debtDesired: ethers.BigNumber;
+  oracleInfo: OracleInfo;
 };
 
 export function CreateLoanButton({
   paprController,
   depositNFTs,
   debtDesired,
+  oracleInfo,
 }: CreateLoanButtonProps) {
   const { jsonRpcProvider, tokenName } = useConfig();
   const { address } = useAccount();
-  const oracleInfo = useOracleInfo();
 
   const quote = useAsyncValue(() => {
     const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
@@ -161,16 +166,17 @@ type RepayLoansButtonProps = {
   paprController: PaprController;
   withdrawNFTs: string[];
   totalVaultsDebt: ethers.BigNumber;
+  oracleInfo: OracleInfo;
 };
 
 export function RepayLoansButton({
   paprController,
   withdrawNFTs,
   totalVaultsDebt,
+  oracleInfo,
 }: RepayLoansButtonProps) {
   const { jsonRpcProvider, tokenName } = useConfig();
   const { address } = useAccount();
-  const oracleInfo = useOracleInfo();
 
   const quote = useAsyncValue(() => {
     const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
@@ -187,12 +193,6 @@ export function RepayLoansButton({
     jsonRpcProvider,
     tokenName,
   ]);
-
-  console.log({
-    withdrawNFTs,
-    totalVaultsDebt: formatBigNum(totalVaultsDebt, 18),
-    quote: formatBigNum(quote || ethers.BigNumber.from(0), 18),
-  });
 
   const { removeCollateralCalldata } = useModifyCollateralCalldata(
     [],
