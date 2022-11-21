@@ -228,7 +228,8 @@ function BuyButton({ auction, controllerId }: BuyButtonProps) {
     onSuccess: (data: any) => {
       data.wait().then(() => window.location.reload());
     },
-  });
+    // TODO: figure out what's wrong here
+  } as any);
   return <TextButton onClick={write!}>Buy</TextButton>;
 }
 
