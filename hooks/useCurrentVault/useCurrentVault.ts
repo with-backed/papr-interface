@@ -59,31 +59,3 @@ export function useCurrentVaults(
     vaultsFetching,
   };
 }
-
-export function useVault(
-  controller: PaprController,
-  collateralContract: string,
-  user: string | undefined,
-) {
-  const [{ data: vaultsData, fetching: vaultFetching }] = useQuery({
-    query: CollateralVaultByOwnerForControllerDocument,
-    variables: {
-      owner: user?.toLowerCase(),
-      controller: controller.id.toLowerCase(),
-      collateralContract: collateralContract.toLowerCase(),
-    },
-    pause: !user,
-  });
-
-  const vault = useMemo(() => {
-    if (vaultFetching || !vaultsData?.vaults) return null;
-    if (vaultsData.vaults.length === 0) return null;
-
-    return vaultsData.vaults[0];
-  }, [vaultFetching, vaultsData]);
-
-  return {
-    vault,
-    vaultFetching,
-  };
-}

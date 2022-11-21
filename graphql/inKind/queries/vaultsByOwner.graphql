@@ -9,19 +9,3 @@ query vaultsByOwnerForController($owner: Bytes, $controller: String) {
     ...allVaultProperties
   }
 }
-
-query collateralVaultByOwnerForController(
-  $owner: Bytes
-  $controller: String
-  $collateralContract: Bytes
-) {
-  vaults(
-    where: {
-      account: $owner
-      controller: $controller
-      collateralContract: $collateralContract
-    }
-  ) {
-    ...allVaultProperties
-  }
-}

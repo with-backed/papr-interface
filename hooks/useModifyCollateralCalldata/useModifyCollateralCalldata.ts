@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { oracleInfoArgEncoded } from 'lib/constants';
 import { deconstructFromId } from 'lib/controllers';
 import { useMemo } from 'react';
@@ -32,10 +32,10 @@ export function useModifyCollateralCalldata(
   depositNFTs: string[],
   withdrawNFTs: string[],
   address: string | undefined,
-  oracleInfo: OracleInfo | null,
+  oracleInfo: OracleInfo,
 ) {
   const addCollateralCalldata = useMemo(() => {
-    if (!oracleInfo) return [];
+    if (!address) return [];
 
     const contractsAndTokenIds = depositNFTs.map((id) => deconstructFromId(id));
 
@@ -52,10 +52,10 @@ export function useModifyCollateralCalldata(
         args.collateral,
       ]),
     );
-  }, [oracleInfo, depositNFTs]);
+  }, [address, depositNFTs]);
 
   const removeCollateralCalldata = useMemo(() => {
-    if (!oracleInfo || !address) return [];
+    if (!address) return [];
 
     const contractsAndTokenIds = withdrawNFTs.map((id) =>
       deconstructFromId(id),
@@ -80,7 +80,7 @@ export function useModifyCollateralCalldata(
         args.oracleInfo,
       ]),
     );
-  }, [oracleInfo, withdrawNFTs, address]);
+  }, [address, withdrawNFTs, oracleInfo]);
 
   return { addCollateralCalldata, removeCollateralCalldata };
 }
