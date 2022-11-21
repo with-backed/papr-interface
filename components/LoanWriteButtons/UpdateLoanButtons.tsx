@@ -26,9 +26,6 @@ import { ERC20, ERC721, ERC721__factory } from 'types/generated/abis';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
-const overrides = {
-  gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
-};
 
 const increaseDebtEncoderString = `increaseDebt(address mintTo, address asset, uint256 amount, ${oracleInfoArgEncoded})`;
 
@@ -46,6 +43,8 @@ type BorrowOrRepayPerpetualButtonProps = {
   withdrawNFTs: string[];
   amount: ethers.BigNumber | null;
   oracleInfo: OracleInfo;
+  vaultHasDebt: boolean;
+  disabled: boolean;
 };
 
 export function BorrowPerpetualButton({
@@ -55,6 +54,8 @@ export function BorrowPerpetualButton({
   withdrawNFTs,
   amount,
   oracleInfo,
+  vaultHasDebt,
+  disabled,
 }: BorrowOrRepayPerpetualButtonProps) {
   const { address } = useAccount();
 
@@ -98,7 +99,8 @@ export function BorrowPerpetualButton({
       size="small"
       onClick={write!}
       transactionData={data}
-      text={`Update Loan`}
+      text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
+      disabled={disabled}
     />
   );
 }
@@ -118,6 +120,7 @@ export function RepayPerpetualButton({
   withdrawNFTs,
   amount,
   oracleInfo,
+  disabled,
 }: BorrowOrRepayPerpetualButtonProps) {
   const { address } = useAccount();
 
@@ -157,7 +160,8 @@ export function RepayPerpetualButton({
       size="small"
       onClick={write!}
       transactionData={data}
-      text={`Update Loan`}
+      text="Update Loan"
+      disabled={disabled}
     />
   );
 }
@@ -182,6 +186,8 @@ type BorrowOrRepayWithSwapButtonProps = {
   amount: ethers.BigNumber | null;
   quote: ethers.BigNumber | null;
   oracleInfo: OracleInfo;
+  vaultHasDebt: boolean;
+  disabled: boolean;
 };
 
 export function RepayWithSwapButton({
@@ -192,6 +198,8 @@ export function RepayWithSwapButton({
   amount,
   quote,
   oracleInfo,
+  vaultHasDebt,
+  disabled,
 }: BorrowOrRepayWithSwapButtonProps) {
   const { address } = useAccount();
 
@@ -237,7 +245,8 @@ export function RepayWithSwapButton({
       size="small"
       onClick={write!}
       transactionData={data}
-      text={`Update Loan`}
+      text="Update Loan"
+      disabled={disabled}
     />
   );
 }
@@ -261,6 +270,8 @@ export function BorrowWithSwapButton({
   amount,
   quote,
   oracleInfo,
+  vaultHasDebt,
+  disabled,
 }: BorrowOrRepayWithSwapButtonProps) {
   const { address } = useAccount();
 
@@ -308,7 +319,8 @@ export function BorrowWithSwapButton({
       size="small"
       onClick={write!}
       transactionData={data}
-      text={`Update Loan`}
+      text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
+      disabled={disabled}
     />
   );
 }
@@ -316,17 +328,19 @@ export function BorrowWithSwapButton({
 type ApproveTokenButtonProps = {
   controller: PaprController;
   token: ERC20;
+  tokenApproved: boolean;
+  setTokenApproved: (val: boolean) => void;
 };
 
 export function ApproveTokenButton({
   controller,
   token,
+  tokenApproved,
+  setTokenApproved,
 }: ApproveTokenButtonProps) {
   const { address } = useAccount();
 
-  const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
-  const [underlyingApprovedLoading, setUnderlyingApprovedLoading] =
-    useState<boolean>(true);
+  const [approvedLoading, setApprovedLoading] = useState<boolean>(true);
 
   const initializeUnderlyingApproved = useCallback(async () => {
     if (!address) {
@@ -339,10 +353,10 @@ export function ApproveTokenButton({
       (await connectedToken.allowance(address, controller.id)) >
       ethers.BigNumber.from(0)
     ) {
-      setUnderlyingApproved(true);
+      setTokenApproved(true);
     }
-    setUnderlyingApprovedLoading(false);
-  }, [controller, address]);
+    setApprovedLoading(false);
+  }, [controller, address, setTokenApproved]);
 
   useEffect(() => {
     initializeUnderlyingApproved();
@@ -358,11 +372,11 @@ export function ApproveTokenButton({
   const { data, write } = useContractWrite({
     ...config,
     onSuccess: (data: any) => {
-      data.wait().then(() => setUnderlyingApproved(true));
+      data.wait().then(() => setTokenApproved(true));
     },
   });
 
-  if (underlyingApproved || underlyingApprovedLoading || !symbol) return <></>;
+  if (tokenApproved || approvedLoading || !symbol) return <></>;
 
   return (
     <TransactionButton
@@ -371,7 +385,7 @@ export function ApproveTokenButton({
       onClick={write!}
       transactionData={data}
       text={`Approve ${symbol}`}
-      completed={underlyingApproved}
+      completed={tokenApproved}
     />
   );
 }
@@ -379,15 +393,18 @@ export function ApproveTokenButton({
 type ApproveNFTButtonProps = {
   paprController: PaprController;
   collateralContractAddress: string;
+  approved: boolean;
+  setApproved: (val: boolean) => void;
 };
 
 export function ApproveNFTButton({
   paprController,
   collateralContractAddress,
+  approved,
+  setApproved,
 }: ApproveNFTButtonProps) {
   const { address } = useAccount();
   const signerOrProvider = useSignerOrProvider();
-  const [approved, setApproved] = useState<boolean>(false);
   const [approvedLoading, setApprovedLoading] = useState<boolean>(true);
 
   const collateralContract = useMemo(() => {
@@ -401,7 +418,7 @@ export function ApproveNFTButton({
     );
     setApproved(approved);
     setApprovedLoading(false);
-  }, [collateralContract, paprController.id, address]);
+  }, [collateralContract, paprController.id, address, setApproved]);
 
   useEffect(() => {
     initializeApproved();

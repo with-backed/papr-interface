@@ -14,6 +14,7 @@ type VaultDebtSliderProps = {
   setControlledSliderValue: (val: number) => void;
   handleChosenDebtChanged: (val: string) => void;
   setIsBorrowing: (val: boolean) => void;
+  setHideLoanFormToggle: (val: boolean) => void;
 };
 
 export function VaultDebtSlider({
@@ -25,6 +26,7 @@ export function VaultDebtSlider({
   setControlledSliderValue,
   handleChosenDebtChanged,
   setIsBorrowing,
+  setHideLoanFormToggle,
 }: VaultDebtSliderProps) {
   const [hideMaxLTV, setHideMaxLTV] = useState<boolean>(false);
   const [blackTrackWidth, setBlackTrackWidth] = useState<[string, number]>([
@@ -72,6 +74,7 @@ export function VaultDebtSlider({
         min={0}
         max={maxDebtNumber}
         onChange={(val: number, _index: number) => {
+          setHideLoanFormToggle(false);
           setControlledSliderValue(val);
           setIsBorrowing(val >= currentVaultDebtNumber);
         }}

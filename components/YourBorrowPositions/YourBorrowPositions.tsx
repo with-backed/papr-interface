@@ -33,6 +33,7 @@ export function YourBorrowPositions({
   currentVaults,
   oracleInfo,
 }: YourBorrowPositionsProps) {
+  const { address } = useAccount();
   const { tokenName } = useConfig();
 
   const uniqueCollections = useMemo(() => {
@@ -80,6 +81,19 @@ export function YourBorrowPositions({
   ]);
 
   if (!oracleInfo) return <></>;
+
+  if (!address) {
+    return (
+      <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>
+        <div>
+          <p>
+            Connect your wallet to see eligible collections and your maximum
+            loan amount
+          </p>
+        </div>
+      </Fieldset>
+    );
+  }
 
   return (
     <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>

@@ -282,10 +282,10 @@ export function VaultDebtPicker({
     [paprController.debtToken.decimals],
   );
 
-  const collateralApproved = useAsyncValue(async () => {
-    if (!address) return false;
-    return connectedNFT.isApprovedForAll(address!, paprController.id);
-  }, [address, paprController.id, connectedNFT]);
+  const [collateralApproved, setCollateralApproved] = useState<boolean>(false);
+  const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
+  const [debtTokenApproved, setDebtTokenApproved] = useState<boolean>(false);
+
   const underlyingBalance = useAsyncValue(async () => {
     if (!address) return null;
     return ERC20__factory.connect(
@@ -381,12 +381,13 @@ export function VaultDebtPicker({
             handleChosenDebtChanged={handleChosenDebtChanged}
             maxLTV={maxLTV}
             setIsBorrowing={setIsBorrowing}
+            setHideLoanFormToggle={setHideLoanFormToggle}
           />
         )}
       </div>
       <div className={styles.editLoanPreviewWrapper}>
         <div className={styles.editLoanPreview}>
-          <div>
+          <div className={`${!vaultHasDebt ? styles.hidden : ''}`}>
             <Button
               size="xsmall"
               theme="white"
@@ -443,6 +444,8 @@ export function VaultDebtPicker({
               <ApproveNFTButton
                 paprController={paprController}
                 collateralContractAddress={collateralContractAddress}
+                approved={collateralApproved}
+                setApproved={setCollateralApproved}
               />
               {usingPerpetual && !isBorrowing && (
                 <ApproveTokenButton
@@ -452,6 +455,8 @@ export function VaultDebtPicker({
                       ? paprController.token1
                       : paprController.token0
                   }
+                  tokenApproved={debtTokenApproved}
+                  setTokenApproved={setDebtTokenApproved}
                 />
               )}
               {!usingPerpetual && !isBorrowing && (
@@ -462,6 +467,8 @@ export function VaultDebtPicker({
                       ? paprController.token0
                       : paprController.token1
                   }
+                  tokenApproved={underlyingApproved}
+                  setTokenApproved={setUnderlyingApproved}
                 />
               )}
             </div>
@@ -474,6 +481,8 @@ export function VaultDebtPicker({
                   withdrawNFTs={withdrawNFTs}
                   paprController={paprController}
                   oracleInfo={oracleInfo}
+                  vaultHasDebt={vaultHasDebt}
+                  disabled={!collateralApproved}
                 />
               )}
               {usingPerpetual && !isBorrowing && (
@@ -484,6 +493,8 @@ export function VaultDebtPicker({
                   withdrawNFTs={withdrawNFTs}
                   paprController={paprController}
                   oracleInfo={oracleInfo}
+                  vaultHasDebt={vaultHasDebt}
+                  disabled={!!balanceErrorMessage || !debtTokenApproved}
                 />
               )}
               {!usingPerpetual && !isBorrowing && (
@@ -495,6 +506,8 @@ export function VaultDebtPicker({
                   withdrawNFTs={withdrawNFTs}
                   paprController={paprController}
                   oracleInfo={oracleInfo}
+                  vaultHasDebt={vaultHasDebt}
+                  disabled={!!balanceErrorMessage || !underlyingApproved}
                 />
               )}
               {!usingPerpetual && isBorrowing && (
@@ -506,6 +519,8 @@ export function VaultDebtPicker({
                   withdrawNFTs={withdrawNFTs}
                   paprController={paprController}
                   oracleInfo={oracleInfo}
+                  vaultHasDebt={vaultHasDebt}
+                  disabled={!collateralApproved}
                 />
               )}
             </div>

@@ -199,3 +199,7 @@
     font-style: italic;
     color: var(--highlight-alert-100);
 }
+
+.hidden {
+    visibility: hidden;
+}

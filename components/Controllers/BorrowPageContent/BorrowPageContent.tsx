@@ -69,7 +69,6 @@ export function BorrowPageContent({
         <YourBorrowPositions
           userNFTs={userCollectionNFTs}
           paprController={paprController}
-<<<<<<< HEAD
           currentVaults={currentVaults}
           oracleInfo={oracleInfo}
         />
@@ -89,7 +88,6 @@ export function BorrowPageContent({
               )}
             />
           ))}
-=======
           currentVaults={currentVaults!}
           oracleInfo={oracleInfo}
         />
@@ -108,7 +106,22 @@ export function BorrowPageContent({
             )}
           />
         ))}
->>>>>>> d9fdaef (progress)
+        {!!address &&
+          uniqueCollections.map((collection) => (
+            <VaultDebtPicker
+              key={collection}
+              collateralContractAddress={collection}
+              oracleInfo={oracleInfo}
+              paprController={paprController}
+              vault={currentVaults?.find(
+                (v) =>
+                  getAddress(v.collateralContract) === getAddress(collection),
+              )}
+              userNFTsForVault={userCollectionNFTs.filter(
+                (nft) => getAddress(collection) === getAddress(nft.address),
+              )}
+            />
+          ))}
       </div>
     </OracleInfoProvider>
   );
