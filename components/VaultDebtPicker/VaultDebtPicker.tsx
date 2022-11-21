@@ -386,17 +386,15 @@ export function VaultDebtPicker({
       </div>
       <div className={styles.editLoanPreviewWrapper}>
         <div className={styles.editLoanPreview}>
-          {vaultHasDebt && (
-            <div>
-              <Button
-                size="xsmall"
-                theme="white"
-                kind="outline"
-                onClick={() => setHideLoanFormToggle(!hideLoanFormToggle)}>
-                Edit Loan
-              </Button>
-            </div>
-          )}
+          <div>
+            <Button
+              size="xsmall"
+              theme="white"
+              kind="outline"
+              onClick={() => setHideLoanFormToggle(!hideLoanFormToggle)}>
+              Edit Loan
+            </Button>
+          </div>
           {!loanFormHidden && (
             <div className={styles.editLoanForm}>
               {vaultHasDebt && (
