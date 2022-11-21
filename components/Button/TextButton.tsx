@@ -11,7 +11,7 @@ export type ButtonKind =
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   kind?: ButtonKind;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export function TextButton({
