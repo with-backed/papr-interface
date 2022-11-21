@@ -213,6 +213,10 @@ function CollateralRemoved({
   }, [debtDecreasedEvents, event]);
 
   const returnedAmount = useMemo(() => {
+    if (!debtDecreasedEvent) {
+      // TODO: handle better
+      return '';
+    }
     const bigNumAmount = ethers.utils.formatUnits(
       debtDecreasedEvent?.amount,
       paprController.token0IsUnderlying
