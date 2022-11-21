@@ -30,7 +30,10 @@ const paprTrash: Config = {
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
-  oracleBaseUrl: 'http://localhost:3000',
+  oracleBaseUrl:
+    process.env.NEXT_PUBLIC_ENV === 'local'
+      ? 'http://localhost:3000'
+      : 'https://v2-interface-rosy.vercel.app',
   paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
