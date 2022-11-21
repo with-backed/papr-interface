@@ -1,3 +1,4 @@
+import { getAddress } from 'ethers/lib/utils';
 import { useConfig } from 'hooks/useConfig';
 import { Config, SupportedToken } from 'lib/config';
 import { getOracleInfoFromAllowedCollateral } from 'lib/controllers';

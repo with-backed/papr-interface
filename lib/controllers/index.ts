@@ -246,6 +246,16 @@ export function computeLtv(
   return ethers.BigNumber.from(debt).div(valueNormRatio);
 }
 
+export function oracleInfoProxy<T>(obj: { [key: string]: T }) {
+  const proxy = new Proxy(obj, {
+    get(target, prop) {
+      return target[getAddress(prop as string)];
+    },
+  });
+
+  return proxy;
+}
+
 export async function getOracleInfoFromAllowedCollateral(
   collections: string[],
   token: SupportedToken,
@@ -267,8 +277,8 @@ export async function getOracleInfoFromAllowedCollateral(
       ...prev,
       [getAddress(current)]: oracleInfoFromAPI[i] as ReservoirResponseData,
     }),
-    {},
+    {} as { [key: string]: ReservoirResponseData },
   );
 
-  return oracleInfo;
+  return oracleInfoProxy(oracleInfo);
 }
