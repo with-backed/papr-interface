@@ -60,15 +60,58 @@ type ActiveAuctionsProps = {
 function ActiveAuctions({ auctions, fetching }: ActiveAuctionsProps) {
   const legend = '🔨 Active Auctions';
   if (fetching) {
-    <Fieldset legend={legend}>Loading auctions...</Fieldset>;
+    return <Fieldset legend={legend}>Loading auctions...</Fieldset>;
   }
 
   if (auctions.length === 0) {
-    <Fieldset legend={legend}>No active auctions.</Fieldset>;
+    return <Fieldset legend={legend}>No active auctions.</Fieldset>;
   }
 
+  console.log({ auctions });
+
   // TODO: make active auction list
-  return <Fieldset legend={legend}>Auctions go here</Fieldset>;
+  return (
+    <Fieldset legend={legend}>
+      <Table>
+        <thead>
+          <tr>
+            <th></th>
+            <th className={styles.right}>ID</th>
+            <th className={styles.right}>△1hr</th>
+            <th className={styles.right}>Floor</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {auctions.map((auction) => (
+            <ActiveAuctionRow key={auction.id} auction={auction} />
+          ))}
+        </tbody>
+      </Table>
+    </Fieldset>
+  );
+}
+
+function ActiveAuctionRow({ auction }: { auction: ActiveAuction }) {
+  return (
+    <tr>
+      <td className={styles.asset}>
+        <CenterAsset
+          address={auction.auctionAssetContract}
+          tokenId={auction.auctionAssetID}
+          preset="small"
+        />
+      </td>
+      <td className={styles.right}>#{auction.auctionAssetID}</td>
+      <td className={styles.right}></td>
+      <td className={styles.right}></td>
+      <td className={styles.center}>
+        <EtherscanTransactionLink transactionHash={auction.endTxHash}>
+          tx
+        </EtherscanTransactionLink>
+      </td>
+    </tr>
+  );
 }
 
 type PastAuctionsProps = {
@@ -78,11 +121,11 @@ type PastAuctionsProps = {
 function PastAuctions({ auctions, fetching }: PastAuctionsProps) {
   const legend = '🕰 Past Auctions';
   if (fetching) {
-    <Fieldset legend={legend}>Loading auctions...</Fieldset>;
+    return <Fieldset legend={legend}>Loading auctions...</Fieldset>;
   }
 
   if (auctions.length === 0) {
-    <Fieldset legend={legend}>No past auctions.</Fieldset>;
+    return <Fieldset legend={legend}>No past auctions.</Fieldset>;
   }
 
   return (
