@@ -9,11 +9,16 @@ query auctions {
     startedBy
     startPrice
     endPrice
-    startTime
-    endTime
     paymentAsset
     secondsInPeriod
     perPeriodDecayPercentWad
-    endTxHash
+    start {
+      timestamp
+    }
+    end {
+      timestamp
+      # id in this case is transaction hash
+      id
+    }
   }
 }

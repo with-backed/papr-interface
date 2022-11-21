@@ -26,7 +26,7 @@ import styles from './Auctions.module.css';
 
 type Auction = AuctionsQuery['auctions'][number];
 type ActiveAuction = Auction & { startPrice: string };
-type PastAuction = ActiveAuction & { endTime: number; endPrice: string };
+type PastAuction = ActiveAuction & { end: { timestamp: number; id: string } };
 
 const ONE_HOUR_IN_SECONDS = 60 * 60;
 
@@ -46,7 +46,7 @@ export function Auctions({ paprController }: AuctionsProps) {
 
     if (!!auctionsQueryResult?.auctions && !fetching) {
       auctionsQueryResult.auctions.forEach((auction) => {
-        if (typeof auction.endTime === 'number') {
+        if (typeof auction.end?.timestamp === 'number') {
           result.pastAuctions.push(auction as PastAuction);
         } else {
           result.activeAuctions.push(auction as ActiveAuction);
@@ -137,7 +137,7 @@ function ActiveAuctionRow({
     if (!timestamp) {
       return ethers.BigNumber.from(0);
     }
-    const secondsElapsed = timestamp - auction.startTime;
+    const secondsElapsed = timestamp - auction.start.timestamp;
     return currentPrice(
       ethers.BigNumber.from(auction.startPrice),
       secondsElapsed,
@@ -153,7 +153,8 @@ function ActiveAuctionRow({
     if (!timestamp) {
       return ethers.BigNumber.from(0);
     }
-    const secondsElapsed = timestamp - ONE_HOUR_IN_SECONDS - auction.startTime;
+    const secondsElapsed =
+      timestamp - ONE_HOUR_IN_SECONDS - auction.start.timestamp;
     return currentPrice(
       ethers.BigNumber.from(auction.startPrice),
       secondsElapsed,
@@ -299,7 +300,7 @@ function PastAuctionRow({ auction }: { auction: PastAuction }) {
   );
   const duration = useMemo(() => {
     const { days, hours, minutes } = getDaysHoursMinutesSeconds(
-      auction.endTime - auction.startTime,
+      auction.end.timestamp - auction.start.timestamp,
     );
     return `${days}:${hours}:${minutes}`;
   }, [auction]);
@@ -317,7 +318,7 @@ function PastAuctionRow({ auction }: { auction: PastAuction }) {
       <td className={styles.right}>{formatPercent(percentOfFloor)}</td>
       <td className={styles.right}>{duration}</td>
       <td className={styles.center}>
-        <EtherscanTransactionLink transactionHash={auction.endTxHash}>
+        <EtherscanTransactionLink transactionHash={auction.end.id}>
           tx
         </EtherscanTransactionLink>
       </td>
