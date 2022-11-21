@@ -23,7 +23,7 @@ import { formatBigNum } from 'lib/numberFormat';
 export type YourBorrowPositionsProps = {
   paprController: PaprController;
   userNFTs: CenterUserNFTsResponse[];
-  currentVaults: VaultsByOwnerForControllerQuery['vaults'];
+  currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
   oracleInfo: OracleInfo;
 };
 
@@ -40,7 +40,7 @@ export function YourBorrowPositions({
     return userNFTs
       .map((nft) => getAddress(nft.address))
       .concat(
-        currentVaults
+        (currentVaults || [])
           .map((v) => v.collateral)
           .flat()
           .map((c) => getAddress(c.contractAddress)),
@@ -53,7 +53,7 @@ export function YourBorrowPositions({
       userNFTs
         .map((nft) => nft.address)
         .concat(
-          currentVaults
+          (currentVaults || [])
             .map((v) => v.collateral)
             .flat()
             .map((c) => c.contractAddress),
@@ -61,7 +61,7 @@ export function YourBorrowPositions({
       oracleInfo,
     );
     const maxLoanMinusCurrentDebt = maxLoanInDebtTokens.sub(
-      currentVaults
+      (currentVaults || [])
         .map((v) => ethers.BigNumber.from(v.debt))
         .reduce((a, b) => a.add(b), ethers.BigNumber.from(0)),
     );
