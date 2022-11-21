@@ -47,7 +47,6 @@ const provider = makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero');
 let controllerInstance = makePaprController(
   subgraphController,
   subgraphPool,
-  {},
   provider,
   configs.paprHero,
 );

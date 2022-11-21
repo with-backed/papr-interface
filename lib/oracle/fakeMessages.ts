@@ -41,7 +41,7 @@ const EIP712_TYPES = {
         type: 'uint8',
       },
       {
-        name: 'twapMinutes',
+        name: 'twapSeconds',
         type: 'uint256',
       },
       {
@@ -77,8 +77,8 @@ export async function generateDummyOracleMessage(
     'ContractWideCollectionPrice',
     EIP712_TYPES.ContractWideCollectionPrice,
     {
-      kind: 1,
-      twapMinutes: 43200,
+      kind: 2,
+      twapSeconds: 2592000,
       contract: collection,
     },
   );
@@ -87,7 +87,8 @@ export async function generateDummyOracleMessage(
     ['address', 'uint256'],
     [UNDERLYING_ADDRESS, price],
   );
-  const timestamp = await rpcProvider.getBlockNumber();
+  const blockNumber = await rpcProvider.getBlockNumber();
+  const timestamp = (await rpcProvider.getBlock(blockNumber)).timestamp;
 
   const signature = await signer.signMessage(
     arrayify(

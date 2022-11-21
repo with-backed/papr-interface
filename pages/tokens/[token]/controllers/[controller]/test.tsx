@@ -47,7 +47,6 @@ export default function InKindTest({
   const paprController = usePaprController({
     subgraphController,
     subgraphPool,
-    oracleInfo: {},
   });
 
   return <TestPageContent paprController={paprController} />;

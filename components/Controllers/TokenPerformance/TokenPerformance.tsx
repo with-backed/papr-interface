@@ -27,6 +27,7 @@ import {
   percentChange,
 } from 'lib/tokenPerformance';
 import { Table } from 'components/Table';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 
 export type ControllerSummaryProps = {
   controllers: PaprController[];
@@ -90,6 +91,7 @@ type SummaryEntryProps = {
   controller: PaprController;
 };
 function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
+  const oracleInfo = useOracleInfo();
   const debtTokenSupply = useAsyncValue(
     () =>
       controller.token0IsUnderlying
@@ -98,14 +100,15 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
     [controller],
   );
   const controllerNFTValue = useMemo(() => {
-    if (!controller.vaults || controller.vaults.length === 0) return 0;
+    if (!controller.vaults || controller.vaults.length === 0 || !oracleInfo)
+      return 0;
     return controller.vaults
       .map((v) => v.collateral)
       .flat()
       .map((collateral) => collateral.contractAddress)
-      .map((collection) => controller.oracleInfo[getAddress(collection)].price)
+      .map((collection) => oracleInfo[getAddress(collection)].price)
       .reduce((a, b) => a + b, 0);
-  }, [controller]);
+  }, [controller, oracleInfo]);
   const contractAPR = useMemo(() => {
     if (!pricesData) {
       return null;

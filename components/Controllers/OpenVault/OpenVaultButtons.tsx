@@ -16,6 +16,7 @@ import {
 } from 'types/generated/abis/PaprController';
 import { useMemo } from 'react';
 import { deconstructFromId } from 'lib/controllers';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 
 type SafeTransferFromButtonProps = {
   controller: PaprController;
@@ -66,6 +67,7 @@ export function SafeTransferFromButton({
   minOut,
 }: SafeTransferFromButtonProps) {
   const { address } = useAccount();
+  const oracleInfo = useOracleInfo();
   const { config } = usePrepareContractWrite({
     address: getAddress(collateralAddress),
     abi: erc721ABI,
@@ -83,7 +85,7 @@ export function SafeTransferFromButton({
             sqrtPriceLimitX96: ethers.BigNumber.from(0),
             mintDebtOrProceedsTo: address,
             oracleInfo: getOraclePayloadFromReservoirObject(
-              controller.oracleInfo[getAddress(collateralAddress)],
+              oracleInfo?.[getAddress(collateralAddress)]!,
             ),
           },
         ],
@@ -158,6 +160,7 @@ export function MutlicallButton({
   minOut,
 }: MulticallButtonProps) {
   const { address } = useAccount();
+  const oracleInfo = useOracleInfo();
   const multicallFunctionData = useMemo(() => {
     const contractsAndTokenIds = nftsSelected.map((id) =>
       deconstructFromId(id),
@@ -166,7 +169,7 @@ export function MutlicallButton({
     const addCollateralArgs: AddCollateralArgsStruct[] =
       contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
         oracleInfo: getOraclePayloadFromReservoirObject(
-          controller.oracleInfo[contractAddress],
+          oracleInfo?.[contractAddress]!,
         ),
         collateral: {
           addr: contractAddress,
@@ -195,7 +198,7 @@ export function MutlicallButton({
     ];
 
     return calldataWithSwap;
-  }, [nftsSelected, address, debt, minOut, controller]);
+  }, [nftsSelected, address, debt, minOut, oracleInfo]);
 
   const { config: multicallConfig } = usePrepareContractWrite({
     address: controller.id,

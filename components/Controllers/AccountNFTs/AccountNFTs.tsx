@@ -8,6 +8,7 @@ import { VaultsByOwnerForControllerDocument } from 'types/generated/graphql/inKi
 import { getAddress } from 'ethers/lib/utils';
 import { CenterAsset } from 'components/CenterAsset';
 import { PaprController } from 'lib/PaprController';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 
 export type AccountNFTsProps = {
   controller: PaprController;
@@ -33,9 +34,7 @@ export function AccountNFTs({
     },
   });
 
-  const oracleInfo = useMemo(() => {
-    return controller.oracleInfo;
-  }, [controller]);
+  const oracleInfo = useOracleInfo();
   const userVaultNFTIds = useMemo(() => {
     return userVaultsData?.vaults
       .map((vault) =>
@@ -119,7 +118,7 @@ export function AccountNFTs({
                       </div>
                       <div className={styles.oracleCheckBox}>
                         <div>
-                          <p>${oracleInfo[getAddress(address)].price}</p>
+                          <p>${oracleInfo?.[getAddress(address)].price}</p>
                         </div>
                         <div>
                           <input type="checkbox" disabled checked />
@@ -140,7 +139,7 @@ export function AccountNFTs({
                       </div>
                       <div className={styles.oracleCheckBox}>
                         <div>
-                          <p>${oracleInfo[getAddress(address)].price}</p>
+                          <p>${oracleInfo?.[getAddress(address)].price}</p>
                         </div>
                         <div>
                           <input
