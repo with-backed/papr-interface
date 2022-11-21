@@ -1,11 +1,8 @@
 import { ethers } from 'ethers';
 import { PaprController } from 'lib/PaprController';
-import {
-  IPaprController,
-  ReservoirOracleUnderwriter,
-} from 'types/generated/abis/PaprController';
+import { ReservoirOracleUnderwriter } from 'types/generated/abis/PaprController';
 import PaprControllerABI from 'abis/PaprController.json';
-import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import {
   erc20ABI,
   erc721ABI,
@@ -19,10 +16,9 @@ import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/u
 import { oracleInfoArgEncoded } from 'lib/constants';
 import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { getAddress } from 'ethers/lib/utils';
-import { formatBigNum } from 'lib/numberFormat';
 import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ERC20, ERC721, ERC721__factory } from 'types/generated/abis';
+import { ERC20, ERC721__factory } from 'types/generated/abis';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
@@ -63,7 +59,7 @@ export function BorrowPerpetualButton({
     useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
 
   const borrowPerpetualCalldata = useMemo(() => {
-    if (!amount || !oracleInfo || amount.isZero()) return '';
+    if (!amount || amount.isZero()) return '';
 
     const args: IncreaseDebtArgsStruct = {
       mintTo: address!,
@@ -282,7 +278,7 @@ export function BorrowWithSwapButton({
     useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
 
   const borrowWithSwapCalldata = useMemo(() => {
-    if (!amount || !quote || !oracleInfo || amount.isZero()) return '';
+    if (!amount || !quote || amount.isZero()) return '';
     const borrowWithSwapArgs: MintAndSwapArgsStruct = {
       collateralAsset: collateralContractAddress,
       debt: amount,

@@ -203,3 +203,18 @@
 .hidden {
     visibility: hidden;
 }
+
+.sliderLabel {
+    line-height: 20px;
+}
+
+.totalLTVLabel {
+    text-align: right;
+    position: relative;
+    top: 30px;
+    margin: 0px;
+}
+
+.totalLTVLabel.hidden {
+    color: white;
+}

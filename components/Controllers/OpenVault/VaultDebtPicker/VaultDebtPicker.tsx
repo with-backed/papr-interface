@@ -1,6 +1,6 @@
-import { Button, TransactionButton } from 'components/Button';
+import { Button } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
-import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider';
+import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
 import { Fieldset } from 'components/Fieldset';
 import {
   ApproveNFTButton,
@@ -9,7 +9,7 @@ import {
   BorrowWithSwapButton,
   RepayPerpetualButton,
   RepayWithSwapButton,
-} from 'components/LoanWriteButtons/UpdateLoanButtons';
+} from 'components/Controllers/OpenVault/LoanWriteButtons/UpdateLoanButtons';
 import { Table } from 'components/Table';
 import { Toggle } from 'components/Toggle';
 import { ethers } from 'ethers';
@@ -17,13 +17,11 @@ import { getAddress } from 'ethers/lib/utils';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
 import { useConfig } from 'hooks/useConfig';
-import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { SupportedToken } from 'lib/config';
-import { Quoter } from 'lib/contracts';
 import {
   computeSlippageForSwap,
-  deconstructFromId,
   getQuoteForSwap,
   getQuoteForSwapOutput,
   getUniqueNFTId,
@@ -40,7 +38,7 @@ import {
 } from 'react';
 import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
-import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { useAccount } from 'wagmi';
 import styles from './VaultDebtPicker.module.css';
 
 type VaultDebtPickerProps = {
@@ -150,6 +148,7 @@ export function VaultDebtPicker({
     ethers.BigNumber.from(vault?.debt || 0),
   );
 
+  // toggle variables
   const [isBorrowing, setIsBorrowing] = useState<boolean>(true);
   const [usingPerpetual, setUsingPerpetual] = useState<boolean>(true);
   const [hideLoanFormToggle, setHideLoanFormToggle] = useState<boolean>(true);
@@ -403,7 +402,6 @@ export function VaultDebtPicker({
                   <Toggle
                     leftText="Borrow"
                     rightText="Repay"
-                    hideRightText={currentVaultDebt.isZero()}
                     checked={isBorrowing}
                     onChange={() => {
                       setChosenDebt(currentVaultDebt);
@@ -414,16 +412,14 @@ export function VaultDebtPicker({
                 </div>
               )}
               <div>
-                {amountToBorrowOrRepay && (
-                  <AmountToBorrowOrRepayInput
-                    paprController={paprController}
-                    debtToBorrowOrRepay={debtToBorrowOrRepay}
-                    isBorrowing={isBorrowing}
-                    currentVaultDebt={currentVaultDebt}
-                    setControlledSliderValue={setControlledSliderValue}
-                    setChosenDebt={setChosenDebt}
-                  />
-                )}
+                <AmountToBorrowOrRepayInput
+                  paprController={paprController}
+                  debtToBorrowOrRepay={debtToBorrowOrRepay}
+                  isBorrowing={isBorrowing}
+                  currentVaultDebt={currentVaultDebt}
+                  setControlledSliderValue={setControlledSliderValue}
+                  setChosenDebt={setChosenDebt}
+                />
               </div>
             </div>
           )}

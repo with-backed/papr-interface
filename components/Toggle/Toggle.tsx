@@ -8,8 +8,6 @@ type ToggleProps = {
   onChange: () => void;
   leftText: string;
   rightText: string;
-  hideLeftText?: boolean;
-  hideRightText?: boolean;
 };
 
 export function Toggle({
@@ -17,8 +15,6 @@ export function Toggle({
   leftText,
   rightText,
   onChange,
-  hideLeftText = false,
-  hideRightText = false,
 }: ToggleProps) {
   return (
     <Checkbox
@@ -27,8 +23,8 @@ export function Toggle({
       onChange={onChange}
       className={styles.toggle}>
       <div className={styles.container}>
-        {!hideLeftText && <div>{leftText}</div>}
-        {!hideRightText && <div>{rightText}</div>}
+        <div>{leftText}</div>
+        <div>{rightText}</div>
       </div>
     </Checkbox>
   );

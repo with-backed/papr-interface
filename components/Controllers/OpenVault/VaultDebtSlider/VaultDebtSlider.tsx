@@ -1,9 +1,8 @@
 import { Slider } from 'components/Slider';
-import { ethers } from 'ethers';
 import { PaprController } from 'lib/PaprController';
 import { formatPercent } from 'lib/numberFormat';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import styles from './OpenVault.module.css';
+import styles from '../VaultDebtPicker/VaultDebtPicker.module.css';
 
 type VaultDebtSliderProps = {
   controller: PaprController;
@@ -103,19 +102,10 @@ export function VaultDebtSlider({
             }
           }
 
-          let pushedClassName: string;
-          if (currentLTV < 5) {
-            pushedClassName = styles.sliderLabelPushedRight;
-          } else if (currentLTV > maxLTV - 5) {
-            pushedClassName = styles.sliderLabelPushedLeft;
-          } else {
-            pushedClassName = '';
-          }
-
           return (
             <>
               <div {...props}>
-                <div className={`${styles.sliderLabel} ${pushedClassName}`}>
+                <div className={styles.sliderLabel}>
                   <p>{formatPercent(currentLTV)} LTV</p>
                 </div>
               </div>

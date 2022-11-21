@@ -5,14 +5,12 @@ import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
 import { useCenterNFTs } from 'hooks/useCenterNFTs';
 import { PaprController } from 'lib/PaprController';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { YourBorrowPositions } from 'components/YourBorrowPositions/YourBorrowPositions';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { VaultDebtPicker } from 'components/Controllers/OpenVault/VaultDebtPicker/VaultDebtPicker';
 import { getAddress } from 'ethers/lib/utils';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
-import { ethers } from 'ethers';
 
 export type BorrowPageProps = {
   controllerAddress: string;
