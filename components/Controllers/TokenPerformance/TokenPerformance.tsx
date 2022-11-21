@@ -1,6 +1,5 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { PaprController } from 'lib/PaprController';
 import {
@@ -106,7 +105,7 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
       .map((v) => v.collateral)
       .flat()
       .map((collateral) => collateral.contractAddress)
-      .map((collection) => oracleInfo[getAddress(collection)].price)
+      .map((collection) => oracleInfo[collection].price)
       .reduce((a, b) => a + b, 0);
   }, [controller, oracleInfo]);
   const contractAPR = useMemo(() => {
