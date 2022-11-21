@@ -9,7 +9,10 @@ import {
   ERC721,
   ERC721__factory,
 } from 'types/generated/abis';
-import { ReservoirOracleUnderwriter } from 'types/generated/abis/PaprController';
+import {
+  INFTEDA,
+  ReservoirOracleUnderwriter,
+} from 'types/generated/abis/PaprController';
 import { PaprControllerByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 import { Config } from './config';
@@ -260,6 +263,20 @@ class PaprControllerInternal {
     return totalDebtPerCollateral.reduce(
       (a, b) => a.add(b),
       ethers.BigNumber.from(0),
+    );
+  }
+
+  async purchaseLiquidationAuctionNFT(
+    auction: INFTEDA.AuctionStruct,
+    maxPrice: ethers.BigNumberish,
+    sendTo: string,
+    oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct,
+  ) {
+    return this._contract.purchaseLiquidationAuctionNFT(
+      auction,
+      maxPrice,
+      sendTo,
+      oracleInfo,
     );
   }
 }

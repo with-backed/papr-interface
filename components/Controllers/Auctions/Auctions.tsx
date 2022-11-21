@@ -13,9 +13,10 @@ import { currentPrice } from 'lib/auctions';
 import { erc20Contract } from 'lib/contracts';
 import { convertOneScaledValue } from 'lib/controllers';
 import { getDaysHoursMinutesSeconds } from 'lib/duration';
-import { formatPercent } from 'lib/numberFormat';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { PaprController } from 'lib/PaprController';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { INFTEDA } from 'types/generated/abis/PaprController';
 import {
   AuctionsDocument,
   AuctionsQuery,
@@ -34,9 +35,10 @@ type AuctionsProps = {
   paprController: PaprController;
 };
 export function Auctions({ paprController }: AuctionsProps) {
-  const [{ data: auctionsQueryResult, fetching }] = useQuery<AuctionsQuery>({
-    query: AuctionsDocument,
-  });
+  const [{ data: auctionsQueryResult, fetching, error }] =
+    useQuery<AuctionsQuery>({
+      query: AuctionsDocument,
+    });
 
   const { activeAuctions, pastAuctions } = useMemo(() => {
     const result: {
@@ -62,7 +64,7 @@ export function Auctions({ paprController }: AuctionsProps) {
       <ActiveAuctions
         auctions={activeAuctions}
         fetching={fetching}
-        controllerId={paprController.id}
+        controller={paprController}
       />
       <PastAuctions auctions={pastAuctions} fetching={fetching} />
     </div>
@@ -72,11 +74,11 @@ export function Auctions({ paprController }: AuctionsProps) {
 type ActiveAuctionsProps = {
   auctions: ActiveAuction[];
   fetching: boolean;
-  controllerId: string;
+  controller: PaprController;
 };
 function ActiveAuctions({
   auctions,
-  controllerId,
+  controller: controller,
   fetching,
 }: ActiveAuctionsProps) {
   const legend = '🔨 Active Auctions';
@@ -106,7 +108,7 @@ function ActiveAuctions({
             <ActiveAuctionRow
               key={auction.id}
               auction={auction}
-              controllerId={controllerId}
+              controller={controller}
             />
           ))}
         </tbody>
@@ -117,10 +119,10 @@ function ActiveAuctions({
 
 function ActiveAuctionRow({
   auction,
-  controllerId,
+  controller,
 }: {
   auction: ActiveAuction;
-  controllerId: string;
+  controller: PaprController;
 }) {
   const timestamp = useTimestamp();
   const signerOrProvider = useSignerOrProvider();
@@ -190,21 +192,35 @@ function ActiveAuctionRow({
       </td>
       <td className={styles.right}>#{auction.auctionAssetID}</td>
       <td className={styles.right}>
-        {decimals ? ethers.utils.formatUnits(priceBigNum, decimals) : '...'}{' '}
+        {decimals
+          ? formatTokenAmount(
+              parseFloat(ethers.utils.formatUnits(priceBigNum, decimals)),
+            )
+          : '...'}{' '}
         {symbol}
       </td>
       <td className={styles.right}>
         {decimals
-          ? ethers.utils.formatUnits(hourlyPriceChange, decimals)
+          ? formatTokenAmount(
+              parseFloat(ethers.utils.formatUnits(hourlyPriceChange, decimals)),
+            )
           : '...'}
       </td>
       <td className={styles.right}>
-        {decimals ? ethers.utils.formatUnits(floorValue, decimals) : '...'}{' '}
+        {decimals
+          ? formatTokenAmount(
+              parseFloat(ethers.utils.formatUnits(floorValue, decimals)),
+            )
+          : '...'}{' '}
         {symbol}
       </td>
       <td className={styles.center}>
         {address ? (
-          <BuyButton auction={auction} controllerId={controllerId} />
+          <BuyButton
+            auction={auction}
+            controller={controller}
+            maxPrice={priceBigNum}
+          />
         ) : null}
       </td>
     </tr>
@@ -213,25 +229,32 @@ function ActiveAuctionRow({
 
 type BuyButtonProps = {
   auction: ActiveAuction;
-  controllerId: string;
+  controller: PaprController;
+  maxPrice: ethers.BigNumber;
 };
-function BuyButton({ auction, controllerId }: BuyButtonProps) {
+function BuyButton({ auction, controller, maxPrice }: BuyButtonProps) {
   const { address } = useAccount();
   const oracleInfo = useOracleInfo();
-  const { config } = usePrepareContractWrite({
-    address: controllerId,
-    abi: PaprControllerABI.abi,
-    functionName: 'purchaseLiquidationAuctionNFT',
-    args: [auction, currentPrice, address, oracleInfo],
-  });
-  const { write } = useContractWrite({
-    ...config,
-    onSuccess: (data: any) => {
-      data.wait().then(() => window.location.reload());
-    },
-    // TODO: figure out what's wrong here
-  } as any);
-  return <TextButton onClick={write!}>Buy</TextButton>;
+  console.log({ oracleInfo });
+  const handleClick = useCallback(async () => {
+    if (!oracleInfo) {
+      console.error('no oracle info, cannot buy');
+      return;
+    }
+    const oracleDetails = oracleInfo[auction.auctionAssetContract];
+    controller.purchaseLiquidationAuctionNFT(
+      auction as unknown as INFTEDA.AuctionStruct,
+      maxPrice,
+      address!,
+      // TODO: oracle data
+    );
+  }, [address, auction, controller, maxPrice, oracleInfo]);
+
+  return (
+    <TextButton kind="clickable" onClick={handleClick}>
+      Buy
+    </TextButton>
+  );
 }
 
 type PastAuctionsProps = {
@@ -285,7 +308,9 @@ function PastAuctionRow({ auction }: { auction: PastAuction }) {
   const endPrice = useMemo(
     () =>
       decimals && symbol
-        ? `${ethers.utils.formatUnits(auction.endPrice, decimals)} ${symbol}`
+        ? `${formatTokenAmount(
+            parseFloat(ethers.utils.formatUnits(auction.endPrice, decimals)),
+          )} ${symbol}`
         : '...',
     [auction.endPrice, decimals, symbol],
   );
