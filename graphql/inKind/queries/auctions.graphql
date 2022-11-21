@@ -14,5 +14,6 @@ query auctions {
     paymentAsset
     secondsInPeriod
     perPeriodDecayPercentWad
+    endTxHash
   }
 }

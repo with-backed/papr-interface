@@ -16,18 +16,20 @@
   height: 30px;
 }
 
-.table tr td:first-child, .table tr th:first-child {
+.table tr td:first-child,
+.table tr th:first-child {
   padding-left: 12px;
 }
 
-.table tr td:last-child {
+.table tr td:last-child,
+.table tr th:last-child {
   padding-right: 12px;
 }
 
 .table th {
   text-transform: uppercase;
   font-size: 12px;
-  font-family: var(--sans);
+  font-family: var(--mono);
   letter-spacing: 0.12rem;
   font-weight: inherit;
 }

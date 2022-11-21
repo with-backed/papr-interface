@@ -1,0 +1,24 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.asset {
+  padding: 0 !important;
+}
+.asset div {
+  width: 30px !important;
+  height: 30px !important;
+}
+.asset img {
+  width: 30px !important;
+}
+
+.right {
+  text-align: right;
+}
+
+.center {
+  text-align: center;
+}
