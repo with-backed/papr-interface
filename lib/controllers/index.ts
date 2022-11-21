@@ -10,7 +10,11 @@ import { PaprController } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
 import { OracleType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { Quoter } from 'lib/contracts';
+<<<<<<< HEAD
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+=======
+import { formatBigNum } from 'lib/numberFormat';
+>>>>>>> e7bce8f (new designs)
 
 dayjs.extend(duration);
 
@@ -199,6 +203,10 @@ export async function computeSlippageForSwap(
   useExactInput: boolean,
   tokenName: SupportedToken,
 ) {
+  console.log({
+    quoteWithSlippage: formatBigNum(quoteWithSlippage, 18),
+    amount: formatBigNum(amount, 18),
+  });
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   let quoteWithoutSlippage: ethers.BigNumber;
   if (useExactInput) {
@@ -238,8 +246,6 @@ export async function computeSlippageForSwap(
     parseFloat(
       ethers.utils.formatUnits(amount, ethers.BigNumber.from(tokenIn.decimals)),
     );
-
-  console.log({ quoteWithoutSlippageScaled, quoteWithSlippageFloat });
 
   const priceImpact =
     Math.abs(quoteWithoutSlippageScaled - quoteWithSlippageFloat) /

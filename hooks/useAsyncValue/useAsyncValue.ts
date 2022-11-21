@@ -7,6 +7,7 @@ export function useAsyncValue<T>(
   const [value, setValue] = useState<T | null>(null);
 
   useEffect(() => {
+    setValue(null);
     callback().then(setValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);

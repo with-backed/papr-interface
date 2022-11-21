@@ -41,6 +41,18 @@ export function VaultDebtSlider({
   );
 
   useEffect(() => {
+    if (maxDebtNumber > 0 && currentVaultDebtNumber === 0) {
+      setControlledSliderValue(maxDebtNumber / 2);
+      handleChosenDebtChanged((maxDebtNumber / 2).toString());
+    }
+  }, [
+    maxDebtNumber,
+    currentVaultDebtNumber,
+    handleChosenDebtChanged,
+    setControlledSliderValue,
+  ]);
+
+  useEffect(() => {
     if (maxDebtNumber !== blackTrackWidth[1]) {
       const newBlackTrackPosition =
         Math.min(1, currentVaultDebtNumber / maxDebtNumber) * 100 * 5.7;

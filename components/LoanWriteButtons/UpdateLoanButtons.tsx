@@ -387,7 +387,8 @@ export function ApproveNFTButton({
 }: ApproveNFTButtonProps) {
   const { address } = useAccount();
   const signerOrProvider = useSignerOrProvider();
-  const [approved, setApproved] = useState<true | false>(false);
+  const [approved, setApproved] = useState<boolean>(false);
+  const [approvedLoading, setApprovedLoading] = useState<boolean>(true);
 
   const collateralContract = useMemo(() => {
     return ERC721__factory.connect(collateralContractAddress, signerOrProvider);
@@ -399,6 +400,7 @@ export function ApproveNFTButton({
       paprController.id,
     );
     setApproved(approved);
+    setApprovedLoading(false);
   }, [collateralContract, paprController.id, address]);
 
   useEffect(() => {
@@ -422,7 +424,7 @@ export function ApproveNFTButton({
     },
   });
 
-  if (approved) return <></>;
+  if (approved || approvedLoading) return <></>;
 
   return (
     <TransactionButton
