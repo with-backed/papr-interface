@@ -390,7 +390,7 @@ export function VaultDebtPicker({
           <div className={`${!vaultHasDebt ? styles.hidden : ''}`}>
             <Button
               size="xsmall"
-              theme="white"
+              theme="meme"
               kind="outline"
               onClick={() => setHideLoanFormToggle(!hideLoanFormToggle)}>
               Edit Loan

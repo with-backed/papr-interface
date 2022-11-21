@@ -38,22 +38,42 @@ export function YourBorrowPositions({
 
   const uniqueCollections = useMemo(() => {
     return userNFTs
-      .map((nft) => nft.address)
+      .map((nft) => getAddress(nft.address))
+      .concat(
+        currentVaults
+          .map((v) => v.collateral)
+          .flat()
+          .map((c) => getAddress(c.contractAddress)),
+      )
       .filter((item, i, arr) => arr.indexOf(item) === i);
-  }, [userNFTs]);
+  }, [userNFTs, currentVaults]);
 
   const maxLoanAmountInUnderlying = useAsyncValue(async () => {
     const maxLoanInDebtTokens = await paprController.maxDebt(
-      userNFTs.map((nft) => nft.address),
+      userNFTs
+        .map((nft) => nft.address)
+        .concat(
+          currentVaults
+            .map((v) => v.collateral)
+            .flat()
+            .map((c) => c.contractAddress),
+        ),
       oracleInfo,
     );
+    const maxLoanMinusCurrentDebt = maxLoanInDebtTokens.sub(
+      currentVaults
+        .map((v) => ethers.BigNumber.from(v.debt))
+        .reduce((a, b) => a.add(b), ethers.BigNumber.from(0)),
+    );
+
+    if (maxLoanMinusCurrentDebt.isZero()) return ethers.BigNumber.from(0);
     return getQuoteForSwap(
-      maxLoanInDebtTokens,
+      maxLoanMinusCurrentDebt,
       paprController.debtToken.id,
       paprController.underlying.id,
       tokenName as SupportedToken,
     );
-  }, [tokenName, paprController, oracleInfo, userNFTs]);
+  }, [tokenName, paprController, oracleInfo, userNFTs, currentVaults]);
 
   const totalPaprMemeDebt = useMemo(() => {
     if (!currentVaults) return ethers.BigNumber.from(0);
@@ -134,14 +154,37 @@ export function YourBorrowPositions({
           </>
         )}
       </div>
-      {currentVaults?.map((vault) => (
-        <VaultOverview
-          vaultInfo={vault}
-          oracleInfo={oracleInfo}
-          paprController={paprController}
-          key={vault.id}
-        />
-      ))}
+      <Table className={styles.vaultTable}>
+        <thead>
+          <tr>
+            <th>
+              <p>COLLECTION</p>
+            </th>
+            <th>
+              <p>NFTS</p>
+            </th>
+            <th>
+              <p>BORROWED</p>
+            </th>
+            <th>
+              <p>CLOSING COST</p>
+            </th>
+            <th>
+              <p>HEALTH</p>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentVaults?.map((vault) => (
+            <VaultOverview
+              vaultInfo={vault}
+              oracleInfo={oracleInfo}
+              paprController={paprController}
+              key={vault.id}
+            />
+          ))}
+        </tbody>
+      </Table>
     </Fieldset>
   );
 }
@@ -196,60 +239,34 @@ export function VaultOverview({
     return <></>;
 
   return (
-    <Table className={styles.vaultTable}>
-      <thead>
-        <tr>
-          <th>
-            <p>COLLECTION</p>
-          </th>
-          <th>
-            <p>NFTS</p>
-          </th>
-          <th>
-            <p>BORROWED</p>
-          </th>
-          <th>
-            <p>CLOSING COST</p>
-          </th>
-          <th>
-            <p>HEALTH</p>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <p>{nftSymbol}</p>
-          </td>
-          <td>
-            <p>{vaultInfo.collateral.length}</p>
-          </td>
-          <td>
-            <p>
-              {formatBigNum(vaultInfo.debt, paprController.debtToken.decimals)}{' '}
-              {tokenName}
-            </p>
-          </td>
-          <td>
-            <p>
-              $
-              {costToClose &&
-                formatBigNum(
-                  costToClose,
-                  paprController.underlying.decimals,
-                )}{' '}
-            </p>
-          </td>
-          <td>
-            {maxDebtForVault && (
-              <NewVaultHealth
-                debt={ethers.BigNumber.from(vaultInfo.debt)}
-                maxDebt={maxDebtForVault}
-              />
-            )}
-          </td>
-        </tr>
-      </tbody>
-    </Table>
+    <tr>
+      <td>
+        <p>{nftSymbol}</p>
+      </td>
+      <td>
+        <p>{vaultInfo.collateral.length}</p>
+      </td>
+      <td>
+        <p>
+          {formatBigNum(vaultInfo.debt, paprController.debtToken.decimals)}{' '}
+          {tokenName}
+        </p>
+      </td>
+      <td>
+        <p>
+          $
+          {costToClose &&
+            formatBigNum(costToClose, paprController.underlying.decimals)}{' '}
+        </p>
+      </td>
+      <td>
+        {maxDebtForVault && (
+          <NewVaultHealth
+            debt={ethers.BigNumber.from(vaultInfo.debt)}
+            maxDebt={maxDebtForVault}
+          />
+        )}
+      </td>
+    </tr>
   );
 }
