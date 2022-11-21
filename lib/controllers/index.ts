@@ -249,7 +249,11 @@ export function computeLtv(
 export function oracleInfoProxy<T>(obj: { [key: string]: T }) {
   const proxy = new Proxy(obj, {
     get(target, prop) {
-      return target[getAddress(prop as string)];
+      try {
+        return target[getAddress(prop as string)];
+      } catch (e) {
+        return undefined;
+      }
     },
   });
 
