@@ -1,9 +1,6 @@
 import { PaprController } from 'lib/PaprController';
 import { useMemo } from 'react';
-import {
-  CollateralVaultByOwnerForControllerDocument,
-  VaultsByOwnerForControllerDocument,
-} from 'types/generated/graphql/inKindSubgraph';
+import { VaultsByOwnerForControllerDocument } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
 // TODO(adamgobes): remove useCurrentVault and utilize useCurrentVaults everywhere
