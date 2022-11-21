@@ -43,7 +43,7 @@ export function ControllerOverviewContent({
       <Activity paprController={paprController} />
       <Charts pricesData={pricesData} />
       <Loans paprController={paprController} pricesData={pricesData} />
-      <Auctions />
+      <Auctions paprController={paprController} />
     </div>
   );
 }

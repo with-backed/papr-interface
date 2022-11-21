@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { ONE } from 'lib/constants';
 
 export function currentPrice(
   startPrice: ethers.BigNumber,
