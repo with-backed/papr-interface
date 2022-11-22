@@ -3,6 +3,7 @@ query auctions {
     id
     vault {
       id
+      account
     }
     auctionAssetID
     auctionAssetContract

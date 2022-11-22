@@ -1,4 +1,3 @@
-import PaprControllerABI from 'abis/PaprController.json';
 import { TextButton } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
 import { EtherscanTransactionLink } from 'components/EtherscanLink';
@@ -14,6 +13,7 @@ import { erc20Contract } from 'lib/contracts';
 import { convertOneScaledValue } from 'lib/controllers';
 import { getDaysHoursMinutesSeconds } from 'lib/duration';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
+import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
 import React, { useCallback, useMemo } from 'react';
 import { INFTEDA } from 'types/generated/abis/PaprController';
@@ -22,7 +22,7 @@ import {
   AuctionsQuery,
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
-import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { useAccount } from 'wagmi';
 import styles from './Auctions.module.css';
 
 type Auction = AuctionsQuery['auctions'][number];
@@ -235,19 +235,21 @@ type BuyButtonProps = {
 function BuyButton({ auction, controller, maxPrice }: BuyButtonProps) {
   const { address } = useAccount();
   const oracleInfo = useOracleInfo();
-  console.log({ oracleInfo });
   const handleClick = useCallback(async () => {
     if (!oracleInfo) {
       console.error('no oracle info, cannot buy');
       return;
     }
     const oracleDetails = oracleInfo[auction.auctionAssetContract];
-    controller.purchaseLiquidationAuctionNFT(
-      auction as unknown as INFTEDA.AuctionStruct,
+    const oracleInfoStruct = getOraclePayloadFromReservoirObject(oracleDetails);
+    const tx = await controller.purchaseLiquidationAuctionNFT(
+      { ...auction, nftOwner: auction.vault.account } as INFTEDA.AuctionStruct,
       maxPrice,
       address!,
-      // TODO: oracle data
+      oracleInfoStruct,
     );
+    await tx.wait();
+    window.location.reload();
   }, [address, auction, controller, maxPrice, oracleInfo]);
 
   return (
