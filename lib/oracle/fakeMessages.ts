@@ -6,7 +6,7 @@ import {
   _TypedDataEncoder,
 } from 'ethers/lib/utils';
 import { Config } from 'lib/config';
-import { ReservoirResponseData } from './reservoir';
+import { OraclePriceType, ReservoirResponseData } from './reservoir';
 
 export const dummyOracleInfoMap = {
   [getAddress('0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e')]: [36.32, 38.02],
@@ -54,6 +54,7 @@ const EIP712_TYPES = {
 
 export async function generateDummyOracleMessage(
   collection: string,
+  kind: OraclePriceType,
   config: Config,
 ) {
   const rpcProvider = new ethers.providers.JsonRpcProvider(
@@ -77,7 +78,7 @@ export async function generateDummyOracleMessage(
     'ContractWideCollectionPrice',
     EIP712_TYPES.ContractWideCollectionPrice,
     {
-      kind: 2,
+      kind: Object.keys(OraclePriceType).indexOf(kind),
       twapSeconds: 2592000,
       contract: collection,
     },

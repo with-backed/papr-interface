@@ -19,6 +19,7 @@ import { buildToken, convertOneScaledValue } from './controllers';
 import { getPool } from './controllers/uniswap';
 import { subgraphUniswapPoolById } from './uniswapSubgraph';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { getAddress } from 'ethers/lib/utils';
 
 export type PaprController = SubgraphController & PaprControllerInternal;
 export type SubgraphController = NonNullable<
@@ -249,14 +250,17 @@ class PaprControllerInternal {
       collateralAssets
         .map((asset) =>
           ethers.utils.parseUnits(
-            oracleInfo[asset].price.toString(),
+            oracleInfo[getAddress(asset)].price.toString(),
             this.underlying.decimals,
           ),
         )
         .map(async (oraclePrice) => await this._contract.maxDebt(oraclePrice)),
     );
 
-    return totalDebtPerCollateral.reduce((a, b) => a.add(b));
+    return totalDebtPerCollateral.reduce(
+      (a, b) => a.add(b),
+      ethers.BigNumber.from(0),
+    );
   }
 }
 

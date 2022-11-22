@@ -32,18 +32,16 @@ export function Slider({
 }: SliderProps) {
   return (
     <>
-      {!hideBlackTrack && (
-        <div
-          style={{
-            width: blackTrackWidth,
-            left: '0px',
-            position: 'relative',
-            top: '36px',
-            height: '36px',
-            backgroundImage: "url('/slider-tile-black.svg')",
-            zIndex: 1,
-          }}></div>
-      )}
+      <div
+        style={{
+          width: hideBlackTrack ? '0px' : blackTrackWidth,
+          left: '0px',
+          position: 'relative',
+          top: '36px',
+          height: '36px',
+          backgroundImage: "url('/slider-tile-black.svg')",
+          zIndex: 1,
+        }}></div>
       <ReactSlider
         className={styles.slider}
         trackClassName={styles.track}

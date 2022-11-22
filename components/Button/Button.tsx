@@ -3,7 +3,7 @@ import styles from './Button.module.css';
 
 export type ButtonKind = 'regular' | 'outline' | 'outline-transparent';
 export type ButtonTheme = 'papr' | 'hero' | 'meme' | 'white';
-export type ButtonSize = 'big' | 'small';
+export type ButtonSize = 'big' | 'small' | 'xsmall';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   kind?: ButtonKind;

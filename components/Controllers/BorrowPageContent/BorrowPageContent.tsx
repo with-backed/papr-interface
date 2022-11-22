@@ -6,6 +6,10 @@ import { useAccount } from 'wagmi';
 import { useCenterNFTs } from 'hooks/useCenterNFTs';
 import { PaprController } from 'lib/PaprController';
 import { YourBorrowPositions } from 'components/YourBorrowPositions/YourBorrowPositions';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { VaultDebtPicker } from 'components/Controllers/OpenVault/VaultDebtPicker/VaultDebtPicker';
+import { getAddress } from 'ethers/lib/utils';
+import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 
 export type BorrowPageProps = {
   controllerAddress: string;
@@ -20,25 +24,70 @@ export function BorrowPageContent({
 }: BorrowPageProps) {
   const config = useConfig();
   const { address } = useAccount();
+  const oracleInfo = useOracleInfo();
 
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.contractAddress);
   }, [paprController.allowedCollateral]);
 
-  const { userCollectionNFTs } = useCenterNFTs(
+  const { userCollectionNFTs, nftsLoading } = useCenterNFTs(
     address,
     collateralContractAddresses,
     config,
   );
 
-  if (!paprController || !pricesData) return <></>;
+  const { currentVaults, vaultsFetching } = useCurrentVaults(
+    paprController,
+    address,
+  );
+
+  const uniqueCollections = useMemo(() => {
+    const userCollectionCollateral = userCollectionNFTs.map((nft) =>
+      getAddress(nft.address),
+    );
+
+    if (!currentVaults) return userCollectionCollateral;
+
+    const userAndVaultCollateral = currentVaults
+      .map((v) => getAddress(v.collateralContract))
+      .concat(userCollectionCollateral);
+
+    return Array.from(new Set(userAndVaultCollateral));
+  }, [userCollectionNFTs, currentVaults]);
+
+  if (
+    !paprController ||
+    !pricesData ||
+    vaultsFetching ||
+    nftsLoading ||
+    !oracleInfo
+  )
+    return <></>;
 
   return (
     <div className={controllerStyles.wrapper}>
       <YourBorrowPositions
         userNFTs={userCollectionNFTs}
         paprController={paprController}
+        currentVaults={currentVaults}
+        oracleInfo={oracleInfo}
       />
+      {!!address &&
+        uniqueCollections.map((collection) => (
+          <VaultDebtPicker
+            key={collection}
+            collateralContractAddress={collection}
+            oracleInfo={oracleInfo}
+            paprController={paprController}
+            vault={currentVaults?.find(
+              (v) =>
+                getAddress(v.collateralContract) === getAddress(collection),
+            )}
+            userNFTsForVault={userCollectionNFTs.filter(
+              (nft) => getAddress(collection) === getAddress(nft.address),
+            )}
+          />
+        ))}
     </div>
   );
 }

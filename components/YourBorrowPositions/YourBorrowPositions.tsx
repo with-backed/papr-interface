@@ -11,7 +11,7 @@ import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { Quoter } from 'lib/contracts';
 import { SupportedToken } from 'lib/config';
 import { useConfig } from 'hooks/useConfig';
-import { getQuoteForSwap } from 'lib/controllers';
+import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import { Table } from 'components/Table';
 import { ERC721__factory } from 'types/generated/abis';
@@ -23,41 +23,57 @@ import { formatBigNum } from 'lib/numberFormat';
 export type YourBorrowPositionsProps = {
   paprController: PaprController;
   userNFTs: CenterUserNFTsResponse[];
+  currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
+  oracleInfo: OracleInfo;
 };
 
 export function YourBorrowPositions({
   paprController,
   userNFTs,
+  currentVaults,
+  oracleInfo,
 }: YourBorrowPositionsProps) {
   const { address } = useAccount();
-  const { jsonRpcProvider, tokenName } = useConfig();
-  const oracleInfo = useOracleInfo();
-
-  const { currentVaults, vaultsFetching } = useCurrentVaults(
-    paprController,
-    address,
-  );
+  const { tokenName } = useConfig();
 
   const uniqueCollections = useMemo(() => {
-    return userNFTs
-      .map((nft) => nft.address)
-      .filter((item, i, arr) => arr.indexOf(item) === i);
-  }, [userNFTs]);
+    const vaultAndUserAddresses = userNFTs
+      .map((nft) => getAddress(nft.address))
+      .concat(
+        (currentVaults || [])
+          .map((v) => v.collateral)
+          .flat()
+          .map((c) => getAddress(c.contractAddress)),
+      );
+    return Array.from(new Set(vaultAndUserAddresses));
+  }, [userNFTs, currentVaults]);
 
   const maxLoanAmountInUnderlying = useAsyncValue(async () => {
-    if (!oracleInfo) return null;
     const maxLoanInDebtTokens = await paprController.maxDebt(
-      userNFTs.map((nft) => nft.address),
+      userNFTs
+        .map((nft) => nft.address)
+        .concat(
+          (currentVaults || [])
+            .map((v) => v.collateral)
+            .flat()
+            .map((c) => c.contractAddress),
+        ),
       oracleInfo,
     );
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
+    const maxLoanMinusCurrentDebt = maxLoanInDebtTokens.sub(
+      (currentVaults || [])
+        .map((v) => ethers.BigNumber.from(v.debt))
+        .reduce((a, b) => a.add(b), ethers.BigNumber.from(0)),
+    );
+
+    if (maxLoanMinusCurrentDebt.isZero()) return ethers.BigNumber.from(0);
     return getQuoteForSwap(
-      quoter,
-      maxLoanInDebtTokens,
+      maxLoanMinusCurrentDebt,
       paprController.debtToken.id,
       paprController.underlying.id,
+      tokenName as SupportedToken,
     );
-  }, [jsonRpcProvider, tokenName, paprController, oracleInfo, userNFTs]);
+  }, [tokenName, paprController, oracleInfo, userNFTs, currentVaults]);
 
   const totalPaprMemeDebt = useMemo(() => {
     if (!currentVaults) return ethers.BigNumber.from(0);
@@ -71,22 +87,33 @@ export function YourBorrowPositions({
 
   const totalPaprMemeDebtInUnderlying = useAsyncValue(async () => {
     if (totalPaprMemeDebt.isZero()) return null;
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
     return getQuoteForSwap(
-      quoter,
       totalPaprMemeDebt,
       paprController.debtToken.id,
       paprController.underlying.id,
+      tokenName as SupportedToken,
     );
   }, [
-    jsonRpcProvider,
     tokenName,
     paprController.debtToken.id,
     paprController.underlying.id,
     totalPaprMemeDebt,
   ]);
 
-  if (vaultsFetching || !oracleInfo) return <></>;
+  if (!oracleInfo) return <></>;
+
+  if (!address) {
+    return (
+      <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>
+        <div>
+          <p>
+            Connect your wallet to see eligible collections and your maximum
+            loan amount
+          </p>
+        </div>
+      </Fieldset>
+    );
+  }
 
   return (
     <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>
@@ -127,14 +154,37 @@ export function YourBorrowPositions({
           </>
         )}
       </div>
-      {currentVaults?.map((vault) => (
-        <VaultOverview
-          vaultInfo={vault}
-          oracleInfo={oracleInfo}
-          paprController={paprController}
-          key={vault.id}
-        />
-      ))}
+      <Table className={styles.vaultTable}>
+        <thead>
+          <tr>
+            <th>
+              <p>COLLECTION</p>
+            </th>
+            <th>
+              <p>NFTS</p>
+            </th>
+            <th>
+              <p>BORROWED</p>
+            </th>
+            <th>
+              <p>CLOSING COST</p>
+            </th>
+            <th>
+              <p>HEALTH</p>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {currentVaults?.map((vault) => (
+            <VaultOverview
+              vaultInfo={vault}
+              oracleInfo={oracleInfo}
+              paprController={paprController}
+              key={vault.id}
+            />
+          ))}
+        </tbody>
+      </Table>
     </Fieldset>
   );
 }
@@ -150,7 +200,7 @@ export function VaultOverview({
   oracleInfo,
   vaultInfo,
 }: VaultOverviewProps) {
-  const { jsonRpcProvider, tokenName } = useConfig();
+  const { tokenName } = useConfig();
   const signerOrProvider = useSignerOrProvider();
   const connectedNFT = useMemo(() => {
     return ERC721__factory.connect(
@@ -159,17 +209,17 @@ export function VaultOverview({
     );
   }, [vaultInfo.collateralContract, signerOrProvider]);
   const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
-  const costToClose = useAsyncValue(() => {
-    const quoter = Quoter(jsonRpcProvider, tokenName as SupportedToken);
-    return getQuoteForSwap(
-      quoter,
+  const costToClose = useAsyncValue(async () => {
+    if (ethers.BigNumber.from(vaultInfo.debt).isZero())
+      return ethers.BigNumber.from(0);
+    return getQuoteForSwapOutput(
       ethers.BigNumber.from(vaultInfo.debt),
-      paprController.debtToken.id,
       paprController.underlying.id,
+      paprController.debtToken.id,
+      tokenName as SupportedToken,
     );
   }, [
     vaultInfo.debt,
-    jsonRpcProvider,
     tokenName,
     paprController.debtToken.id,
     paprController.underlying.id,
@@ -182,61 +232,41 @@ export function VaultOverview({
     );
   }, [paprController, vaultInfo, oracleInfo]);
 
+  if (
+    ethers.BigNumber.from(vaultInfo.debt).isZero() &&
+    vaultInfo.collateral.length === 0
+  )
+    return <></>;
+
   return (
-    <Table className={styles.vaultTable}>
-      <thead>
-        <tr>
-          <th>
-            <p>COLLECTION</p>
-          </th>
-          <th>
-            <p>NFTS</p>
-          </th>
-          <th>
-            <p>BORROWED</p>
-          </th>
-          <th>
-            <p>CLOSING COST</p>
-          </th>
-          <th>
-            <p>HEALTH</p>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <p>{nftSymbol}</p>
-          </td>
-          <td>
-            <p>{vaultInfo.collateral.length}</p>
-          </td>
-          <td>
-            <p>
-              {formatBigNum(vaultInfo.debt, paprController.debtToken.decimals)}{' '}
-              {tokenName}
-            </p>
-          </td>
-          <td>
-            <p>
-              $
-              {costToClose &&
-                formatBigNum(
-                  costToClose,
-                  paprController.underlying.decimals,
-                )}{' '}
-            </p>
-          </td>
-          <td>
-            {maxDebtForVault && (
-              <NewVaultHealth
-                debt={ethers.BigNumber.from(vaultInfo.debt)}
-                maxDebt={maxDebtForVault}
-              />
-            )}
-          </td>
-        </tr>
-      </tbody>
-    </Table>
+    <tr>
+      <td>
+        <p>{nftSymbol}</p>
+      </td>
+      <td>
+        <p>{vaultInfo.collateral.length}</p>
+      </td>
+      <td>
+        <p>
+          {formatBigNum(vaultInfo.debt, paprController.debtToken.decimals)}{' '}
+          {tokenName}
+        </p>
+      </td>
+      <td>
+        <p>
+          $
+          {costToClose &&
+            formatBigNum(costToClose, paprController.underlying.decimals)}{' '}
+        </p>
+      </td>
+      <td>
+        {maxDebtForVault && (
+          <NewVaultHealth
+            debt={ethers.BigNumber.from(vaultInfo.debt)}
+            maxDebt={maxDebtForVault}
+          />
+        )}
+      </td>
+    </tr>
   );
 }

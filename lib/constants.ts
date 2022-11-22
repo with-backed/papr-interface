@@ -14,6 +14,9 @@ export const SCALAR = ethers.BigNumber.from(10).pow(
   INTEREST_RATE_PERCENT_DECIMALS,
 );
 
+export const oracleInfoArgEncoded =
+  'tuple(tuple(bytes32 id, bytes payload, uint256 timestamp, bytes signature) message, tuple(uint8 v, bytes32 r, bytes32 s) sig) oracleInfo';
+
 export const DISCORD_URL = 'https://discord.gg/ZCxGuE6Ytk';
 export const DISCORD_ERROR_CHANNEL = '#🪲bug-reports';
 export const TWITTER_URL = 'https://twitter.com/backed_xyz';
