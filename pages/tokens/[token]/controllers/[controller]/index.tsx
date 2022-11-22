@@ -14,6 +14,7 @@ import { useConfig } from 'hooks/useConfig';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { usePaprController } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
+import { useMemo } from 'react';
 
 type ServerSideProps = Omit<
   ControllerPageProps,
@@ -72,11 +73,13 @@ export default function ControllerPage({
     [config, paprController],
   );
 
+  const collections = useMemo(
+    () => subgraphController.allowedCollateral.map((c) => c.contractAddress),
+    [subgraphController.allowedCollateral],
+  );
+
   return (
-    <OracleInfoProvider
-      collections={subgraphController.allowedCollateral.map(
-        (c) => c.contractAddress,
-      )}>
+    <OracleInfoProvider collections={collections}>
       <ControllerOverviewContent
         address={address}
         paprController={paprController}
