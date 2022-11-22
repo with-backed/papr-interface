@@ -18,7 +18,6 @@ import { subgraphControllerByAddress } from './pAPRSubgraph';
 import { buildToken, convertOneScaledValue } from './controllers';
 import { getPool } from './controllers/uniswap';
 import { subgraphUniswapPoolById } from './uniswapSubgraph';
-import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 
 export type PaprController = SubgraphController & PaprControllerInternal;
@@ -44,14 +43,12 @@ type SignerOrProvider = ethers.Signer | ethers.providers.Provider;
 export function makePaprController(
   subgraphController: SubgraphController,
   subgraphPool: SubgraphPool,
-  oracleInfo: { [key: string]: ReservoirResponseData },
   signerOrProvider: SignerOrProvider,
   config: Config,
 ): PaprController {
   const instance = new PaprControllerInternal(
     subgraphController,
     subgraphPool,
-    oracleInfo,
     !!signerOrProvider
       ? signerOrProvider
       : new providers.AlchemyProvider(config.network, config.alchemyId),
@@ -90,7 +87,6 @@ class PaprControllerInternal {
 
   multicall: GenPaprController['multicall'];
   subgraphPool: SubgraphPool;
-  oracleInfo: { [key: string]: ReservoirResponseData };
   token0: ERC20;
   token1: ERC20;
   collateralContracts: ERC721[];
@@ -98,13 +94,11 @@ class PaprControllerInternal {
   constructor(
     subgraphController: SubgraphController,
     subgraphPool: SubgraphPool,
-    oracleInfo: { [key: string]: ReservoirResponseData },
     signerOrProvider: SignerOrProvider,
     config: Config,
   ) {
     this._subgraphController = subgraphController;
     this.subgraphPool = subgraphPool;
-    this.oracleInfo = oracleInfo;
     this._signerOrProvider = signerOrProvider;
     this._contract = PaprController__factory.connect(
       subgraphController.id,

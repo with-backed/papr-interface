@@ -34,6 +34,7 @@ import {
   RepayButton,
   SafeTransferFromButton,
 } from './OpenVaultButtons';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 
 type BorrowProps = {
   controller: PaprController;
@@ -80,9 +81,7 @@ export function OpenVault({
 }: BorrowProps) {
   const { address } = useAccount();
 
-  const oracleInfo = useMemo(() => {
-    return controller.oracleInfo;
-  }, [controller]);
+  const oracleInfo = useOracleInfo();
   const currentVaultDebt = useMemo(() => {
     return ethers.BigNumber.from(currentVault?.debt || 0);
   }, [currentVault]);
@@ -165,7 +164,7 @@ export function OpenVault({
         (c) => c.contractAddress as string,
       ),
     ]
-      .map((address) => oracleInfo[getAddress(address)].price)
+      .map((address) => oracleInfo?.[getAddress(address)].price!)
       .reduce((a, b) => a + b, 0);
   }, [nftsSelected, currentVault, oracleInfo]);
 

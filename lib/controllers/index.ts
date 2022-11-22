@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
+import { SECONDS_IN_A_DAY } from 'lib/constants';
 import { ERC20, ERC721, IQuoter } from 'types/generated/abis';
 import { ONE } from './constants';
 import { lambertW0 } from 'lambert-w-function';
@@ -9,6 +9,7 @@ import { getAddress } from 'ethers/lib/utils';
 import { PaprController } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
 import { OracleType, ReservoirResponseData } from 'lib/oracle/reservoir';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 
 dayjs.extend(duration);
 
@@ -246,6 +247,20 @@ export function computeLtv(
   return ethers.BigNumber.from(debt).div(valueNormRatio);
 }
 
+export function oracleInfoProxy<T>(obj: { [key: string]: T }) {
+  const proxy = new Proxy(obj, {
+    get(target, prop) {
+      try {
+        return target[getAddress(prop as string)];
+      } catch (e) {
+        return undefined;
+      }
+    },
+  });
+
+  return proxy;
+}
+
 export async function getOracleInfoFromAllowedCollateral(
   collections: string[],
   token: SupportedToken,
@@ -267,8 +282,8 @@ export async function getOracleInfoFromAllowedCollateral(
       ...prev,
       [getAddress(current)]: oracleInfoFromAPI[i] as ReservoirResponseData,
     }),
-    {},
+    {} as OracleInfo,
   );
 
-  return oracleInfo;
+  return oracleInfoProxy(oracleInfo);
 }

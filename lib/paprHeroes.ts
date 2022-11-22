@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
 import { ERC721__factory } from 'types/generated/abis';
 import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
 import { configs } from './config';
@@ -29,7 +28,7 @@ export async function calculateNetPhUSDCBalance(
       connectedERC721.map(async (erc721) => {
         return (await erc721.balanceOf(address)).mul(
           ethers.utils.parseUnits(
-            oracleInfo[getAddress(erc721.address)].price.toString(),
+            oracleInfo[erc721.address].price.toString(),
             decimals,
           ),
         );

@@ -10,7 +10,6 @@ import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { CenterAsset } from 'components/CenterAsset';
 import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
 import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
 import Link from 'next/link';
 import { Table } from 'components/Table';
 
@@ -79,7 +78,7 @@ export function HeroesLandingPageContent({
         {collateral.map((c) => (
           <AllowedCollateral
             contractAddress={c}
-            floorPrice={oracleInfo[getAddress(c)].price}
+            floorPrice={oracleInfo[c].price}
             key={c}
           />
         ))}
