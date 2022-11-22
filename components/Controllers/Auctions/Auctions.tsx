@@ -13,7 +13,10 @@ import { erc20Contract } from 'lib/contracts';
 import { convertOneScaledValue } from 'lib/controllers';
 import { getDaysHoursMinutesSeconds } from 'lib/duration';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
-import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
+import {
+  getOraclePayloadFromReservoirObject,
+  OraclePriceType,
+} from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
 import React, { useCallback, useMemo } from 'react';
 import { INFTEDA } from 'types/generated/abis/PaprController';
@@ -234,7 +237,7 @@ type BuyButtonProps = {
 };
 function BuyButton({ auction, controller, maxPrice }: BuyButtonProps) {
   const { address } = useAccount();
-  const oracleInfo = useOracleInfo();
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const handleClick = useCallback(async () => {
     if (!oracleInfo) {
       console.error('no oracle info, cannot buy');

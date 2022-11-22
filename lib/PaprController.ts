@@ -277,6 +277,7 @@ class PaprControllerInternal {
       maxPrice,
       sendTo,
       oracleInfo,
+      { gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)) },
     );
   }
 }
