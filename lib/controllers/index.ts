@@ -297,7 +297,7 @@ export async function getOracleInfoFromAllowedCollateral(
   collections: string[],
   token: SupportedToken,
   kind: OraclePriceType = OraclePriceType.lower,
-) {
+): Promise<OracleInfo> {
   const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
     collections.map(async (collectionAddress) => {
       const req = await fetch(

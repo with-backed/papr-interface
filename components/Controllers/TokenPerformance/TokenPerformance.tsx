@@ -27,6 +27,7 @@ import {
 } from 'lib/tokenPerformance';
 import { Table } from 'components/Table';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 
 export type ControllerSummaryProps = {
   controllers: PaprController[];
@@ -90,7 +91,7 @@ type SummaryEntryProps = {
   controller: PaprController;
 };
 function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
-  const oracleInfo = useOracleInfo();
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const debtTokenSupply = useAsyncValue(
     () =>
       controller.token0IsUnderlying

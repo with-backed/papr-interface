@@ -14,6 +14,8 @@ import { useConfig } from 'hooks/useConfig';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { usePaprController } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { useMemo } from 'react';
 
 type ServerSideProps = Omit<
   BorrowPageProps,
@@ -73,11 +75,13 @@ export default function Borrow({
     [config, paprController],
   );
 
+  const collections = useMemo(
+    () => subgraphController.allowedCollateral.map((c) => c.contractAddress),
+    [subgraphController.allowedCollateral],
+  );
+
   return (
-    <OracleInfoProvider
-      collections={subgraphController.allowedCollateral.map(
-        (c) => c.contractAddress,
-      )}>
+    <OracleInfoProvider collections={collections}>
       <BorrowPageContent
         paprController={paprController}
         controllerAddress={controllerAddress}
