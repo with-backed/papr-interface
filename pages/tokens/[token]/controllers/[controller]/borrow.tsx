@@ -78,8 +78,7 @@ export default function Borrow({
     <OracleInfoProvider
       collections={subgraphController.allowedCollateral.map(
         (c) => c.contractAddress,
-      )}
-      kind={OraclePriceType.lower}>
+      )}>
       <BorrowPageContent
         paprController={paprController}
         controllerAddress={controllerAddress}

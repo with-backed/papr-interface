@@ -10,6 +10,7 @@ import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { VaultDebtPicker } from 'components/Controllers/OpenVault/VaultDebtPicker/VaultDebtPicker';
 import { getAddress } from 'ethers/lib/utils';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 
 export type BorrowPageProps = {
   controllerAddress: string;
@@ -24,7 +25,7 @@ export function BorrowPageContent({
 }: BorrowPageProps) {
   const config = useConfig();
   const { address } = useAccount();
-  const oracleInfo = useOracleInfo();
+  const oracleInfo = useOracleInfo(OraclePriceType.lower);
 
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.contractAddress);
