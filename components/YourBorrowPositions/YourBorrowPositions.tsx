@@ -37,15 +37,15 @@ export function YourBorrowPositions({
   const { tokenName } = useConfig();
 
   const uniqueCollections = useMemo(() => {
-    return userNFTs
+    const vaultAndUserAddresses = userNFTs
       .map((nft) => getAddress(nft.address))
       .concat(
         (currentVaults || [])
           .map((v) => v.collateral)
           .flat()
           .map((c) => getAddress(c.contractAddress)),
-      )
-      .filter((item, i, arr) => arr.indexOf(item) === i);
+      );
+    return Array.from(new Set(vaultAndUserAddresses));
   }, [userNFTs, currentVaults]);
 
   const maxLoanAmountInUnderlying = useAsyncValue(async () => {

@@ -1,10 +1,6 @@
 import { ethers } from 'ethers';
 import { SECONDS_IN_A_DAY } from 'lib/constants';
-<<<<<<< HEAD
-import { ERC20, ERC721, IQuoter } from 'types/generated/abis';
-=======
 import { ERC20, ERC721 } from 'types/generated/abis';
->>>>>>> af9e651 (more refactoring)
 import { ONE } from './constants';
 import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
@@ -14,14 +10,7 @@ import { PaprController } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { Quoter } from 'lib/contracts';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-=======
-import { formatBigNum } from 'lib/numberFormat';
->>>>>>> e7bce8f (new designs)
-=======
->>>>>>> af9e651 (more refactoring)
 
 dayjs.extend(duration);
 
