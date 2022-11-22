@@ -36,28 +36,44 @@ export function OracleInfoProvider({
   children,
 }: PropsWithChildren<{ collections: string[] }>) {
   const { tokenName } = useConfig();
+  const [registeredKinds, setRegisteredKinds] = useState<OraclePriceType[]>([]);
   const [oracleInfoRepository, setOracleInfoRepository] =
     useState<OracleInfoRepository>(EMPTY);
 
   const register = useCallback(
     async (kind: OraclePriceType) => {
-      const setLatestOracleInfo = async () => {
-        const oracleInfo = await getOracleInfoFromAllowedCollateral(
-          collections,
-          tokenName as SupportedToken,
-          kind,
-        );
-        setOracleInfoRepository((prev) => ({
-          ...prev,
-          [kind]: oracleInfo,
-        }));
-      };
-      setLatestOracleInfo();
-      const intervalId = setInterval(setLatestOracleInfo, ORACLE_POLL_INTERVAL);
-      return () => clearInterval(intervalId);
+      if (!registeredKinds.includes(kind)) {
+        setRegisteredKinds((prev) => [...prev, kind]);
+      }
     },
-    [setOracleInfoRepository, tokenName, collections],
+    [registeredKinds],
   );
+
+  useEffect(() => {
+    const setLatestOracleInfo = async () => {
+      const oracleInfoForKinds = await Promise.all(
+        registeredKinds.map(
+          async (kind) =>
+            await getOracleInfoFromAllowedCollateral(
+              collections,
+              tokenName as SupportedToken,
+              kind,
+            ),
+        ),
+      );
+      const newOracleInfoRepository = registeredKinds.reduce(
+        (prevRepo, nextKind, i) => ({
+          ...prevRepo,
+          [nextKind]: oracleInfoForKinds[i],
+        }),
+        {},
+      );
+      setOracleInfoRepository(newOracleInfoRepository as OracleInfoRepository);
+    };
+    setLatestOracleInfo();
+    const intervalId = setInterval(setLatestOracleInfo, ORACLE_POLL_INTERVAL);
+    return () => clearInterval(intervalId);
+  }, [tokenName, collections, registeredKinds]);
 
   return (
     <OracleInfoContext.Provider

@@ -682,7 +682,7 @@ function CollateralRow({
           type="checkbox"
           disabled={inVault}
           checked={checkedForDeposit || inVault}
-          onClick={() => handleInputBoxChecked('deposit', uniqueNFTId)}
+          onChange={() => handleInputBoxChecked('deposit', uniqueNFTId)}
         />
       </td>
       {vaultHasCollateral && (
@@ -691,7 +691,7 @@ function CollateralRow({
             type="checkbox"
             disabled={!inVault}
             checked={checkedForWithdraw}
-            onClick={() => handleInputBoxChecked('withdraw', uniqueNFTId)}
+            onChange={() => handleInputBoxChecked('withdraw', uniqueNFTId)}
           />
         </td>
       )}
