@@ -34,9 +34,11 @@ type NewVaultHealthProps = {
 
 // TODO(adamgobes): Migrate all old health components to use this new vault health component and rename
 export function NewVaultHealth({ debt, maxDebt }: NewVaultHealthProps) {
-  const ratio =
+  const ratio = Math.min(
+    1,
     parseFloat(ethers.utils.formatEther(debt)) /
-    parseFloat(ethers.utils.formatEther(maxDebt));
+      parseFloat(ethers.utils.formatEther(maxDebt)),
+  );
 
   const indicator = useMemo(() => {
     // Ratio, but as a number out of 10 rather than a decimal out of 1

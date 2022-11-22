@@ -12,7 +12,7 @@ import duration from 'dayjs/plugin/duration';
 import { getAddress } from 'ethers/lib/utils';
 import { PaprController } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
-import { OracleType, ReservoirResponseData } from 'lib/oracle/reservoir';
+import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { Quoter } from 'lib/contracts';
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -307,7 +307,7 @@ export function oracleInfoProxy<T>(obj: { [key: string]: T }) {
 export async function getOracleInfoFromAllowedCollateral(
   collections: string[],
   token: SupportedToken,
-  kind: OracleType = OracleType.lower,
+  kind: OraclePriceType = OraclePriceType.lower,
 ) {
   const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
     collections.map(async (collectionAddress) => {
