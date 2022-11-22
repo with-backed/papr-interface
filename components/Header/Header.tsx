@@ -128,7 +128,7 @@ export function Header() {
         <div className={styles.center}>
           <LogoLink />
         </div>
-        {activeRoute !== '' && (
+        {activeRoute !== '' && activeRoute !== 'errorPage' && (
           <>
             <div className={styles.center}>
               <NavLinks activeRoute={activeRoute} />
