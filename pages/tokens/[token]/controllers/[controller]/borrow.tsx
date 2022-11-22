@@ -14,6 +14,7 @@ import { useConfig } from 'hooks/useConfig';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { usePaprController } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 
 type ServerSideProps = Omit<
   BorrowPageProps,
@@ -77,7 +78,8 @@ export default function Borrow({
     <OracleInfoProvider
       collections={subgraphController.allowedCollateral.map(
         (c) => c.contractAddress,
-      )}>
+      )}
+      kind={OraclePriceType.lower}>
       <BorrowPageContent
         paprController={paprController}
         controllerAddress={controllerAddress}
