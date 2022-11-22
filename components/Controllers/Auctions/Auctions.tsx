@@ -19,6 +19,7 @@ import {
 } from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
 import React, { useCallback, useMemo } from 'react';
+import { ERC20, PHUSDC__factory } from 'types/generated/abis';
 import { INFTEDA } from 'types/generated/abis/PaprController';
 import {
   AuctionsDocument,
@@ -84,6 +85,12 @@ function ActiveAuctions({
   controller: controller,
   fetching,
 }: ActiveAuctionsProps) {
+  const { address } = useAccount();
+  const signerOrProvider = useSignerOrProvider();
+  const tokenContract = useMemo(
+    () => erc20Contract(controller.debtToken.id, signerOrProvider),
+    [controller.debtToken.id, signerOrProvider],
+  );
   const legend = '🔨 Active Auctions';
   if (fetching) {
     return <Fieldset legend={legend}>Loading auctions...</Fieldset>;
@@ -103,7 +110,6 @@ function ActiveAuctions({
             <th className={styles.right}>Current</th>
             <th className={styles.right}>△1hr</th>
             <th className={styles.right}>Floor</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -112,6 +118,7 @@ function ActiveAuctions({
               key={auction.id}
               auction={auction}
               controller={controller}
+              tokenContract={tokenContract}
             />
           ))}
         </tbody>
@@ -123,9 +130,11 @@ function ActiveAuctions({
 function ActiveAuctionRow({
   auction,
   controller,
+  tokenContract,
 }: {
   auction: ActiveAuction;
   controller: PaprController;
+  tokenContract: ERC20;
 }) {
   const timestamp = useTimestamp();
   const signerOrProvider = useSignerOrProvider();
@@ -182,8 +191,6 @@ function ActiveAuctionRow({
     [auction.startPrice],
   );
 
-  const { address } = useAccount();
-
   return (
     <tr>
       <td className={styles.asset}>
@@ -217,15 +224,6 @@ function ActiveAuctionRow({
           : '...'}{' '}
         {symbol}
       </td>
-      <td className={styles.center}>
-        {address ? (
-          <BuyButton
-            auction={auction}
-            controller={controller}
-            maxPrice={priceBigNum}
-          />
-        ) : null}
-      </td>
     </tr>
   );
 }
@@ -234,8 +232,14 @@ type BuyButtonProps = {
   auction: ActiveAuction;
   controller: PaprController;
   maxPrice: ethers.BigNumber;
+  tokenContract: ERC20;
 };
-function BuyButton({ auction, controller, maxPrice }: BuyButtonProps) {
+function BuyButton({
+  auction,
+  controller,
+  maxPrice,
+  tokenContract,
+}: BuyButtonProps) {
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const handleClick = useCallback(async () => {
@@ -243,6 +247,10 @@ function BuyButton({ auction, controller, maxPrice }: BuyButtonProps) {
       console.error('no oracle info, cannot buy');
       return;
     }
+
+    const approvalTx = await tokenContract.approve(controller.id, maxPrice);
+    await approvalTx.wait();
+
     const oracleDetails = oracleInfo[auction.auctionAssetContract];
     const oracleInfoStruct = getOraclePayloadFromReservoirObject(oracleDetails);
     const tx = await controller.purchaseLiquidationAuctionNFT(
@@ -253,7 +261,7 @@ function BuyButton({ auction, controller, maxPrice }: BuyButtonProps) {
     );
     await tx.wait();
     window.location.reload();
-  }, [address, auction, controller, maxPrice, oracleInfo]);
+  }, [address, auction, controller, maxPrice, oracleInfo, tokenContract]);
 
   return (
     <TextButton kind="clickable" onClick={handleClick}>
