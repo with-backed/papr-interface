@@ -44,6 +44,14 @@ const prodPages = (controllerAddress: string): Page[] => [
   },
 ];
 
+const paprHeroPages: Page[] = [
+  {
+    name: 'Contest',
+    route: `/contest`,
+    matcher: 'contest',
+  },
+];
+
 const stagingPages: Page[] = [];
 
 function isActiveRoute(activeRoute: string, candidate: Page) {
@@ -65,14 +73,20 @@ function NavLinks({ activeRoute }: NavLinksProps) {
   const { tokenName, controllerAddress } = useConfig();
 
   const pages = useMemo(() => {
+    const productSpecificPages = tokenName === 'paprHero' ? paprHeroPages : [];
     if (process.env.VERCEL_ENV === 'production') {
-      return prodPages(controllerAddress!);
+      return [...productSpecificPages, ...prodPages(controllerAddress!)];
     }
-    return [...prodPages(controllerAddress!), ...stagingPages];
-  }, [controllerAddress]);
+    return [
+      ...productSpecificPages,
+      ...prodPages(controllerAddress!),
+      ...stagingPages,
+    ];
+  }, [controllerAddress, tokenName]);
 
   return (
     <ul className={styles.links}>
+      <li className={styles.entry}>${tokenName}:</li>
       {pages.map((p) => (
         <li key={p.name}>
           <Link
@@ -109,6 +123,9 @@ function LogoLink() {
   );
 }
 
+const SHOW_HEADER_ON_LANDING_PAGE =
+  process.env.NEXT_PUBLIC_LANDING_PAGE_HEADER === 'true';
+
 export function Header() {
   const { pathname } = useRouter();
   const activeRoute = useMemo(() => {
@@ -122,33 +139,28 @@ export function Header() {
     return pathname.split('[token]/')[1] || '';
   }, [pathname]);
 
+  if (
+    (activeRoute === '' || activeRoute === 'errorPage') &&
+    !SHOW_HEADER_ON_LANDING_PAGE
+  ) {
+    return (
+      <nav className={styles['logo-only-nav']}>
+        <LogoLink />
+      </nav>
+    );
+  }
+
   return (
     <nav className={styles.nav}>
       <div className={styles['desktop-content']}>
-        <div className={styles.center}>
-          <LogoLink />
-        </div>
-        {activeRoute !== '' && activeRoute !== 'errorPage' && (
-          <>
-            <div className={styles.center}>
-              <NavLinks activeRoute={activeRoute} />
-            </div>
-            <div className={styles['right-side']}>
-              <ConnectWallet />
-            </div>
-          </>
-        )}
+        <LogoLink />
+        <NavLinks activeRoute={activeRoute} />
+        <ConnectWallet />
       </div>
       <div className={styles['mobile-content']}>
-        <div className={styles.center}>
-          <LogoLink />
-        </div>
-        {/* <div className={styles.center}>
-          <NavLinks activeRoute={activeRoute} />
-        </div>
-        <div className={styles['right-side']}>
-          <ConnectWallet />
-        </div> */}
+        <LogoLink />
+        <NavLinks activeRoute={activeRoute} />
+        <ConnectWallet />
       </div>
     </nav>
   );
