@@ -4,6 +4,9 @@ query auctions {
     vault {
       id
       account
+      controller {
+        id
+      }
     }
     auctionAssetID
     auctionAssetContract

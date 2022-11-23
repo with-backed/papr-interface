@@ -19,7 +19,7 @@ import {
 } from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
 import React, { useCallback, useMemo } from 'react';
-import { ERC20, PHUSDC__factory } from 'types/generated/abis';
+import { ERC20 } from 'types/generated/abis';
 import { INFTEDA } from 'types/generated/abis/PaprController';
 import {
   AuctionsDocument,
@@ -51,17 +51,19 @@ export function Auctions({ paprController }: AuctionsProps) {
     } = { activeAuctions: [], pastAuctions: [] };
 
     if (!!auctionsQueryResult?.auctions && !fetching) {
-      auctionsQueryResult.auctions.forEach((auction) => {
-        if (typeof auction.end?.timestamp === 'number') {
-          result.pastAuctions.push(auction as PastAuction);
-        } else {
-          result.activeAuctions.push(auction as ActiveAuction);
-        }
-      });
+      auctionsQueryResult.auctions
+        .filter((a) => a.vault.controller.id === paprController.id)
+        .forEach((auction) => {
+          if (typeof auction.end?.timestamp === 'number') {
+            result.pastAuctions.push(auction as PastAuction);
+          } else {
+            result.activeAuctions.push(auction as ActiveAuction);
+          }
+        });
     }
 
     return result;
-  }, [auctionsQueryResult, fetching]);
+  }, [auctionsQueryResult, fetching, paprController]);
 
   return (
     <div className={styles.wrapper}>
