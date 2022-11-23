@@ -123,6 +123,9 @@ function LogoLink() {
   );
 }
 
+const SHOW_HEADER_ON_LANDING_PAGE =
+  process.env.NEXT_PUBLIC_LANDING_PAGE_HEADER === 'true';
+
 export function Header() {
   const { pathname } = useRouter();
   const activeRoute = useMemo(() => {
@@ -136,7 +139,10 @@ export function Header() {
     return pathname.split('[token]/')[1] || '';
   }, [pathname]);
 
-  if (activeRoute === '' || activeRoute === 'errorPage') {
+  if (
+    (activeRoute === '' || activeRoute === 'errorPage') &&
+    !SHOW_HEADER_ON_LANDING_PAGE
+  ) {
     return (
       <nav className={styles['logo-only-nav']}>
         <LogoLink />
