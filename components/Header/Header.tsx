@@ -152,9 +152,9 @@ export function Header() {
         <ConnectWallet />
       </div>
       <div className={styles['mobile-content']}>
-        <div className={styles.center}>
-          <LogoLink />
-        </div>
+        <LogoLink />
+        <NavLinks activeRoute={activeRoute} />
+        <ConnectWallet />
       </div>
     </nav>
   );

@@ -28,6 +28,7 @@
 
 .mobile-content {
   composes: content;
+  flex-direction: column;
 }
 
 .links {
