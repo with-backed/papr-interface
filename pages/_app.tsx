@@ -8,7 +8,12 @@ import { Footer } from 'components/Footer';
 import { ConfigProvider } from 'hooks/useConfig';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { SupportedToken, prodConfigs, devConfigs } from 'lib/config';
+import {
+  SupportedToken,
+  prodConfigs,
+  devConfigs,
+  isSupportedToken,
+} from 'lib/config';
 import { ApplicationProviders } from 'components/ApplicationProviders';
 import { Header } from 'components/Header';
 import { ErrorBanners } from 'components/ErrorBanners';
@@ -20,12 +25,14 @@ const networks = (
 ) as SupportedToken[];
 
 const TOKEN_FROM_PATH_REGEXP = /\/tokens\/([^\/]+)/;
-function tokenFromPath(path: string) {
+function tokenFromPath(path: string): SupportedToken {
   const match = path.match(TOKEN_FROM_PATH_REGEXP);
-  if (match) {
+  if (match && isSupportedToken(match[1])) {
     return match[1];
   }
-  return networks[0];
+  // For the time being, the "default network" (e.g. on the home page)
+  // is paprHero. We will change to paprMeme when that launches.
+  return 'paprHero';
 }
 
 export default function App({ Component, pageProps }: AppProps) {
