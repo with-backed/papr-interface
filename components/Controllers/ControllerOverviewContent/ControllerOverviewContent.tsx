@@ -8,6 +8,7 @@ import { Loans } from 'components/Controllers/Loans';
 import { TokenPerformance } from 'components/Controllers/TokenPerformance';
 import dynamic from 'next/dynamic';
 import { YourPositions } from 'components/Controllers/YourPositions';
+import { Auctions } from 'components/Controllers/Auctions';
 
 /* lightweight-charts uses canvas and cannot be SSRed */
 const Charts = dynamic(() => import('components/Controllers/Charts/Charts'), {
@@ -42,6 +43,7 @@ export function ControllerOverviewContent({
       <Activity paprController={paprController} />
       <Charts pricesData={pricesData} />
       <Loans paprController={paprController} pricesData={pricesData} />
+      <Auctions paprController={paprController} />
     </div>
   );
 }

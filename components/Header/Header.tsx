@@ -111,7 +111,6 @@ function LogoLink() {
 
 export function Header() {
   const { pathname } = useRouter();
-
   const activeRoute = useMemo(() => {
     // Handling these since they aren't network-namespaced
     if (pathname === '/404' || pathname === '/500') {
@@ -120,7 +119,7 @@ export function Header() {
     if (pathname.startsWith('/community') || pathname === '/about') {
       return pathname.substring(1);
     }
-    return pathname.split('[network]/')[1] || '';
+    return pathname.split('[token]/')[1] || '';
   }, [pathname]);
 
   return (
@@ -129,12 +128,16 @@ export function Header() {
         <div className={styles.center}>
           <LogoLink />
         </div>
-        {/* <div className={styles.center}>
-          <NavLinks activeRoute={activeRoute} />
-        </div>
-        <div className={styles['right-side']}>
-          <ConnectWallet />
-        </div> */}
+        {activeRoute !== '' && activeRoute !== 'errorPage' && (
+          <>
+            <div className={styles.center}>
+              <NavLinks activeRoute={activeRoute} />
+            </div>
+            <div className={styles['right-side']}>
+              <ConnectWallet />
+            </div>
+          </>
+        )}
       </div>
       <div className={styles['mobile-content']}>
         <div className={styles.center}>

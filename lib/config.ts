@@ -26,10 +26,11 @@ const paprTrash: Config = {
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
-  controllerAddress: '0xd2ccc7970501f2802783acd750ee350fcf758349',
+  controllerAddress: '0xeef3203c99a37682b15bd782b46a1db68948b084',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
-  paprMemeSubgraph: 'https://api.thegraph.com/subgraphs/name/adamgobes/sly-fox',
+  paprMemeSubgraph:
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.0/gn',
   oracleBaseUrl:
     process.env.NEXT_PUBLIC_ENV === 'local'
       ? 'http://localhost:3000'
