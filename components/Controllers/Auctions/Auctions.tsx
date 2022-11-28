@@ -227,7 +227,7 @@ function ActiveAuctionRow({
           : '...'}{' '}
         {symbol}
       </td>
-      <td>
+      <td className={styles.center}>
         <BuyButton
           auction={auction}
           controller={controller}
