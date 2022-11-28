@@ -275,7 +275,7 @@ function BuyButton({
   }, [address, auction, controller, maxPrice, oracleInfo, tokenContract]);
 
   return (
-    <TextButton kind="clickable" onClick={handleClick}>
+    <TextButton disabled={!address} kind="clickable" onClick={handleClick}>
       Buy
     </TextButton>
   );
