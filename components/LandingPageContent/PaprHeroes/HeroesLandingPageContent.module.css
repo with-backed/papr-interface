@@ -25,7 +25,6 @@
 
 .table th,
 .table td {
-  padding-left: 1rem;
   text-align: center;
 }
 
@@ -125,4 +124,24 @@
   
 .leaderboard {
   font-size: var(--font-large);
+}
+
+.leaderboardTable tbody tr:nth-child(2n) {
+  background-color: white !important;
+}
+
+.leaderboardTable tbody tr:last-child {
+  background-color: var(--heroes-red) !important;
+}
+
+.leaderboardTable p {
+  margin: 4px;
+}
+
+.leaderboardTable .green {
+  color: #008A69;
+}
+
+.leaderboardTable .red {
+  color: #D83200;
 }

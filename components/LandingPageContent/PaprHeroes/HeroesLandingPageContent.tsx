@@ -12,11 +12,13 @@ import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory'
 import { ethers } from 'ethers';
 import Link from 'next/link';
 import { Table } from 'components/Table';
+import { getAddress } from 'ethers/lib/utils';
+import { HeroPlayerBalance } from 'lib/paprHeroes';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
   oracleInfo: { [key: string]: ReservoirResponseData };
-  rankedPlayers: string[][];
+  rankedPlayers: [string, HeroPlayerBalance][];
 };
 
 export function HeroesLandingPageContent({
@@ -25,6 +27,15 @@ export function HeroesLandingPageContent({
   rankedPlayers,
 }: HeroesLandingPageContentProps) {
   const { address } = useAccount();
+
+  const connectedRankedPlayer = useMemo(() => {
+    if (!address) {
+      return null;
+    }
+    return rankedPlayers.find(
+      ([p, _balance]) => getAddress(p) === getAddress(address),
+    );
+  }, [address, rankedPlayers]);
 
   return (
     <div className={styles.wrapper}>
@@ -58,27 +69,70 @@ export function HeroesLandingPageContent({
 
         <Fieldset legend="leaderboard">
           <div className={styles.leaderboard}>
-            {rankedPlayers.map((p, i) => (
-              <LeaderboardEntry
-                address={p[0]}
-                worth={p[1]}
-                position={i + 1}
-                key={p[0]}
-              />
-            ))}
-            <div className={styles.userWalletValue}>
-              <p>
-                Your wallet value...............$
-                {rankedPlayers.find((p) => p[0] === address)?.[1]} phUSDC
-              </p>
-            </div>
+            <Table className={`${styles.table} ${styles.leaderboardTable}`}>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>
+                    <p>
+                      NFT
+                      <br />
+                      value
+                    </p>
+                  </th>
+                  <th>
+                    <p>phUSDC</p>
+                  </th>
+                  <th>
+                    <p>
+                      paprHERO (net)
+                      <br />
+                      (in phUSDC)
+                    </p>
+                  </th>
+                  <th>
+                    <p>
+                      Total
+                      <br />
+                      (phUSDC)
+                    </p>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rankedPlayers.map(([player, balance], i) => (
+                  <LeaderboardEntry
+                    key={player}
+                    address={player}
+                    heroPlayerBalance={balance}
+                    position={i + 1}
+                  />
+                ))}
+                {!!connectedRankedPlayer && (
+                  <>
+                    <tr></tr>
+                    <LeaderboardEntry
+                      key={address}
+                      address={'You'}
+                      heroPlayerBalance={connectedRankedPlayer[1]}
+                      position={
+                        rankedPlayers.findIndex(
+                          ([p, _balance]) =>
+                            getAddress(p) === getAddress(address!),
+                        ) + 1
+                      }
+                    />
+                  </>
+                )}
+              </tbody>
+            </Table>
           </div>
         </Fieldset>
         <PHUSDC />
         {collateral.map((c) => (
           <AllowedCollateral
             contractAddress={c}
-            floorPrice={oracleInfo[c].price}
+            floorPrice={oracleInfo[getAddress(c)].price}
             key={c}
           />
         ))}
@@ -179,6 +233,7 @@ function PHUSDC() {
               <th className={styles.interestEarned}>
                 <p>Interest earned</p>
               </th>
+              <th className={styles.interestEarned}></th>
             </tr>
           </thead>
           <tbody>
@@ -301,15 +356,40 @@ function AllowedCollateral({
 }
 
 type LeaderboardEntryProps = {
-  address: string;
-  worth: string;
+  address: string | 'You';
   position: number;
+  heroPlayerBalance: HeroPlayerBalance;
 };
 
-function LeaderboardEntry({ address, worth, position }: LeaderboardEntryProps) {
+function LeaderboardEntry({
+  address,
+  position,
+  heroPlayerBalance: {
+    totalNFTWorth,
+    totalPhUSDCBalance,
+    netPapr,
+    totalBalance,
+  },
+}: LeaderboardEntryProps) {
   return (
-    <p>
-      {position}. {address.substring(0, 10)}....................${worth} phUSDC
-    </p>
+    <tr>
+      <td>
+        <p>
+          {position}. {address.substring(0, 7)} {address !== 'You' ? '...' : ''}
+        </p>
+      </td>
+      <td className={styles.green}>
+        <p>{totalNFTWorth.toFixed(2)}</p>
+      </td>
+      <td className={styles.green}>
+        <p>{totalPhUSDCBalance.toFixed(2)}</p>
+      </td>
+      <td className={`${netPapr > 0 ? 'green' : 'red'}`}>
+        <p>{netPapr.toFixed(2)}</p>
+      </td>
+      <td>
+        <p>{totalBalance.toFixed(2)}</p>
+      </td>
+    </tr>
   );
 }

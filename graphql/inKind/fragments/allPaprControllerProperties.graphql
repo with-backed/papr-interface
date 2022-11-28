@@ -3,6 +3,7 @@ fragment allPaprControllerProperties on PaprController {
   createdAt
   poolAddress
   underlying
+  paprToken
   target
   allowedCollateral(where: { allowed: true }) {
     id
