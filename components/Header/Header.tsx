@@ -140,8 +140,8 @@ export function Header() {
   }, [pathname]);
 
   if (
-    (activeRoute === '' || activeRoute === 'errorPage') &&
-    !SHOW_HEADER_ON_LANDING_PAGE
+    (activeRoute === '' && !SHOW_HEADER_ON_LANDING_PAGE) ||
+    activeRoute === 'errorPage'
   ) {
     return (
       <nav className={styles['logo-only-nav']}>
