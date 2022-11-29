@@ -93,8 +93,6 @@ export function Activity({ paprController, vaultIds }: ActivityProps) {
     return <Fieldset legend="🐝 Activity">No activity yet</Fieldset>;
   }
 
-  console.log({ allEvents });
-
   return (
     <Fieldset legend="🐝 Activity">
       <Table>

@@ -99,6 +99,8 @@ describe('Activity', () => {
         removeCollateralEvents: [],
         debtDecreasedEvents: [],
         debtIncreasedEvents: [],
+        auctionEndEvents: [],
+        auctionStartEvents: [],
       },
     });
     const { container } = render(
@@ -122,6 +124,8 @@ describe('Activity', () => {
         removeCollateralEvents: [],
         debtDecreasedEvents: [],
         debtIncreasedEvents: [],
+        auctionEndEvents: [],
+        auctionStartEvents: [],
       },
     });
     const { container, getByText } = render(
