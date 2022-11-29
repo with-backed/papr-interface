@@ -8,6 +8,8 @@ import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 import styles from './Header.module.css';
 import paprLogo from 'public/logos/papr-logo.png';
+import { useTheme } from 'hooks/useTheme';
+import Head from 'next/head';
 
 type Page = {
   name: string;
@@ -139,6 +141,7 @@ const SHOW_HEADER_ON_LANDING_PAGE =
   process.env.NEXT_PUBLIC_LANDING_PAGE_HEADER === 'true';
 
 export function Header() {
+  const theme = useTheme();
   const { pathname } = useRouter();
 
   const activeRoute = useMemo(() => {
@@ -166,7 +169,7 @@ export function Header() {
   const isHomepage = pathname === '/';
 
   return (
-    <nav className={styles.nav}>
+    <nav className={[styles.nav, styles[theme]].join(' ')}>
       <div className={styles['desktop-content']}>
         <LogoLink />
         <NavLinks activeRoute={activeRoute} isHomepage={isHomepage} />
@@ -177,6 +180,21 @@ export function Header() {
         <NavLinks activeRoute={activeRoute} isHomepage={isHomepage} />
         <ConnectWallet />
       </div>
+      <Head>
+        <style>
+          {theme === 'paprHero'
+            ? `
+          :root {
+            --table-zebra-stripe: var(--heroes-red);
+          }
+          `
+            : `
+          :root {
+            --table-zebra-stripe: var(--background-faded-green);
+          }
+          `}
+        </style>
+      </Head>
     </nav>
   );
 }

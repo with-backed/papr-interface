@@ -35,5 +35,5 @@
 }
 
 .table tbody tr:nth-child(odd) {
-  background-color: var(--background-faded-green);
+  background-color: var(--table-zebra-stripe);
 }

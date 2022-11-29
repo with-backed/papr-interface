@@ -1,6 +1,17 @@
+.paprMeme {
+  background: url('/graph-square.png'), var(--background-blue-paper);
+}
+
+.paprHero {
+  background: url('/graph-square.png'), var(--background-orange-paper);
+}
+
+.paprTrash {
+  background: url('/graph-square.png'), var(--background-green-paper);
+}
+
 .nav {
   width: 100%;
-  background: url('/graph-square.png'), var(--background-blue-paper);
   padding: 20px 0;
   height: 151px;
 }
