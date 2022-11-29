@@ -14,9 +14,8 @@ import Link from 'next/link';
 import { Table } from 'components/Table';
 import { getAddress } from 'ethers/lib/utils';
 import { HeroPlayerBalance } from 'lib/paprHeroes';
-import { addressToENS, resolveEns } from 'lib/account';
+import { addressToENS } from 'lib/account';
 import { useConfig } from 'hooks/useConfig';
-import { add } from 'lodash';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
