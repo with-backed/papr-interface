@@ -26,12 +26,12 @@ type ActivityProps = {
   paprController: PaprController;
   // If scoping activity view to just a specific vault
   // instead of the whole controller
-  vaultId?: string;
+  vaultIds?: Set<string>;
 };
 
 const EVENT_INCREMENT = 5;
 
-export function Activity({ paprController, vaultId }: ActivityProps) {
+export function Activity({ paprController, vaultIds }: ActivityProps) {
   const { data: swapsData, fetching: swapsFetching } = useUniswapSwapsByPool(
     paprController.poolAddress,
   );
@@ -40,19 +40,19 @@ export function Activity({ paprController, vaultId }: ActivityProps) {
     useActivityByController(paprController.id);
 
   const allEvents = useMemo(() => {
-    const unsortedEvents = vaultId
+    const unsortedEvents = vaultIds
       ? [
-          ...(activityData?.addCollateralEvents.filter(
-            (e) => e.vault.id === vaultId,
+          ...(activityData?.addCollateralEvents.filter((e) =>
+            vaultIds.has(e.vault.id),
           ) || []),
-          ...(activityData?.removeCollateralEvents.filter(
-            (e) => e.vault.id === vaultId,
+          ...(activityData?.removeCollateralEvents.filter((e) =>
+            vaultIds.has(e.vault.id),
           ) || []),
-          ...(activityData?.auctionStartEvents.filter(
-            (e) => e.auction.vault.id === vaultId,
+          ...(activityData?.auctionStartEvents.filter((e) =>
+            vaultIds.has(e.auction.vault.id),
           ) || []),
-          ...(activityData?.auctionEndEvents.filter(
-            (e) => e.auction.vault.id === vaultId,
+          ...(activityData?.auctionEndEvents.filter((e) =>
+            vaultIds.has(e.auction.vault.id),
           ) || []),
         ]
       : [
@@ -67,7 +67,7 @@ export function Activity({ paprController, vaultId }: ActivityProps) {
           ) || []),
         ];
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
-  }, [activityData, paprController.id, swapsData, vaultId]);
+  }, [activityData, paprController.id, swapsData, vaultIds]);
 
   const [feed, setFeed] = useState<typeof allEvents>([]);
   const [remaining, setRemaining] = useState<typeof allEvents>([]);

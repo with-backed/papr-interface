@@ -22,7 +22,7 @@ export function VaultPageContent({
     <div className={controllerStyles.wrapper}>
       <LoanDetails vaultId={vaultId} paprController={paprController} />
       <Collateral paprController={paprController} vaultId={vaultId} />
-      <Activity paprController={paprController} vaultId={vaultId} />
+      <Activity paprController={paprController} vaultIds={vaultId} />
       <TokenPerformance
         pricesData={{ [paprController.id]: pricesData }}
         controllers={[paprController]}
