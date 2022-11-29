@@ -29,7 +29,7 @@ type HeroesLandingPageContentProps = {
 };
 
 const longestString = (arr: string[]) => {
-  return arr.reduce((a, b) => (a.length > b.length ? a : b));
+  return arr.reduce((a, b) => (a.length > b.length ? a : b), '');
 };
 
 export function HeroesLandingPageContent({
@@ -553,13 +553,16 @@ function Claim() {
 
     const t = await connectedClaimsContract.claim(
       {
-        blitCount,
-        dinoCount,
-        moonBirdCount,
-        toadzCount,
-        phUSDCAmount,
+        account: address!,
+        claim: {
+          blitCount,
+          dinoCount,
+          moonBirdCount,
+          toadzCount,
+          phUSDCAmount: ethers.utils.parseUnits(phUSDCAmount.toString(), 6),
+        },
       },
-      claimOutputForAccount.map((val) => ethers.utils.arrayify(val)),
+      claimOutputForAccount,
       {
         gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
       },
