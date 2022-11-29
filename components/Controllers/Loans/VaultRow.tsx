@@ -72,10 +72,14 @@ export function VaultRow({
         </td>
       )}
       <td className={styles['right-align']}>
-        {ltv ? formatPercent(ltv) : '...'}
+        {ltv !== undefined ? formatPercent(ltv) : '...'}
       </td>
       <td className={styles['center-align']}>
-        {!!ltv && !!maxLTV ? <VaultHealth ltv={ltv} maxLtv={maxLTV} /> : '...'}
+        {ltv !== undefined && !!maxLTV ? (
+          <VaultHealth ltv={ltv} maxLtv={maxLTV} />
+        ) : (
+          '...'
+        )}
       </td>
     </tr>
   );
