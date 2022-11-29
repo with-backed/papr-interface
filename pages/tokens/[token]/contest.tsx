@@ -6,9 +6,9 @@ import { OpenGraph } from 'components/OpenGraph';
 import { HeroesLandingPageContent } from 'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent';
 import { getOracleInfoFromAllowedCollateral } from 'lib/controllers';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
-import { calculateNetPhUSDCBalance } from 'lib/paprHeroes';
-import { ethers } from 'ethers';
+import { calculateNetPhUSDCBalance, HeroPlayerBalance } from 'lib/paprHeroes';
 import { fetchSubgraphData } from 'lib/PaprController';
+import { getAllPaprHeroPlayers } from 'lib/pAPRSubgraph';
 
 export const getServerSideProps: GetServerSideProps<
   HeroesLandingPageProps
@@ -32,27 +32,33 @@ export const getServerSideProps: GetServerSideProps<
     const allowedCollateral = paprController.allowedCollateral.map(
       (ac: any) => ac.contractAddress,
     );
+    const underlying = paprController.underlying;
+    const paprToken = paprController.paprToken;
 
     const oracleInfo = await getOracleInfoFromAllowedCollateral(
       allowedCollateral,
       token,
     );
 
-    // TODO(adamgobes): figure out a way to get all participating players, probably from subgraph
-    const participatingPlayers = ['0xE89CB2053A04Daf86ABaa1f4bC6D50744e57d39E'];
+    const participatingPlayers = Array.from(
+      new Set(await getAllPaprHeroPlayers()),
+    );
 
-    const playerScores = await Promise.all(
+    const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
       participatingPlayers.map(async (p) => [
         p,
-        ethers.utils.formatUnits(
-          await calculateNetPhUSDCBalance(p, allowedCollateral, oracleInfo),
-          6,
+        await calculateNetPhUSDCBalance(
+          p,
+          allowedCollateral,
+          oracleInfo,
+          underlying,
+          paprToken,
         ),
       ]),
     );
 
     const rankedPlayers = playerScores.sort(
-      (a, b) => parseInt(b[1]) - parseInt(a[1]),
+      (a, b) => b[1].totalBalance - a[1].totalBalance,
     );
 
     return {
@@ -75,7 +81,7 @@ type HeroesLandingPageProps = {
   token: SupportedToken;
   allowedCollateral: string[];
   oracleInfo: { [key: string]: ReservoirResponseData };
-  rankedPlayers: string[][];
+  rankedPlayers: [string, HeroPlayerBalance][];
 };
 export default function HeroesLandingPage({
   token,

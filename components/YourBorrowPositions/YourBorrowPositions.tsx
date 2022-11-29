@@ -154,37 +154,39 @@ export function YourBorrowPositions({
           </>
         )}
       </div>
-      <Table className={styles.vaultTable}>
-        <thead>
-          <tr>
-            <th>
-              <p>COLLECTION</p>
-            </th>
-            <th>
-              <p>NFTS</p>
-            </th>
-            <th>
-              <p>BORROWED</p>
-            </th>
-            <th>
-              <p>CLOSING COST</p>
-            </th>
-            <th>
-              <p>HEALTH</p>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentVaults?.map((vault) => (
-            <VaultOverview
-              vaultInfo={vault}
-              oracleInfo={oracleInfo}
-              paprController={paprController}
-              key={vault.id}
-            />
-          ))}
-        </tbody>
-      </Table>
+      {currentVaults && (
+        <Table className={styles.vaultTable}>
+          <thead>
+            <tr>
+              <th>
+                <p>COLLECTION</p>
+              </th>
+              <th>
+                <p>NFTS</p>
+              </th>
+              <th>
+                <p>BORROWED</p>
+              </th>
+              <th>
+                <p>CLOSING COST</p>
+              </th>
+              <th>
+                <p>HEALTH</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentVaults.map((vault) => (
+              <VaultOverview
+                vaultInfo={vault}
+                oracleInfo={oracleInfo}
+                paprController={paprController}
+                key={vault.id}
+              />
+            ))}
+          </tbody>
+        </Table>
+      )}
     </Fieldset>
   );
 }

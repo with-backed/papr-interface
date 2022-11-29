@@ -52,7 +52,7 @@ const paprHero: Config = {
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
-  controllerAddress: '0xF478340769a200f20fEa385dEEA6D42550DD8986',
+  controllerAddress: '0xe8e55cddb2cdc3803d66fda1a409c7dd0933fca5',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph:
