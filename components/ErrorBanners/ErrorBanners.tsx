@@ -16,10 +16,11 @@ export function ErrorBanners() {
     [pathname],
   );
   const isAboutPage = useMemo(() => pathname === '/about', [pathname]);
+  const isHomePage = useMemo(() => pathname === '/', [pathname]);
 
   return (
     <div className={styles.banners}>
-      {!isErrorPage && !isAboutPage && (
+      {!isErrorPage && !isAboutPage && !isHomePage && (
         <WrongNetwork
           expectedChainId={chainId}
           expectedChainName={network as SupportedNetwork}
