@@ -57,8 +57,6 @@ export function VaultRow({
     return formatTokenAmount(debtNum) + ` ${symbol}`;
   }, [debt, decimals, symbol]);
 
-  console.log({ ltv, maxLTV });
-
   return (
     <tr>
       <td>
