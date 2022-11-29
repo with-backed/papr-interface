@@ -90,7 +90,8 @@
 }
 
 .logo {
-  height: 48px;
+  position: relative;
+  max-width: 120px;
 }
 
 @media screen and (max-width: 750px) {
