@@ -20,6 +20,7 @@ import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ERC20, ERC721__factory } from 'types/generated/abis';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useTheme } from 'hooks/useTheme';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
 
@@ -88,12 +89,13 @@ export function BorrowPerpetualButton({
   );
 
   const { data, write } = useMulticallWrite(paprController, calldata);
+  const { buttonTheme } = useTheme();
 
   return (
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme={buttonTheme}
       onClick={write!}
       transactionData={data}
       text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
@@ -150,12 +152,13 @@ export function RepayPerpetualButton({
   );
 
   const { data, write } = useMulticallWrite(paprController, calldata);
+  const { buttonTheme } = useTheme();
 
   return (
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme={buttonTheme}
       onClick={write!}
       transactionData={data}
       text="Update Loan"
@@ -236,12 +239,13 @@ export function RepayWithSwapButton({
   );
 
   const { data, write } = useMulticallWrite(paprController, calldata);
+  const { buttonTheme } = useTheme();
 
   return (
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme={buttonTheme}
       onClick={write!}
       transactionData={data}
       text="Update Loan"
@@ -311,12 +315,13 @@ export function BorrowWithSwapButton({
   );
 
   const { data, write } = useMulticallWrite(paprController, calldata);
+  const { buttonTheme } = useTheme();
 
   return (
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme={buttonTheme}
       onClick={write!}
       transactionData={data}
       text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
@@ -375,6 +380,7 @@ export function ApproveTokenButton({
       data.wait().then(() => setTokenApproved(true));
     },
   });
+  const { buttonTheme } = useTheme();
 
   if (tokenApproved || approvedLoading || !symbol) return <></>;
 
@@ -382,7 +388,7 @@ export function ApproveTokenButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme={buttonTheme}
       onClick={write!}
       transactionData={data}
       text={`Approve ${symbol}`}
@@ -443,6 +449,7 @@ export function ApproveNFTButton({
       data.wait().then(() => setApproved(true));
     },
   });
+  const { buttonTheme } = useTheme();
 
   if (alreadyApproved) {
     return (
@@ -460,7 +467,7 @@ export function ApproveNFTButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme={buttonTheme}
       onClick={write!}
       transactionData={data}
       disabled={approvedLoading}

@@ -1,8 +1,5 @@
 import { ConnectWallet } from 'components/ConnectWallet';
-import { PaprMEME } from 'components/Icons/PaprMEME';
-import { Logo } from 'components/Logo';
 import { useConfig } from 'hooks/useConfig';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -141,7 +138,7 @@ const SHOW_HEADER_ON_LANDING_PAGE =
   process.env.NEXT_PUBLIC_LANDING_PAGE_HEADER === 'true';
 
 export function Header() {
-  const theme = useTheme();
+  const { mainTheme } = useTheme();
   const { pathname } = useRouter();
 
   const activeRoute = useMemo(() => {
@@ -169,7 +166,7 @@ export function Header() {
   const isHomepage = pathname === '/';
 
   return (
-    <nav className={[styles.nav, styles[theme]].join(' ')}>
+    <nav className={[styles.nav, styles[mainTheme]].join(' ')}>
       <div className={styles['desktop-content']}>
         <LogoLink />
         <NavLinks activeRoute={activeRoute} isHomepage={isHomepage} />
@@ -182,7 +179,7 @@ export function Header() {
       </div>
       <Head>
         <style>
-          {theme === 'paprHero'
+          {mainTheme === 'paprHero'
             ? `
           :root {
             --table-zebra-stripe: var(--heroes-red);

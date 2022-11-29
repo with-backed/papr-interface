@@ -22,7 +22,10 @@ describe('useTheme', () => {
     } as any);
     const { result } = renderHook(() => useTheme());
 
-    expect(result.current).toEqual('paprTrash');
+    expect(result.current).toEqual({
+      mainTheme: 'paprTrash',
+      buttonTheme: 'papr',
+    });
   });
 
   it('returns the default (paprMeme) on the homepage', () => {
@@ -31,6 +34,9 @@ describe('useTheme', () => {
     } as any);
     const { result } = renderHook(() => useTheme());
 
-    expect(result.current).toEqual('paprMeme');
+    expect(result.current).toEqual({
+      mainTheme: 'paprMeme',
+      buttonTheme: 'meme',
+    });
   });
 });
