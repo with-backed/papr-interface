@@ -166,14 +166,8 @@ function CollateralAdded({
 }) {
   const vaultOwner = useMemo(() => {
     const vaultId = event.vault.id;
-    const vault = paprController.vaults?.find((v) => v.id === vaultId);
-
-    if (!vault) {
-      return 'Unknown';
-    }
-
-    return vault.id;
-  }, [event, paprController]);
+    return vaultId.split('-')[1];
+  }, [event]);
 
   const debtIncreasedEvent = useMemo(() => {
     return debtIncreasedEvents.find((e) => e.id === event.id);
@@ -224,14 +218,8 @@ function CollateralRemoved({
 }) {
   const vaultOwner = useMemo(() => {
     const vaultId = event.vault.id;
-    const vault = paprController.vaults?.find((v) => v.id === vaultId);
-
-    if (!vault) {
-      return 'Unknown';
-    }
-
-    return vault.id;
-  }, [event, paprController]);
+    return vaultId.split('-')[1];
+  }, [event]);
 
   const debtDecreasedEvent = useMemo(() => {
     return debtDecreasedEvents.find((e) => e.id === event.id);
