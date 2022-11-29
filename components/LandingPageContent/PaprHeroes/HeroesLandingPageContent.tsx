@@ -80,7 +80,7 @@ export function HeroesLandingPageContent({
       <div className={styles.fieldsetsWrapper}>
         <Fieldset legend="🧮 join the game">
           <p>
-            Papr Hero is a PVP competition where players compete to see who can
+            Papr Hero is a PvP competition where players compete to see who can
             end up with the most <i>phUSDC</i>. Every player starts with a fixed
             amount of <i>phUSDC</i> and eligible NFTs. Players can perform one
             or more of the following actions to increase their <i>phUSDC</i>{' '}
@@ -99,9 +99,9 @@ export function HeroesLandingPageContent({
                 Buy NFTs with their <i>phUSDC</i>
               </li>
             </ol>
-            At the end of the competition, a users final <i>phUSDC</i> score is
-            the sum of their <i>phUSDC</i> balance as well as the value of their
-            NFTs (as calculated by the floor price of the collection)
+            At the end of the competition, a user&apos;s final <i>phUSDC</i>{' '}
+            score is the sum of their <i>phUSDC</i> balance as well as the value
+            of their NFTs (as calculated by the floor price of the collection)
           </p>
         </Fieldset>
 
