@@ -112,6 +112,7 @@ function ActiveAuctions({
             <th className={styles.right}>Current</th>
             <th className={styles.right}>△1hr</th>
             <th className={styles.right}>Floor</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -226,6 +227,14 @@ function ActiveAuctionRow({
           : '...'}{' '}
         {symbol}
       </td>
+      <td className={styles.center}>
+        <BuyButton
+          auction={auction}
+          controller={controller}
+          maxPrice={priceBigNum}
+          tokenContract={tokenContract}
+        />
+      </td>
     </tr>
   );
 }
@@ -266,7 +275,7 @@ function BuyButton({
   }, [address, auction, controller, maxPrice, oracleInfo, tokenContract]);
 
   return (
-    <TextButton kind="clickable" onClick={handleClick}>
+    <TextButton disabled={!address} kind="clickable" onClick={handleClick}>
       Buy
     </TextButton>
   );
