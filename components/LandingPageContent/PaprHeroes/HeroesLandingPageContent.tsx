@@ -557,9 +557,9 @@ function Claim() {
         dinoCount,
         moonBirdCount,
         toadzCount,
-        phUSDCAmount: ethers.utils.parseUnits(phUSDCAmount.toString(), 6),
+        phUSDCAmount,
       },
-      claimOutputForAccount,
+      claimOutputForAccount.map((val) => ethers.utils.arrayify(val)),
       {
         gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
       },
