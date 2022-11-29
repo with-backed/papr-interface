@@ -4,7 +4,7 @@ import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import styles from './HeroesLandingPageContent.module.css';
 import { ERC721__factory } from 'types/generated/abis';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { CenterAsset } from 'components/CenterAsset';
@@ -14,11 +14,18 @@ import Link from 'next/link';
 import { Table } from 'components/Table';
 import { getAddress } from 'ethers/lib/utils';
 import { HeroPlayerBalance } from 'lib/paprHeroes';
+import { addressToENS, resolveEns } from 'lib/account';
+import { useConfig } from 'hooks/useConfig';
+import { add } from 'lodash';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
   oracleInfo: { [key: string]: ReservoirResponseData };
   rankedPlayers: [string, HeroPlayerBalance][];
+};
+
+const longestString = (arr: string[]) => {
+  return arr.reduce((a, b) => (a.length > b.length ? a : b));
 };
 
 export function HeroesLandingPageContent({
@@ -36,6 +43,38 @@ export function HeroesLandingPageContent({
       ([p, _balance]) => getAddress(p) === getAddress(address),
     );
   }, [address, rankedPlayers]);
+
+  const longestNFTValue = useMemo(() => {
+    return longestString(
+      rankedPlayers.map(([_player, balance]) =>
+        balance.totalNFTWorth.toFixed(2).toString(),
+      ),
+    );
+  }, [rankedPlayers]);
+
+  const longestPhUSDCBalance = useMemo(() => {
+    return longestString(
+      rankedPlayers.map(([_player, balance]) =>
+        balance.totalPhUSDCBalance.toFixed(2).toString(),
+      ),
+    );
+  }, [rankedPlayers]);
+
+  const longestTotalBalance = useMemo(() => {
+    return longestString(
+      rankedPlayers.map(([_player, balance]) =>
+        balance.totalBalance.toFixed(2).toString(),
+      ),
+    );
+  }, [rankedPlayers]);
+
+  const longestNetPapr = useMemo(() => {
+    return longestString(
+      rankedPlayers.map(([_player, balance]) =>
+        balance.netPapr.toFixed(2).toString(),
+      ),
+    );
+  }, [rankedPlayers]);
 
   return (
     <div className={styles.wrapper}>
@@ -106,6 +145,12 @@ export function HeroesLandingPageContent({
                     address={player}
                     heroPlayerBalance={balance}
                     position={i + 1}
+                    longestBalanceStrings={{
+                      totalBalance: longestTotalBalance,
+                      totalNFTWorth: longestNFTValue,
+                      totalPhUSDCBalance: longestPhUSDCBalance,
+                      netPapr: longestNetPapr,
+                    }}
                   />
                 ))}
                 {!!connectedRankedPlayer && (
@@ -121,6 +166,12 @@ export function HeroesLandingPageContent({
                             getAddress(p) === getAddress(address!),
                         ) + 1
                       }
+                      longestBalanceStrings={{
+                        totalBalance: longestTotalBalance,
+                        totalNFTWorth: longestNFTValue,
+                        totalPhUSDCBalance: longestPhUSDCBalance,
+                        netPapr: longestNetPapr,
+                      }}
                     />
                   </>
                 )}
@@ -359,36 +410,86 @@ type LeaderboardEntryProps = {
   address: string | 'You';
   position: number;
   heroPlayerBalance: HeroPlayerBalance;
+  longestBalanceStrings: {
+    totalNFTWorth: string;
+    totalPhUSDCBalance: string;
+    netPapr: string;
+    totalBalance: string;
+  };
 };
+
+function shortenAddress(address: string) {
+  if (address.length < 9) {
+    return address;
+  } else {
+    return address.substring(0, 8);
+  }
+}
 
 function LeaderboardEntry({
   address,
   position,
-  heroPlayerBalance: {
-    totalNFTWorth,
-    totalPhUSDCBalance,
-    netPapr,
-    totalBalance,
-  },
+  heroPlayerBalance,
+  longestBalanceStrings,
 }: LeaderboardEntryProps) {
+  const { jsonRpcProvider } = useConfig();
+  const ensOrAddress = useAsyncValue(async () => {
+    if (address === 'You') return address;
+
+    const ens = await addressToENS(address, jsonRpcProvider);
+    if (!ens) return shortenAddress(address);
+    else return shortenAddress(ens);
+  }, [address, jsonRpcProvider]);
+
+  const whiteSpaceForColumn = useCallback(
+    (
+      k: 'totalBalance' | 'totalPhUSDCBalance' | 'totalNFTWorth' | 'netPapr',
+    ) => {
+      if (
+        heroPlayerBalance[k].toFixed(2).toString().length >=
+        longestBalanceStrings[k].length
+      ) {
+        return '';
+      }
+      return ' '.repeat(
+        longestBalanceStrings[k].length -
+          heroPlayerBalance[k].toFixed(2).toString().length,
+      );
+    },
+    [heroPlayerBalance, longestBalanceStrings],
+  );
+
   return (
     <tr>
       <td>
         <p>
-          {position}. {address.substring(0, 7)} {address !== 'You' ? '...' : ''}
+          {position}. <span>{ensOrAddress}</span>
+          {address !== 'You' ? <span>...</span> : ''}
         </p>
       </td>
       <td className={styles.green}>
-        <p>{totalNFTWorth.toFixed(2)}</p>
+        <p>
+          {whiteSpaceForColumn('totalNFTWorth')}
+          {heroPlayerBalance.totalNFTWorth.toFixed(2)}
+        </p>
       </td>
       <td className={styles.green}>
-        <p>{totalPhUSDCBalance.toFixed(2)}</p>
+        <p>
+          {whiteSpaceForColumn('totalPhUSDCBalance')}
+          {heroPlayerBalance.totalPhUSDCBalance.toFixed(2)}
+        </p>
       </td>
-      <td className={`${netPapr > 0 ? 'green' : 'red'}`}>
-        <p>{netPapr.toFixed(2)}</p>
+      <td className={`${heroPlayerBalance.netPapr > 0 ? 'green' : 'red'}`}>
+        <p>
+          {whiteSpaceForColumn('netPapr')}
+          {heroPlayerBalance.netPapr.toFixed(2)}
+        </p>
       </td>
       <td>
-        <p>{totalBalance.toFixed(2)}</p>
+        <p>
+          {whiteSpaceForColumn('totalBalance')}
+          {heroPlayerBalance.totalBalance.toFixed(2)}
+        </p>
       </td>
     </tr>
   );

@@ -46,14 +46,14 @@ export async function calculateNetPhUSDCBalance(
     )
   ).reduce((a, b) => b.add(a));
 
-  const totalPhUSDCBalance = await connectedPhUSDC.balanceOf(address);
-
-  const totalPaprBalance = await connectedPapr.balanceOf(address);
-
-  const userVaults = await getAllVaultsForControllerForUser(
-    configs.paprHero.controllerAddress,
-    address,
-  );
+  const [totalPhUSDCBalance, totalPaprBalance, userVaults] = await Promise.all([
+    connectedPhUSDC.balanceOf(address),
+    connectedPapr.balanceOf(address),
+    getAllVaultsForControllerForUser(
+      configs.paprHero.controllerAddress,
+      address,
+    ),
+  ]);
 
   const totalPaprDebt = userVaults
     .map((v) => ethers.BigNumber.from(v.debt))

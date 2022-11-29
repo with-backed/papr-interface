@@ -47,7 +47,7 @@ export function BorrowPageContent({
       getAddress(nft.address),
     );
 
-    if (!currentVaults) return userCollectionCollateral;
+    if (!currentVaults) return Array.from(new Set(userCollectionCollateral));
 
     const userAndVaultCollateral = currentVaults
       .map((v) => getAddress(v.collateralContract))
