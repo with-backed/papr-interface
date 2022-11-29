@@ -305,15 +305,17 @@ export function VaultDebtPicker({
     if (isBorrowing) return '';
     if (usingPerpetual)
       return debtTokenBalance.lt(debtToBorrowOrRepay)
-        ? 'Insufficient paprTrash balance'
+        ? `Insufficient ${paprController.debtToken.symbol} balance`
         : '';
     if (!usingPerpetual && !!underlyingRepayQuote)
       return underlyingBalance.lt(underlyingRepayQuote[0])
-        ? 'Insufficient USDC balance'
+        ? `Insufficient ${paprController.underlying.symbol} balance`
         : '';
 
     return '';
   }, [
+    paprController.debtToken.symbol,
+    paprController.underlying.symbol,
     underlyingBalance,
     debtTokenBalance,
     isBorrowing,
@@ -725,7 +727,9 @@ function LoanActionSummary({
       <div className={styles.loanActionSummary}>
         <div>
           <div>
-            <p>{isBorrowing ? 'Borrow' : 'Repay'} paprTRASH</p>
+            <p>
+              {isBorrowing ? 'Borrow' : 'Repay'} {controller.debtToken.symbol}
+            </p>
           </div>
           <div>
             <p>
@@ -764,7 +768,9 @@ function LoanActionSummary({
           <div>
             <p>
               {isBorrowing ? 'Receive' : 'Pay'}{' '}
-              {usingPerpetual ? 'paprTrash' : 'USDC'}
+              {usingPerpetual
+                ? controller.debtToken.symbol
+                : controller.underlying.symbol}
             </p>
           </div>
           <div>
