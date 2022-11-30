@@ -5,6 +5,7 @@ import {
   NftsForAccountAndCollectionDocument,
   NftsForAccountAndCollectionQuery,
 } from 'types/generated/graphql/erc721';
+import { useQuery } from 'urql';
 
 export type AccountNFTsResponse = {
   address: string;
@@ -16,45 +17,31 @@ export const useAccountNFTs = (
   collections: string[] | undefined,
   config: Config,
 ) => {
-  const [userCollectionNFTs, setUserCollectionNFTs] = useState<
-    AccountNFTsResponse[]
-  >([]);
-  const [nftsLoading, setNFTsLoading] = useState<boolean>(true);
-
-  const client = useMemo(() => {
-    return clientFromUrl(config.erc721Subgraph);
-  }, [config.erc721Subgraph]);
-
-  useEffect(() => {
-    const fetch = async () => {
-      const { data, error } = await client
-        .query<NftsForAccountAndCollectionQuery>(
-          NftsForAccountAndCollectionDocument,
-          {
-            owner: address?.toLowerCase(),
-            collections: collections?.map((c) => c.toLowerCase()),
-          },
-        )
-        .toPromise();
-
-      if (error) {
-        console.error(error);
-        return [];
-      }
-
-      return data?.tokens || [];
-    };
-
-    fetch().then((tokens) => {
-      setUserCollectionNFTs(
-        tokens.map((token) => ({
-          address: token.registry.id,
-          tokenId: token.identifier,
-        })),
-      );
-      setNFTsLoading(false);
+  const [{ data, fetching: nftsLoading }] =
+    useQuery<NftsForAccountAndCollectionQuery>({
+      query: NftsForAccountAndCollectionDocument,
+      variables: {
+        owner: address?.toLowerCase(),
+        collections: collections?.map((c) => c.toLowerCase()),
+      },
+      context: useMemo(
+        () => ({
+          url: config.erc721Subgraph,
+        }),
+        [config],
+      ),
     });
-  }, [address, collections, client]);
 
-  return { userCollectionNFTs, nftsLoading };
+  const userCollectionNFTs = useMemo(() => {
+    if (!data?.tokens) return [];
+    return data?.tokens.map((token) => ({
+      address: token.registry.id,
+      tokenId: token.identifier,
+    }));
+  }, [data]);
+
+  return {
+    userCollectionNFTs,
+    nftsLoading,
+  };
 };
