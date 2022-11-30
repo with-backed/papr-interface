@@ -22,6 +22,7 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
   const controllerSubgraphData = await fetchSubgraphData(
     address,
     configs[token].uniswapSubgraph,
+    token,
   );
 
   if (!controllerSubgraphData) {

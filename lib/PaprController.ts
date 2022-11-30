@@ -15,7 +15,7 @@ import {
 } from 'types/generated/abis/PaprController';
 import { PaprControllerByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
-import { Config } from './config';
+import { Config, SupportedToken } from './config';
 import { ReservoirResponseData } from './oracle/reservoir';
 import { subgraphControllerByAddress } from './pAPRSubgraph';
 import { buildToken, convertOneScaledValue } from './controllers';
@@ -291,9 +291,11 @@ class PaprControllerInternal {
 export async function fetchSubgraphData(
   controllerAddress: string,
   uniswapSubgraphUrl: string,
+  token: SupportedToken,
 ) {
   const subgraphController = await subgraphControllerByAddress(
     controllerAddress,
+    token,
   );
 
   if (!subgraphController?.paprController) {
