@@ -45,29 +45,29 @@ export function TokenPerformance({
           <thead>
             <tr>
               <th>
-                Market
+                MARKET
                 <br />
-                Price
+                PRICE
               </th>
               <th>
-                Target/
+                TARGET/
                 <br />
-                Market
+                MARKET
               </th>
               <th>
-                Contract
+                CONTRACT
                 <br />
                 APR
               </th>
               <th>
-                Realized
+                REALIZED
                 <br />
                 APR (30d)
               </th>
               <th>
                 NFT/
                 <br />
-                Cap
+                CAP
               </th>
             </tr>
           </thead>
