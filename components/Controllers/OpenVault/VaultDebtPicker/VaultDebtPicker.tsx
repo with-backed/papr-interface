@@ -412,6 +412,7 @@ export function VaultDebtPicker({
                       setControlledSliderValue(currentVaultDebtNumber);
                       setIsBorrowing(!isBorrowing);
                     }}
+                    theme={theme}
                   />
                 </div>
               )}
