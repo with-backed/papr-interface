@@ -45,18 +45,20 @@ export const getServerSideProps: GetServerSideProps<
       new Set(await getAllPaprHeroPlayers(token)),
     );
 
-    const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
-      participatingPlayers.map(async (p) => [
-        p,
-        await calculateNetPhUSDCBalance(
-          p,
-          allowedCollateral,
-          oracleInfo,
-          underlying,
-          paprToken,
-        ),
-      ]),
-    );
+    // const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
+    //   participatingPlayers.map(async (p) => [
+    //     p,
+    //     await calculateNetPhUSDCBalance(
+    //       p,
+    //       allowedCollateral,
+    //       oracleInfo,
+    //       underlying,
+    //       paprToken,
+    //     ),
+    //   ]),
+    // );
+
+    const playerScores: [string, HeroPlayerBalance][] = [];
 
     const rankedPlayers = playerScores.sort(
       (a, b) => b[1].totalBalance - a[1].totalBalance,
@@ -71,6 +73,7 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   } catch (e) {
+    console.log({ e });
     captureException(e);
     return {
       notFound: true,
@@ -92,7 +95,7 @@ export default function HeroesLandingPage({
 }: HeroesLandingPageProps) {
   return (
     <>
-      <OpenGraph title={`Backed | Papr Heroes | Home`} />
+      <OpenGraph title={`paprHero | Competition`} />
       <HeroesLandingPageContent
         collateral={allowedCollateral}
         oracleInfo={oracleInfo}

@@ -46,9 +46,9 @@ const prodPages = (controllerAddress: string): Page[] => [
 
 const paprHeroPages: Page[] = [
   {
-    name: 'Contest',
-    route: `contest`,
-    matcher: 'contest',
+    name: 'Competition',
+    route: `competition`,
+    matcher: 'competition',
   },
 ];
 
