@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
 import { controllerPricesData } from 'lib/controllers/charts';
-import { configs, SupportedToken } from 'lib/config';
+import { configs, getConfig, SupportedToken } from 'lib/config';
 import {
   ControllerOverviewContent,
   ControllerPageProps,
@@ -28,7 +28,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
   const token = context.params?.token as SupportedToken;
-  const address = configs[token].controllerAddress.toLocaleLowerCase();
+  const address = getConfig(token).controllerAddress.toLocaleLowerCase();
 
   const controllerSubgraphData = await fetchSubgraphData(
     address,

@@ -91,6 +91,16 @@ const paprMeme = {
   reservoirMarketplace: '',
 };
 
+export function getConfig(configName: string) {
+  const c: { [name: string]: any } = {
+    paprtrash: paprTrash,
+    paprhero: paprHero,
+    paprmeme: paprMeme,
+  };
+  return c[configName.toLowerCase()];
+}
+
+// DEPRECATE IN FAVOR OF getConfig
 export const configs = {
   paprTrash,
   paprHero,

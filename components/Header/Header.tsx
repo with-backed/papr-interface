@@ -21,13 +21,13 @@ type Page = {
 const prodPages = (controllerAddress: string): Page[] => [
   {
     name: 'Performance',
-    route: `controllers/${controllerAddress}`,
-    matcher: 'controllers/[controller]',
+    route: ``,
+    matcher: '',
   },
   {
     name: 'Borrow',
-    route: `controllers/${controllerAddress}/borrow`,
-    matcher: 'controllers/[controller]/borrow',
+    route: `/borrow`,
+    matcher: '/borrow',
   },
   {
     name: 'Swap ↗',

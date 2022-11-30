@@ -13,15 +13,6 @@ const moduleExports = {
     domains: ['nftpawnshop.mypinata.cloud'],
   },
   optimizeFonts: false,
-  async redirects() {
-    return [
-      {
-        source: '/tokens/paprHero',
-        destination: '/tokens/paprHero/contest',
-        permanent: false,
-      },
-    ];
-  },
 };
 
 const shouldInitializeSentry = !process.env.GITHUB_ACTIONS;
