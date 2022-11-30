@@ -45,20 +45,18 @@ export const getServerSideProps: GetServerSideProps<
       new Set(await getAllPaprHeroPlayers(token)),
     );
 
-    // const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
-    //   participatingPlayers.map(async (p) => [
-    //     p,
-    //     await calculateNetPhUSDCBalance(
-    //       p,
-    //       allowedCollateral,
-    //       oracleInfo,
-    //       underlying,
-    //       paprToken,
-    //     ),
-    //   ]),
-    // );
-
-    const playerScores: [string, HeroPlayerBalance][] = [];
+    const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
+      participatingPlayers.map(async (p) => [
+        p,
+        await calculateNetPhUSDCBalance(
+          p,
+          allowedCollateral,
+          oracleInfo,
+          underlying,
+          paprToken,
+        ),
+      ]),
+    );
 
     const rankedPlayers = playerScores.sort(
       (a, b) => b[1].totalBalance - a[1].totalBalance,
@@ -73,7 +71,6 @@ export const getServerSideProps: GetServerSideProps<
       },
     };
   } catch (e) {
-    console.log({ e });
     captureException(e);
     return {
       notFound: true,
