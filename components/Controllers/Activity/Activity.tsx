@@ -325,7 +325,11 @@ function AuctionStart({
 
   return (
     <tr>
-      <td>{humanizedTimestamp(event.timestamp)}</td>
+      <td>
+        <EtherscanTransactionLink transactionHash={event.id}>
+          {humanizedTimestamp(event.timestamp)}
+        </EtherscanTransactionLink>
+      </td>
       <td>
         Auction: {symbol} #{event.auction.auctionAssetID}
       </td>
@@ -356,7 +360,11 @@ function AuctionEnd({
 
   return (
     <tr>
-      <td>{humanizedTimestamp(event.timestamp)}</td>
+      <td>
+        <EtherscanTransactionLink transactionHash={event.id}>
+          {humanizedTimestamp(event.timestamp)}
+        </EtherscanTransactionLink>
+      </td>
       <td>
         Auction completed: {symbol} #{event.auction.auctionAssetID} for{' '}
         {formattedEndPrice} papr.
