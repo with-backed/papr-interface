@@ -15,6 +15,7 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { usePaprController } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
+import { OpenGraph } from 'components/OpenGraph';
 
 type ServerSideProps = Omit<
   ControllerPageProps,
@@ -81,6 +82,7 @@ export default function ControllerPage({
 
   return (
     <OracleInfoProvider collections={collections}>
+      <OpenGraph title={`${config.tokenName} | Performance`} />
       <ControllerOverviewContent
         address={address}
         paprController={paprController}

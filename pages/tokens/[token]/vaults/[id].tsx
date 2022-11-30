@@ -1,5 +1,5 @@
 import { useConfig } from 'hooks/useConfig';
-import { configs, SupportedToken } from 'lib/config';
+import { configs, getConfig, SupportedToken } from 'lib/config';
 import {
   fetchSubgraphData,
   SubgraphPool,
@@ -11,6 +11,7 @@ import { usePaprController } from 'hooks/usePaprController';
 import { VaultPageContent } from 'components/Controllers/VaultPageContent';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { controllerPricesData } from 'lib/controllers/charts';
+import { OpenGraph } from 'components/OpenGraph';
 
 type ServerSideProps = {
   vaultId: string;
@@ -21,9 +22,9 @@ type ServerSideProps = {
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
-  const address = (context.params?.controller as string).toLowerCase();
   const token = context.params?.token as SupportedToken;
   const id = context.params?.id as string;
+  const address = getConfig(token).controllerAddress.toLocaleLowerCase();
 
   const controllerSubgraphData = await fetchSubgraphData(
     address,
@@ -70,13 +71,19 @@ export default function VaultPage({
   );
 
   return (
-    <div className={styles.column}>
-      <a href={`/tokens/${tokenName}`}>⬅ controller</a>
-      <VaultPageContent
-        paprController={paprController}
-        vaultId={vaultId}
-        pricesData={pricesData}
+    <>
+      <OpenGraph
+        title={`${tokenName} | Vault`}
+        description={`Vault ${vaultId}`}
       />
-    </div>
+      <div className={styles.column}>
+        <a href={`/tokens/${tokenName}`}>⬅ controller</a>
+        <VaultPageContent
+          paprController={paprController}
+          vaultId={vaultId}
+          pricesData={pricesData}
+        />
+      </div>
+    </>
   );
 }
