@@ -18,8 +18,8 @@ const Wrapper: FunctionComponent = ({ children }) => (
   </div>
 );
 
-const buttonKinds: ButtonKind[] = ['regular', 'outline'];
-const buttonThemes: ButtonTheme[] = ['papr', 'meme', 'hero', 'white'];
+const buttonKinds: ButtonKind[] = ['regular', 'outline', 'white'];
+const buttonThemes: ButtonTheme[] = ['papr', 'meme', 'hero', 'trash'];
 export const BigButtons = () => (
   <Wrapper>
     {buttonKinds.flatMap((kind) =>

@@ -61,7 +61,7 @@ export function VaultDebtPicker({
   const { address } = useAccount();
   const { tokenName } = useConfig();
   const signerOrProvider = useSignerOrProvider();
-  const { buttonTheme } = useTheme();
+  const theme = useTheme();
 
   // nft variables
   const [depositNFTs, setDepositNFTs] = useState<string[]>([]);
@@ -393,7 +393,7 @@ export function VaultDebtPicker({
           <div className={`${!vaultHasDebt ? styles.hidden : ''}`}>
             <Button
               size="xsmall"
-              theme={buttonTheme}
+              theme={theme}
               kind="outline"
               onClick={() => setHideLoanFormToggle(!hideLoanFormToggle)}>
               Edit Loan

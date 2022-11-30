@@ -29,46 +29,48 @@
 
 .regular {
   composes: button;
+  color: white;
 }
 
 .regular.papr {
-  background-color: var(--button-outline-papr);
-  color: white;
-}
-
-.regular.papr:hover,
-.regular.papr:focus {
-  background: var(--button-outline-papr);
+  background-color: var(--papr-50);
 }
 
 .regular.hero {
-  background-color: var(--button-outline-hero);
-  color: white;
-}
-
-.regular.hero:hover,
-.regular.hero:focus {
-  background: var(--button-outline-hero);
+  background-color: var(--paprHERO-50);
 }
 
 .regular.meme {
-  background-color: var(--button-outline-meme);
-  color: white;
+  background-color: var(--paprMEME-50);
 }
 
-.regular.meme:hover,
-.regular.meme:focus {
-  background: var(--button-outline-meme);
+.regular.trash {
+  background-color: var(--paprTRASH-50);
 }
 
-.regular.white {
+.white {
+  composes: button;
   background-color: white;
-  color: black;
 }
 
-.regular.white:hover,
-.regular.white:focus {
-  background: var(--highlight-clickable-10);
+.white.papr:hover,
+.white.papr:focus {
+  background: var(--papr-5);
+}
+
+.white.hero:hover,
+.white.hero:focus {
+  background: var(--paprHERO-5);
+}
+
+.white.meme:hover,
+.white.meme:focus {
+  background: var(--paprMEME-5);
+}
+
+.white.trash:hover,
+.white.trash:focus {
+  background: var(--paprTRASH-5);
 }
 
 .outline {
@@ -86,60 +88,58 @@
 }
 
 .outline.papr {
-  border: 2px var(--button-outline-papr) solid;
-  color: var(--button-outline-papr);
+  border: 2px var(--papr-50) solid;
+  color: var(--papr-50);
 }
 
 .outline.papr:hover,
 .outline.papr:focus {
-  background: var(--button-fill-papr);
+  background: var(--papr-5);
 }
 
 .outline.meme {
-  border: 2px var(--button-outline-meme) solid;
-  color: var(--button-outline-meme);
+  border: 2px var(--paprMEME-50) solid;
+  color: var(--paprMEME-50);
 }
 
 .outline.meme:hover,
 .outline.meme:focus {
-  background: var(--button-fill-meme);
+  background: var(--paprMEME-5);
 }
 
 .outline.hero {
-  border: 2px var(--button-outline-hero) solid;
-  color: var(--button-outline-hero);
+  border: 2px var(--paprHERO-50) solid;
+  color: var(--paprHERO-50);
 }
 
 .outline.hero:hover,
 .outline.hero:focus {
-  background: var(--button-fill-hero);
+  background: var(--paprHERO-5);
 }
 
-.outline.white {
-  border: 2px black solid;
-  color: black;
+.outline.trash {
+  border: 2px var(--paprTRASH-50) solid;
+  color: var(--paprTRASH-50);
 }
 
-.outline.white:hover,
-.outline.white:focus {
-  background: var(--highlight-clickable-10);
+.outline.trash:hover,
+.outline.trash:focus {
+  background: var(--paprTRASH-5);
 }
 
 .button:disabled {
   cursor: not-allowed;
-  color: #aaaaaa;
+  color: var(--gray-30);
+  background-color: var(--gray-5);
 }
 
-.button.papr:disabled {
-  background: var(--button-fill-papr);
+.button.outline:disabled {
+  border: 2px var(--gray-30) solid;
 }
 
-.button.hero:disabled {
-  background: var(--button-fill-hero);
-}
-
-.button.meme:disabled {
-  background: var(--button-fill-meme);
+.button:disabled:hover,
+.button:disabled:focus {
+  background-color: var(--gray-5);
 }
 
 .button.outline-transparent:disabled,

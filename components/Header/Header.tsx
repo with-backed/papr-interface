@@ -4,13 +4,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 import styles from './Header.module.css';
-import paprLogo from 'public/logos/papr-logo.png';
 import paprTitle from 'public/logos/papr-title.png';
 import paprMemeTitle from 'public/logos/paprMEME-title.png';
 import paprHeroTitle from 'public/logos/paprHERO-title.png';
 import paprTrashTitle from 'public/logos/paprTRASH-title.png';
 import { useTheme } from 'hooks/useTheme';
-import Head from 'next/head';
 import Image from 'next/image';
 import { SupportedToken } from 'lib/config';
 
@@ -85,6 +83,7 @@ type NavLinksProps = {
 };
 function NavLinks({ activeRoute, isHomePage }: NavLinksProps) {
   const { tokenName, underlyingAddress, paprTokenAddress } = useConfig();
+  const theme = useTheme();
 
   const pages = useMemo(() => {
     const productSpecificPages = tokenName === 'paprHero' ? paprHeroPages : [];
@@ -117,8 +116,10 @@ function NavLinks({ activeRoute, isHomePage }: NavLinksProps) {
             <a
               className={
                 isActiveRoute(activeRoute, p, isHomePage)
-                  ? styles['link-active']
-                  : styles.link
+                  ? [styles.link, styles['link-active'], styles[theme]].join(
+                      ' ',
+                    )
+                  : [styles.link, styles[theme]].join(' ')
               }
               target={p.externalRedirect ? '_blank' : ''}>
               {p.name}
@@ -159,7 +160,7 @@ const SHOW_HEADER_ON_LANDING_PAGE =
   process.env.NEXT_PUBLIC_LANDING_PAGE_HEADER === 'true';
 
 export function Header() {
-  const { mainTheme } = useTheme();
+  const theme = useTheme();
   const { pathname } = useRouter();
 
   const activeRoute = useMemo(() => {
@@ -190,7 +191,7 @@ export function Header() {
   }
 
   return (
-    <nav className={[styles.nav, styles[mainTheme]].join(' ')}>
+    <nav className={[styles.nav, styles[theme]].join(' ')}>
       <div className={styles['desktop-content']}>
         <LogoLink isHomePage={isHomePage} />
         <NavLinks activeRoute={activeRoute} isHomePage={isHomePage} />
@@ -201,21 +202,6 @@ export function Header() {
         <NavLinks activeRoute={activeRoute} isHomePage={isHomePage} />
         <ConnectWallet />
       </div>
-      <Head>
-        <style>
-          {mainTheme === 'paprHero'
-            ? `
-          :root {
-            --table-zebra-stripe: var(--heroes-red);
-          }
-          `
-            : `
-          :root {
-            --table-zebra-stripe: var(--background-faded-green);
-          }
-          `}
-        </style>
-      </Head>
     </nav>
   );
 }

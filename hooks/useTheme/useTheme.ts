@@ -3,30 +3,19 @@ import { useConfig } from 'hooks/useConfig';
 import { SupportedToken } from 'lib/config';
 import { useRouter } from 'next/router';
 
-type UseThemeReturn = {
-  mainTheme: SupportedToken;
-  buttonTheme: ButtonTheme;
-};
-
 const buttonLookup: { [key in SupportedToken]: ButtonTheme } = {
   paprMeme: 'meme',
-  paprTrash: 'papr',
+  paprTrash: 'trash',
   paprHero: 'hero',
 };
 
-export function useTheme(): UseThemeReturn {
+export function useTheme(): ButtonTheme {
   const { tokenName } = useConfig();
   const { asPath } = useRouter();
 
   if (asPath === '/') {
-    return {
-      mainTheme: 'paprMeme',
-      buttonTheme: 'meme',
-    };
+    return 'papr';
   }
 
-  return {
-    mainTheme: tokenName as SupportedToken,
-    buttonTheme: buttonLookup[tokenName as SupportedToken],
-  };
+  return buttonLookup[tokenName as SupportedToken];
 }

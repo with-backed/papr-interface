@@ -89,13 +89,13 @@ export function BorrowPerpetualButton({
   );
 
   const { data, write } = useMulticallWrite(paprController, calldata);
-  const { buttonTheme } = useTheme();
+  const theme = useTheme();
 
   return (
     <TransactionButton
       kind="regular"
       size="small"
-      theme={buttonTheme}
+      theme={theme}
       onClick={write!}
       transactionData={data}
       text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
@@ -152,13 +152,13 @@ export function RepayPerpetualButton({
   );
 
   const { data, write } = useMulticallWrite(paprController, calldata);
-  const { buttonTheme } = useTheme();
+  const theme = useTheme();
 
   return (
     <TransactionButton
       kind="regular"
       size="small"
-      theme={buttonTheme}
+      theme={theme}
       onClick={write!}
       transactionData={data}
       text="Update Loan"
@@ -239,13 +239,13 @@ export function RepayWithSwapButton({
   );
 
   const { data, write } = useMulticallWrite(paprController, calldata);
-  const { buttonTheme } = useTheme();
+  const theme = useTheme();
 
   return (
     <TransactionButton
       kind="regular"
       size="small"
-      theme={buttonTheme}
+      theme={theme}
       onClick={write!}
       transactionData={data}
       text="Update Loan"
@@ -315,13 +315,13 @@ export function BorrowWithSwapButton({
   );
 
   const { data, write } = useMulticallWrite(paprController, calldata);
-  const { buttonTheme } = useTheme();
+  const theme = useTheme();
 
   return (
     <TransactionButton
       kind="regular"
       size="small"
-      theme={buttonTheme}
+      theme={theme}
       onClick={write!}
       transactionData={data}
       text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
@@ -380,7 +380,7 @@ export function ApproveTokenButton({
       data.wait().then(() => setTokenApproved(true));
     },
   });
-  const { buttonTheme } = useTheme();
+  const theme = useTheme();
 
   if (tokenApproved || approvedLoading || !symbol) return <></>;
 
@@ -388,7 +388,7 @@ export function ApproveTokenButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme={buttonTheme}
+      theme={theme}
       onClick={write!}
       transactionData={data}
       text={`Approve ${symbol}`}
@@ -449,7 +449,7 @@ export function ApproveNFTButton({
       data.wait().then(() => setApproved(true));
     },
   });
-  const { buttonTheme } = useTheme();
+  const theme = useTheme();
 
   if (alreadyApproved) {
     return (
@@ -467,7 +467,7 @@ export function ApproveNFTButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme={buttonTheme}
+      theme={theme}
       onClick={write!}
       transactionData={data}
       disabled={approvedLoading}

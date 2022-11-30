@@ -34,6 +34,18 @@
   font-weight: inherit;
 }
 
-.table tbody tr:nth-child(odd) {
-  background-color: var(--table-zebra-stripe);
+.table.papr tbody tr:nth-child(odd) {
+  background-color: var(--papr-5);
+}
+
+.table.meme tbody tr:nth-child(odd) {
+  background-color: var(--paprMEME-5);
+}
+
+.table.hero tbody tr:nth-child(odd) {
+  background-color: var(--paprHERO-5);
+}
+
+.table.trash tbody tr:nth-child(odd) {
+  background-color: var(--paprTRASH-5);
 }

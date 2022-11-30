@@ -13,6 +13,9 @@ jest.mock('hooks/useUniswapSwapsByPool', () => ({
 jest.mock('hooks/useActivityByController', () => ({
   useActivityByController: jest.fn(),
 }));
+jest.mock('hooks/useTheme', () => ({
+  useTheme: jest.fn(() => 'papr'),
+}));
 
 const mockedUseUniswapSwapsByPool =
   useUniswapSwapsByPool as jest.MockedFunction<typeof useUniswapSwapsByPool>;

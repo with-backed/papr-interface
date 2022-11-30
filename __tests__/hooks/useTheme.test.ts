@@ -22,21 +22,15 @@ describe('useTheme', () => {
     } as any);
     const { result } = renderHook(() => useTheme());
 
-    expect(result.current).toEqual({
-      mainTheme: 'paprTrash',
-      buttonTheme: 'papr',
-    });
+    expect(result.current).toEqual('trash');
   });
 
-  it('returns the default (paprMeme) on the homepage', () => {
+  it('returns the default (papr) on the homepage', () => {
     mockedUseRouter.mockReturnValue({
       asPath: '/',
     } as any);
     const { result } = renderHook(() => useTheme());
 
-    expect(result.current).toEqual({
-      mainTheme: 'paprMeme',
-      buttonTheme: 'meme',
-    });
+    expect(result.current).toEqual('papr');
   });
 });

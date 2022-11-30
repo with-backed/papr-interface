@@ -1,13 +1,17 @@
-.paprMeme {
-  background: url('/graph-square.png'), var(--background-blue-paper);
+.nav.papr {
+  background: url('/graph-square.png'), var(--papr-20);
 }
 
-.paprHero {
-  background: url('/graph-square.png'), var(--background-orange-paper);
+.nav.meme {
+  background: url('/graph-square.png'), var(--paprMEME-20);
 }
 
-.paprTrash {
-  background: url('/graph-square.png'), var(--background-green-paper);
+.nav.hero {
+  background: url('/graph-square.png'), var(--paprHERO-20);
+}
+
+.nav.trash {
+  background: url('/graph-square.png'), var(--paprTRASH-20);
 }
 
 .nav {
@@ -75,14 +79,40 @@
   transition: color 200ms ease;
 }
 
-.link:hover {
+.link.papr:hover {
   transition: background-color 200ms ease;
-  background-color: var(--highlight-clickable-10);
+  background-color: var(--papr-20);
 }
 
-.link-active {
-  composes: link;
-  background-color: var(--highlight-clickable-10);
+.link-active.papr {
+  background-color: var(--papr-20);
+}
+
+.link.meme:hover {
+  transition: background-color 200ms ease;
+  background-color: var(--paprMEME-20);
+}
+
+.link-active.meme {
+  background-color: var(--paprMEME-20);
+}
+
+.link.hero:hover {
+  transition: background-color 200ms ease;
+  background-color: var(--paprHERO-20);
+}
+
+.link-active.hero {
+  background-color: var(--paprHERO-20);
+}
+
+.link.trash:hover {
+  transition: background-color 200ms ease;
+  background-color: var(--paprTRASH-20);
+}
+
+.link-active.trash {
+  background-color: var(--paprTRASH-20);
 }
 
 .link-active:visited {
