@@ -184,7 +184,7 @@ export function Header() {
     activeRoute === 'errorPage'
   ) {
     return (
-      <nav className={styles['logo-only-nav']}>
+      <nav className={[styles['logo-only-nav'], styles.papr].join(' ')}>
         <LogoLink isHomePage={isHomePage} />
       </nav>
     );
