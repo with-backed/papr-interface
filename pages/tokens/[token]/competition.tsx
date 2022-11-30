@@ -92,7 +92,7 @@ export default function HeroesLandingPage({
 }: HeroesLandingPageProps) {
   return (
     <>
-      <OpenGraph title={`Backed | Papr Heroes | Home`} />
+      <OpenGraph title={`paprHero | Competition`} />
       <HeroesLandingPageContent
         collateral={allowedCollateral}
         oracleInfo={oracleInfo}

@@ -5,7 +5,7 @@ export default function Page() {
   return (
     <>
       <Head>
-        <title>Backed | 500</title>
+        <title>Papr | 500</title>
         <meta name="description" content="Something went wrong" />
       </Head>
       <Custom500 />

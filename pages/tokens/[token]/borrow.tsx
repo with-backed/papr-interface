@@ -1,4 +1,4 @@
-import { configs, SupportedToken } from 'lib/config';
+import { configs, getConfig, SupportedToken } from 'lib/config';
 import { controllerPricesData } from 'lib/controllers/charts';
 import { GetServerSideProps } from 'next';
 import {
@@ -14,8 +14,8 @@ import { useConfig } from 'hooks/useConfig';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { usePaprController } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
-import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useMemo } from 'react';
+import { OpenGraph } from 'components/OpenGraph';
 
 type ServerSideProps = Omit<
   BorrowPageProps,
@@ -28,8 +28,8 @@ type ServerSideProps = Omit<
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
-  const address = (context.params?.controller as string).toLowerCase();
   const token = context.params?.token as SupportedToken;
+  const address = getConfig(token).controllerAddress.toLocaleLowerCase();
 
   const controllerSubgraphData = await fetchSubgraphData(
     address,
@@ -83,6 +83,7 @@ export default function Borrow({
 
   return (
     <OracleInfoProvider collections={collections}>
+      <OpenGraph title={`${config.tokenName} | Borrow`} />
       <BorrowPageContent
         paprController={paprController}
         controllerAddress={controllerAddress}
