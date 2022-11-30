@@ -175,8 +175,8 @@ export function Header() {
   }, [pathname]);
 
   const isHomePage = useMemo(
-    () => activeRoute === '' || activeRoute === 'errorPage',
-    [activeRoute],
+    () => pathname === '/' || activeRoute === 'errorPage',
+    [activeRoute, pathname],
   );
 
   if (
