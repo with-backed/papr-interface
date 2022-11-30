@@ -37,6 +37,39 @@
   --button-outline-meme: #06846f;
   --button-fill-meme: #f3fcfb;
 
+  /* papr colors */
+  --papr-5: #5397ff;
+  --papr-10: #e5efff;
+  --papr-20: #cce0fe;
+  --papr-50: #5397ff;
+  --papr-100: #0064fa;
+  --papr-offset: #00cdfa;
+
+  --paprMEME-5: #f2f9f8;
+  --paprMEME-10: #e4f3f1;
+  --paprMEME-20: #c6e6e1;
+  --paprMEME-50: #47b79c;
+  --paprMEME-100: #06846f;
+  --paprMEME-offset: #00e827;
+
+  --paprHERO-5: #fef5f2;
+  --paprHERO-10: #ffe8e0;
+  --paprHERO-20: #ffd7cc;
+  --paprHERO-50: #ff6333;
+  --paprHERO-100: #e03400;
+  --paprHERO-offset: #ffc658;
+
+  --paprTRASH-5: #f8f7ff;
+  --paprTRASH-10: #e9e8ff;
+  --paprTRASH-20: #dddbff;
+  --paprTRASH-50: #908ee7;
+  --paprTRASH-100: #4c45d9;
+  --paprTRASH-offset: #ff778f;
+
+  --gray-5: #f2f2f2;
+  --gray-30: #b2b2b2;
+  --highlight-clickable-100: #0000ee;
+
   /* layout */
   --max-width-header: 1224px;
   --max-width: 1100px;
