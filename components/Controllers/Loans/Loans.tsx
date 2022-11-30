@@ -7,10 +7,10 @@ import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { computeLtv, convertOneScaledValue } from 'lib/controllers';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Health } from '../Health';
 import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
+import { VaultHealth } from './VaultHealth';
 
 type LoansProps = {
   paprController: PaprController;
@@ -32,20 +32,12 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     const ltvValues = Object.values(ltvs);
 
     if (ltvValues.length === 0) {
-      return '...';
+      return 0;
     }
-
-    return formatPercent(ltvValues.reduce((a, b) => a + b) / ltvValues.length);
+    return ltvValues.reduce((a, b) => a + b) / ltvValues.length;
   }, [ltvs]);
 
-  const totalDebt = useMemo(
-    () =>
-      activeVaults.reduce(
-        (prev, v) => prev.add(v.debt),
-        ethers.BigNumber.from(0),
-      ),
-    [activeVaults],
-  );
+  const formattedAvgLtv = useMemo(() => formatPercent(avgLtv), [avgLtv]);
 
   const formattedTotalDebt = useMemo(() => {
     const debtBigNum = activeVaults.reduce(
@@ -55,7 +47,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     const debtNum = parseFloat(
       ethers.utils.formatUnits(debtBigNum, paprController.underlying.decimals),
     );
-    return formatTokenAmount(debtNum) + ` ${paprController.underlying.symbol}`;
+    return '$' + formatTokenAmount(debtNum);
   }, [activeVaults, paprController.underlying]);
 
   useEffect(() => {
@@ -70,29 +62,38 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     setLtvs(calculatedLtvs);
   }, [activeVaults, norm]);
 
+  const formattedDebts = useMemo(() => {
+    const decimals = paprController.underlying.decimals;
+    const debts = activeVaults.map(
+      (v) =>
+        '$' +
+        formatTokenAmount(
+          parseFloat(ethers.utils.formatUnits(v.debt, decimals)),
+        ),
+    );
+    const longestDebt = debts.reduce((prev, curr) =>
+      prev.length > curr.length ? prev : curr,
+    );
+    return debts.map((d) => d.padStart(longestDebt.length, ' '));
+  }, [activeVaults, paprController.underlying.decimals]);
+
   return (
     <Fieldset legend="💸 Loans">
       <Table className={styles.table} fixed>
         <thead>
           <tr>
             <th>Total</th>
-            <th className={styles['right-align']}>Amount</th>
-            <th className={styles['right-align']}>Days</th>
-            <th className={styles['right-align']}>Avg. LTV</th>
-            <th className={styles['center-align']}>Health</th>
+            <th>Amount</th>
+            <th>Avg.LTV</th>
+            <th>Health</th>
           </tr>
         </thead>
         <tbody>
           <tr className={styles.row}>
             <td>{activeVaults.length} Loans</td>
-            <td className={styles['right-align']}>{formattedTotalDebt}</td>
-            <td className={styles['right-align']}>
-              {timestampDaysAgo(paprController.createdAt)}
-            </td>
-            <td className={styles['right-align']}>{avgLtv}</td>
-            <td className={styles['center-align']}>
-              {!!pricesData ? <Health pricesData={pricesData} /> : '???'}
-            </td>
+            <td>{formattedTotalDebt}</td>
+            <td>{formattedAvgLtv}</td>
+            <td>{!!maxLTV && <VaultHealth ltv={avgLtv} maxLtv={maxLTV} />}</td>
           </tr>
         </tbody>
       </Table>
@@ -100,24 +101,22 @@ export function Loans({ paprController, pricesData }: LoansProps) {
         <thead>
           <tr>
             <th>Loan</th>
-            <th className={styles['right-align']}>Amount</th>
-            <th className={styles['right-align']}>Days</th>
-            <th className={styles['right-align']}>LTV</th>
-            <th className={styles['center-align']}>Health</th>
+            <th>Amount</th>
+            <th>LTV</th>
+            <th>Health</th>
           </tr>
         </thead>
         <tbody>
-          {activeVaults.map((v) => {
+          {activeVaults.map((v, i) => {
             const ltv = ltvs[v.id];
+            const formattedDebt = formattedDebts[i];
             return (
               <VaultRow
                 key={v.account}
                 id={v.id}
                 account={v.account}
-                debt={v.debt}
+                debt={formattedDebt}
                 controllerId={paprController.id}
-                decimals={paprController.underlying.decimals}
-                symbol={paprController.underlying.symbol}
                 ltv={ltv}
                 maxLTV={maxLTV}
               />
