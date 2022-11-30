@@ -4,7 +4,7 @@
   padding: var(--padding-container);
   word-break: normal;
   overflow-wrap: anywhere;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
 }
 
 .legend {

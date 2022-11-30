@@ -2,7 +2,7 @@
   background-color: #282828;
   color: white;
   padding: 20px;
-  border-radius: var(--border-radius-large);
+  border-radius: var(--border-radius);
   max-width: 500px;
   line-height: 22px;
 }

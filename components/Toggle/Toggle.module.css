@@ -10,7 +10,7 @@
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  border-radius: var(--border-radius-small);
+  border-radius: var(--border-radius);
   color: var(--neutral-50);
   background: var(--neutral-5);
   line-height: 15px;
@@ -32,12 +32,12 @@
   border: 2px var(--button-outline-meme) solid;
   background: var(--button-fill-meme);
   color: var(--button-outline-meme);
-  border-radius: var(--border-radius-small);
+  border-radius: var(--border-radius);
 }
 
 .toggle[aria-checked='false'] .container div:last-child {
   border: 2px var(--button-outline-meme) solid;
   background: var(--button-fill-meme);
   color: var(--button-outline-meme);
-  border-radius: var(--border-radius-small);
+  border-radius: var(--border-radius);
 }

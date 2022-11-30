@@ -1,6 +1,6 @@
 .button {
   border: none;
-  border-radius: var(--border-radius-large);
+  border-radius: var(--border-radius);
   line-height: 31px;
   cursor: pointer;
 }
@@ -167,7 +167,7 @@
   width: 100%;
   line-height: 1.6;
   font-size: var(--font-large);
-  border-radius: var(--border-radius-large);
+  border-radius: var(--border-radius);
   position: relative;
   background: var(--highlight-visited-5);
 }
