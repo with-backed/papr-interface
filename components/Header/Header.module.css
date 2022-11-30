@@ -84,9 +84,11 @@
   background-color: var(--papr-5);
 }
 
-.link-active.papr,
+.link-active.papr {
+  background-color: var(--papr-5);
+}
 .link-active.papr:hover {
-  background-color: var(--papr-20);
+  background-color: var(--papr-10);
 }
 
 .link.meme:hover {
@@ -94,9 +96,11 @@
   background-color: var(--paprMEME-5);
 }
 
-.link-active.meme,
+.link-active.meme {
+  background-color: var(--paprMEME-5);
+}
 .link-active.meme:hover {
-  background-color: var(--paprMEME-20);
+  background-color: var(--paprMEME-10);
 }
 
 .link.hero:hover {
@@ -104,9 +108,11 @@
   background-color: var(--paprHERO-5);
 }
 
-.link-active.hero,
+.link-active.hero {
+  background-color: var(--paprHERO-5);
+}
 .link-active.hero:hover {
-  background-color: var(--paprHERO-20);
+  background-color: var(--paprHERO-10);
 }
 
 .link.trash:hover {
@@ -114,9 +120,11 @@
   background-color: var(--paprTRASH-5);
 }
 
-.link-active.trash,
+.link-active.trash {
+  background-color: var(--paprTRASH-5);
+}
 .link-active.trash:hover {
-  background-color: var(--paprTRASH-20);
+  background-color: var(--paprTRASH-10);
 }
 
 .link-active:visited {
