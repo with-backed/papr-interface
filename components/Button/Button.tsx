@@ -1,4 +1,3 @@
-import { useTheme } from 'hooks/useTheme';
 import React, { ButtonHTMLAttributes, useMemo } from 'react';
 import styles from './Button.module.css';
 

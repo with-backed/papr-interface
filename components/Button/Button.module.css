@@ -33,19 +33,31 @@
 }
 
 .regular.papr {
-  background-color: var(--papr-50);
+  background-color: var(--papr-100);
+}
+.regular.papr:hover {
+  background-color: var(--papr-110);
 }
 
 .regular.hero {
   background-color: var(--paprHERO-50);
 }
+.regular.hero:hover {
+  background-color: var(--paprHERO-100);
+}
 
 .regular.meme {
   background-color: var(--paprMEME-50);
 }
+.regular.meme:hover {
+  background-color: var(--paprMEME-100);
+}
 
 .regular.trash {
   background-color: var(--paprTRASH-50);
+}
+.regular.trash:hover {
+  background-color: var(--paprTRASH-100);
 }
 
 .white {
