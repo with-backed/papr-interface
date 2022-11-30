@@ -427,7 +427,7 @@ export function VaultDebtPicker({
           )}
         </div>
         {!loanFormHidden && (
-          <>
+          <div className={styles['loan-form']}>
             <LoanActionSummary
               controller={paprController}
               debtToBorrowOrRepay={debtToBorrowOrRepay}
@@ -438,91 +438,89 @@ export function VaultDebtPicker({
               slippage={isBorrowing ? slippageForBorrow : slippageForRepay}
               errorMessage={balanceErrorMessage}
             />
-            <div className={styles.approveButtons}>
-              <ApproveNFTButton
-                paprController={paprController}
-                collateralContractAddress={collateralContractAddress}
-                approved={collateralApproved}
-                setApproved={setCollateralApproved}
+
+            <ApproveNFTButton
+              paprController={paprController}
+              collateralContractAddress={collateralContractAddress}
+              approved={collateralApproved}
+              setApproved={setCollateralApproved}
+            />
+            {usingPerpetual && !isBorrowing && (
+              <ApproveTokenButton
+                controller={paprController}
+                token={
+                  paprController.token0IsUnderlying
+                    ? paprController.token1
+                    : paprController.token0
+                }
+                tokenApproved={debtTokenApproved}
+                setTokenApproved={setDebtTokenApproved}
               />
-              {usingPerpetual && !isBorrowing && (
-                <ApproveTokenButton
-                  controller={paprController}
-                  token={
-                    paprController.token0IsUnderlying
-                      ? paprController.token1
-                      : paprController.token0
-                  }
-                  tokenApproved={debtTokenApproved}
-                  setTokenApproved={setDebtTokenApproved}
-                />
-              )}
-              {!usingPerpetual && !isBorrowing && (
-                <ApproveTokenButton
-                  controller={paprController}
-                  token={
-                    paprController.token0IsUnderlying
-                      ? paprController.token0
-                      : paprController.token1
-                  }
-                  tokenApproved={underlyingApproved}
-                  setTokenApproved={setUnderlyingApproved}
-                />
-              )}
-            </div>
-            <div className={styles.updateLoanButtonWrapper}>
-              {usingPerpetual && isBorrowing && (
-                <BorrowPerpetualButton
-                  amount={amountToBorrowOrRepay}
-                  collateralContractAddress={collateralContractAddress}
-                  depositNFTs={depositNFTs}
-                  withdrawNFTs={withdrawNFTs}
-                  paprController={paprController}
-                  oracleInfo={oracleInfo}
-                  vaultHasDebt={vaultHasDebt}
-                  disabled={!collateralApproved}
-                />
-              )}
-              {usingPerpetual && !isBorrowing && (
-                <RepayPerpetualButton
-                  amount={amountToBorrowOrRepay}
-                  collateralContractAddress={collateralContractAddress}
-                  depositNFTs={depositNFTs}
-                  withdrawNFTs={withdrawNFTs}
-                  paprController={paprController}
-                  oracleInfo={oracleInfo}
-                  vaultHasDebt={vaultHasDebt}
-                  disabled={!!balanceErrorMessage || !debtTokenApproved}
-                />
-              )}
-              {!usingPerpetual && !isBorrowing && (
-                <RepayWithSwapButton
-                  amount={amountToBorrowOrRepay}
-                  quote={debtToBorrowOrRepay}
-                  collateralContractAddress={collateralContractAddress}
-                  depositNFTs={depositNFTs}
-                  withdrawNFTs={withdrawNFTs}
-                  paprController={paprController}
-                  oracleInfo={oracleInfo}
-                  vaultHasDebt={vaultHasDebt}
-                  disabled={!!balanceErrorMessage || !underlyingApproved}
-                />
-              )}
-              {!usingPerpetual && isBorrowing && (
-                <BorrowWithSwapButton
-                  amount={debtToBorrowOrRepay}
-                  quote={underlyingToBorrow}
-                  collateralContractAddress={collateralContractAddress}
-                  depositNFTs={depositNFTs}
-                  withdrawNFTs={withdrawNFTs}
-                  paprController={paprController}
-                  oracleInfo={oracleInfo}
-                  vaultHasDebt={vaultHasDebt}
-                  disabled={!collateralApproved}
-                />
-              )}
-            </div>
-          </>
+            )}
+            {!usingPerpetual && !isBorrowing && (
+              <ApproveTokenButton
+                controller={paprController}
+                token={
+                  paprController.token0IsUnderlying
+                    ? paprController.token0
+                    : paprController.token1
+                }
+                tokenApproved={underlyingApproved}
+                setTokenApproved={setUnderlyingApproved}
+              />
+            )}
+
+            {usingPerpetual && isBorrowing && (
+              <BorrowPerpetualButton
+                amount={amountToBorrowOrRepay}
+                collateralContractAddress={collateralContractAddress}
+                depositNFTs={depositNFTs}
+                withdrawNFTs={withdrawNFTs}
+                paprController={paprController}
+                oracleInfo={oracleInfo}
+                vaultHasDebt={vaultHasDebt}
+                disabled={!collateralApproved}
+              />
+            )}
+            {usingPerpetual && !isBorrowing && (
+              <RepayPerpetualButton
+                amount={amountToBorrowOrRepay}
+                collateralContractAddress={collateralContractAddress}
+                depositNFTs={depositNFTs}
+                withdrawNFTs={withdrawNFTs}
+                paprController={paprController}
+                oracleInfo={oracleInfo}
+                vaultHasDebt={vaultHasDebt}
+                disabled={!!balanceErrorMessage || !debtTokenApproved}
+              />
+            )}
+            {!usingPerpetual && !isBorrowing && (
+              <RepayWithSwapButton
+                amount={amountToBorrowOrRepay}
+                quote={debtToBorrowOrRepay}
+                collateralContractAddress={collateralContractAddress}
+                depositNFTs={depositNFTs}
+                withdrawNFTs={withdrawNFTs}
+                paprController={paprController}
+                oracleInfo={oracleInfo}
+                vaultHasDebt={vaultHasDebt}
+                disabled={!!balanceErrorMessage || !underlyingApproved}
+              />
+            )}
+            {!usingPerpetual && isBorrowing && (
+              <BorrowWithSwapButton
+                amount={debtToBorrowOrRepay}
+                quote={underlyingToBorrow}
+                collateralContractAddress={collateralContractAddress}
+                depositNFTs={depositNFTs}
+                withdrawNFTs={withdrawNFTs}
+                paprController={paprController}
+                oracleInfo={oracleInfo}
+                vaultHasDebt={vaultHasDebt}
+                disabled={!collateralApproved}
+              />
+            )}
+          </div>
         )}
       </div>
     </Fieldset>

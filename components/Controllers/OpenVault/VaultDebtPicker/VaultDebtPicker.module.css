@@ -1,220 +1,198 @@
 .thumbnail {
-    width: 30px;
-    height: 30px;
+  width: 30px;
+  height: 30px;
 }
 
 .thumbnail img {
-    width: 100%;
+  width: 100%;
 }
 
 .collateralTable p {
-    margin: 0;
+  margin: 0;
 }
 
 .collateralTable thead tr th {
-    text-align: center;
+  text-align: center;
 }
 
 .collateralTable tbody tr td {
-    text-align: center;
+  text-align: center;
 }
 
 .collateralTable thead tr th:nth-of-type(1) {
-    text-align: left;
+  text-align: left;
 }
 
 .collateralTable tbody tr td:nth-of-type(1) {
-    padding: 0;
+  padding: 0;
 }
 
 .collateralTable tbody tr td:last-of-type {
-    padding: 0;
+  padding: 0;
 }
 
 .collateralTable tbody tr td:last-of-type input {
-    margin-top: 4px;
+  margin-top: 4px;
 }
 
 .collateralTable thead tr th:nth-of-type(2) {
-    text-align: left;
-    width: 20%;
+  text-align: left;
+  width: 20%;
 }
 
 .collateralTable tbody tr td:nth-of-type(2) {
-    text-align: left;
-    width: 20%;
+  text-align: left;
+  width: 20%;
 }
 
 .slider {
-    margin-top: -18px;
-    margin-bottom: 30px;
+  margin-top: -18px;
+  margin-bottom: 30px;
 }
 
 .editLoanPreviewWrapper {
-    width: 100%;
+  width: 100%;
 }
 
 .editLoanPreview {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
 .editLoanPreview > div:first-of-type {
-    width: 40%;
+  width: 40%;
 }
 
 .editLoanPreview > div:nth-of-type(2) {
-    width: 60%;
+  width: 60%;
 }
 
 .editLoanPreview p:first-of-type span {
-    font-size: var(--font-huge);
+  font-size: var(--font-huge);
 }
 
 .editLoanPreview p:nth-of-type(2) {
-    text-align: right;
+  text-align: right;
 }
 
 .editLoanPreview p {
-    margin: 0px;
+  margin: 0px;
 }
 
 .editLoanForm {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-end;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .editLoanForm > div {
-    margin: 0 4px;
+  margin: 0 4px;
 }
 
 .editLoanForm div button div {
-    min-height: 40px;
+  min-height: 40px;
 }
 
 .editLoanForm:nth-child(3) {
-    width: 30%;
+  width: 30%;
 }
 
 .editLoanForm div input {
-    width: 100%;
-    border: 1px solid black;
-    background-color: white;
-    border-radius: 10px;
-    padding: 12px;
-    text-align: right;
+  width: 100%;
+  border: 1px solid black;
+  background-color: white;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: right;
 }
 
 .slippage {
-    width: 100%;
-    text-align: right;
-    padding-right: 6px;
-}
-
-.approveButtons {
-    margin-top: 20px;
-    text-align: right;
-    width: 100%;
-}
-
-.approveButtons button {
-    width: 56%;
-}
-
-.loanActionSummaryWrapper {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.loanActionSummary {
-    width: 56%;
+  width: 100%;
+  text-align: right;
+  padding-right: 6px;
 }
 
 .loanActionSummary > div:nth-of-type(1) {
-    background-color: var(--background-faded-green);
+  background-color: var(--background-faded-green);
 }
 
 .loanActionSummary > div:nth-of-type(3) {
-    background-color: var(--background-faded-green);
+  background-color: var(--background-faded-green);
 }
 
 .loanActionSummary > div {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .loanActionSummary > div > div:first-of-type {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 
 .loanActionSummary > div > div:nth-of-type(2) {
-    margin-right: 10px;
+  margin-right: 10px;
 }
 
 .loanActionSummary > div p {
-    margin: 2px;
+  margin: 2px;
 }
 
 .loanActionSummary .swapQuote {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .loanActionSummary .swapQuote input {
-    margin-right: 6px;
+  margin-right: 6px;
 }
 
 .loanActionSummary .swapQuote p {
-    margin-top: 2px;
+  margin-top: 2px;
 }
 
 .greyed {
-    color: var(--neutral-20);
-}
-
-.updateLoanButtonWrapper {
-    margin-top: 18px;
-    width: 100%;
-    text-align: right;
-}
-
-.updateLoanButtonWrapper button {
-    width: 56%;
+  color: var(--neutral-20);
 }
 
 .error {
-    margin-top: 12px;
-    width: 100%;
-    font-style: italic;
-    color: var(--highlight-alert-100);
+  margin-top: 12px;
+  width: 100%;
+  font-style: italic;
+  color: var(--highlight-alert-100);
 }
 
 .hidden {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .sliderLabel {
-    line-height: 20px;
+  line-height: 20px;
 }
 
 .totalLTVLabel {
-    text-align: right;
-    position: relative;
-    top: 30px;
-    margin: 0px;
+  text-align: right;
+  position: relative;
+  top: 30px;
+  margin: 0px;
 }
 
 .totalLTVLabel.hidden {
-    color: white;
+  color: white;
+}
+
+.loan-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 56%;
+  margin-left: auto;
 }
