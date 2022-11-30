@@ -1,0 +1,44 @@
+{
+  "data": [
+    {
+      "account": "0xbc3ed6B537f2980e66f396Fe14210A56ba3f72C4",
+      "claim": {
+        "blitCount": 1,
+        "dinoCount": 1,
+        "moonBirdCount": 2,
+        "phUSDCAmount": 25500,
+        "toadzCount": 2
+      }
+    },
+    {
+      "account": "0x0DD7D78Ed27632839cd2a929EE570eAd346C19fC",
+      "claim": {
+        "blitCount": 3,
+        "dinoCount": 0,
+        "moonBirdCount": 5,
+        "phUSDCAmount": 22500,
+        "toadzCount": 3
+      }
+    },
+    {
+      "account": "0xcc692d6e11268b40a1e3c58e3d86fc4caab9b77a",
+      "claim": {
+        "blitCount": 2,
+        "dinoCount": 0,
+        "moonBirdCount": 3,
+        "phUSDCAmount": 32000,
+        "toadzCount": 2
+      }
+    },
+    {
+      "account": "0x6b2770A75A928989C1D7356366d4665a6487e1b4",
+      "claim": {
+        "blitCount": 1,
+        "dinoCount": 0,
+        "moonBirdCount": 2,
+        "phUSDCAmount": 35500,
+        "toadzCount": 2
+      }
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { SendTransactionResult } from '@wagmi/core';
 import { Fieldset } from 'components/Fieldset';
 import { configs } from 'lib/config';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
@@ -16,6 +17,10 @@ import { getAddress } from 'ethers/lib/utils';
 import { HeroPlayerBalance } from 'lib/paprHeroes';
 import { addressToENS } from 'lib/account';
 import { useConfig } from 'hooks/useConfig';
+import { HeroClaim__factory } from 'types/generated/abis/factories/HeroClaim__factory';
+import airdropInput from 'lib/heroClaims/airdropInput.json';
+import airdropOutput from 'lib/heroClaims/airdropOutput.json';
+import { TransactionButton } from 'components/Button';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
@@ -24,7 +29,7 @@ type HeroesLandingPageContentProps = {
 };
 
 const longestString = (arr: string[]) => {
-  return arr.reduce((a, b) => (a.length > b.length ? a : b));
+  return arr.reduce((a, b) => (a.length > b.length ? a : b), '');
 };
 
 export function HeroesLandingPageContent({
@@ -103,6 +108,7 @@ export function HeroesLandingPageContent({
             score is the sum of their <i>phUSDC</i> balance as well as the value
             of their NFTs (as calculated by the floor price of the collection)
           </p>
+          <Claim />
         </Fieldset>
 
         <Fieldset legend="leaderboard">
@@ -491,5 +497,124 @@ function LeaderboardEntry({
         </p>
       </td>
     </tr>
+  );
+}
+
+function Claim() {
+  const { address } = useAccount();
+  const signerOrProvider = useSignerOrProvider();
+  const [tx, setTx] = useState<SendTransactionResult | undefined>(undefined);
+
+  const connectedClaimsContract = useMemo(
+    () =>
+      HeroClaim__factory.connect(
+        process.env.NEXT_PUBLIC_HERO_CLAIM_CONTRACT!,
+        signerOrProvider,
+      ),
+    [signerOrProvider],
+  );
+
+  const claimInputForAccount = useMemo(() => {
+    if (!address) return null;
+    return airdropInput.data.find(
+      (d) => getAddress(d.account) === getAddress(address),
+    );
+  }, [address]);
+
+  const claimOutputForAccount = useMemo(() => {
+    if (!address) return null;
+    const proofAddress = Object.keys(airdropOutput.proofs).find(
+      (addr) => getAddress(addr) === getAddress(address),
+    );
+    if (!proofAddress) return null;
+    return (airdropOutput.proofs as { [key: string]: string[] })[proofAddress];
+  }, [address]);
+
+  const userEligibleForAirdrop = useMemo(
+    () =>
+      !address
+        ? false
+        : Object.keys(airdropOutput.proofs)
+            .map((addr) => getAddress(addr))
+            .includes(getAddress(address)),
+    [address],
+  );
+
+  const alreadyClaimed = useAsyncValue(async () => {
+    if (!address) return null;
+    return connectedClaimsContract.claimed(address);
+  }, [address, connectedClaimsContract]);
+
+  const claim = useCallback(async () => {
+    if (!address) return;
+    if (!claimInputForAccount || !claimOutputForAccount) return;
+    const { blitCount, dinoCount, moonBirdCount, toadzCount, phUSDCAmount } =
+      claimInputForAccount.claim;
+
+    const t = await connectedClaimsContract.claim(
+      {
+        account: address!,
+        claim: {
+          blitCount,
+          dinoCount,
+          moonBirdCount,
+          toadzCount,
+          phUSDCAmount: ethers.utils.parseUnits(phUSDCAmount.toString(), 6),
+        },
+      },
+      claimOutputForAccount,
+      {
+        gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
+      },
+    );
+    setTx({
+      hash: t.hash as `0x${string}`,
+      wait: t.wait,
+    });
+  }, [
+    address,
+    claimInputForAccount,
+    claimOutputForAccount,
+    connectedClaimsContract,
+  ]);
+
+  if (!address)
+    return (
+      <div>
+        <p>Connect your wallet to check eligilbility and claim your assets</p>
+      </div>
+    );
+
+  if (alreadyClaimed === null)
+    return (
+      <div>
+        <p>Loading claim info...</p>
+      </div>
+    );
+
+  if (alreadyClaimed === true) return <></>;
+
+  if (!userEligibleForAirdrop)
+    return (
+      <div>
+        <p>Oops! Looks like you are not eligible to participate in paprHero</p>
+      </div>
+    );
+
+  return (
+    <div>
+      <p>
+        You are eligible for the following airdrop claim to participate in
+        paprHero:
+      </p>
+      <ol>
+        <li>{claimInputForAccount?.claim.blitCount} Blitmaps</li>
+        <li>{claimInputForAccount?.claim.dinoCount} Dinos</li>
+        <li>{claimInputForAccount?.claim.moonBirdCount} Moonbirds</li>
+        <li>{claimInputForAccount?.claim.toadzCount} Toadz</li>
+        <li>{claimInputForAccount?.claim.phUSDCAmount} phUSDC</li>
+      </ol>
+      <TransactionButton text="Claim" onClick={claim} transactionData={tx} />
+    </div>
   );
 }
