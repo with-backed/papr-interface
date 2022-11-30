@@ -119,7 +119,7 @@ function LoanInfo({ paprController, vault }: LoanInfoProps) {
       ' ' +
       paprController.debtToken.symbol
     );
-  }, [vault]);
+  }, [vault, paprController]);
   const formattedMaxLTV = useMemo(() => {
     if (!maxLTV) {
       return '...';
