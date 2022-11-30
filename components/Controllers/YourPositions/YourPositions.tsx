@@ -114,9 +114,11 @@ function LoanInfo({ paprController, vault }: LoanInfoProps) {
     return (
       formatTokenAmount(
         convertOneScaledValue(ethers.BigNumber.from(vault.debt), 4),
-      ) + ' USDC'
+      ) +
+      ' ' +
+      paprController.debtToken.symbol
     );
-  }, [vault]);
+  }, [vault, paprController]);
   const formattedMaxLTV = useMemo(() => {
     if (!maxLTV) {
       return '...';
@@ -125,9 +127,7 @@ function LoanInfo({ paprController, vault }: LoanInfoProps) {
   }, [maxLTV]);
   return (
     <p>
-      Your loan of <b>{formattedDebt}</b> is at <b>{formattedLTV}</b> and is
-      projected to reach the {formattedMaxLTV} max in{' '}
-      <b>{liquidationEstimate} days</b>.
+      Your loan of <b>{formattedDebt}</b> is at <b>{formattedLTV}</b>.
     </p>
   );
 }

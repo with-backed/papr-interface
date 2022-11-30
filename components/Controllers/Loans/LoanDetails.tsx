@@ -45,6 +45,7 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
         <tbody>
           <VaultRow
             id={vaultId}
+            account={vault?.account}
             debt={vault!.debt}
             decimals={paprController.underlying.decimals}
             symbol={paprController.underlying.symbol}
