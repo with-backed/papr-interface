@@ -88,8 +88,8 @@
 }
 
 .outline.papr {
-  border: 2px var(--papr-50) solid;
-  color: var(--papr-50);
+  border: 2px var(--papr-100) solid;
+  color: var(--papr-100);
 }
 
 .outline.papr:hover,
@@ -98,8 +98,8 @@
 }
 
 .outline.meme {
-  border: 2px var(--paprMEME-50) solid;
-  color: var(--paprMEME-50);
+  border: 2px var(--paprMEME-100) solid;
+  color: var(--paprMEME-100);
 }
 
 .outline.meme:hover,
@@ -108,8 +108,8 @@
 }
 
 .outline.hero {
-  border: 2px var(--paprHERO-50) solid;
-  color: var(--paprHERO-50);
+  border: 2px var(--paprHERO-100) solid;
+  color: var(--paprHERO-100);
 }
 
 .outline.hero:hover,
@@ -118,8 +118,8 @@
 }
 
 .outline.trash {
-  border: 2px var(--paprTRASH-50) solid;
-  color: var(--paprTRASH-50);
+  border: 2px var(--paprTRASH-100) solid;
+  color: var(--paprTRASH-100);
 }
 
 .outline.trash:hover,
