@@ -177,13 +177,11 @@ function CollateralAdded({
     if (!debtIncreasedEvent) return null;
     const bigNumAmount = ethers.utils.formatUnits(
       debtIncreasedEvent?.amount,
-      paprController.token0IsUnderlying
-        ? paprController.subgraphPool.token0.decimals
-        : paprController.subgraphPool.token1.decimals,
+      paprController.debtToken.decimals,
     );
     return (
       formatTokenAmount(parseFloat(bigNumAmount)) +
-      ` ${paprController.underlying.symbol}`
+      ` ${paprController.debtToken.symbol}`
     );
   }, [debtIncreasedEvent, paprController]);
 
@@ -200,7 +198,7 @@ function CollateralAdded({
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
           deposited {event.collateral.symbol} #{event.collateral.tokenId} and
-          borrowed {borrowedAmount || 'nothing'}
+          minted {borrowedAmount || 'nothing'}
         </span>
       </td>
     </tr>
@@ -237,7 +235,7 @@ function CollateralRemoved({
     );
     return (
       formatTokenAmount(parseFloat(bigNumAmount)) +
-      ` ${paprController.underlying.symbol}`
+      ` ${paprController.debtToken.symbol}`
     );
   }, [debtDecreasedEvent, paprController]);
 
@@ -273,7 +271,7 @@ function CollateralRemoved({
           <EtherscanAddressLink address={vaultOwner}>
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
-          returned {returnedAmount} and reclaimed {event.collateral.symbol} #
+          repaid {returnedAmount} and withdrew {event.collateral.symbol} #
           {event.collateral.tokenId}
         </span>
       </td>
