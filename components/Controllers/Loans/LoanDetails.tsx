@@ -47,8 +47,6 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
             id={vaultId}
             account={vault?.account}
             debt={vault!.debt}
-            decimals={paprController.underlying.decimals}
-            symbol={paprController.underlying.symbol}
             maxLTV={maxLTV}
             ltv={ltv}
             controllerId={paprController.id}

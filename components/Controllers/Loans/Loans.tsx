@@ -7,10 +7,10 @@ import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { computeLtv, convertOneScaledValue } from 'lib/controllers';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Health } from '../Health';
 import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
+import { VaultHealth } from './VaultHealth';
 
 type LoansProps = {
   paprController: PaprController;
@@ -32,11 +32,12 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     const ltvValues = Object.values(ltvs);
 
     if (ltvValues.length === 0) {
-      return '...';
+      return 0;
     }
-
-    return formatPercent(ltvValues.reduce((a, b) => a + b) / ltvValues.length);
+    return ltvValues.reduce((a, b) => a + b) / ltvValues.length;
   }, [ltvs]);
+
+  const formattedAvgLtv = useMemo(() => formatPercent(avgLtv), [avgLtv]);
 
   const formattedTotalDebt = useMemo(() => {
     const debtBigNum = activeVaults.reduce(
@@ -93,8 +94,8 @@ export function Loans({ paprController, pricesData }: LoansProps) {
             <td>{activeVaults.length} Loans</td>
             <td>{formattedTotalDebt}</td>
             <td>{timestampDaysAgo(paprController.createdAt)}</td>
-            <td>{avgLtv}</td>
-            <td>{!!pricesData ? <Health pricesData={pricesData} /> : '???'}</td>
+            <td>{formattedAvgLtv}</td>
+            <td>{!!maxLTV && <VaultHealth ltv={avgLtv} maxLtv={maxLTV} />}</td>
           </tr>
         </tbody>
       </Table>
