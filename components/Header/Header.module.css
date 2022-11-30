@@ -81,37 +81,41 @@
 
 .link.papr:hover {
   transition: background-color 200ms ease;
-  background-color: var(--papr-20);
+  background-color: var(--papr-5);
 }
 
-.link-active.papr {
+.link-active.papr,
+.link-active.papr:hover {
   background-color: var(--papr-20);
 }
 
 .link.meme:hover {
   transition: background-color 200ms ease;
-  background-color: var(--paprMEME-20);
+  background-color: var(--paprMEME-5);
 }
 
-.link-active.meme {
+.link-active.meme,
+.link-active.meme:hover {
   background-color: var(--paprMEME-20);
 }
 
 .link.hero:hover {
   transition: background-color 200ms ease;
-  background-color: var(--paprHERO-20);
+  background-color: var(--paprHERO-5);
 }
 
-.link-active.hero {
+.link-active.hero,
+.link-active.hero:hover {
   background-color: var(--paprHERO-20);
 }
 
 .link.trash:hover {
   transition: background-color 200ms ease;
-  background-color: var(--paprTRASH-20);
+  background-color: var(--paprTRASH-5);
 }
 
-.link-active.trash {
+.link-active.trash,
+.link-active.trash:hover {
   background-color: var(--paprTRASH-20);
 }
 
