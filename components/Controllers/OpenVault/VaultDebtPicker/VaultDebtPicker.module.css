@@ -110,6 +110,7 @@
   border-radius: var(--border-radius);
   padding: 12px;
   text-align: right;
+  font-size: var(--font-large);
 }
 
 .slippage {
@@ -135,15 +136,23 @@
 }
 
 .loanActionSummary {
-  width: 56%;
+  width: 100%;
 }
 
-.loanActionSummary > div:nth-of-type(1) {
-  background-color: var(--background-faded-green);
+.loanActionSummary.papr > div:nth-of-type(odd) {
+  background-color: var(--papr-5);
 }
 
-.loanActionSummary > div:nth-of-type(3) {
-  background-color: var(--background-faded-green);
+.loanActionSummary.meme > div:nth-of-type(odd) {
+  background-color: var(--paprMEME-5);
+}
+
+.loanActionSummary.hero > div:nth-of-type(odd) {
+  background-color: var(--paprHERO-5);
+}
+
+.loanActionSummary.trash > div:nth-of-type(odd) {
+  background-color: var(--paprTRASH-5);
 }
 
 .loanActionSummary > div {
@@ -225,4 +234,5 @@
   gap: 18px;
   width: 56%;
   margin-left: auto;
+  font-size: var(--font-large);
 }

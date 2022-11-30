@@ -392,7 +392,7 @@ export function VaultDebtPicker({
         <div className={styles.editLoanPreview}>
           <div className={`${!vaultHasDebt ? styles.hidden : ''}`}>
             <Button
-              size="xsmall"
+              size="small"
               theme={theme}
               kind="outline"
               onClick={() => setHideLoanFormToggle(!hideLoanFormToggle)}>
@@ -723,9 +723,10 @@ function LoanActionSummary({
   setUsingPerpetual,
   errorMessage,
 }: LoanActionSummaryProps) {
+  const theme = useTheme();
   return (
     <div className={styles.loanActionSummaryWrapper}>
-      <div className={styles.loanActionSummary}>
+      <div className={[styles.loanActionSummary, styles[theme]].join(' ')}>
         <div>
           <div>
             <p>
