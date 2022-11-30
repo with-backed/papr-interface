@@ -39,7 +39,7 @@ export const useAccountNFTs = (
 
       if (error) {
         console.error(error);
-        return null;
+        return [];
       }
 
       return data?.tokens || [];
@@ -47,7 +47,7 @@ export const useAccountNFTs = (
 
     fetch().then((tokens) => {
       setUserCollectionNFTs(
-        (tokens || []).map((token) => ({
+        tokens.map((token) => ({
           address: token.registry.id,
           tokenId: token.identifier,
         })),
