@@ -31,7 +31,10 @@ const paprTrash: Config = {
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph:
     'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.0/gn',
-  oracleBaseUrl: 'http://localhost:3000',
+  oracleBaseUrl:
+    process.env.NEXT_PUBLIC_ENV === 'local'
+      ? 'http://localhost:3000'
+      : 'https://v2-interface-rosy.vercel.app',
   paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
@@ -54,7 +57,10 @@ const paprHero: Config = {
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph:
     'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.1/gn',
-  oracleBaseUrl: 'http://localhost:3000',
+  oracleBaseUrl:
+    process.env.NEXT_PUBLIC_ENV === 'local'
+      ? 'http://localhost:3000'
+      : 'https://v2-interface-rosy.vercel.app',
   paprUnderlyingAddress: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
@@ -80,7 +86,7 @@ const paprMeme = {
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprMemeSubgraph: 'TODO: update this when we have a prod subgraph',
   paprUnderlyingAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-  oracleBaseUrl: 'http://localhost:3000',
+  oracleBaseUrl: '',
   reservoirAPI: 'https://api.reservoir.tools',
   reservoirMarketplace: '',
 };
