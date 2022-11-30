@@ -15,7 +15,7 @@ import { Toggle } from 'components/Toggle';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
+import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
 import { useConfig } from 'hooks/useConfig';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
@@ -46,7 +46,7 @@ type VaultDebtPickerProps = {
   oracleInfo: OracleInfo;
   vault: VaultsByOwnerForControllerQuery['vaults']['0'] | undefined;
   collateralContractAddress: string;
-  userNFTsForVault: CenterUserNFTsResponse[];
+  userNFTsForVault: AccountNFTsResponse[];
 };
 
 export function VaultDebtPicker({

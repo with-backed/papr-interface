@@ -1,5 +1,5 @@
 import styles from './YourBorrowPositions.module.css';
-import { CenterUserNFTsResponse } from 'hooks/useCenterNFTs';
+import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
 import { Fieldset } from 'components/Fieldset';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { PaprController } from 'lib/PaprController';
@@ -22,7 +22,7 @@ import { formatBigNum } from 'lib/numberFormat';
 
 export type YourBorrowPositionsProps = {
   paprController: PaprController;
-  userNFTs: CenterUserNFTsResponse[];
+  userNFTs: AccountNFTsResponse[];
   currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
   oracleInfo: OracleInfo;
 };

@@ -1,0 +1,9 @@
+query nftsForAccountAndCollection($owner: String, $collections: [String!]) {
+  tokens(where: { owner: $owner, registry_in: $collections }) {
+    id
+    registry {
+      id
+    }
+    identifier
+  }
+}

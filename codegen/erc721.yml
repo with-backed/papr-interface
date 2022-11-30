@@ -1,0 +1,10 @@
+overwrite: true
+schema: 'https://api.thegraph.com/subgraphs/name/adamgobes/erc721-goerli'
+documents: './graphql/erc721/**/*.graphql'
+generates:
+  types/generated/graphql/erc721.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'urql-introspection'
+      - 'typed-document-node'

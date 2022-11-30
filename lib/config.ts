@@ -38,6 +38,8 @@ const paprTrash: Config = {
   paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
+  erc721Subgraph:
+    'https://api.thegraph.com/subgraphs/name/adamgobes/erc721-goerli',
 };
 
 const paprHero: Config = {
@@ -64,6 +66,8 @@ const paprHero: Config = {
   paprUnderlyingAddress: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
+  erc721Subgraph:
+    'https://api.thegraph.com/subgraphs/name/adamgobes/erc721-goerli',
 };
 
 const paprMeme = {
@@ -89,6 +93,7 @@ const paprMeme = {
   oracleBaseUrl: '',
   reservoirAPI: 'https://api.reservoir.tools',
   reservoirMarketplace: '',
+  erc721Subgraph: '',
 };
 
 export const configs = {
