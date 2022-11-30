@@ -8,7 +8,7 @@ import { formatTokenAmount } from 'lib/numberFormat';
 import { ethers } from 'ethers';
 import { erc20ABI } from 'wagmi';
 
-const LEGEND = '🩰 Your Positions';
+const LEGEND = '🧮 Your Positions';
 
 type YourPositionsProps = {
   paprController: PaprController;
