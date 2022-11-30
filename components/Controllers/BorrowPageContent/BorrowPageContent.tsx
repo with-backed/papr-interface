@@ -11,6 +11,7 @@ import { VaultDebtPicker } from 'components/Controllers/OpenVault/VaultDebtPicke
 import { getAddress } from 'ethers/lib/utils';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { OraclePriceType } from 'lib/oracle/reservoir';
+import { Activity } from '../Activity';
 
 export type BorrowPageProps = {
   controllerAddress: string;
@@ -56,6 +57,11 @@ export function BorrowPageContent({
     return Array.from(new Set(userAndVaultCollateral));
   }, [userCollectionNFTs, currentVaults]);
 
+  const vaultIds = useMemo(
+    () => new Set(currentVaults?.map((v) => v.id)),
+    [currentVaults],
+  );
+
   if (
     !paprController ||
     !pricesData ||
@@ -89,6 +95,9 @@ export function BorrowPageContent({
             )}
           />
         ))}
+      {!!currentVaults && (
+        <Activity paprController={paprController} vaultIds={vaultIds} />
+      )}
     </div>
   );
 }

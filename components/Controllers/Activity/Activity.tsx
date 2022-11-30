@@ -15,6 +15,9 @@ import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgrap
 import { SwapsByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
 import styles from './Activity.module.css';
 import { Table } from 'components/Table';
+import { erc721Contract } from 'lib/contracts';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -23,12 +26,12 @@ type ActivityProps = {
   paprController: PaprController;
   // If scoping activity view to just a specific vault
   // instead of the whole controller
-  vaultId?: string;
+  vaultIds?: Set<string>;
 };
 
 const EVENT_INCREMENT = 5;
 
-export function Activity({ paprController, vaultId }: ActivityProps) {
+export function Activity({ paprController, vaultIds }: ActivityProps) {
   const { data: swapsData, fetching: swapsFetching } = useUniswapSwapsByPool(
     paprController.poolAddress,
   );
@@ -37,22 +40,34 @@ export function Activity({ paprController, vaultId }: ActivityProps) {
     useActivityByController(paprController.id);
 
   const allEvents = useMemo(() => {
-    const unsortedEvents = vaultId
+    const unsortedEvents = vaultIds
       ? [
-          ...(activityData?.addCollateralEvents.filter(
-            (e) => e.vault.id === vaultId,
+          ...(activityData?.addCollateralEvents.filter((e) =>
+            vaultIds.has(e.vault.id),
           ) || []),
-          ...(activityData?.removeCollateralEvents.filter(
-            (e) => e.vault.id === vaultId,
+          ...(activityData?.removeCollateralEvents.filter((e) =>
+            vaultIds.has(e.vault.id),
+          ) || []),
+          ...(activityData?.auctionStartEvents.filter((e) =>
+            vaultIds.has(e.auction.vault.id),
+          ) || []),
+          ...(activityData?.auctionEndEvents.filter((e) =>
+            vaultIds.has(e.auction.vault.id),
           ) || []),
         ]
       : [
           ...(activityData?.addCollateralEvents || []),
           ...(activityData?.removeCollateralEvents || []),
           ...(swapsData?.swaps || []),
+          ...(activityData?.auctionStartEvents.filter(
+            (e) => e.auction.vault.controller.id === paprController.id,
+          ) || []),
+          ...(activityData?.auctionEndEvents.filter(
+            (e) => e.auction.vault.controller.id === paprController.id,
+          ) || []),
         ];
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
-  }, [activityData, swapsData, vaultId]);
+  }, [activityData, paprController.id, swapsData, vaultIds]);
 
   const [feed, setFeed] = useState<typeof allEvents>([]);
   const [remaining, setRemaining] = useState<typeof allEvents>([]);
@@ -114,6 +129,16 @@ export function Activity({ paprController, vaultId }: ActivityProps) {
                     paprController={paprController}
                   />
                 );
+              case 'AuctionStartEvent':
+                return <AuctionStart event={event} key={event.id} />;
+              case 'AuctionEndEvent':
+                return (
+                  <AuctionEnd
+                    event={event}
+                    key={event.id}
+                    paprController={paprController}
+                  />
+                );
             }
           })}
         </tbody>
@@ -141,14 +166,8 @@ function CollateralAdded({
 }) {
   const vaultOwner = useMemo(() => {
     const vaultId = event.vault.id;
-    const vault = paprController.vaults?.find((v) => v.id === vaultId);
-
-    if (!vault) {
-      return 'Unknown';
-    }
-
-    return vault.id;
-  }, [event, paprController]);
+    return vaultId.split('-')[1];
+  }, [event]);
 
   const debtIncreasedEvent = useMemo(() => {
     return debtIncreasedEvents.find((e) => e.id === event.id);
@@ -158,13 +177,11 @@ function CollateralAdded({
     if (!debtIncreasedEvent) return null;
     const bigNumAmount = ethers.utils.formatUnits(
       debtIncreasedEvent?.amount,
-      paprController.token0IsUnderlying
-        ? paprController.subgraphPool.token0.decimals
-        : paprController.subgraphPool.token1.decimals,
+      paprController.debtToken.decimals,
     );
     return (
       formatTokenAmount(parseFloat(bigNumAmount)) +
-      ` ${paprController.underlying.symbol}`
+      ` ${paprController.debtToken.symbol}`
     );
   }, [debtIncreasedEvent, paprController]);
 
@@ -181,7 +198,7 @@ function CollateralAdded({
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
           deposited {event.collateral.symbol} #{event.collateral.tokenId} and
-          borrowed {borrowedAmount || 'nothing'}
+          minted {borrowedAmount || 'nothing'}
         </span>
       </td>
     </tr>
@@ -199,14 +216,8 @@ function CollateralRemoved({
 }) {
   const vaultOwner = useMemo(() => {
     const vaultId = event.vault.id;
-    const vault = paprController.vaults?.find((v) => v.id === vaultId);
-
-    if (!vault) {
-      return 'Unknown';
-    }
-
-    return vault.id;
-  }, [event, paprController]);
+    return vaultId.split('-')[1];
+  }, [event]);
 
   const debtDecreasedEvent = useMemo(() => {
     return debtDecreasedEvents.find((e) => e.id === event.id);
@@ -214,7 +225,6 @@ function CollateralRemoved({
 
   const returnedAmount = useMemo(() => {
     if (!debtDecreasedEvent) {
-      // TODO: handle better
       return '';
     }
     const bigNumAmount = ethers.utils.formatUnits(
@@ -225,9 +235,29 @@ function CollateralRemoved({
     );
     return (
       formatTokenAmount(parseFloat(bigNumAmount)) +
-      ` ${paprController.underlying.symbol}`
+      ` ${paprController.debtToken.symbol}`
     );
   }, [debtDecreasedEvent, paprController]);
+
+  if (!debtDecreasedEvent) {
+    return (
+      <tr>
+        <td>
+          <EtherscanTransactionLink transactionHash={event.id}>
+            {humanizedTimestamp(event.timestamp)}
+          </EtherscanTransactionLink>
+        </td>
+        <td>
+          <span>
+            {event.collateral.symbol} #{event.collateral.tokenId} transferred to{' '}
+            <EtherscanAddressLink address={vaultOwner}>
+              {vaultOwner.substring(0, 8)}
+            </EtherscanAddressLink>{' '}
+          </span>
+        </td>
+      </tr>
+    );
+  }
 
   return (
     <tr>
@@ -241,7 +271,7 @@ function CollateralRemoved({
           <EtherscanAddressLink address={vaultOwner}>
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
-          returned {returnedAmount} and reclaimed {event.collateral.symbol} #
+          repaid {returnedAmount} and withdrew {event.collateral.symbol} #
           {event.collateral.tokenId}
         </span>
       </td>
@@ -276,6 +306,68 @@ function Swap({
       </td>
       <td>
         <span>{description}</span>
+      </td>
+    </tr>
+  );
+}
+
+function AuctionStart({
+  event,
+}: {
+  event: ArrayElement<ActivityByControllerQuery['auctionStartEvents']>;
+}) {
+  const signerOrProvider = useSignerOrProvider();
+  const assetContract = useMemo(
+    () => erc721Contract(event.auction.auctionAssetContract, signerOrProvider),
+    [event, signerOrProvider],
+  );
+  const symbol = useAsyncValue(() => assetContract.symbol(), [assetContract]);
+
+  return (
+    <tr>
+      <td>
+        <EtherscanTransactionLink transactionHash={event.id}>
+          {humanizedTimestamp(event.timestamp)}
+        </EtherscanTransactionLink>
+      </td>
+      <td>
+        Auction: {symbol} #{event.auction.auctionAssetID}
+      </td>
+    </tr>
+  );
+}
+
+function AuctionEnd({
+  event,
+  paprController,
+}: {
+  event: ArrayElement<ActivityByControllerQuery['auctionEndEvents']>;
+  paprController: PaprController;
+}) {
+  const signerOrProvider = useSignerOrProvider();
+  const assetContract = useMemo(
+    () => erc721Contract(event.auction.auctionAssetContract, signerOrProvider),
+    [event, signerOrProvider],
+  );
+  const symbol = useAsyncValue(() => assetContract.symbol(), [assetContract]);
+  const formattedEndPrice = useMemo(() => {
+    const endPrice = ethers.utils.formatUnits(
+      event.auction.endPrice,
+      paprController.debtToken.decimals,
+    );
+    return formatTokenAmount(parseFloat(endPrice));
+  }, [event, paprController]);
+
+  return (
+    <tr>
+      <td>
+        <EtherscanTransactionLink transactionHash={event.id}>
+          {humanizedTimestamp(event.timestamp)}
+        </EtherscanTransactionLink>
+      </td>
+      <td>
+        Auction completed: {symbol} #{event.auction.auctionAssetID} for{' '}
+        {formattedEndPrice} papr.
       </td>
     </tr>
   );

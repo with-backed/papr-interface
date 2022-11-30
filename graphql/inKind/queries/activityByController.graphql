@@ -41,4 +41,35 @@ query activityByController($controllerId: String) {
     }
     amount
   }
+  auctionStartEvents {
+    id
+    timestamp
+    auction {
+      id
+      auctionAssetID
+      auctionAssetContract
+      startPrice
+      vault {
+        id
+        controller {
+          id
+        }
+      }
+    }
+  }
+  auctionEndEvents {
+    id
+    timestamp
+    auction {
+      auctionAssetID
+      auctionAssetContract
+      endPrice
+      vault {
+        id
+        controller {
+          id
+        }
+      }
+    }
+  }
 }
