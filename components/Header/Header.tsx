@@ -26,7 +26,7 @@ const prodPages = (controllerAddress: string): Page[] => [
   },
   {
     name: 'Borrow',
-    route: `/borrow`,
+    route: `borrow`,
     matcher: '/borrow',
   },
   {
@@ -47,14 +47,21 @@ const prodPages = (controllerAddress: string): Page[] => [
 const paprHeroPages: Page[] = [
   {
     name: 'Contest',
-    route: `/contest`,
+    route: `contest`,
     matcher: 'contest',
   },
 ];
 
 const stagingPages: Page[] = [];
 
-function isActiveRoute(activeRoute: string, candidate: Page) {
+function isActiveRoute(
+  activeRoute: string,
+  candidate: Page,
+  isHomepage: boolean,
+) {
+  if (isHomepage) {
+    return false;
+  }
   if (candidate.route.length === 0) {
     return activeRoute.length === 0;
   }
@@ -68,8 +75,9 @@ function isActiveRoute(activeRoute: string, candidate: Page) {
 
 type NavLinksProps = {
   activeRoute: string;
+  isHomepage: boolean;
 };
-function NavLinks({ activeRoute }: NavLinksProps) {
+function NavLinks({ activeRoute, isHomepage }: NavLinksProps) {
   const { tokenName, controllerAddress } = useConfig();
 
   const pages = useMemo(() => {
@@ -99,7 +107,7 @@ function NavLinks({ activeRoute }: NavLinksProps) {
             }>
             <a
               className={
-                isActiveRoute(activeRoute, p)
+                isActiveRoute(activeRoute, p, isHomepage)
                   ? styles['link-active']
                   : styles.link
               }
@@ -128,6 +136,7 @@ const SHOW_HEADER_ON_LANDING_PAGE =
 
 export function Header() {
   const { pathname } = useRouter();
+
   const activeRoute = useMemo(() => {
     // Handling these since they aren't network-namespaced
     if (pathname === '/404' || pathname === '/500') {
@@ -150,16 +159,18 @@ export function Header() {
     );
   }
 
+  const isHomepage = pathname === '/';
+
   return (
     <nav className={styles.nav}>
       <div className={styles['desktop-content']}>
         <LogoLink />
-        <NavLinks activeRoute={activeRoute} />
+        <NavLinks activeRoute={activeRoute} isHomepage={isHomepage} />
         <ConnectWallet />
       </div>
       <div className={styles['mobile-content']}>
         <LogoLink />
-        <NavLinks activeRoute={activeRoute} />
+        <NavLinks activeRoute={activeRoute} isHomepage={isHomepage} />
         <ConnectWallet />
       </div>
     </nav>
