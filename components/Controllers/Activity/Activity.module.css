@@ -3,3 +3,8 @@
   justify-content: center;
   margin-top: 1rem;
 }
+
+.table tr td:first-child {
+  white-space: nowrap;
+  padding-right: 12px;
+}
