@@ -82,8 +82,6 @@ function NavLinks({ activeRoute }: NavLinksProps) {
     );
   }, [tokenName]);
 
-  console.log({ paprController });
-
   const pages = useMemo(() => {
     const productSpecificPages = tokenName === 'paprHero' ? paprHeroPages : [];
     if (process.env.VERCEL_ENV === 'production') {
