@@ -191,7 +191,11 @@ export function Header() {
   }
 
   return (
-    <nav className={[styles.nav, styles[theme]].join(' ')}>
+    <nav
+      className={[
+        styles.nav,
+        isHomePage ? styles.homepage : styles[theme],
+      ].join(' ')}>
       <div className={styles['desktop-content']}>
         <LogoLink isHomePage={isHomePage} />
         <NavLinks activeRoute={activeRoute} isHomePage={isHomePage} />

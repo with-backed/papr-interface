@@ -1,4 +1,4 @@
-.nav.papr {
+.nav.homepage {
   background: url('/graph-square.png'),
     linear-gradient(
       120deg,
@@ -7,8 +7,17 @@
     );
 }
 
+.nav.papr {
+  background: url('/graph-5x5.png'),
+    linear-gradient(
+      120deg,
+      var(--papr-offset-gradient) 0%,
+      var(--papr-100-gradient) 100%
+    );
+}
+
 .nav.meme {
-  background: url('/graph-square.png'),
+  background: url('/graph-5x5.png'),
     linear-gradient(
       120deg,
       var(--paprMEME-offset-gradient) 0%,
@@ -17,7 +26,7 @@
 }
 
 .nav.hero {
-  background: url('/graph-square.png'),
+  background: url('/graph-5x5.png'),
     linear-gradient(
       120deg,
       var(--paprHERO-offset-gradient) 0%,
@@ -26,7 +35,7 @@
 }
 
 .nav.trash {
-  background: url('/graph-square.png'),
+  background: url('/graph-5x5.png'),
     linear-gradient(
       120deg,
       var(--paprTRASH-offset-gradient) 0%,
