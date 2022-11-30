@@ -4,6 +4,7 @@ import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory'
 import { configs } from './config';
 import { makeProvider } from './contracts';
 import { getQuoteForSwap } from './controllers';
+import { formatBigNum } from './numberFormat';
 import { ReservoirResponseData } from './oracle/reservoir';
 import { getAllVaultsForControllerForUser } from './pAPRSubgraph';
 
@@ -65,16 +66,19 @@ export async function calculateNetPhUSDCBalance(
     netPaprInUnderlying = ethers.BigNumber.from(0);
   } else {
     netPaprInUnderlying = await getQuoteForSwap(
-      netPapr,
+      netPapr.abs(),
       paprToken,
       underlying,
       'paprHero',
     );
   }
 
-  const totalBalance = totalNFTWorth
-    .add(totalPhUSDCBalance)
-    .add(netPaprInUnderlying);
+  let totalBalance = totalNFTWorth.add(totalPhUSDCBalance);
+  if (netPapr.isNegative()) {
+    totalBalance = totalBalance.sub(netPaprInUnderlying);
+  } else {
+    totalBalance = totalBalance.add(netPaprInUnderlying);
+  }
 
   return {
     totalNFTWorth: parseFloat(
@@ -83,7 +87,10 @@ export async function calculateNetPhUSDCBalance(
     totalPhUSDCBalance: parseFloat(
       ethers.utils.formatUnits(totalPhUSDCBalance, underlyingDecimals),
     ),
-    netPapr: parseFloat(ethers.utils.formatUnits(netPapr, underlyingDecimals)),
+    netPapr:
+      parseFloat(
+        ethers.utils.formatUnits(netPaprInUnderlying, underlyingDecimals),
+      ) * (netPapr.isNegative() ? -1 : 1),
     totalBalance: parseFloat(
       ethers.utils.formatUnits(totalBalance, underlyingDecimals),
     ),

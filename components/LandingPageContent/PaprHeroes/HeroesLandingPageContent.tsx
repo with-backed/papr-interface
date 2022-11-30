@@ -484,7 +484,10 @@ function LeaderboardEntry({
           {heroPlayerBalance.totalPhUSDCBalance.toFixed(2)}
         </p>
       </td>
-      <td className={`${heroPlayerBalance.netPapr > 0 ? 'green' : 'red'}`}>
+      <td
+        className={`${
+          heroPlayerBalance.netPapr >= 0 ? styles.green : styles.red
+        }`}>
         <p>
           {whiteSpaceForColumn('netPapr')}
           {heroPlayerBalance.netPapr.toFixed(2)}
