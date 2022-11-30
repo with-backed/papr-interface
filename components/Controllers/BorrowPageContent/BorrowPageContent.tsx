@@ -31,7 +31,7 @@ export function BorrowPageContent({
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.contractAddress);
   }, [paprController.allowedCollateral]);
-  useAccountNFTs;
+
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
     address,
     collateralContractAddresses,
