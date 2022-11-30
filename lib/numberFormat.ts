@@ -3,8 +3,8 @@ import { ethers } from 'ethers';
 const LOCALE = 'en-US';
 const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
   notation: 'compact',
-  minimumSignificantDigits: 3,
-  maximumSignificantDigits: 3,
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 });
 /**
  * Formats a number representing a quantity of tokens consistent with our design.
