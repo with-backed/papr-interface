@@ -111,7 +111,6 @@ function LoanInfo({ paprController, vault }: LoanInfoProps) {
     );
   }, [target, vault]);
   const formattedDebt = useMemo(() => {
-    console.log(paprController.paprToken);
     return (
       formatTokenAmount(
         convertOneScaledValue(ethers.BigNumber.from(vault.debt), 4),
