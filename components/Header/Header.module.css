@@ -89,7 +89,7 @@
 
 .entry {
   padding: 5px 15px;
-  height: 48px;
+  height: 45px;
   display: flex;
   flex-direction: row;
   white-space: nowrap;
@@ -163,6 +163,7 @@
 .logo {
   position: relative;
   max-width: 120px;
+  margin-top: 8px;
 }
 
 @media screen and (max-width: 750px) {
