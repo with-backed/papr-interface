@@ -50,7 +50,6 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
             maxLTV={maxLTV}
             ltv={ltv}
             controllerId={paprController.id}
-            expanded={false}
           />
         </tbody>
       </Table>

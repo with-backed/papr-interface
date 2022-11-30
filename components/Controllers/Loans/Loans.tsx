@@ -84,7 +84,6 @@ export function Loans({ paprController, pricesData }: LoansProps) {
           <tr>
             <th>Total</th>
             <th>Amount</th>
-            <th>Days</th>
             <th>Avg.LTV</th>
             <th>Health</th>
           </tr>
@@ -93,7 +92,6 @@ export function Loans({ paprController, pricesData }: LoansProps) {
           <tr className={styles.row}>
             <td>{activeVaults.length} Loans</td>
             <td>{formattedTotalDebt}</td>
-            <td>{timestampDaysAgo(paprController.createdAt)}</td>
             <td>{formattedAvgLtv}</td>
             <td>{!!maxLTV && <VaultHealth ltv={avgLtv} maxLtv={maxLTV} />}</td>
           </tr>
@@ -104,7 +102,6 @@ export function Loans({ paprController, pricesData }: LoansProps) {
           <tr>
             <th>Loan</th>
             <th>Amount</th>
-            <th>Days</th>
             <th>LTV</th>
             <th>Health</th>
           </tr>
