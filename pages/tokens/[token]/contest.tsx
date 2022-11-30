@@ -30,7 +30,6 @@ export const getServerSideProps: GetServerSideProps<
     }
 
     const { paprController } = controllerSubgraphData;
-
     const allowedCollateral = paprController.allowedCollateral.map(
       (ac: any) => ac.contractAddress,
     );
