@@ -169,7 +169,7 @@
   font-size: var(--font-large);
   border-radius: var(--border-radius);
   position: relative;
-  background: var(--highlight-visited-5);
+  background: var(--gray-5);
 }
 
 .button-completed-message {
@@ -182,7 +182,7 @@
   justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
-  background: var(--highlight-visited-10);
+  background: #dddddd;
   border-radius: 1rem;
   position: absolute;
   z-index: 50;
