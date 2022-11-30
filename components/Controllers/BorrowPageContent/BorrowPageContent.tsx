@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
-import { useCenterNFTs } from 'hooks/useCenterNFTs';
+import { useAccountNFTs } from 'hooks/useAccountNFTs';
 import { PaprController } from 'lib/PaprController';
 import { YourBorrowPositions } from 'components/YourBorrowPositions/YourBorrowPositions';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
@@ -31,8 +31,8 @@ export function BorrowPageContent({
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.contractAddress);
   }, [paprController.allowedCollateral]);
-
-  const { userCollectionNFTs, nftsLoading } = useCenterNFTs(
+  useAccountNFTs;
+  const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
     address,
     collateralContractAddresses,
     config,
