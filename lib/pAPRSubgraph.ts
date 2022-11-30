@@ -8,14 +8,16 @@ import {
   PaprHeroPlayersDocument,
   PaprHeroPlayersQuery,
 } from 'types/generated/graphql/inKindSubgraph';
+import { configs, SupportedToken } from './config';
 import { PaprController, SubgraphController } from './PaprController';
 import { clientFromUrl } from './urql';
 
-export async function subgraphControllerByAddress(id: string) {
+export async function subgraphControllerByAddress(
+  id: string,
+  token: SupportedToken,
+) {
   // TODO: dynamic client address
-  const client = clientFromUrl(
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.0/gn',
-  );
+  const client = clientFromUrl(configs[token].paprMemeSubgraph);
   const { data, error } = await client
     .query<PaprControllerByIdQuery>(PaprControllerByIdDocument, { id })
     .toPromise();
@@ -28,10 +30,10 @@ export async function subgraphControllerByAddress(id: string) {
   return data || null;
 }
 
-export async function getAllPaprControllers(): Promise<SubgraphController[]> {
-  const client = clientFromUrl(
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.0/gn',
-  );
+export async function getAllPaprControllers(
+  token: SupportedToken,
+): Promise<SubgraphController[]> {
+  const client = clientFromUrl(configs[token].paprMemeSubgraph);
   const { data, error } = await client
     .query<PaprControllersQuery>(PaprControllersDocument, {})
     .toPromise();
@@ -44,10 +46,10 @@ export async function getAllPaprControllers(): Promise<SubgraphController[]> {
   return data?.paprControllers || [];
 }
 
-export async function getAllPaprHeroPlayers(): Promise<string[]> {
-  const client = clientFromUrl(
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.0/gn',
-  );
+export async function getAllPaprHeroPlayers(
+  token: SupportedToken,
+): Promise<string[]> {
+  const client = clientFromUrl(configs[token].paprMemeSubgraph);
   const { data, error } = await client
     .query<PaprHeroPlayersQuery>(PaprHeroPlayersDocument, {})
     .toPromise();

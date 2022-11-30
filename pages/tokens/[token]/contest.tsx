@@ -20,6 +20,7 @@ export const getServerSideProps: GetServerSideProps<
     const controllerSubgraphData = await fetchSubgraphData(
       configs[token].controllerAddress,
       configs[token].uniswapSubgraph,
+      token,
     );
 
     if (!controllerSubgraphData) {
@@ -41,7 +42,7 @@ export const getServerSideProps: GetServerSideProps<
     );
 
     const participatingPlayers = Array.from(
-      new Set(await getAllPaprHeroPlayers()),
+      new Set(await getAllPaprHeroPlayers(token)),
     );
 
     const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
