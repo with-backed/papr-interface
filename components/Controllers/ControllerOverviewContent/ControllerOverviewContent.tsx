@@ -27,7 +27,7 @@ export function ControllerOverviewContent({
   pricesData,
 }: ControllerPageProps) {
   const latestMarketPrice =
-    pricesData?.markValues[pricesData?.markValues.length - 1].value;
+    pricesData?.markValues[pricesData?.markValues.length - 1]?.value || 1.0;
 
   return (
     <div className={styles.wrapper}>
