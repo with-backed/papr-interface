@@ -19,6 +19,5 @@ export function Table({ children, className, fixed, ...props }: TableProps) {
         : [baseClassName, styles[theme]].join(' '),
     [baseClassName, theme, className],
   );
-  console.log({ fullClassName });
   return <table className={fullClassName}>{children}</table>;
 }
