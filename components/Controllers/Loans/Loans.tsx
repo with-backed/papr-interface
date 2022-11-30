@@ -111,8 +111,9 @@ export function Loans({ paprController, pricesData }: LoansProps) {
             const ltv = ltvs[v.id];
             return (
               <VaultRow
-                key={v.id}
+                key={v.account}
                 id={v.id}
+                account={v.account}
                 debt={v.debt}
                 controllerId={paprController.id}
                 decimals={paprController.underlying.decimals}

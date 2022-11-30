@@ -1,5 +1,6 @@
 fragment allVaultProperties on Vault {
   id
+  account
   debt
   collateralContract
   collateral {

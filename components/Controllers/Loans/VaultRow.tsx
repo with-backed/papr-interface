@@ -14,6 +14,7 @@ import Link from 'next/link';
 
 type VaultRowProps = {
   id: string;
+  account: string;
   debt: ethers.BigNumberish;
   decimals: ethers.BigNumberish;
   symbol: string;
@@ -24,6 +25,7 @@ type VaultRowProps = {
 };
 export function VaultRow({
   id,
+  account,
   debt,
   decimals,
   symbol,
@@ -62,7 +64,7 @@ export function VaultRow({
       <td>
         <Link
           href={`/tokens/${tokenName}/controllers/${controllerId}/vaults/${id}`}>
-          {id.substring(0, 7)}
+          {account.substring(0, 7)}
         </Link>
       </td>
       <td className={styles['right-align']}>{formattedDebt}</td>
