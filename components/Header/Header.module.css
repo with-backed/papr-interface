@@ -1,17 +1,37 @@
 .nav.papr {
-  background: url('/graph-square.png'), var(--papr-20);
+  background: url('/graph-square.png'),
+    linear-gradient(
+      120deg,
+      var(--papr-offset-gradient) 0%,
+      var(--papr-100-gradient) 100%
+    );
 }
 
 .nav.meme {
-  background: url('/graph-square.png'), var(--paprMEME-20);
+  background: url('/graph-square.png'),
+    linear-gradient(
+      120deg,
+      var(--paprMEME-offset-gradient) 0%,
+      var(--paprMEME-100-gradient) 100%
+    );
 }
 
 .nav.hero {
-  background: url('/graph-square.png'), var(--paprHERO-20);
+  background: url('/graph-square.png'),
+    linear-gradient(
+      120deg,
+      var(--paprHERO-offset-gradient) 0%,
+      var(--paprHERO-100-gradient) 100%
+    );
 }
 
 .nav.trash {
-  background: url('/graph-square.png'), var(--paprTRASH-20);
+  background: url('/graph-square.png'),
+    linear-gradient(
+      120deg,
+      var(--paprTRASH-offset-gradient) 0%,
+      var(--paprTRASH-100-gradient) 100%
+    );
 }
 
 .nav {
