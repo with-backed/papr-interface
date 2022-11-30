@@ -1,9 +1,12 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { timestampDaysAgo } from 'lib/duration';
 import { PaprController } from 'lib/PaprController';
-import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
+import {
+  formatBigNum,
+  formatPercent,
+  formatTokenAmount,
+} from 'lib/numberFormat';
 import { computeLtv, convertOneScaledValue } from 'lib/controllers';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -11,6 +14,8 @@ import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
 import { VaultHealth } from './VaultHealth';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 
 type LoansProps = {
   paprController: PaprController;
@@ -18,6 +23,7 @@ type LoansProps = {
 };
 
 export function Loans({ paprController, pricesData }: LoansProps) {
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const [ltvs, setLtvs] = useState<{ [key: string]: number }>({});
   const norm = useAsyncValue(
     () => paprController.newTarget(),
@@ -49,6 +55,29 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     );
     return '$' + formatTokenAmount(debtNum);
   }, [activeVaults, paprController.underlying]);
+
+  const computedLtvs: { [key: string]: number } | null =
+    useAsyncValue(async () => {
+      if (!oracleInfo || !maxLTV) return null;
+      return await activeVaults.reduce(async (prev, v) => {
+        const maxDebtForVault: ethers.BigNumber = (
+          await paprController.maxDebt([v.collateralContract], oracleInfo)
+        ).mul(v.collateral.length);
+        const maxNumber = parseFloat(
+          formatBigNum(maxDebtForVault, paprController.debtToken.decimals),
+        );
+        const debtNumber = parseFloat(
+          formatBigNum(v.debt, paprController.debtToken.decimals),
+        );
+
+        return {
+          ...prev,
+          [v.id]:
+            (debtNumber / maxNumber) *
+            parseFloat(ethers.utils.formatEther(maxLTV)),
+        };
+      }, {});
+    }, [activeVaults, oracleInfo, paprController, maxLTV]);
 
   useEffect(() => {
     if (!norm) {
@@ -108,7 +137,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
         </thead>
         <tbody>
           {activeVaults.map((v, i) => {
-            const ltv = ltvs[v.id];
+            const ltv = computedLtvs ? computedLtvs[v.id] : 0;
             const formattedDebt = formattedDebts[i];
             return (
               <VaultRow
