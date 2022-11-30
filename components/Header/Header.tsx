@@ -1,13 +1,13 @@
 import { ConnectWallet } from 'components/ConnectWallet';
-import { PaprMEME } from 'components/Icons/PaprMEME';
-import { Logo } from 'components/Logo';
 import { useConfig } from 'hooks/useConfig';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 import styles from './Header.module.css';
 import paprLogo from 'public/logos/papr-logo.png';
+import { configs, SupportedToken } from 'lib/config';
+import { fetchSubgraphData } from 'lib/PaprController';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 
 type Page = {
   name: string;
@@ -18,28 +18,30 @@ type Page = {
   isNetworkSpecialCase?: boolean;
   externalRedirect?: boolean;
 };
-const prodPages = (controllerAddress: string): Page[] => [
+const prodPages = (
+  controller?: string,
+  paprToken?: string,
+  underlying?: string,
+): Page[] => [
   {
     name: 'Performance',
-    route: `controllers/${controllerAddress}`,
+    route: `controllers/${controller}`,
     matcher: 'controllers/[controller]',
   },
   {
     name: 'Borrow',
-    route: `controllers/${controllerAddress}/borrow`,
+    route: `controllers/${controller}/borrow`,
     matcher: 'controllers/[controller]/borrow',
   },
   {
     name: 'Swap ↗',
-    route:
-      'https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=0x3089b47853df1b82877beef6d904a0ce98a12553&outputCurrency=0xb5e5f51e3e112634975fb44e6351380413f653ac',
+    route: `https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=${underlying}&outputCurrency=${paprToken}`,
     externalRedirect: true,
   },
 
   {
     name: 'LP ↗',
-    route:
-      'https://app.uniswap.org/#/add/0x3089B47853df1b82877bEef6D904a0ce98a12553/0x4a783cb0adb6403a739f907131f8788b40dc7678/10000?chain=goerli',
+    route: `https://app.uniswap.org/#/add/${underlying}/${paprToken}/10000?chain=goerli`,
     externalRedirect: true,
   },
 ];
@@ -72,17 +74,43 @@ type NavLinksProps = {
 function NavLinks({ activeRoute }: NavLinksProps) {
   const { tokenName, controllerAddress } = useConfig();
 
+  const paprController = useAsyncValue(() => {
+    return fetchSubgraphData(
+      configs[tokenName as SupportedToken].controllerAddress,
+      configs[tokenName as SupportedToken].uniswapSubgraph,
+      tokenName as SupportedToken,
+    );
+  }, [tokenName]);
+
+  console.log({ paprController });
+
   const pages = useMemo(() => {
     const productSpecificPages = tokenName === 'paprHero' ? paprHeroPages : [];
     if (process.env.VERCEL_ENV === 'production') {
-      return [...productSpecificPages, ...prodPages(controllerAddress!)];
+      return [
+        ...productSpecificPages,
+        ...prodPages(
+          paprController?.paprController.id,
+          paprController?.paprController.paprToken,
+          paprController?.paprController.underlying,
+        ),
+      ];
     }
     return [
       ...productSpecificPages,
-      ...prodPages(controllerAddress!),
+      ...prodPages(
+        paprController?.paprController.id,
+        paprController?.paprController.paprToken,
+        paprController?.paprController.underlying,
+      ),
       ...stagingPages,
     ];
-  }, [controllerAddress, tokenName]);
+  }, [
+    tokenName,
+    paprController?.paprController.id,
+    paprController?.paprController.paprToken,
+    paprController?.paprController.underlying,
+  ]);
 
   return (
     <ul className={styles.links}>
