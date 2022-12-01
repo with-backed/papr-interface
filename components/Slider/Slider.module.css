@@ -46,7 +46,7 @@
 
 .thumb {
   width: 8px;
-  margin-top: -10px;
+  margin-top: -5px;
   margin-left: -13px;
   border-radius: 4px;
   height: 46px;
@@ -67,7 +67,6 @@
 }
 
 .thumb > div {
-  color: var(--greentext);
   position: relative;
   width: 100px;
   right: 28px;
@@ -78,4 +77,20 @@
 .thumb > div p {
   margin: 0;
   text-align: center;
+}
+
+.papr {
+  color: var(--papr-100);
+}
+
+.meme {
+  color: var(--paprMEME-100);
+}
+
+.hero {
+  color: var(--paprHERO-100);
+}
+
+.trash {
+  color: var(--paprTRASH-100);
 }
