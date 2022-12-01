@@ -51,18 +51,20 @@ export function YourPositions({
 
   return (
     <Fieldset legend={LEGEND}>
-      {!paprMemeBalance.eq(0) && (
-        <BalanceInfo
-          paprMEMEBalance={paprMemeBalance}
-          paprMEMEDecimals={paprController.debtToken.decimals}
-          paprMEMESymbol={paprController.debtToken.symbol}
-          numberOfVaults={currentVaults?.length || 0}
-          latestMarketPrice={latestMarketPrice}
-        />
-      )}
-      {paprMemeBalance.eq(0) && !currentVaults && (
-        <p>You do not have any positions on this controller.</p>
-      )}
+      <div className={styles.wrapper}>
+        {!paprMemeBalance.eq(0) && (
+          <BalanceInfo
+            paprMEMEBalance={paprMemeBalance}
+            paprMEMEDecimals={paprController.debtToken.decimals}
+            paprMEMESymbol={paprController.debtToken.symbol}
+            numberOfVaults={currentVaults?.length || 0}
+            latestMarketPrice={latestMarketPrice}
+          />
+        )}
+        {paprMemeBalance.eq(0) && !currentVaults && (
+          <p>You do not have any positions on this controller.</p>
+        )}
+      </div>
     </Fieldset>
   );
 }
