@@ -2,14 +2,38 @@
   width: 100%;
   height: 36px;
   margin: 0 auto;
-  background-image: url('../../public/slider-tile-dim.svg');
   cursor: pointer;
+}
+
+.slider.papr {
+  background: url('../../public/slider-tile-mask.svg'), var(--papr-10);
+}
+.slider.meme {
+  background: url('../../public/slider-tile-mask.svg'), var(--paprMEME-10);
+}
+.slider.hero {
+  background: url('../../public/slider-tile-mask.svg'), var(--paprHERO-10);
+}
+.slider.trash {
+  background: url('../../public/slider-tile-mask.svg'), var(--paprTRASH-10);
 }
 
 .track {
   height: 36px;
-  background-image: url('../../public/slider-tile-bright.svg');
   z-index: 1;
+}
+
+.track.papr {
+  background: url('../../public/slider-tile-mask.svg'), var(--papr-50);
+}
+.track.meme {
+  background: url('../../public/slider-tile-mask.svg'), var(--paprMEME-50);
+}
+.track.hero {
+  background: url('../../public/slider-tile-mask.svg'), var(--paprHERO-50);
+}
+.track.trash {
+  background: url('../../public/slider-tile-mask.svg'), var(--paprTRASH-50);
 }
 
 /* The track comes in 2 parts. This selects everything _but_ the first element
@@ -17,7 +41,7 @@
    This allows us to keep a consistent checkerboard background with 2 different
    colors. */
 .track ~ .track {
-  background-image: none;
+  background: none;
 }
 
 .thumb {
@@ -29,12 +53,20 @@
   /* remove default outline when selected */
   outline: none;
 }
-.thumb:before {
-  content: url('../../public/grabber.svg');
+.thumb.papr:before {
+  content: url('../../public/grabber-papr.svg');
+}
+.thumb.meme:before {
+  content: url('../../public/grabber-meme.svg');
+}
+.thumb.hero:before {
+  content: url('../../public/grabber-hero.svg');
+}
+.thumb.trash:before {
+  content: url('../../public/grabber-trash.svg');
 }
 
 .thumb > div {
-  color: var(--greentext);
   position: relative;
   width: 100px;
   right: 28px;
@@ -47,3 +79,18 @@
   text-align: center;
 }
 
+.papr {
+  color: var(--papr-100);
+}
+
+.meme {
+  color: var(--paprMEME-100);
+}
+
+.hero {
+  color: var(--paprHERO-100);
+}
+
+.trash {
+  color: var(--paprTRASH-100);
+}

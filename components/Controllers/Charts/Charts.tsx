@@ -11,7 +11,6 @@ import {
   TimeScaleOptions,
 } from 'lightweight-charts';
 import { percentChangeOverDuration, percentChange } from 'lib/tokenPerformance';
-import { formatPercentChange } from 'lib/numberFormat';
 
 const APR_COLOR = '#0000ee';
 const PRICE_COLOR = '#FF659C';
@@ -62,7 +61,7 @@ const BASE_CHART_OPTIONS: DeepPartial<ChartOptions> = {
   },
   layout: {
     textColor: 'black',
-    fontFamily: "'GT Maru Regular', Helvetica, sans-serif",
+    fontFamily: "'Courier Prime', 'Courier New', monospace",
     fontSize: 12,
   },
 };

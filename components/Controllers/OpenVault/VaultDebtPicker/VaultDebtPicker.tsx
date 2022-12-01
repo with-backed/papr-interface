@@ -40,6 +40,7 @@ import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import { useAccount } from 'wagmi';
 import styles from './VaultDebtPicker.module.css';
+import { useTheme } from 'hooks/useTheme';
 
 type VaultDebtPickerProps = {
   paprController: PaprController;
@@ -60,6 +61,7 @@ export function VaultDebtPicker({
   const { address } = useAccount();
   const { tokenName } = useConfig();
   const signerOrProvider = useSignerOrProvider();
+  const theme = useTheme();
 
   // nft variables
   const [depositNFTs, setDepositNFTs] = useState<string[]>([]);
@@ -390,8 +392,8 @@ export function VaultDebtPicker({
         <div className={styles.editLoanPreview}>
           <div className={`${!vaultHasDebt ? styles.hidden : ''}`}>
             <Button
-              size="xsmall"
-              theme="meme"
+              size="small"
+              theme={theme}
               kind="outline"
               onClick={() => setHideLoanFormToggle(!hideLoanFormToggle)}>
               Edit Loan
@@ -410,6 +412,7 @@ export function VaultDebtPicker({
                       setControlledSliderValue(currentVaultDebtNumber);
                       setIsBorrowing(!isBorrowing);
                     }}
+                    theme={theme}
                   />
                 </div>
               )}
@@ -720,9 +723,10 @@ function LoanActionSummary({
   setUsingPerpetual,
   errorMessage,
 }: LoanActionSummaryProps) {
+  const theme = useTheme();
   return (
     <div className={styles.loanActionSummaryWrapper}>
-      <div className={styles.loanActionSummary}>
+      <div className={[styles.loanActionSummary, styles[theme]].join(' ')}>
         <div>
           <div>
             <p>

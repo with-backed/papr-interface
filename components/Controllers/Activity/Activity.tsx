@@ -96,7 +96,7 @@ export function Activity({ paprController, vaultIds }: ActivityProps) {
   return (
     <Fieldset legend="🐝 Activity">
       <Table>
-        <tbody>
+        <tbody className={styles.table}>
           {feed.map((event) => {
             switch (event.__typename) {
               case 'AddCollateralEvent':

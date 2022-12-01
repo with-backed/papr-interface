@@ -1,8 +1,12 @@
 import React, { ButtonHTMLAttributes, useMemo } from 'react';
 import styles from './Button.module.css';
 
-export type ButtonKind = 'regular' | 'outline' | 'outline-transparent';
-export type ButtonTheme = 'papr' | 'hero' | 'meme' | 'white';
+export type ButtonKind =
+  | 'regular'
+  | 'outline'
+  | 'outline-transparent'
+  | 'white';
+export type ButtonTheme = 'papr' | 'hero' | 'meme' | 'trash';
 export type ButtonSize = 'big' | 'small' | 'xsmall';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

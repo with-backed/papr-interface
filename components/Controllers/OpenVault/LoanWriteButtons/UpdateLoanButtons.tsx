@@ -93,7 +93,7 @@ export function BorrowPerpetualButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme="papr"
       onClick={write!}
       transactionData={data}
       text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
@@ -155,7 +155,7 @@ export function RepayPerpetualButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme="papr"
       onClick={write!}
       transactionData={data}
       text="Update Loan"
@@ -241,7 +241,7 @@ export function RepayWithSwapButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme="papr"
       onClick={write!}
       transactionData={data}
       text="Update Loan"
@@ -316,7 +316,7 @@ export function BorrowWithSwapButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme="papr"
       onClick={write!}
       transactionData={data}
       text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
@@ -382,7 +382,7 @@ export function ApproveTokenButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme="papr"
       onClick={write!}
       transactionData={data}
       text={`Approve ${symbol}`}
@@ -460,7 +460,7 @@ export function ApproveNFTButton({
     <TransactionButton
       kind="regular"
       size="small"
-      theme="meme"
+      theme="papr"
       onClick={write!}
       transactionData={data}
       disabled={approvedLoading}

@@ -27,13 +27,26 @@
 }
 
 .table th {
-  text-transform: uppercase;
-  font-size: 12px;
+  font-size: var(--font-medium);
   font-family: var(--mono);
-  letter-spacing: 0.12rem;
+  letter-spacing: 0.08rem;
+  line-height: 1.5em;
+  padding-bottom: 0.5em;
   font-weight: inherit;
 }
 
-.table tbody tr:nth-child(odd) {
-  background-color: var(--background-faded-green);
+.table.papr tbody tr:nth-child(odd) {
+  background-color: var(--papr-5);
+}
+
+.table.meme tbody tr:nth-child(odd) {
+  background-color: var(--paprMEME-5);
+}
+
+.table.hero tbody tr:nth-child(odd) {
+  background-color: var(--paprHERO-5);
+}
+
+.table.trash tbody tr:nth-child(odd) {
+  background-color: var(--paprTRASH-5);
 }

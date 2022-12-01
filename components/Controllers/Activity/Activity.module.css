@@ -3,3 +3,16 @@
   justify-content: center;
   margin-top: 1rem;
 }
+
+.table {
+  vertical-align: top;
+}
+
+.table tr td {
+  padding-top: 6px;
+}
+
+.table tr td:first-child {
+  white-space: nowrap;
+  padding-right: 12px;
+}

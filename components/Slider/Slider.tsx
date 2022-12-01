@@ -1,3 +1,4 @@
+import { ButtonTheme } from 'components/Button/Button';
 import ReactSlider from 'react-slider';
 import styles from './Slider.module.css';
 
@@ -17,6 +18,7 @@ export type SliderProps = {
   ) => JSX.Element | null;
   blackTrackWidth: string;
   hideBlackTrack: boolean;
+  theme: ButtonTheme;
 };
 
 export function Slider({
@@ -29,6 +31,7 @@ export function Slider({
   value,
   blackTrackWidth,
   hideBlackTrack,
+  theme,
 }: SliderProps) {
   return (
     <>
@@ -43,9 +46,9 @@ export function Slider({
           zIndex: 1,
         }}></div>
       <ReactSlider
-        className={styles.slider}
-        trackClassName={styles.track}
-        thumbClassName={styles.thumb}
+        className={[styles.slider, styles[theme]].join(' ')}
+        trackClassName={[styles.track, styles[theme]].join(' ')}
+        thumbClassName={[styles.thumb, styles[theme]].join(' ')}
         renderThumb={renderThumb}
         renderTrack={renderTrack}
         min={min}

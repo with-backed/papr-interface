@@ -42,13 +42,13 @@ export function Loans({ paprController, pricesData }: LoansProps) {
       ethers.BigNumber.from(0),
     );
     const debtNum = parseFloat(
-      ethers.utils.formatUnits(debtBigNum, paprController.underlying.decimals),
+      ethers.utils.formatUnits(debtBigNum, paprController.debtToken.decimals),
     );
     return '$' + formatTokenAmount(debtNum);
-  }, [activeVaults, paprController.underlying]);
+  }, [activeVaults, paprController.debtToken]);
 
   const formattedDebts = useMemo(() => {
-    const decimals = paprController.underlying.decimals;
+    const decimals = paprController.debtToken.decimals;
     const debts = activeVaults.map(
       (v) =>
         '$' +
@@ -56,11 +56,8 @@ export function Loans({ paprController, pricesData }: LoansProps) {
           parseFloat(ethers.utils.formatUnits(v.debt, decimals)),
         ),
     );
-    const longestDebt = debts.reduce((prev, curr) =>
-      prev.length > curr.length ? prev : curr,
-    );
-    return debts.map((d) => d.padStart(longestDebt.length, ' '));
-  }, [activeVaults, paprController.underlying.decimals]);
+    return debts;
+  }, [activeVaults, paprController.debtToken.decimals]);
 
   return (
     <Fieldset legend="💸 Loans">

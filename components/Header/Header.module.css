@@ -1,6 +1,50 @@
+.nav.homepage {
+  background: url('/graph-square.png'),
+    linear-gradient(
+      120deg,
+      var(--papr-offset-gradient) 0%,
+      var(--papr-100-gradient) 100%
+    );
+}
+
+.nav.papr {
+  background: url('/graph-5x5.png'),
+    linear-gradient(
+      120deg,
+      var(--papr-offset-gradient) 0%,
+      var(--papr-100-gradient) 100%
+    );
+}
+
+.nav.meme {
+  background: url('/graph-5x5.png'),
+    linear-gradient(
+      120deg,
+      var(--paprMEME-offset-gradient) 0%,
+      var(--paprMEME-100-gradient) 100%
+    );
+}
+
+.nav.hero {
+  background: url('/graph-5x5.png'),
+    linear-gradient(
+      120deg,
+      var(--paprHERO-offset-gradient) 0%,
+      var(--paprHERO-100-gradient) 100%
+    );
+}
+
+.nav.trash {
+  background: url('/graph-5x5.png'),
+    linear-gradient(
+      120deg,
+      var(--paprTRASH-offset-gradient) 0%,
+      var(--paprTRASH-100-gradient) 100%
+    );
+}
+
 .nav {
   width: 100%;
-  background: url('/graph-square.png'), var(--background-blue-paper);
   padding: 20px 0;
   height: 151px;
 }
@@ -45,7 +89,7 @@
 
 .entry {
   padding: 5px 15px;
-  height: 48px;
+  height: 45px;
   display: flex;
   flex-direction: row;
   white-space: nowrap;
@@ -64,14 +108,52 @@
   transition: color 200ms ease;
 }
 
-.link:hover {
+.link.papr:hover {
   transition: background-color 200ms ease;
-  background-color: var(--highlight-clickable-10);
+  background-color: var(--papr-5);
 }
 
-.link-active {
-  composes: link;
-  background-color: var(--highlight-clickable-10);
+.link-active.papr {
+  background-color: var(--papr-5);
+}
+.link-active.papr:hover {
+  background-color: var(--papr-10);
+}
+
+.link.meme:hover {
+  transition: background-color 200ms ease;
+  background-color: var(--paprMEME-5);
+}
+
+.link-active.meme {
+  background-color: var(--paprMEME-5);
+}
+.link-active.meme:hover {
+  background-color: var(--paprMEME-10);
+}
+
+.link.hero:hover {
+  transition: background-color 200ms ease;
+  background-color: var(--paprHERO-5);
+}
+
+.link-active.hero {
+  background-color: var(--paprHERO-5);
+}
+.link-active.hero:hover {
+  background-color: var(--paprHERO-10);
+}
+
+.link.trash:hover {
+  transition: background-color 200ms ease;
+  background-color: var(--paprTRASH-5);
+}
+
+.link-active.trash {
+  background-color: var(--paprTRASH-5);
+}
+.link-active.trash:hover {
+  background-color: var(--paprTRASH-10);
 }
 
 .link-active:visited {
@@ -79,7 +161,9 @@
 }
 
 .logo {
-  height: 48px;
+  position: relative;
+  max-width: 120px;
+  margin-top: 8px;
 }
 
 @media screen and (max-width: 750px) {

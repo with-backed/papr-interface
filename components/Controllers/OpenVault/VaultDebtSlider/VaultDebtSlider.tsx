@@ -3,6 +3,7 @@ import { PaprController } from 'lib/PaprController';
 import { formatPercent } from 'lib/numberFormat';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from '../VaultDebtPicker/VaultDebtPicker.module.css';
+import { useTheme } from 'hooks/useTheme';
 
 type VaultDebtSliderProps = {
   controller: PaprController;
@@ -27,6 +28,7 @@ export function VaultDebtSlider({
   setIsBorrowing,
   setHideLoanFormToggle,
 }: VaultDebtSliderProps) {
+  const theme = useTheme();
   const [hideMaxLTV, setHideMaxLTV] = useState<boolean>(false);
   const [blackTrackWidth, setBlackTrackWidth] = useState<[string, number]>([
     '',
@@ -118,6 +120,7 @@ export function VaultDebtSlider({
         }}
         blackTrackWidth={blackTrackWidth[0]}
         hideBlackTrack={currentVaultDebtNumber === 0}
+        theme={theme}
       />
     </div>
   );

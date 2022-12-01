@@ -3,21 +3,22 @@
   border: none;
   cursor: pointer;
   padding: 0;
+  font-size: var(--font-large);
 }
 
 .container {
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  border-radius: var(--border-radius-small);
-  color: var(--neutral-50);
-  background: var(--neutral-5);
+  border-radius: var(--border-radius);
+  color: var(--gray-30);
+  background: var(--gray-5);
   line-height: 15px;
   box-sizing: border-box;
 }
 
 .container div {
-  border: 2px transparent solid;
+  border: 1px transparent solid;
   display: flex;
   align-items: center;
   text-align: center;
@@ -27,16 +28,34 @@
   flex-grow: 1;
 }
 
-.toggle[aria-checked='true'] .container div:first-child {
-  border: 2px var(--button-outline-meme) solid;
-  background: var(--button-fill-meme);
-  color: var(--button-outline-meme);
-  border-radius: var(--border-radius-small);
+.toggle .container div {
+  border-radius: var(--border-radius);
 }
 
-.toggle[aria-checked='false'] .container div:last-child {
-  border: 2px var(--button-outline-meme) solid;
-  background: var(--button-fill-meme);
-  color: var(--button-outline-meme);
-  border-radius: var(--border-radius-small);
+.toggle[aria-checked='true'] .container.papr div:first-child,
+.toggle[aria-checked='false'] .container.papr div:last-child {
+  border: 1px var(--papr-100) solid;
+  background: var(--papr-5);
+  color: var(--papr-100);
+}
+
+.toggle[aria-checked='true'] .container.meme div:first-child,
+.toggle[aria-checked='false'] .container.meme div:last-child {
+  border: 1px var(--paprMEME-100) solid;
+  background: var(--paprMEME-5);
+  color: var(--paprMEME-100);
+}
+
+.toggle[aria-checked='true'] .container.hero div:first-child,
+.toggle[aria-checked='false'] .container.hero div:last-child {
+  border: 1px var(--paprHERO-100) solid;
+  background: var(--paprHERO-5);
+  color: var(--paprHERO-100);
+}
+
+.toggle[aria-checked='true'] .container.trash div:first-child,
+.toggle[aria-checked='false'] .container.trash div:last-child {
+  border: 1px var(--paprTRASH-100) solid;
+  background: var(--paprTRASH-5);
+  color: var(--paprTRASH-100);
 }

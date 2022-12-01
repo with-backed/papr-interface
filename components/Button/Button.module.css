@@ -1,6 +1,6 @@
 .button {
   border: none;
-  border-radius: var(--border-radius-large);
+  border-radius: var(--border-radius);
   line-height: 31px;
   cursor: pointer;
 }
@@ -18,7 +18,7 @@
 .small {
   padding: var(--padding-button-small);
   font-size: var(--font-large);
-  min-height: 48px;
+  min-height: 45px;
 }
 
 .xsmall {
@@ -29,46 +29,60 @@
 
 .regular {
   composes: button;
+  color: white;
 }
 
 .regular.papr {
-  background-color: var(--button-outline-papr);
-  color: white;
+  background-color: var(--papr-100);
 }
-
-.regular.papr:hover,
-.regular.papr:focus {
-  background: var(--button-outline-papr);
+.regular.papr:hover {
+  background-color: var(--papr-110);
 }
 
 .regular.hero {
-  background-color: var(--button-outline-hero);
-  color: white;
+  background-color: var(--paprHERO-50);
 }
-
-.regular.hero:hover,
-.regular.hero:focus {
-  background: var(--button-outline-hero);
+.regular.hero:hover {
+  background-color: var(--paprHERO-100);
 }
 
 .regular.meme {
-  background-color: var(--button-outline-meme);
-  color: white;
+  background-color: var(--paprMEME-50);
+}
+.regular.meme:hover {
+  background-color: var(--paprMEME-100);
 }
 
-.regular.meme:hover,
-.regular.meme:focus {
-  background: var(--button-outline-meme);
+.regular.trash {
+  background-color: var(--paprTRASH-50);
+}
+.regular.trash:hover {
+  background-color: var(--paprTRASH-100);
 }
 
-.regular.white {
+.white {
+  composes: button;
   background-color: white;
-  color: black;
 }
 
-.regular.white:hover,
-.regular.white:focus {
-  background: var(--highlight-clickable-10);
+.white.papr:hover,
+.white.papr:focus {
+  background: var(--papr-5);
+}
+
+.white.hero:hover,
+.white.hero:focus {
+  background: var(--paprHERO-5);
+}
+
+.white.meme:hover,
+.white.meme:focus {
+  background: var(--paprMEME-5);
+}
+
+.white.trash:hover,
+.white.trash:focus {
+  background: var(--paprTRASH-5);
 }
 
 .outline {
@@ -86,60 +100,58 @@
 }
 
 .outline.papr {
-  border: 2px var(--button-outline-papr) solid;
-  color: var(--button-outline-papr);
+  border: 1px var(--papr-100) solid;
+  color: var(--papr-100);
 }
 
 .outline.papr:hover,
 .outline.papr:focus {
-  background: var(--button-fill-papr);
+  background: var(--papr-5);
 }
 
 .outline.meme {
-  border: 2px var(--button-outline-meme) solid;
-  color: var(--button-outline-meme);
+  border: 1px var(--paprMEME-100) solid;
+  color: var(--paprMEME-100);
 }
 
 .outline.meme:hover,
 .outline.meme:focus {
-  background: var(--button-fill-meme);
+  background: var(--paprMEME-5);
 }
 
 .outline.hero {
-  border: 2px var(--button-outline-hero) solid;
-  color: var(--button-outline-hero);
+  border: 1px var(--paprHERO-100) solid;
+  color: var(--paprHERO-100);
 }
 
 .outline.hero:hover,
 .outline.hero:focus {
-  background: var(--button-fill-hero);
+  background: var(--paprHERO-5);
 }
 
-.outline.white {
-  border: 2px black solid;
-  color: black;
+.outline.trash {
+  border: 1px var(--paprTRASH-100) solid;
+  color: var(--paprTRASH-100);
 }
 
-.outline.white:hover,
-.outline.white:focus {
-  background: var(--highlight-clickable-10);
+.outline.trash:hover,
+.outline.trash:focus {
+  background: var(--paprTRASH-5);
 }
 
 .button:disabled {
   cursor: not-allowed;
-  color: #aaaaaa;
+  color: var(--gray-30);
+  background-color: var(--gray-5);
 }
 
-.button.papr:disabled {
-  background: var(--button-fill-papr);
+.button.outline:disabled {
+  border: 1px var(--gray-30) solid;
 }
 
-.button.hero:disabled {
-  background: var(--button-fill-hero);
-}
-
-.button.meme:disabled {
-  background: var(--button-fill-meme);
+.button:disabled:hover,
+.button:disabled:focus {
+  background-color: var(--gray-5);
 }
 
 .button.outline-transparent:disabled,
@@ -165,11 +177,12 @@
   justify-content: center;
   padding: var(--padding-button);
   width: 100%;
-  line-height: 1.6;
+  line-height: 1.3;
   font-size: var(--font-large);
-  border-radius: var(--border-radius-large);
+  border-radius: var(--border-radius);
   position: relative;
-  background: var(--highlight-visited-5);
+  background: var(--gray-5);
+  padding-top: 2px;
 }
 
 .button-completed-message {
@@ -182,7 +195,7 @@
   justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
-  background: var(--highlight-visited-10);
+  background: #dddddd;
   border-radius: 1rem;
   position: absolute;
   z-index: 50;

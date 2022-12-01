@@ -1,13 +1,16 @@
 import { ConnectWallet } from 'components/ConnectWallet';
-import { PaprMEME } from 'components/Icons/PaprMEME';
-import { Logo } from 'components/Logo';
 import { useConfig } from 'hooks/useConfig';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
 import styles from './Header.module.css';
-import paprLogo from 'public/logos/papr-logo.png';
+import paprTitle from 'public/logos/papr-title.png';
+import paprMemeTitle from 'public/logos/paprMEME-title.png';
+import paprHeroTitle from 'public/logos/paprHERO-title.png';
+import paprTrashTitle from 'public/logos/paprTRASH-title.png';
+import { useTheme } from 'hooks/useTheme';
+import Image from 'next/image';
+import { SupportedToken } from 'lib/config';
 
 type Page = {
   name: string;
@@ -30,7 +33,7 @@ const prodPages = (
   {
     name: 'Borrow',
     route: `borrow`,
-    matcher: '/borrow',
+    matcher: 'borrow',
   },
   {
     name: 'Swap ↗',
@@ -58,9 +61,9 @@ const stagingPages: Page[] = [];
 function isActiveRoute(
   activeRoute: string,
   candidate: Page,
-  isHomepage: boolean,
+  isHomePage: boolean,
 ) {
-  if (isHomepage) {
+  if (isHomePage) {
     return false;
   }
   if (candidate.route.length === 0) {
@@ -76,10 +79,11 @@ function isActiveRoute(
 
 type NavLinksProps = {
   activeRoute: string;
-  isHomepage: boolean;
+  isHomePage: boolean;
 };
-function NavLinks({ activeRoute, isHomepage }: NavLinksProps) {
+function NavLinks({ activeRoute, isHomePage }: NavLinksProps) {
   const { tokenName, underlyingAddress, paprTokenAddress } = useConfig();
+  const theme = useTheme();
 
   const pages = useMemo(() => {
     const productSpecificPages = tokenName === 'paprHero' ? paprHeroPages : [];
@@ -111,9 +115,11 @@ function NavLinks({ activeRoute, isHomepage }: NavLinksProps) {
             }>
             <a
               className={
-                isActiveRoute(activeRoute, p, isHomepage)
-                  ? styles['link-active']
-                  : styles.link
+                isActiveRoute(activeRoute, p, isHomePage)
+                  ? [styles.link, styles['link-active'], styles[theme]].join(
+                      ' ',
+                    )
+                  : [styles.link, styles[theme]].join(' ')
               }
               target={p.externalRedirect ? '_blank' : ''}>
               {p.name}
@@ -125,11 +131,26 @@ function NavLinks({ activeRoute, isHomepage }: NavLinksProps) {
   );
 }
 
-function LogoLink() {
+const imageLookup: { [key in SupportedToken]: StaticImageData } = {
+  paprMeme: paprMemeTitle,
+  paprHero: paprHeroTitle,
+  paprTrash: paprTrashTitle,
+};
+
+function LogoLink({ isHomePage }: { isHomePage: boolean }) {
+  const { tokenName } = useConfig();
+  const image = useMemo(() => {
+    if (isHomePage) {
+      return paprTitle;
+    }
+    return imageLookup[tokenName as SupportedToken];
+  }, [isHomePage, tokenName]);
   return (
     <Link href={`/`} passHref>
       <a title="papr">
-        <img className={styles.logo} src={paprLogo.src} alt="" />
+        <div className={styles.logo}>
+          <Image src={image} alt="" placeholder="blur" />
+        </div>
       </a>
     </Link>
   );
@@ -139,6 +160,7 @@ const SHOW_HEADER_ON_LANDING_PAGE =
   process.env.NEXT_PUBLIC_LANDING_PAGE_HEADER === 'true';
 
 export function Header() {
+  const theme = useTheme();
   const { pathname } = useRouter();
 
   const activeRoute = useMemo(() => {
@@ -152,29 +174,36 @@ export function Header() {
     return pathname.split('[token]/')[1] || '';
   }, [pathname]);
 
+  const isHomePage = useMemo(
+    () => pathname === '/' || activeRoute === 'errorPage',
+    [activeRoute, pathname],
+  );
+
   if (
     (activeRoute === '' && !SHOW_HEADER_ON_LANDING_PAGE) ||
     activeRoute === 'errorPage'
   ) {
     return (
-      <nav className={styles['logo-only-nav']}>
-        <LogoLink />
+      <nav className={[styles['logo-only-nav'], styles.papr].join(' ')}>
+        <LogoLink isHomePage={isHomePage} />
       </nav>
     );
   }
 
-  const isHomepage = pathname === '/';
-
   return (
-    <nav className={styles.nav}>
+    <nav
+      className={[
+        styles.nav,
+        isHomePage ? styles.homepage : styles[theme],
+      ].join(' ')}>
       <div className={styles['desktop-content']}>
-        <LogoLink />
-        <NavLinks activeRoute={activeRoute} isHomepage={isHomepage} />
+        <LogoLink isHomePage={isHomePage} />
+        <NavLinks activeRoute={activeRoute} isHomePage={isHomePage} />
         <ConnectWallet />
       </div>
       <div className={styles['mobile-content']}>
-        <LogoLink />
-        <NavLinks activeRoute={activeRoute} isHomepage={isHomepage} />
+        <LogoLink isHomePage={isHomePage} />
+        <NavLinks activeRoute={activeRoute} isHomePage={isHomePage} />
         <ConnectWallet />
       </div>
     </nav>

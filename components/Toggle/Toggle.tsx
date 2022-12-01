@@ -1,3 +1,4 @@
+import { ButtonTheme } from 'components/Button/Button';
 import React from 'react';
 import { Button } from 'reakit/Button';
 import { Checkbox } from 'reakit/Checkbox';
@@ -8,6 +9,7 @@ type ToggleProps = {
   onChange: () => void;
   leftText: string;
   rightText: string;
+  theme: ButtonTheme;
 };
 
 export function Toggle({
@@ -15,6 +17,7 @@ export function Toggle({
   leftText,
   rightText,
   onChange,
+  theme,
 }: ToggleProps) {
   return (
     <Checkbox
@@ -22,7 +25,7 @@ export function Toggle({
       checked={checked}
       onChange={onChange}
       className={styles.toggle}>
-      <div className={styles.container}>
+      <div className={[styles.container, styles[theme]].join(' ')}>
         <div>{leftText}</div>
         <div>{rightText}</div>
       </div>

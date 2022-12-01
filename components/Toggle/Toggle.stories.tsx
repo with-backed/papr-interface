@@ -24,12 +24,28 @@ export const Toggles = () => {
         onChange={() => setCheck1((prev) => !prev)}
         leftText="Borrow More"
         rightText="Repay"
+        theme="hero"
       />
       <Toggle
         checked={check2}
         onChange={() => setCheck2((prev) => !prev)}
         leftText="Borrow More"
         rightText="Repay"
+        theme="papr"
+      />
+      <Toggle
+        checked={check1}
+        onChange={() => setCheck1((prev) => !prev)}
+        leftText="Borrow More"
+        rightText="Repay"
+        theme="trash"
+      />
+      <Toggle
+        checked={check2}
+        onChange={() => setCheck2((prev) => !prev)}
+        leftText="Borrow More"
+        rightText="Repay"
+        theme="meme"
       />
     </Wrapper>
   );
