@@ -27,6 +27,8 @@ const paprTrash: Config = {
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
   controllerAddress: '0xeef3203c99a37682b15bd782b46a1db68948b084',
+  underlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
+  paprTokenAddress: '0xce7676bd398032a330a5252d3ea26ee31adb69ad',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph:
@@ -55,6 +57,8 @@ const paprHero: Config = {
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
   controllerAddress: '0xd6834b0a67eb304c7faf7169bdfa7f2e02c2ee9e',
+  underlyingAddress: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
+  paprTokenAddress: '0x032ad2796250c1dfd3ddcce2053faff5667ea012',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph:
@@ -87,6 +91,8 @@ const paprMeme = {
   siteUrl: 'https://withbacked.xyz',
   network: 'ethereum',
   controllerAddress: 'TODO update this when we have a papr controller',
+  underlyingAddress: '',
+  paprTokenAddress: '',
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprMemeSubgraph: 'TODO: update this when we have a prod subgraph',
   paprUnderlyingAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
