@@ -7,6 +7,7 @@ import {
   VaultsByOwnerForControllerQuery,
   PaprHeroPlayersDocument,
   PaprHeroPlayersQuery,
+  User,
 } from 'types/generated/graphql/inKindSubgraph';
 import { configs, SupportedToken } from './config';
 import { PaprController, SubgraphController } from './PaprController';
@@ -48,7 +49,7 @@ export async function getAllPaprControllers(
 
 export async function getAllPaprHeroPlayers(
   token: SupportedToken,
-): Promise<string[]> {
+): Promise<User[] | null> {
   const client = clientFromUrl(configs[token].paprMemeSubgraph);
   const { data, error } = await client
     .query<PaprHeroPlayersQuery>(PaprHeroPlayersDocument, {})
@@ -59,7 +60,7 @@ export async function getAllPaprHeroPlayers(
     return [];
   }
 
-  return data?.phusdcmints.map((mint) => mint.account) || [];
+  return data?.users || null;
 }
 
 export async function getAllVaultsForControllerForUser(
@@ -67,7 +68,7 @@ export async function getAllVaultsForControllerForUser(
   owner: string,
 ) {
   const client = clientFromUrl(
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.0/gn',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.2/gn',
   );
   const { data, error } = await client
     .query<VaultsByOwnerForControllerQuery>(

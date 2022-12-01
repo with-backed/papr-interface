@@ -83,7 +83,7 @@ async function getNewTarget(
 async function subgraphTargetalizationUpdatesForController(controller: string) {
   // TODO: dynamic client address
   const client = clientFromUrl(
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.0/gn',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.2/gn',
   );
   const { data, error } = await client
     .query<TargetUpdatesByControllerQuery>(TargetUpdatesByControllerDocument, {

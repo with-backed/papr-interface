@@ -1,5 +1,5 @@
 overwrite: true
-schema: 'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.0/gn'
+schema: 'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.2/gn'
 documents: './graphql/inKind/**/*.graphql'
 generates:
   types/generated/graphql/inKindSubgraph.ts:
