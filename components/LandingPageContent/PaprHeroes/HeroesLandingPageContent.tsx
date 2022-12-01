@@ -441,7 +441,10 @@ function LeaderboardEntry({
   const ensOrAddress = useAsyncValue(async () => {
     if (address === 'You') return address;
 
-    const ens = await addressToENS(address, jsonRpcProvider);
+    const ens = await addressToENS(
+      address,
+      'https://eth-mainnet.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
+    );
     if (!ens) return shortenAddress(address);
     else return shortenAddress(ens);
   }, [address, jsonRpcProvider]);

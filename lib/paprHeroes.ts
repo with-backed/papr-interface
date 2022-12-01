@@ -24,7 +24,7 @@ export async function calculateNetPhUSDCBalance(
 ): Promise<HeroPlayerBalance> {
   const provider = makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero');
   const connectedPhUSDC = PHUSDC__factory.connect(underlying, provider);
-  const phUSDCBalance = await connectedPhUSDC.balanceOf(user.id);
+  const phUSDCBalance = ethers.BigNumber.from(user.phUSDCHoldings); //await connectedPhUSDC.balanceOf(user.id);
   const paprBalance = ethers.BigNumber.from(user.paprHoldings);
   const paprDebt = ethers.BigNumber.from(user.paprDebt);
   const netPapr = paprBalance.sub(paprDebt);
