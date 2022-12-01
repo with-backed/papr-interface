@@ -99,8 +99,8 @@ function BalanceInfo({
   }, [paprMEMEBalance, paprMEMEDecimals, latestMarketPrice]);
   return (
     <p>
-      You hold <b>{formattedBalance}</b> across {numberOfVaults} vaults. Cost to
-      repay is <b>{formattedValue}</b>.
+      You hold <b>{formattedBalance}</b> across {numberOfVaults} vault(s). Cost
+      to repay is <b>{formattedValue}</b>.
     </p>
   );
 }
