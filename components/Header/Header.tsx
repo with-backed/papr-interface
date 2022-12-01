@@ -179,7 +179,10 @@ export function Header() {
     [activeRoute, pathname],
   );
 
-  if (isHomePage && !SHOW_HEADER_ON_LANDING_PAGE) {
+  if (
+    (isHomePage && !SHOW_HEADER_ON_LANDING_PAGE) ||
+    activeRoute === 'errorPage'
+  ) {
     return (
       <nav className={[styles['logo-only-nav'], styles.papr].join(' ')}>
         <LogoLink isHomePage={isHomePage} />
