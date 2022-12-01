@@ -111,6 +111,7 @@
   padding: 12px;
   text-align: right;
   font-size: var(--font-large);
+  max-width: 150px;
 }
 
 .slippage {
@@ -189,8 +190,17 @@
   margin-top: 2px;
 }
 
-.greyed {
-  color: var(--neutral-20);
+.greyed.papr {
+  color: var(--papr-20);
+}
+.greyed.meme {
+  color: var(--paprMEME-20);
+}
+.greyed.hero {
+  color: var(--paprHERO-20);
+}
+.greyed.trash {
+  color: var(--paprTRASH-20);
 }
 
 .updateLoanButtonWrapper {
