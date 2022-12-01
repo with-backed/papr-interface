@@ -63,7 +63,6 @@ function isActiveRoute(
   candidate: Page,
   isHomePage: boolean,
 ) {
-  console.log({ activeRoute, candidate, isHomePage });
   if (isHomePage) {
     return false;
   }
