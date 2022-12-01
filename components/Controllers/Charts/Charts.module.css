@@ -11,10 +11,12 @@
   text-orientation: sideways;
   transform: rotate(180deg);
   text-align: center;
+  font-size: var(--font-large);
+  letter-spacing: 0.06em;
 }
 
 .price-label {
-  color: #FF659C;
+  color: #ff659c;
 }
 
 .apr-label {
