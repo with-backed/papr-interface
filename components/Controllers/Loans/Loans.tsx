@@ -1,16 +1,15 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { timestampDaysAgo } from 'lib/duration';
 import { PaprController } from 'lib/PaprController';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
-import { computeLtv, convertOneScaledValue } from 'lib/controllers';
 import { ControllerPricesData } from 'lib/controllers/charts';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
 import { VaultHealth } from './VaultHealth';
+import { useLTVs } from 'hooks/useLTVs/useLTVs';
 
 type LoansProps = {
   paprController: PaprController;
@@ -18,16 +17,14 @@ type LoansProps = {
 };
 
 export function Loans({ paprController, pricesData }: LoansProps) {
-  const [ltvs, setLtvs] = useState<{ [key: string]: number }>({});
-  const norm = useAsyncValue(
-    () => paprController.newTarget(),
-    [paprController],
-  );
   const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
   const activeVaults = useMemo(
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
     [paprController],
   );
+
+  const { ltvs } = useLTVs(paprController, activeVaults, maxLTV);
+
   const avgLtv = useMemo(() => {
     const ltvValues = Object.values(ltvs);
 
@@ -49,18 +46,6 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     );
     return '$' + formatTokenAmount(debtNum);
   }, [activeVaults, paprController.underlying]);
-
-  useEffect(() => {
-    if (!norm) {
-      return;
-    }
-    const calculatedLtvs = activeVaults.reduce((prev, v) => {
-      // TODO fix after we decide how get up to date oracle quote
-      const l = computeLtv(v.debt, 1, norm);
-      return { ...prev, [v.id]: convertOneScaledValue(l, 4) };
-    }, {} as { [key: string]: number });
-    setLtvs(calculatedLtvs);
-  }, [activeVaults, norm]);
 
   const formattedDebts = useMemo(() => {
     const decimals = paprController.underlying.decimals;
@@ -108,7 +93,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
         </thead>
         <tbody>
           {activeVaults.map((v, i) => {
-            const ltv = ltvs[v.id];
+            const ltv = ltvs ? ltvs[v.id] : 0;
             const formattedDebt = formattedDebts[i];
             return (
               <VaultRow
