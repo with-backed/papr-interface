@@ -25,8 +25,8 @@ export function useLTVs(
         return {
           ...prev,
           [v.id]: computeLTVFromDebts(
-            maxDebtForVault,
             ethers.BigNumber.from(v.debt),
+            maxDebtForVault,
             maxLTV,
             paprController.debtToken.decimals,
           ),
