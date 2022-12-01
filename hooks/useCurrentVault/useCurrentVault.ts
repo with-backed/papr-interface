@@ -1,6 +1,9 @@
 import { PaprController } from 'lib/PaprController';
-import { useMemo } from 'react';
-import { VaultsByOwnerForControllerDocument } from 'types/generated/graphql/inKindSubgraph';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  VaultsByOwnerForControllerDocument,
+  VaultsByOwnerForControllerQuery,
+} from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
 // TODO(adamgobes): remove useCurrentVault and utilize useCurrentVaults everywhere
@@ -35,6 +38,9 @@ export function useCurrentVaults(
   controller: PaprController,
   user: string | undefined,
 ) {
+  const [prevData, setPrevData] = useState<
+    VaultsByOwnerForControllerQuery | undefined
+  >(undefined);
   const [{ data: vaultsData, fetching: vaultsFetching }, reexecuteQuery] =
     useQuery({
       query: VaultsByOwnerForControllerDocument,
@@ -45,12 +51,20 @@ export function useCurrentVaults(
       pause: !user,
     });
 
-  const currentVaults = useMemo(() => {
-    if (vaultsFetching || !vaultsData?.vaults) return null;
-    if (vaultsData.vaults.length === 0) return null;
+  useEffect(() => {
+    if (vaultsData) {
+      setPrevData(vaultsData);
+    }
+  }, [vaultsData]);
 
-    return vaultsData.vaults;
-  }, [vaultsFetching, vaultsData]);
+  const vaultsDataToUse = vaultsData ?? prevData;
+
+  const currentVaults = useMemo(() => {
+    if ((vaultsFetching && !prevData) || !vaultsDataToUse?.vaults) return null;
+    if (vaultsDataToUse.vaults.length === 0) return null;
+
+    return vaultsDataToUse.vaults;
+  }, [prevData, vaultsFetching, vaultsDataToUse]);
 
   return {
     currentVaults,

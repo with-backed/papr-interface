@@ -1,5 +1,5 @@
 import { Config } from 'lib/config';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   NftsForAccountAndCollectionDocument,
   NftsForAccountAndCollectionQuery,
@@ -16,6 +16,11 @@ export const useAccountNFTs = (
   collections: string[] | undefined,
   config: Config,
 ) => {
+  // Cache last result, so that when refreshing we don't have a flash of
+  // blank page while new results are fetching
+  const [prevData, setPrevData] = useState<
+    NftsForAccountAndCollectionQuery | undefined
+  >(undefined);
   const [{ data, fetching: nftsLoading }, reexecuteQuery] =
     useQuery<NftsForAccountAndCollectionQuery>({
       query: NftsForAccountAndCollectionDocument,
@@ -31,13 +36,21 @@ export const useAccountNFTs = (
       ),
     });
 
+  useEffect(() => {
+    if (data) {
+      setPrevData(data);
+    }
+  }, [data]);
+
+  const dataToUse = data ?? prevData;
+
   const userCollectionNFTs = useMemo(() => {
-    if (!data?.tokens) return [];
-    return data?.tokens.map((token) => ({
+    if (!dataToUse?.tokens) return [];
+    return dataToUse?.tokens.map((token) => ({
       address: token.registry.id,
       tokenId: token.identifier,
     }));
-  }, [data]);
+  }, [dataToUse]);
 
   return {
     userCollectionNFTs,

@@ -68,14 +68,9 @@ export function BorrowPageContent({
     [currentVaults],
   );
 
-  if (
-    !paprController ||
-    !pricesData ||
-    vaultsFetching ||
-    nftsLoading ||
-    !oracleInfo
-  )
+  if (!paprController || !pricesData || !oracleInfo) {
     return <></>;
+  }
 
   return (
     <div className={controllerStyles.wrapper}>

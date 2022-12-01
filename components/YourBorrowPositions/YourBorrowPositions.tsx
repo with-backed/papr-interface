@@ -1,14 +1,12 @@
 import styles from './YourBorrowPositions.module.css';
 import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
 import { Fieldset } from 'components/Fieldset';
-import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { PaprController } from 'lib/PaprController';
 import { useAccount } from 'wagmi';
 import { useMemo } from 'react';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { Quoter } from 'lib/contracts';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { SupportedToken } from 'lib/config';
 import { useConfig } from 'hooks/useConfig';
 import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
