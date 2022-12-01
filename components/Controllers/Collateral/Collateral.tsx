@@ -8,9 +8,10 @@ import { TooltipReference, useTooltipState } from 'reakit';
 import { Tooltip } from 'components/Tooltip';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ethers } from 'ethers';
-import { computeLtv, convertOneScaledValue } from 'lib/controllers';
-import { formatPercent } from 'lib/numberFormat';
+import { formatBigNum, formatPercent } from 'lib/numberFormat';
 import { CenterAsset } from 'components/CenterAsset';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 
 type CollateralProps = {
   paprController: PaprController;
@@ -20,27 +21,15 @@ type CollateralProps = {
 };
 
 export function Collateral({ paprController, vaultId }: CollateralProps) {
-  const norm = useAsyncValue(
-    () => paprController.newTarget(),
-    [paprController],
-  );
-  const collateral = useMemo(() => {
+  const vaults = useMemo(() => {
     if (vaultId) {
       const vault = paprController.vaults?.find((v) => v.id === vaultId);
-      return vault?.collateral.map((c) => ({
-        ...c,
-        debt: vault.debt,
-      }));
+      return vault ? [vault] : [];
     }
-    return paprController.vaults?.flatMap((v) =>
-      v.collateral.map((c) => ({
-        ...c,
-        debt: v.debt,
-      })),
-    );
+    return paprController.vaults || [];
   }, [paprController, vaultId]);
 
-  if (!collateral || collateral.length === 0) {
+  if (!vaults || vaults.length === 0) {
     return (
       <Fieldset legend="🖼 Collateral">
         No collateral associated with this controller
@@ -51,17 +40,17 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
   return (
     <Fieldset legend="🖼 Collateral">
       <div className={styles.wrapper}>
-        {collateral.map((c) => (
-          <Tile
-            key={c.id}
-            address={c.contractAddress}
-            tokenId={c.tokenId}
-            debt={c.debt}
-            // TODO punting this for the vault rework
-            totalCollateralValue={0}
-            norm={norm}
-          />
-        ))}
+        {vaults.flatMap((v) =>
+          v.collateral.map((c) => (
+            <Tile
+              key={c.id}
+              address={c.contractAddress}
+              tokenId={c.tokenId}
+              paprController={paprController}
+              vault={v}
+            />
+          )),
+        )}
       </div>
     </Fieldset>
   );
@@ -70,27 +59,35 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
 type TileProps = {
   address: string;
   tokenId: string;
-  debt: any;
-  totalCollateralValue: any;
-  norm: ethers.BigNumber | null;
+  paprController: PaprController;
+  vault: NonNullable<PaprController['vaults']>['0'];
 };
-function Tile({
-  address,
-  tokenId,
-  debt,
-  totalCollateralValue,
-  norm,
-}: TileProps) {
+function Tile({ address, tokenId, paprController, vault }: TileProps) {
   const { centerNetwork } = useConfig();
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
+
   const result = useCollection({ network: centerNetwork as any, address });
+  const maxLTV = useAsyncValue(() => {
+    return paprController.maxLTV();
+  }, [paprController]);
+  const maxDebt = useAsyncValue(async () => {
+    if (!oracleInfo) return null;
+    return paprController.maxDebt([address], oracleInfo);
+  }, [paprController, address, oracleInfo]);
+  const debt = useMemo(() => ethers.BigNumber.from(vault.debt), [vault.debt]);
   const ltv = useMemo(() => {
-    if (norm) {
-      return formatPercent(
-        convertOneScaledValue(computeLtv(debt, totalCollateralValue, norm), 4),
-      );
-    }
-    return '...';
-  }, [debt, norm, totalCollateralValue]);
+    if (!maxLTV || !maxDebt) return null;
+    const maxNumber = parseFloat(
+      formatBigNum(maxDebt, paprController.debtToken.decimals),
+    );
+    const debtNumber = parseFloat(
+      formatBigNum(debt, paprController.debtToken.decimals),
+    );
+    return (
+      (debtNumber / maxNumber) * parseFloat(ethers.utils.formatEther(maxLTV))
+    );
+  }, [maxLTV, maxDebt, debt, paprController.debtToken.decimals]);
+
   const tooltip = useTooltipState();
   return (
     <div className={styles.tile}>
@@ -100,7 +97,7 @@ function Tile({
       <Tooltip {...tooltip}>
         {result?.name} #{tokenId}
         <br />
-        LTV: {ltv}
+        LTV: {ltv ? formatPercent(ltv) : '...'}
       </Tooltip>
     </div>
   );
