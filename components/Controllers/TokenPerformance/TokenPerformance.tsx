@@ -117,7 +117,7 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
     const l = pricesData.targetValues.length;
     const cur = pricesData.targetValues[l - 1];
     const prev = pricesData.targetValues[2 - 1];
-    const change = percentChange(cur.value, prev.value);
+    const change = percentChange(prev.value, cur.value);
     // convert to APR
     return (change / (cur.time - prev.time)) * SECONDS_IN_A_YEAR;
   }, [pricesData]);
