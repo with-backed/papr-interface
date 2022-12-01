@@ -33,7 +33,7 @@ const prodPages = (
   {
     name: 'Borrow',
     route: `borrow`,
-    matcher: '/borrow',
+    matcher: 'borrow',
   },
   {
     name: 'Swap ↗',
@@ -63,6 +63,7 @@ function isActiveRoute(
   candidate: Page,
   isHomePage: boolean,
 ) {
+  console.log({ activeRoute, candidate, isHomePage });
   if (isHomePage) {
     return false;
   }
