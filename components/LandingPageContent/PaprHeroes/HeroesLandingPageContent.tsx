@@ -437,7 +437,6 @@ function LeaderboardEntry({
   heroPlayerBalance,
   longestBalanceStrings,
 }: LeaderboardEntryProps) {
-  const { jsonRpcProvider } = useConfig();
   const ensOrAddress = useAsyncValue(async () => {
     if (address === 'You') return address;
 
@@ -447,7 +446,7 @@ function LeaderboardEntry({
     );
     if (!ens) return shortenAddress(address);
     else return shortenAddress(ens);
-  }, [address, jsonRpcProvider]);
+  }, [address]);
 
   const whiteSpaceForColumn = useCallback(
     (
