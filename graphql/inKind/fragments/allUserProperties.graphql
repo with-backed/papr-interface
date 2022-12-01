@@ -1,0 +1,10 @@
+fragment allUserProperties on User {
+    id,
+    paprDebt,
+    paprHoldings
+    phUSDCHoldings,
+    blitCount,
+    moonbirdCount,
+    toadCount,
+    dinoCount
+}

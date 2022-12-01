@@ -4,11 +4,16 @@ import { captureException } from '@sentry/nextjs';
 import { configs, SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import { HeroesLandingPageContent } from 'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent';
-import { getOracleInfoFromAllowedCollateral } from 'lib/controllers';
+import {
+  getOracleInfoFromAllowedCollateral,
+  getQuoteForSwap,
+} from 'lib/controllers';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { calculateNetPhUSDCBalance, HeroPlayerBalance } from 'lib/paprHeroes';
 import { fetchSubgraphData } from 'lib/PaprController';
 import { getAllPaprHeroPlayers } from 'lib/pAPRSubgraph';
+import { ONE } from 'lib/constants';
+import { ethers } from 'ethers';
 
 export const getServerSideProps: GetServerSideProps<
   HeroesLandingPageProps
@@ -45,16 +50,16 @@ export const getServerSideProps: GetServerSideProps<
       new Set(await getAllPaprHeroPlayers(token)),
     );
 
+    const paprPrice = await getQuoteForSwap(
+      ethers.BigNumber.from(1),
+      paprToken,
+      underlying,
+      'paprHero',
+    );
     const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
       participatingPlayers.map(async (p) => [
-        p,
-        await calculateNetPhUSDCBalance(
-          p,
-          allowedCollateral,
-          oracleInfo,
-          underlying,
-          paprToken,
-        ),
+        p.id,
+        await calculateNetPhUSDCBalance(p, paprPrice, oracleInfo, underlying),
       ]),
     );
 

@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
+import { User } from 'types/generated/graphql/inKindSubgraph';
 import { configs } from './config';
 import { makeProvider } from './contracts';
 import { getQuoteForSwap } from './controllers';
@@ -16,64 +17,43 @@ export type HeroPlayerBalance = {
 };
 
 export async function calculateNetPhUSDCBalance(
-  address: string,
-  allowedCollateral: string[],
+  user: User,
+  paprPrice: ethers.BigNumber,
   oracleInfo: { [key: string]: ReservoirResponseData },
   underlying: string,
-  paprToken: string,
 ): Promise<HeroPlayerBalance> {
   const provider = makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero');
-  const connectedERC721 = allowedCollateral.map((c) =>
-    ERC721__factory.connect(
-      c,
-      makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero'),
-    ),
-  );
   const connectedPhUSDC = PHUSDC__factory.connect(underlying, provider);
-  const connectedPapr = ERC20__factory.connect(paprToken, provider);
+  const phUSDCBalance = ethers.BigNumber.from(user.phUSDCHoldings); //await connectedPhUSDC.balanceOf(user.id);
+  const paprBalance = ethers.BigNumber.from(user.paprHoldings);
+  const paprDebt = ethers.BigNumber.from(user.paprDebt);
+  const netPapr = paprBalance.sub(paprDebt);
+  const netPaprInUnderlying = netPapr.mul(paprPrice);
+  const addressToCount = (address: string, user: User) => {
+    switch (address.toLowerCase()) {
+      case '0xabe17952e7fe468711826c26b04b047c0da53b86':
+        return user.dinoCount;
+      case '0x0593cd2238d1b143bd1c67cd7fa98eee32a260ea':
+        return user.moonbirdCount;
+      case '0xd4e652bbfcf616c966e1b1e8ed37599d81f11889':
+        return user.toadCount;
+      case '0x4770646fe8635fa9ed3cb72ed4b7ef6386a06827':
+        return user.blitCount;
+      default:
+        return 0;
+    }
+  };
+  const totalNFTWorth = Object.keys(oracleInfo).reduce(
+    (accumulator, current) => {
+      var value =
+        oracleInfo[current].price * parseInt(addressToCount(current, user));
+      value = Math.floor(value * 1e6) / 1e6;
+      return accumulator.add(ethers.utils.parseUnits(value.toString(), 6));
+    },
+    ethers.BigNumber.from(0),
+  );
 
-  const underlyingDecimals = await connectedPhUSDC.decimals();
-
-  const totalNFTWorth = (
-    await Promise.all(
-      connectedERC721.map(async (erc721) => {
-        return (await erc721.balanceOf(address)).mul(
-          ethers.utils.parseUnits(
-            oracleInfo[erc721.address].price.toString(),
-            underlyingDecimals,
-          ),
-        );
-      }),
-    )
-  ).reduce((a, b) => b.add(a));
-
-  const [totalPhUSDCBalance, totalPaprBalance, userVaults] = await Promise.all([
-    connectedPhUSDC.balanceOf(address),
-    connectedPapr.balanceOf(address),
-    getAllVaultsForControllerForUser(
-      configs.paprHero.controllerAddress,
-      address,
-    ),
-  ]);
-
-  const totalPaprDebt = userVaults
-    .map((v) => ethers.BigNumber.from(v.debt))
-    .reduce((a, b) => a.add(b), ethers.BigNumber.from(0));
-
-  const netPapr = totalPaprBalance.sub(totalPaprDebt);
-  let netPaprInUnderlying: ethers.BigNumber;
-  if (netPapr.isZero()) {
-    netPaprInUnderlying = ethers.BigNumber.from(0);
-  } else {
-    netPaprInUnderlying = await getQuoteForSwap(
-      netPapr.abs(),
-      paprToken,
-      underlying,
-      'paprHero',
-    );
-  }
-
-  let totalBalance = totalNFTWorth.add(totalPhUSDCBalance);
+  let totalBalance = phUSDCBalance.add(totalNFTWorth);
   if (netPapr.isNegative()) {
     totalBalance = totalBalance.sub(netPaprInUnderlying);
   } else {
@@ -81,18 +61,11 @@ export async function calculateNetPhUSDCBalance(
   }
 
   return {
-    totalNFTWorth: parseFloat(
-      ethers.utils.formatUnits(totalNFTWorth, underlyingDecimals),
-    ),
-    totalPhUSDCBalance: parseFloat(
-      ethers.utils.formatUnits(totalPhUSDCBalance, underlyingDecimals),
-    ),
+    totalNFTWorth: parseFloat(ethers.utils.formatUnits(totalNFTWorth, 6)),
+    totalPhUSDCBalance: parseFloat(ethers.utils.formatUnits(phUSDCBalance, 6)),
     netPapr:
-      parseFloat(
-        ethers.utils.formatUnits(netPaprInUnderlying, underlyingDecimals),
-      ) * (netPapr.isNegative() ? -1 : 1),
-    totalBalance: parseFloat(
-      ethers.utils.formatUnits(totalBalance, underlyingDecimals),
-    ),
+      parseFloat(ethers.utils.formatUnits(netPaprInUnderlying, 6)) *
+      (netPapr.isNegative() ? -1 : 1),
+    totalBalance: parseFloat(ethers.utils.formatUnits(totalBalance, 6)),
   };
 }
