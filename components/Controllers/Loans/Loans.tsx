@@ -94,7 +94,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
             const formattedDebt = formattedDebts[i];
             return (
               <VaultRow
-                key={v.account}
+                key={v.id}
                 id={v.id}
                 account={v.account}
                 debt={formattedDebt}

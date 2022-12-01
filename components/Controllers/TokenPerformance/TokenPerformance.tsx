@@ -28,6 +28,7 @@ import {
 import { Table } from 'components/Table';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
+import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
 
 export type ControllerSummaryProps = {
   controllers: PaprController[];
@@ -113,13 +114,20 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
     if (!pricesData) {
       return null;
     }
-    return percentChangeOverDuration(pricesData.targetValues, 1);
+    const percentChangeSinceYesterday = percentChangeOverDuration(
+      pricesData.targetValues,
+      1,
+    );
+    // convert to APR
+    return (percentChangeSinceYesterday / SECONDS_IN_A_DAY) * SECONDS_IN_A_YEAR;
   }, [pricesData]);
   const realizedAPR = useMemo(() => {
     if (!pricesData) {
       return null;
     }
-    return percentChangeOverDuration(pricesData.targetValues, 30);
+    const change = percentChangeOverDuration(pricesData.markValues, 30);
+    /// convert to APR
+    return (change / (SECONDS_IN_A_DAY * 30)) * SECONDS_IN_A_YEAR;
   }, [pricesData]);
   const markAndChange = useMemo(() => {
     if (!pricesData) {
@@ -227,6 +235,7 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
           tooltip={nftOverCapTooltip}
           debtTokenMarketCap={debtTokenMarketCap}
           nftMarketCap={controllerNFTValue}
+          paprSymbol={controller.debtToken.symbol}
         />
       </td>
     </tr>

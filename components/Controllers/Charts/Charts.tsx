@@ -11,6 +11,7 @@ import {
   TimeScaleOptions,
 } from 'lightweight-charts';
 import { percentChangeOverDuration, percentChange } from 'lib/tokenPerformance';
+import { SECONDS_IN_A_YEAR } from 'lib/constants';
 
 const APR_COLOR = '#0000ee';
 const PRICE_COLOR = '#FF659C';
@@ -79,7 +80,10 @@ function RateOfGrowth({
       targetValues.slice(1).map((curr, i) => {
         const prev = targetValues[i];
         // lightweight-charts expects percentages as the actual value, not a ratio
-        const change = percentChange(prev.value, curr.value) * 100;
+        const change =
+          ((percentChange(prev.value, curr.value) * 100) /
+            (curr.time - prev.time)) *
+          SECONDS_IN_A_YEAR;
         return { value: change, time: curr.time };
       }),
     [targetValues],

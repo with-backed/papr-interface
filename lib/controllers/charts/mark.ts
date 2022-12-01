@@ -10,6 +10,7 @@ import {
 } from 'types/generated/graphql/uniswapSubgraph';
 import { RatePeriod } from '..';
 import { UTCTimestamp } from 'lightweight-charts';
+import { sort } from 'd3';
 
 export async function markValues(
   now: number,
@@ -20,11 +21,11 @@ export async function markValues(
   let quoteCurrency: UniSubgraphToken;
   let baseCurrency: UniSubgraphToken;
   if (controller.underlying == pool.token0) {
-    quoteCurrency = pool.token1;
-    baseCurrency = pool.token0;
-  } else {
     quoteCurrency = pool.token0;
     baseCurrency = pool.token1;
+  } else {
+    quoteCurrency = pool.token1;
+    baseCurrency = pool.token0;
   }
 
   const swapsQuery = await subgraphUniswapSwapsByPool(
@@ -63,7 +64,9 @@ export async function markValues(
     baseCurrency,
     quoteCurrency,
   );
-
+  console.log(formattedSwapValues);
+  console.log(sortedSwaps);
+  console.log(`controller ${controller.poolAddress}`);
   return [formattedSwapValues, dprValues];
 }
 
