@@ -10,7 +10,6 @@ import {
 } from 'types/generated/graphql/uniswapSubgraph';
 import { RatePeriod } from '..';
 import { UTCTimestamp } from 'lightweight-charts';
-import { sort } from 'd3';
 
 export async function markValues(
   now: number,

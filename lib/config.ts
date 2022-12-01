@@ -96,7 +96,7 @@ const paprMeme = {
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprMemeSubgraph: 'TODO: update this when we have a prod subgraph',
   paprUnderlyingAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-  oracleBaseUrl: 'http://localhost:3000',
+  oracleBaseUrl: '',
   reservoirAPI: 'https://api.reservoir.tools',
   reservoirMarketplace: '',
   erc721Subgraph: '',
