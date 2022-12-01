@@ -133,6 +133,7 @@
   width: 100%;
   display: flex;
   justify-content: flex-end;
+  font-size: var(--font-medium);
 }
 
 .loanActionSummary {
