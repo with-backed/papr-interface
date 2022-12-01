@@ -41,6 +41,7 @@ type BorrowOrRepayPerpetualButtonProps = {
   oracleInfo: OracleInfo;
   vaultHasDebt: boolean;
   disabled: boolean;
+  refresh: () => void;
 };
 
 export function BorrowPerpetualButton({
@@ -52,6 +53,7 @@ export function BorrowPerpetualButton({
   oracleInfo,
   vaultHasDebt,
   disabled,
+  refresh,
 }: BorrowOrRepayPerpetualButtonProps) {
   const { address } = useAccount();
 
@@ -87,7 +89,7 @@ export function BorrowPerpetualButton({
     [addCollateralCalldata, removeCollateralCalldata, borrowPerpetualCalldata],
   );
 
-  const { data, write } = useMulticallWrite(paprController, calldata);
+  const { data, write } = useMulticallWrite(paprController, calldata, refresh);
 
   return (
     <TransactionButton
@@ -118,6 +120,7 @@ export function RepayPerpetualButton({
   amount,
   oracleInfo,
   disabled,
+  refresh,
 }: BorrowOrRepayPerpetualButtonProps) {
   const { address } = useAccount();
 
@@ -149,7 +152,7 @@ export function RepayPerpetualButton({
     [addCollateralCalldata, removeCollateralCalldata, borrowPerpetualCalldata],
   );
 
-  const { data, write } = useMulticallWrite(paprController, calldata);
+  const { data, write } = useMulticallWrite(paprController, calldata, refresh);
 
   return (
     <TransactionButton
@@ -186,6 +189,7 @@ type BorrowOrRepayWithSwapButtonProps = {
   oracleInfo: OracleInfo;
   vaultHasDebt: boolean;
   disabled: boolean;
+  refresh: () => void;
 };
 
 export function RepayWithSwapButton({
@@ -198,6 +202,7 @@ export function RepayWithSwapButton({
   oracleInfo,
   vaultHasDebt,
   disabled,
+  refresh,
 }: BorrowOrRepayWithSwapButtonProps) {
   const { address } = useAccount();
 
@@ -235,7 +240,7 @@ export function RepayWithSwapButton({
     [addCollateralCalldata, removeCollateralCalldata, repayWithSwapCalldata],
   );
 
-  const { data, write } = useMulticallWrite(paprController, calldata);
+  const { data, write } = useMulticallWrite(paprController, calldata, refresh);
 
   return (
     <TransactionButton
@@ -271,6 +276,7 @@ export function BorrowWithSwapButton({
   oracleInfo,
   vaultHasDebt,
   disabled,
+  refresh,
 }: BorrowOrRepayWithSwapButtonProps) {
   const { address } = useAccount();
 
@@ -310,7 +316,7 @@ export function BorrowWithSwapButton({
     [addCollateralCalldata, removeCollateralCalldata, borrowWithSwapCalldata],
   );
 
-  const { data, write } = useMulticallWrite(paprController, calldata);
+  const { data, write } = useMulticallWrite(paprController, calldata, refresh);
 
   return (
     <TransactionButton
