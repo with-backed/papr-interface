@@ -12,6 +12,7 @@ import { formatBigNum, formatPercent } from 'lib/numberFormat';
 import { CenterAsset } from 'components/CenterAsset';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
+import { computeLTVFromDebts } from 'lib/controllers';
 
 type CollateralProps = {
   paprController: PaprController;
@@ -77,14 +78,11 @@ function Tile({ address, tokenId, paprController, vault }: TileProps) {
   const debt = useMemo(() => ethers.BigNumber.from(vault.debt), [vault.debt]);
   const ltv = useMemo(() => {
     if (!maxLTV || !maxDebt) return null;
-    const maxNumber = parseFloat(
-      formatBigNum(maxDebt, paprController.debtToken.decimals),
-    );
-    const debtNumber = parseFloat(
-      formatBigNum(debt, paprController.debtToken.decimals),
-    );
-    return (
-      (debtNumber / maxNumber) * parseFloat(ethers.utils.formatEther(maxLTV))
+    return computeLTVFromDebts(
+      debt,
+      maxDebt,
+      maxLTV,
+      paprController.debtToken.decimals,
     );
   }, [maxLTV, maxDebt, debt, paprController.debtToken.decimals]);
 
