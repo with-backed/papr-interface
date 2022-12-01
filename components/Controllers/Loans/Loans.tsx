@@ -2,20 +2,13 @@ import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { PaprController } from 'lib/PaprController';
-import {
-  formatBigNum,
-  formatPercent,
-  formatTokenAmount,
-} from 'lib/numberFormat';
-import { computeLtv, convertOneScaledValue } from 'lib/controllers';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { ControllerPricesData } from 'lib/controllers/charts';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
 import { VaultHealth } from './VaultHealth';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useLTVs } from 'hooks/useLTVs/useLTVs';
 
 type LoansProps = {
@@ -24,11 +17,6 @@ type LoansProps = {
 };
 
 export function Loans({ paprController, pricesData }: LoansProps) {
-  const oracleInfo = useOracleInfo(OraclePriceType.twap);
-  const norm = useAsyncValue(
-    () => paprController.newTarget(),
-    [paprController],
-  );
   const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
   const activeVaults = useMemo(
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
