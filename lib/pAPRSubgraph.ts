@@ -60,7 +60,7 @@ export async function getAllPaprHeroPlayers(
     return [];
   }
 
-  return data?.users || null;
+  return data?.users || [];
 }
 
 export async function getAllVaultsForControllerForUser(
