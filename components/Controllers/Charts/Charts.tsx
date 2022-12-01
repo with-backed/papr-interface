@@ -52,10 +52,6 @@ const BASE_CHART_OPTIONS: DeepPartial<ChartOptions> = {
   grid: { horzLines: { visible: false }, vertLines: { visible: false } },
   rightPriceScale: {
     ...BASE_PRICE_SCALE_OPTIONS,
-    scaleMargins: {
-      top: 0.499,
-      bottom: 0.499,
-    },
   },
   leftPriceScale: {
     ...BASE_PRICE_SCALE_OPTIONS,
@@ -87,15 +83,6 @@ function RateOfGrowth({
         return { value: change, time: curr.time };
       }),
     [targetValues],
-  );
-
-  const priceChange24h = useMemo(
-    () => percentChangeOverDuration(markValues, 1),
-    [markValues],
-  );
-  const contractAPRChange24h = useMemo(
-    () => percentChangeOverDuration(contractAPRs, 1),
-    [contractAPRs],
   );
 
   useEffect(() => {
