@@ -1,5 +1,5 @@
 .wrapper {
-    padding-top: 47px;
+  padding-top: 47px;
 }
 
 .wrapper h1,
@@ -22,25 +22,12 @@
   text-align: center;
 }
 
-.table tbody tr {
-  background-color: var(--heroes-red) !important;
-}
-
-.phUSDCTable thead tr th {
-  width: 22%;
-}
-
-.phUSDCTable .buyOrSell {
-  width: 34%;
-  text-align: center;
-}
-
-.phUSDCTable tbody td input {
+.phUSDCTable input {
+  max-width: 150px;
   border: none;
-  background-color: white;
   border-radius: 10px;
-  width: 80%;
   padding: 12px;
+  text-align: right;
 }
 
 .buyOrSell button {
@@ -53,6 +40,11 @@
 
 .allowedCollateralTable thead tr th {
   width: 30%;
+}
+
+.allowedCollateralTable thead tr th p {
+  margin: 0;
+  line-height: 1.5em;
 }
 
 .button {
@@ -85,15 +77,10 @@
 }
 
 .fieldsetsWrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.fieldsetsWrapper fieldset {
-    margin: 1%;
-    width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .fieldsetsWrapper fieldset p {
@@ -111,7 +98,7 @@
 .phUSDCWrapper {
   margin: 3%;
 }
-  
+
 .leaderboard {
   font-size: var(--font-large);
 }
@@ -119,7 +106,7 @@
 .leaderboardTable th {
   text-transform: none !important;
   font-size: var(--font-large);
-  letter-spacing: .08rem;
+  letter-spacing: 0.08rem;
   font-weight: inherit;
   line-height: 1.2em;
   padding-bottom: 10px;
@@ -128,28 +115,34 @@
 
 .leaderboardTable td {
   white-space: pre;
+  font-size: var(--font-medium);
 }
 
 .leaderboardTable thead th div {
   text-align: center;
 }
 
+.leaderboardTable thead th p {
+  margin: 0;
+  line-height: 1.5em;
+}
+
 .leaderboardTable tbody tr:nth-child(2n) {
   background-color: white !important;
 }
 
-.leaderboardTable tbody tr:last-child {
-  background-color: var(--heroes-red) !important;
-}
-
 .leaderboardTable p {
-  margin: 4px;
+  margin: 0;
 }
 
 .leaderboardTable .green {
-  color: #008A69;
+  color: #008a69;
 }
 
 .leaderboardTable .red {
-  color: #D83200;
+  color: #d83200;
+}
+
+.leaderboardTable tr td:first-child {
+  text-align: left;
 }

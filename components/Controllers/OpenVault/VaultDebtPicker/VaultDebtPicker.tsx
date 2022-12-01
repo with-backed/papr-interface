@@ -756,14 +756,20 @@ function LoanActionSummary({
           </div>
           <div>
             {quote && (
-              <p className={`${usingPerpetual ? styles.greyed : ''}`}>
+              <p
+                className={`${
+                  usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
+                }`}>
                 {formatBigNum(quote, controller.underlying.decimals)}
               </p>
             )}
             {!quote && <p>...</p>}
           </div>
         </div>
-        <div className={`${usingPerpetual ? styles.greyed : ''}`}>
+        <div
+          className={`${
+            usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
+          }`}>
           <div>
             <p>Slippage</p>
           </div>
