@@ -21,6 +21,8 @@ import { HeroClaim__factory } from 'types/generated/abis/factories/HeroClaim__fa
 import airdropInput from 'lib/heroClaims/airdropInput.json';
 import airdropOutput from 'lib/heroClaims/airdropOutput.json';
 import { TransactionButton } from 'components/Button';
+import controllerStyles from 'components/Controllers/Controller.module.css';
+import { formatTokenAmount } from 'lib/numberFormat';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
@@ -48,151 +50,104 @@ export function HeroesLandingPageContent({
     );
   }, [address, rankedPlayers]);
 
-  const longestNFTValue = useMemo(() => {
-    return longestString(
-      rankedPlayers.map(([_player, balance]) =>
-        balance.totalNFTWorth.toFixed(2).toString(),
-      ),
-    );
-  }, [rankedPlayers]);
-
-  const longestPhUSDCBalance = useMemo(() => {
-    return longestString(
-      rankedPlayers.map(([_player, balance]) =>
-        balance.totalPhUSDCBalance.toFixed(2).toString(),
-      ),
-    );
-  }, [rankedPlayers]);
-
-  const longestTotalBalance = useMemo(() => {
-    return longestString(
-      rankedPlayers.map(([_player, balance]) =>
-        balance.totalBalance.toFixed(2).toString(),
-      ),
-    );
-  }, [rankedPlayers]);
-
-  const longestNetPapr = useMemo(() => {
-    return longestString(
-      rankedPlayers.map(([_player, balance]) =>
-        balance.netPapr.toFixed(2).toString(),
-      ),
-    );
-  }, [rankedPlayers]);
-
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.fieldsetsWrapper}>
-        <Fieldset legend="🧮 join the game">
-          <p>
-            Papr Hero is a PvP competition where players compete to see who can
-            end up with the most <i>phUSDC</i>. Every player starts with a fixed
-            amount of <i>phUSDC</i> and eligible NFTs. Players can perform one
-            or more of the following actions to increase their <i>phUSDC</i>{' '}
-            balance:
-            <ol>
-              <li>
-                Lock NFTs as collateral and borrow <i>phUSDC</i>
-              </li>
-              <li>
-                Stake <i>phUSDC</i> for 10% APR
-              </li>
-              <li>
-                Sell their NFTs for <i>phUSDC</i>
-              </li>
-              <li>
-                Buy NFTs with their <i>phUSDC</i>
-              </li>
-            </ol>
-            At the end of the competition, a user&apos;s final <i>phUSDC</i>{' '}
-            score is the sum of their <i>phUSDC</i> balance as well as the value
-            of their NFTs (as calculated by the floor price of the collection)
-          </p>
-          <Claim />
-        </Fieldset>
+    <div className={controllerStyles.wrapper}>
+      <Fieldset legend="🧮 join the game">
+        <p>
+          Papr Hero is a PvP competition where players compete to see who can
+          end up with the most <i>phUSDC</i>. Every player starts with a fixed
+          amount of <i>phUSDC</i> and eligible NFTs. Players can perform one or
+          more of the following actions to increase their <i>phUSDC</i> balance:
+          <ol>
+            <li>
+              Lock NFTs as collateral and borrow <i>phUSDC</i>
+            </li>
+            <li>
+              Stake <i>phUSDC</i> for 10% APR
+            </li>
+            <li>
+              Sell their NFTs for <i>phUSDC</i>
+            </li>
+            <li>
+              Buy NFTs with their <i>phUSDC</i>
+            </li>
+          </ol>
+          At the end of the competition, a user&apos;s final <i>phUSDC</i> score
+          is the sum of their <i>phUSDC</i> balance as well as the value of
+          their NFTs (as calculated by the floor price of the collection)
+        </p>
+        <Claim />
+      </Fieldset>
 
-        <Fieldset legend="leaderboard">
-          <div className={styles.leaderboard}>
-            <Table className={`${styles.table} ${styles.leaderboardTable}`}>
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>
-                    <p>
-                      NFT
-                      <br />
-                      value
-                    </p>
-                  </th>
-                  <th>
-                    <p>phUSDC</p>
-                  </th>
-                  <th>
-                    <p>
-                      paprHERO (net)
-                      <br />
-                      (in phUSDC)
-                    </p>
-                  </th>
-                  <th>
-                    <p>
-                      Total
-                      <br />
-                      (phUSDC)
-                    </p>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rankedPlayers.map(([player, balance], i) => (
+      <Fieldset legend="leaderboard">
+        <div className={styles.leaderboard}>
+          <Table className={`${styles.table} ${styles.leaderboardTable}`}>
+            <thead>
+              <tr>
+                <th></th>
+                <th>
+                  <p>
+                    NFT
+                    <br />
+                    value
+                  </p>
+                </th>
+                <th>
+                  <p>phUSDC</p>
+                </th>
+                <th>
+                  <p>
+                    paprHERO
+                    <br />
+                    (net)
+                  </p>
+                </th>
+                <th>
+                  <p>
+                    Total
+                    <br />
+                    (phUSDC)
+                  </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rankedPlayers.map(([player, balance], i) => (
+                <LeaderboardEntry
+                  key={player}
+                  address={player}
+                  heroPlayerBalance={balance}
+                  position={i + 1}
+                />
+              ))}
+              {!!connectedRankedPlayer && (
+                <>
+                  <tr></tr>
                   <LeaderboardEntry
-                    key={player}
-                    address={player}
-                    heroPlayerBalance={balance}
-                    position={i + 1}
-                    longestBalanceStrings={{
-                      totalBalance: longestTotalBalance,
-                      totalNFTWorth: longestNFTValue,
-                      totalPhUSDCBalance: longestPhUSDCBalance,
-                      netPapr: longestNetPapr,
-                    }}
+                    key={address}
+                    address={'You'}
+                    heroPlayerBalance={connectedRankedPlayer[1]}
+                    position={
+                      rankedPlayers.findIndex(
+                        ([p, _balance]) =>
+                          getAddress(p) === getAddress(address!),
+                      ) + 1
+                    }
                   />
-                ))}
-                {!!connectedRankedPlayer && (
-                  <>
-                    <tr></tr>
-                    <LeaderboardEntry
-                      key={address}
-                      address={'You'}
-                      heroPlayerBalance={connectedRankedPlayer[1]}
-                      position={
-                        rankedPlayers.findIndex(
-                          ([p, _balance]) =>
-                            getAddress(p) === getAddress(address!),
-                        ) + 1
-                      }
-                      longestBalanceStrings={{
-                        totalBalance: longestTotalBalance,
-                        totalNFTWorth: longestNFTValue,
-                        totalPhUSDCBalance: longestPhUSDCBalance,
-                        netPapr: longestNetPapr,
-                      }}
-                    />
-                  </>
-                )}
-              </tbody>
-            </Table>
-          </div>
-        </Fieldset>
-        <PHUSDC />
-        {collateral.map((c) => (
-          <AllowedCollateral
-            contractAddress={c}
-            floorPrice={oracleInfo[getAddress(c)].price}
-            key={c}
-          />
-        ))}
-      </div>
+                </>
+              )}
+            </tbody>
+          </Table>
+        </div>
+      </Fieldset>
+      <PHUSDC />
+      {collateral.map((c) => (
+        <AllowedCollateral
+          contractAddress={c}
+          floorPrice={oracleInfo[getAddress(c)].price}
+          key={c}
+        />
+      ))}
     </div>
   );
 }
@@ -415,12 +370,6 @@ type LeaderboardEntryProps = {
   address: string | 'You';
   position: number;
   heroPlayerBalance: HeroPlayerBalance;
-  longestBalanceStrings: {
-    totalNFTWorth: string;
-    totalPhUSDCBalance: string;
-    netPapr: string;
-    totalBalance: string;
-  };
 };
 
 function shortenAddress(address: string) {
@@ -435,7 +384,6 @@ function LeaderboardEntry({
   address,
   position,
   heroPlayerBalance,
-  longestBalanceStrings,
 }: LeaderboardEntryProps) {
   const ensOrAddress = useAsyncValue(async () => {
     if (address === 'You') return address;
@@ -448,24 +396,6 @@ function LeaderboardEntry({
     else return shortenAddress(ens);
   }, [address]);
 
-  const whiteSpaceForColumn = useCallback(
-    (
-      k: 'totalBalance' | 'totalPhUSDCBalance' | 'totalNFTWorth' | 'netPapr',
-    ) => {
-      if (
-        heroPlayerBalance[k].toFixed(2).toString().length >=
-        longestBalanceStrings[k].length
-      ) {
-        return '';
-      }
-      return ' '.repeat(
-        longestBalanceStrings[k].length -
-          heroPlayerBalance[k].toFixed(2).toString().length,
-      );
-    },
-    [heroPlayerBalance, longestBalanceStrings],
-  );
-
   return (
     <tr>
       <td>
@@ -475,31 +405,19 @@ function LeaderboardEntry({
         </p>
       </td>
       <td className={styles.green}>
-        <p>
-          {whiteSpaceForColumn('totalNFTWorth')}
-          {heroPlayerBalance.totalNFTWorth.toFixed(2)}
-        </p>
+        <p>{formatTokenAmount(heroPlayerBalance.totalNFTWorth)}</p>
       </td>
       <td className={styles.green}>
-        <p>
-          {whiteSpaceForColumn('totalPhUSDCBalance')}
-          {heroPlayerBalance.totalPhUSDCBalance.toFixed(2)}
-        </p>
+        <p>{formatTokenAmount(heroPlayerBalance.totalPhUSDCBalance)}</p>
       </td>
       <td
         className={`${
           heroPlayerBalance.netPapr >= 0 ? styles.green : styles.red
         }`}>
-        <p>
-          {whiteSpaceForColumn('netPapr')}
-          {heroPlayerBalance.netPapr.toFixed(2)}
-        </p>
+        <p>{formatTokenAmount(heroPlayerBalance.netPapr)}</p>
       </td>
       <td>
-        <p>
-          {whiteSpaceForColumn('totalBalance')}
-          {heroPlayerBalance.totalBalance.toFixed(2)}
-        </p>
+        <p>{formatTokenAmount(heroPlayerBalance.totalBalance)}</p>
       </td>
     </tr>
   );

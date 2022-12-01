@@ -1,5 +1,5 @@
 .wrapper {
-    padding-top: 47px;
+  padding-top: 47px;
 }
 
 .wrapper h1,
@@ -85,15 +85,10 @@
 }
 
 .fieldsetsWrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.fieldsetsWrapper fieldset {
-    margin: 1%;
-    width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .fieldsetsWrapper fieldset p {
@@ -111,7 +106,7 @@
 .phUSDCWrapper {
   margin: 3%;
 }
-  
+
 .leaderboard {
   font-size: var(--font-large);
 }
@@ -119,7 +114,7 @@
 .leaderboardTable th {
   text-transform: none !important;
   font-size: var(--font-large);
-  letter-spacing: .08rem;
+  letter-spacing: 0.08rem;
   font-weight: inherit;
   line-height: 1.2em;
   padding-bottom: 10px;
@@ -143,13 +138,18 @@
 }
 
 .leaderboardTable p {
-  margin: 4px;
+  margin: 0;
 }
 
 .leaderboardTable .green {
-  color: #008A69;
+  color: #008a69;
 }
 
 .leaderboardTable .red {
-  color: #D83200;
+  color: #d83200;
+}
+
+.leaderboardTable tr td:first-child {
+  text-align: left;
+  font-size: var(--font-medium);
 }
