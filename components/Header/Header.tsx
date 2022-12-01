@@ -180,7 +180,7 @@ export function Header() {
   );
 
   if (
-    (activeRoute === '' && !SHOW_HEADER_ON_LANDING_PAGE) ||
+    (isHomePage && !SHOW_HEADER_ON_LANDING_PAGE) ||
     activeRoute === 'errorPage'
   ) {
     return (

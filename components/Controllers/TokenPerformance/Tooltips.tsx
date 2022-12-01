@@ -64,7 +64,12 @@ export function NFTCapTooltip({
   tooltip,
   debtTokenMarketCap,
   nftMarketCap,
-}: TooltipProps & { debtTokenMarketCap: number; nftMarketCap: number }) {
+  paprSymbol,
+}: TooltipProps & {
+  debtTokenMarketCap: number;
+  nftMarketCap: number;
+  paprSymbol: string;
+}) {
   return (
     <Tooltip {...tooltip}>
       <div className={styles.nftCapTooltip}>
@@ -78,7 +83,7 @@ export function NFTCapTooltip({
           <p>${formatTokenAmount(debtTokenMarketCap)}</p>
         </div>
         <div className={styles.description}>
-          <p>(CAP) Market value of controller&apos;s pAPR tokens</p>
+          <p>(CAP) Market value of {paprSymbol}</p>
         </div>
         <div className={styles.value}>
           <p>{(nftMarketCap / debtTokenMarketCap).toFixed(2)}</p>

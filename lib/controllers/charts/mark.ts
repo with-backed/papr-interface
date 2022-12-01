@@ -20,11 +20,11 @@ export async function markValues(
   let quoteCurrency: UniSubgraphToken;
   let baseCurrency: UniSubgraphToken;
   if (controller.underlying == pool.token0) {
-    quoteCurrency = pool.token1;
-    baseCurrency = pool.token0;
-  } else {
     quoteCurrency = pool.token0;
     baseCurrency = pool.token1;
+  } else {
+    quoteCurrency = pool.token1;
+    baseCurrency = pool.token0;
   }
 
   const swapsQuery = await subgraphUniswapSwapsByPool(
@@ -63,7 +63,6 @@ export async function markValues(
     baseCurrency,
     quoteCurrency,
   );
-
   return [formattedSwapValues, dprValues];
 }
 

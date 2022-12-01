@@ -11,6 +11,7 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { computeRate, RatePeriod } from '..';
 import { UTCTimestamp } from 'lightweight-charts';
+import { Pool } from 'types/generated/graphql/uniswapSubgraph';
 
 interface TargetUpdate {
   newTarget: string;
@@ -20,8 +21,11 @@ interface TargetUpdate {
 export async function targetValues(
   now: number,
   controller: PaprController | SubgraphController,
+  pool: Pool,
   token: SupportedToken,
 ): Promise<[TimeSeriesValue[], TimeSeriesValue[]]> {
+  const underlyingDecimals =
+    controller.underlying == pool ? pool.token0.decimals : pool.token1.decimals;
   const result = await subgraphTargetalizationUpdatesForController(
     controller.id,
   );
@@ -60,7 +64,10 @@ export async function targetValues(
     });
     formattedTargets.push({
       value: parseFloat(
-        ethers.utils.formatEther(ethers.BigNumber.from(current.newTarget)),
+        ethers.utils.formatUnits(
+          ethers.BigNumber.from(current.newTarget),
+          underlyingDecimals,
+        ),
       ),
       time: t as UTCTimestamp,
     });

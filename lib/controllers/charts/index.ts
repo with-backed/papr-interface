@@ -38,6 +38,8 @@ export async function controllerPricesData(
 
   var markDPRs: TimeSeriesValue[] = [];
   var marks: TimeSeriesValue[] = [];
+  var targets: TimeSeriesValue[] = [];
+  var targetDPRs: TimeSeriesValue[] = [];
   if (subgraphUniswapPool) {
     [marks, markDPRs] = await markValues(
       now,
@@ -45,9 +47,13 @@ export async function controllerPricesData(
       subgraphUniswapPool.pool as Pool,
       uniswapSubgraphUrl,
     );
+    [targets, targetDPRs] = await targetValues(
+      now,
+      controller,
+      subgraphUniswapPool.pool as Pool,
+      token,
+    );
   }
-
-  const [targets, targetDPRs] = await targetValues(now, controller, token);
 
   // add a starting data point all on target
   markDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });
