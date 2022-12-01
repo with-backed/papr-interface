@@ -23,6 +23,8 @@ import airdropOutput from 'lib/heroClaims/airdropOutput.json';
 import { TransactionButton } from 'components/Button';
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { formatTokenAmount } from 'lib/numberFormat';
+import { useTooltipState, TooltipReference } from 'reakit/Tooltip';
+import { Tooltip } from 'components/Tooltip';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
@@ -385,6 +387,7 @@ function LeaderboardEntry({
   position,
   heroPlayerBalance,
 }: LeaderboardEntryProps) {
+  const addressTooltip = useTooltipState();
   const ensOrAddress = useAsyncValue(async () => {
     if (address === 'You') return address;
 
@@ -392,16 +395,25 @@ function LeaderboardEntry({
       address,
       'https://eth-mainnet.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
     );
-    if (!ens) return shortenAddress(address);
-    else return shortenAddress(ens);
+    return ens ?? address;
   }, [address]);
+
+  const formattedEnsOrAddress = useMemo(() => {
+    if (!ensOrAddress) {
+      return null;
+    }
+    return shortenAddress(ensOrAddress);
+  }, [ensOrAddress]);
 
   return (
     <tr>
       <td>
         <p>
-          {position}. <span>{ensOrAddress}</span>
-          {address !== 'You' ? <span>...</span> : ''}
+          <TooltipReference {...addressTooltip}>
+            {position}. <span>{formattedEnsOrAddress}</span>
+            {address !== 'You' ? <span>...</span> : ''}
+          </TooltipReference>
+          <Tooltip {...addressTooltip}>{ensOrAddress}</Tooltip>
         </p>
       </td>
       <td className={styles.green}>
