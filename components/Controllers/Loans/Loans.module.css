@@ -11,11 +11,22 @@
   white-space: nowrap;
 }
 
+.indicator {
+  cursor: pointer;
+}
+
 .indicator-danger {
+  composes: indicator;
   color: var(--highlight-alert-100);
 }
 
 .table td {
   white-space: pre;
   text-align: center;
+}
+
+.tooltip div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
 }

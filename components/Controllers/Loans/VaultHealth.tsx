@@ -2,6 +2,9 @@ import React, { useMemo } from 'react';
 import { ethers } from 'ethers';
 import { convertOneScaledValue } from 'lib/controllers';
 import styles from './Loans.module.css';
+import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
+import { Tooltip } from 'components/Tooltip';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 
 type VaultHealthProps = {
   ltv: number;
@@ -34,6 +37,7 @@ type NewVaultHealthProps = {
 
 // TODO(adamgobes): Migrate all old health components to use this new vault health component and rename
 export function NewVaultHealth({ debt, maxDebt }: NewVaultHealthProps) {
+  const healthTooltip = useTooltipState();
   const ratio = Math.min(
     1,
     parseFloat(ethers.utils.formatEther(debt)) /
@@ -48,10 +52,42 @@ export function NewVaultHealth({ debt, maxDebt }: NewVaultHealthProps) {
     return hashes.concat(dashes).join('').substring(0, 10);
   }, [ratio]);
 
+  const formattedLoanAmount = useMemo(
+    () => formatTokenAmount(parseFloat(ethers.utils.formatEther(debt))),
+    [debt],
+  );
+
+  const formattedMaxDebt = useMemo(
+    () => formatTokenAmount(parseFloat(ethers.utils.formatEther(maxDebt))),
+    [maxDebt],
+  );
+
   return (
-    <span
-      className={ratio > 0.5 ? styles['indicator-danger'] : styles.indicator}>
-      {indicator}
-    </span>
+    <>
+      <TooltipReference {...healthTooltip}>
+        <span
+          className={
+            ratio > 0.5 ? styles['indicator-danger'] : styles.indicator
+          }>
+          {indicator}
+        </span>
+      </TooltipReference>
+      <Tooltip {...healthTooltip}>
+        <div className={styles.tooltip}>
+          <div>
+            <span>Loan</span>
+            <span>${formattedLoanAmount}</span>
+          </div>
+          <div>
+            <span>Max Debt</span>
+            <span>${formattedMaxDebt}</span>
+          </div>
+          <div>
+            <span>Current/Max Debt</span>
+            <span>{formatPercent(ratio)}</span>
+          </div>
+        </div>
+      </Tooltip>
+    </>
   );
 }
