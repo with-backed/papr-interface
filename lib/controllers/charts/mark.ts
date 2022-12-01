@@ -64,9 +64,6 @@ export async function markValues(
     baseCurrency,
     quoteCurrency,
   );
-  console.log(formattedSwapValues);
-  console.log(sortedSwaps);
-  console.log(`controller ${controller.poolAddress}`);
   return [formattedSwapValues, dprValues];
 }
 

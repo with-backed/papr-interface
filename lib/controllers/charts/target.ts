@@ -72,10 +72,6 @@ export async function targetValues(
       time: t as UTCTimestamp,
     });
   }
-  console.log(sortedTargets);
-
-  console.log(formattedTargets);
-  console.log(underlyingDecimals);
 
   return [formattedTargets, targetDPRs];
 }
