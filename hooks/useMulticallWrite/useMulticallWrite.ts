@@ -10,6 +10,7 @@ const overrides = {
 export function useMulticallWrite(
   paprController: PaprController,
   calldata: string[],
+  refresh: () => void,
 ) {
   const { config: multicallConfig } = usePrepareContractWrite({
     address: paprController.id,
@@ -21,7 +22,7 @@ export function useMulticallWrite(
   const { data, write } = useContractWrite({
     ...multicallConfig,
     onSuccess: (data: any) => {
-      data.wait().then(() => window.location.reload());
+      data.wait().then(refresh);
     },
   } as any);
 

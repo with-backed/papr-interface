@@ -1,6 +1,5 @@
 import { Config } from 'lib/config';
-import { clientFromUrl } from 'lib/urql';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import {
   NftsForAccountAndCollectionDocument,
   NftsForAccountAndCollectionQuery,
@@ -17,7 +16,7 @@ export const useAccountNFTs = (
   collections: string[] | undefined,
   config: Config,
 ) => {
-  const [{ data, fetching: nftsLoading }] =
+  const [{ data, fetching: nftsLoading }, reexecuteQuery] =
     useQuery<NftsForAccountAndCollectionQuery>({
       query: NftsForAccountAndCollectionDocument,
       variables: {
@@ -43,5 +42,6 @@ export const useAccountNFTs = (
   return {
     userCollectionNFTs,
     nftsLoading,
+    reexecuteQuery,
   };
 };

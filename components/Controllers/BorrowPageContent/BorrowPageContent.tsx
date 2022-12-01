@@ -1,5 +1,5 @@
 import { ControllerPricesData } from 'lib/controllers/charts';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
@@ -32,16 +32,22 @@ export function BorrowPageContent({
     return paprController.allowedCollateral.map((ac) => ac.contractAddress);
   }, [paprController.allowedCollateral]);
 
-  const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
-    address,
-    collateralContractAddresses,
-    config,
-  );
+  const {
+    userCollectionNFTs,
+    nftsLoading,
+    reexecuteQuery: refreshAccountNFTs,
+  } = useAccountNFTs(address, collateralContractAddresses, config);
 
-  const { currentVaults, vaultsFetching } = useCurrentVaults(
-    paprController,
-    address,
-  );
+  const {
+    currentVaults,
+    vaultsFetching,
+    reexecuteQuery: refreshCurrentVaults,
+  } = useCurrentVaults(paprController, address);
+
+  const refresh = useCallback(() => {
+    refreshAccountNFTs({ requestPolicy: 'network-only' });
+    refreshCurrentVaults({ requestPolicy: 'network-only' });
+  }, [refreshAccountNFTs, refreshCurrentVaults]);
 
   const uniqueCollections = useMemo(() => {
     const userCollectionCollateral = userCollectionNFTs.map((nft) =>
@@ -93,6 +99,7 @@ export function BorrowPageContent({
             userNFTsForVault={userCollectionNFTs.filter(
               (nft) => getAddress(collection) === getAddress(nft.address),
             )}
+            refresh={refresh}
           />
         ))}
       {!!currentVaults && (

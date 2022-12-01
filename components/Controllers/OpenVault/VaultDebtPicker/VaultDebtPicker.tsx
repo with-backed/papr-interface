@@ -48,6 +48,7 @@ type VaultDebtPickerProps = {
   vault: VaultsByOwnerForControllerQuery['vaults']['0'] | undefined;
   collateralContractAddress: string;
   userNFTsForVault: AccountNFTsResponse[];
+  refresh: () => void;
 };
 
 export function VaultDebtPicker({
@@ -56,6 +57,7 @@ export function VaultDebtPicker({
   vault,
   collateralContractAddress,
   userNFTsForVault,
+  refresh,
 }: VaultDebtPickerProps) {
   // init hooks
   const { address } = useAccount();
@@ -483,6 +485,7 @@ export function VaultDebtPicker({
                 oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!collateralApproved}
+                refresh={refresh}
               />
             )}
             {usingPerpetual && !isBorrowing && (
@@ -495,6 +498,7 @@ export function VaultDebtPicker({
                 oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!!balanceErrorMessage || !debtTokenApproved}
+                refresh={refresh}
               />
             )}
             {!usingPerpetual && !isBorrowing && (
@@ -508,6 +512,7 @@ export function VaultDebtPicker({
                 oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!!balanceErrorMessage || !underlyingApproved}
+                refresh={refresh}
               />
             )}
             {!usingPerpetual && isBorrowing && (
@@ -521,6 +526,7 @@ export function VaultDebtPicker({
                 oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!collateralApproved}
+                refresh={refresh}
               />
             )}
           </div>

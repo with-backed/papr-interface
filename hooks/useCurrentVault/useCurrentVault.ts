@@ -35,14 +35,15 @@ export function useCurrentVaults(
   controller: PaprController,
   user: string | undefined,
 ) {
-  const [{ data: vaultsData, fetching: vaultsFetching }] = useQuery({
-    query: VaultsByOwnerForControllerDocument,
-    variables: {
-      owner: user?.toLowerCase(),
-      controller: controller.id.toLowerCase(),
-    },
-    pause: !user,
-  });
+  const [{ data: vaultsData, fetching: vaultsFetching }, reexecuteQuery] =
+    useQuery({
+      query: VaultsByOwnerForControllerDocument,
+      variables: {
+        owner: user?.toLowerCase(),
+        controller: controller.id.toLowerCase(),
+      },
+      pause: !user,
+    });
 
   const currentVaults = useMemo(() => {
     if (vaultsFetching || !vaultsData?.vaults) return null;
@@ -54,5 +55,6 @@ export function useCurrentVaults(
   return {
     currentVaults,
     vaultsFetching,
+    reexecuteQuery,
   };
 }
