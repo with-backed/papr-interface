@@ -57,23 +57,23 @@
   --paprMEME-100-gradient: #06846f50;
   --paprMEME-offset-gradient: #00e82750;
 
-  --paprHERO-5: #fef5f2;
-  --paprHERO-10: #ffe8e0;
-  --paprHERO-20: #ffd7cc;
-  --paprHERO-50: #ff6333;
-  --paprHERO-100: #e03400;
-  --paprHERO-offset: #ffc658;
-  --paprHERO-100-gradient: #e0340050;
-  --paprHERO-offset-gradient: #ffc65850;
+  --paprTRASH-5: #fef5f2;
+  --paprTRASH-10: #ffe8e0;
+  --paprTRASH-20: #ffd7cc;
+  --paprTRASH-50: #ff6333;
+  --paprTRASH-100: #e03400;
+  --paprTRASH-offset: #ffc658;
+  --paprTRASH-100-gradient: #e0340050;
+  --paprTRASH-offset-gradient: #ffc65850;
 
-  --paprTRASH-5: #f8f7ff;
-  --paprTRASH-10: #e9e8ff;
-  --paprTRASH-20: #dddbff;
-  --paprTRASH-50: #908ee7;
-  --paprTRASH-100: #4c45d9;
-  --paprTRASH-offset: #ff778f;
-  --paprTRASH-100-gradient: #4c45d950;
-  --paprTRASH-offset-gradient: #ff778f50;
+  --paprHERO-5: #f8f7ff;
+  --paprHERO-10: #e9e8ff;
+  --paprHERO-20: #dddbff;
+  --paprHERO-50: #908ee7;
+  --paprHERO-100: #4c45d9;
+  --paprHERO-offset: #ff778f;
+  --paprHERO-100-gradient: #4c45d950;
+  --paprHERO-offset-gradient: #ff778f50;
 
   --gray-5: #f2f2f2;
   --gray-30: #b2b2b2;
