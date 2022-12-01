@@ -114,12 +114,12 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
     if (!pricesData) {
       return null;
     }
-    const percentChangeSinceYesterday = percentChangeOverDuration(
-      pricesData.targetValues,
-      1,
-    );
+    const l = pricesData.targetValues.length;
+    const cur = pricesData.targetValues[l - 1];
+    const prev = pricesData.targetValues[l - 2];
+    const change = percentChange(prev.value, cur.value);
     // convert to APR
-    return (percentChangeSinceYesterday / SECONDS_IN_A_DAY) * SECONDS_IN_A_YEAR;
+    return (change / (cur.time - prev.time)) * SECONDS_IN_A_YEAR;
   }, [pricesData]);
   const realizedAPR = useMemo(() => {
     if (!pricesData) {
