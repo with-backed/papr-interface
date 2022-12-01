@@ -16,6 +16,7 @@ import { Table } from 'components/Table';
 import { VaultHealth } from './VaultHealth';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
+import { useLTVs } from 'hooks/useLTVs/useLTVs';
 
 type LoansProps = {
   paprController: PaprController;
@@ -24,7 +25,6 @@ type LoansProps = {
 
 export function Loans({ paprController, pricesData }: LoansProps) {
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
-  const [ltvs, setLtvs] = useState<{ [key: string]: number }>({});
   const norm = useAsyncValue(
     () => paprController.newTarget(),
     [paprController],
@@ -34,6 +34,9 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
     [paprController],
   );
+
+  const { ltvs } = useLTVs(paprController, activeVaults, maxLTV);
+
   const avgLtv = useMemo(() => {
     const ltvValues = Object.values(ltvs);
 
@@ -55,41 +58,6 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     );
     return '$' + formatTokenAmount(debtNum);
   }, [activeVaults, paprController.underlying]);
-
-  const computedLtvs: { [key: string]: number } | null =
-    useAsyncValue(async () => {
-      if (!oracleInfo || !maxLTV) return null;
-      return await activeVaults.reduce(async (prev, v) => {
-        const maxDebtForVault: ethers.BigNumber = (
-          await paprController.maxDebt([v.collateralContract], oracleInfo)
-        ).mul(v.collateral.length);
-        const maxNumber = parseFloat(
-          formatBigNum(maxDebtForVault, paprController.debtToken.decimals),
-        );
-        const debtNumber = parseFloat(
-          formatBigNum(v.debt, paprController.debtToken.decimals),
-        );
-
-        return {
-          ...prev,
-          [v.id]:
-            (debtNumber / maxNumber) *
-            parseFloat(ethers.utils.formatEther(maxLTV)),
-        };
-      }, {});
-    }, [activeVaults, oracleInfo, paprController, maxLTV]);
-
-  useEffect(() => {
-    if (!norm) {
-      return;
-    }
-    const calculatedLtvs = activeVaults.reduce((prev, v) => {
-      // TODO fix after we decide how get up to date oracle quote
-      const l = computeLtv(v.debt, 1, norm);
-      return { ...prev, [v.id]: convertOneScaledValue(l, 4) };
-    }, {} as { [key: string]: number });
-    setLtvs(calculatedLtvs);
-  }, [activeVaults, norm]);
 
   const formattedDebts = useMemo(() => {
     const decimals = paprController.underlying.decimals;
@@ -137,7 +105,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
         </thead>
         <tbody>
           {activeVaults.map((v, i) => {
-            const ltv = computedLtvs ? computedLtvs[v.id] : 0;
+            const ltv = ltvs ? ltvs[v.id] : 0;
             const formattedDebt = formattedDebts[i];
             return (
               <VaultRow
