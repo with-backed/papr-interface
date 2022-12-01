@@ -216,7 +216,12 @@
 
 .papr-heroes-container {
   composes: product-container;
-  background: url('/graph-dense.png'), var(--background-orange-paper);
+  background: url('/graph-dense.png'),
+    linear-gradient(
+      120deg,
+      var(--paprHERO-offset-gradient) 0%,
+      var(--paprHERO-100-gradient) 100%
+    );
   margin-top: 100px;
 }
 
@@ -281,7 +286,12 @@
 /* paprMEME */
 .papr-meme-container {
   composes: product-container;
-  background: url('/graph-denser.png'), var(--background-green-paper);
+  background: url('/graph-denser.png'),
+    linear-gradient(
+      120deg,
+      var(--paprMEME-offset-gradient) 0%,
+      var(--paprMEME-100-gradient) 100%
+    );
 }
 
 .memes {
