@@ -22,25 +22,12 @@
   text-align: center;
 }
 
-.table tbody tr {
-  background-color: var(--heroes-red) !important;
-}
-
-.phUSDCTable thead tr th {
-  width: 22%;
-}
-
-.phUSDCTable .buyOrSell {
-  width: 34%;
-  text-align: center;
-}
-
-.phUSDCTable tbody td input {
+.phUSDCTable input {
+  max-width: 150px;
   border: none;
-  background-color: white;
   border-radius: 10px;
-  width: 80%;
   padding: 12px;
+  text-align: right;
 }
 
 .buyOrSell button {
@@ -53,6 +40,11 @@
 
 .allowedCollateralTable thead tr th {
   width: 30%;
+}
+
+.allowedCollateralTable thead tr th p {
+  margin: 0;
+  line-height: 1.5em;
 }
 
 .button {
@@ -123,18 +115,20 @@
 
 .leaderboardTable td {
   white-space: pre;
+  font-size: var(--font-medium);
 }
 
 .leaderboardTable thead th div {
   text-align: center;
 }
 
-.leaderboardTable tbody tr:nth-child(2n) {
-  background-color: white !important;
+.leaderboardTable thead th p {
+  margin: 0;
+  line-height: 1.5em;
 }
 
-.leaderboardTable tbody tr:last-child {
-  background-color: var(--heroes-red) !important;
+.leaderboardTable tbody tr:nth-child(2n) {
+  background-color: white !important;
 }
 
 .leaderboardTable p {
@@ -151,5 +145,4 @@
 
 .leaderboardTable tr td:first-child {
   text-align: left;
-  font-size: var(--font-medium);
 }

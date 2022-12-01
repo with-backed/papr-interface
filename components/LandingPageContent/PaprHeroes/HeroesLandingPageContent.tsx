@@ -122,9 +122,11 @@ export function HeroesLandingPageContent({
                   position={i + 1}
                 />
               ))}
+            </tbody>
+            <br />
+            <tbody>
               {!!connectedRankedPlayer && (
                 <>
-                  <tr></tr>
                   <LeaderboardEntry
                     key={address}
                     address={'You'}
@@ -238,13 +240,19 @@ function PHUSDC() {
           <thead>
             <tr>
               <th className={styles.yourBalance}>
-                <p>Your balance</p>
+                Your
+                <br />
+                balance
               </th>
               <th className={styles.stakedAmount}>
-                <p>Staked amount</p>
+                Staked
+                <br />
+                amount
               </th>
               <th className={styles.interestEarned}>
-                <p>Interest earned</p>
+                Interest
+                <br />
+                earned
               </th>
               <th className={styles.interestEarned}></th>
             </tr>
@@ -254,7 +262,9 @@ function PHUSDC() {
               <td>
                 <p>
                   {!!currentBalance
-                    ? ethers.utils.formatUnits(currentBalance, decimals)
+                    ? parseFloat(
+                        ethers.utils.formatUnits(currentBalance, decimals),
+                      ).toFixed(2)
                     : 'N/A'}
                 </p>
               </td>
