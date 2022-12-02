@@ -1,15 +1,23 @@
 .vaultTable {
-    margin: 16px 0;
+  margin: 16px 0;
 }
 
 .vaultTable p {
-    margin: 0;
+  margin: 0;
 }
 
 .vaultTable thead tr th {
-    text-align: center;
+  text-align: center;
 }
 
 .vaultTable tbody tr td {
-    text-align: center;
+  text-align: center;
+}
+
+.paragraphs p:first-child {
+  margin-top: 0;
+}
+
+.paragraphs p:last-child {
+  margin-bottom: 0;
 }
