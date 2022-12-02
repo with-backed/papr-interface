@@ -296,9 +296,7 @@ class PaprControllerInternal {
     oracleInfo: OracleInfo,
   ): number {
     if (collateralAssets.length == 0) return 0;
-    const price = oracleInfo[collateralAssets[0]].price;
-    const total = price * collateralAssets.length;
-    return total;
+    return collateralAssets.reduce((a, c) => a + oracleInfo[c].price, 0);
   }
 
   async purchaseLiquidationAuctionNFT(
