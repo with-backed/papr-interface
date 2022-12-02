@@ -408,7 +408,7 @@ function LeaderboardEntry({
 
     const ens = await addressToENS(
       address,
-      'https://eth-mainnet.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
+      'https://eth-mainnet.g.alchemy.com/v2/De3LMv_8CYuN9WzVEgoOI5w7ltnGIhnH',
     );
     return ens ?? address;
   }, [address]);
