@@ -11,7 +11,12 @@
   white-space: nowrap;
 }
 
+.indicator {
+  cursor: pointer;
+}
+
 .indicator-danger {
+  composes: indicator;
   color: var(--highlight-alert-100);
 }
 
