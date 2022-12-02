@@ -114,7 +114,7 @@ export function HeroesLandingPageContent({
               </tr>
             </thead>
             <tbody>
-              {rankedPlayers.map(([player, balance], i) => (
+              {rankedPlayers.slice(0, 10).map(([player, balance], i) => (
                 <LeaderboardEntry
                   key={player}
                   address={player}

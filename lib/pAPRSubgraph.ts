@@ -66,10 +66,9 @@ export async function getAllPaprHeroPlayers(
 export async function getAllVaultsForControllerForUser(
   controller: string,
   owner: string,
+  token: SupportedToken,
 ) {
-  const client = clientFromUrl(
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.2/gn',
-  );
+  const client = clientFromUrl(configs[token].paprMemeSubgraph);
   const { data, error } = await client
     .query<VaultsByOwnerForControllerQuery>(
       VaultsByOwnerForControllerDocument,
