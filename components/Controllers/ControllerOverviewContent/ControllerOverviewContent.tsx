@@ -8,7 +8,7 @@ import { Loans } from 'components/Controllers/Loans';
 import { TokenPerformance } from 'components/Controllers/TokenPerformance';
 import dynamic from 'next/dynamic';
 import { Auctions } from 'components/Controllers/Auctions';
-import { YourBorrowPositions } from 'components/YourBorrowPositions/YourBorrowPositions';
+import { YourPositions } from 'components/YourPositions/YourPositions';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { useAccount } from 'wagmi';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
@@ -54,7 +54,7 @@ export function ControllerOverviewContent({
   return (
     <div className={styles.wrapper}>
       {oracleInfo && !vaultsFetching && !nftsLoading && (
-        <YourBorrowPositions
+        <YourPositions
           currentVaults={currentVaults}
           latestMarketPrice={latestMarketPrice}
           oracleInfo={oracleInfo}

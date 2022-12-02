@@ -1,4 +1,4 @@
-import styles from './YourBorrowPositions.module.css';
+import styles from './YourPositions.module.css';
 import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
 import { Fieldset } from 'components/Fieldset';
 import { PaprController } from 'lib/PaprController';
@@ -18,7 +18,7 @@ import { NewVaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { getAddress } from 'ethers/lib/utils';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
 
-export type YourBorrowPositionsProps = {
+export type YourPositions = {
   paprController: PaprController;
   userNFTs: AccountNFTsResponse[];
   currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
@@ -26,13 +26,13 @@ export type YourBorrowPositionsProps = {
   latestMarketPrice: number;
 };
 
-export function YourBorrowPositions({
+export function YourPositions({
   paprController,
   userNFTs,
   currentVaults,
   oracleInfo,
   latestMarketPrice,
-}: YourBorrowPositionsProps) {
+}: YourPositions) {
   const { address } = useAccount();
   const { tokenName } = useConfig();
 

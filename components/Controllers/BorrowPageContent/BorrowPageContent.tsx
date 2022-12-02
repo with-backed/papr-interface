@@ -5,7 +5,7 @@ import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
 import { useAccountNFTs } from 'hooks/useAccountNFTs';
 import { PaprController } from 'lib/PaprController';
-import { YourBorrowPositions } from 'components/YourBorrowPositions/YourBorrowPositions';
+import { YourPositions } from 'components/YourPositions/YourPositions';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { VaultDebtPicker } from 'components/Controllers/OpenVault/VaultDebtPicker/VaultDebtPicker';
 import { getAddress } from 'ethers/lib/utils';
@@ -77,7 +77,7 @@ export function BorrowPageContent({
 
   return (
     <div className={controllerStyles.wrapper}>
-      <YourBorrowPositions
+      <YourPositions
         userNFTs={userCollectionNFTs}
         paprController={paprController}
         currentVaults={currentVaults}
