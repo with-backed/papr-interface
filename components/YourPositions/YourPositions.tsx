@@ -36,19 +36,6 @@ export function YourPositions({
   const { address } = useAccount();
   const { tokenName } = useConfig();
 
-  const { data: rawPaprMEMEBalance, isFetching: balanceFetching } =
-    useContractRead({
-      address: paprController.debtToken.id,
-      abi: erc20ABI,
-      functionName: 'balanceOf',
-      args: [address as `0x${string}`],
-    });
-
-  const paprMemeBalance = useMemo(
-    () => ethers.BigNumber.from(rawPaprMEMEBalance || 0),
-    [rawPaprMEMEBalance],
-  );
-
   const uniqueCollections = useMemo(() => {
     const vaultAndUserAddresses = userNFTs
       .map((nft) => getAddress(nft.address))
