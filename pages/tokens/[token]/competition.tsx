@@ -20,7 +20,7 @@ const DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD: Set<string> = new Set([
   // Claim contract
   '0x9e6c6b22d07b0c6b525fd9ab61c30970880d0627',
   // Adam
-  '0xE89CB2053A04Daf86ABaa1f4bC6D50744e57d39E',
+  '0xE89CB2053A04Daf86ABaa1f4bC6D50744e57d39E'.toLowerCase(),
 ]);
 
 export const getServerSideProps: GetServerSideProps<
@@ -56,7 +56,10 @@ export const getServerSideProps: GetServerSideProps<
 
     const participatingPlayers = Array.from(
       new Set(await getAllPaprHeroPlayers(token)),
-    ).filter((p) => !DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD.has(p.id));
+    ).filter(
+      (p) =>
+        !DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD.has(p.id.toLowerCase()),
+    );
 
     let paprPrice: ethers.BigNumber;
     try {
