@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { PaprController } from 'lib/PaprController';
-import { LoanDetails } from 'components/Controllers/Loans/LoanDetails';
 import controllerStyles from '../Controller.module.css';
 import { Collateral } from 'components/Controllers/Collateral';
 import { Activity } from 'components/Controllers/Activity';
 import { TokenPerformance } from 'components/Controllers/TokenPerformance';
 import { ControllerPricesData } from 'lib/controllers/charts';
+import { Loans } from 'components/Controllers/Loans';
 
 type VaultPageContentProps = {
   paprController: PaprController;
@@ -21,7 +21,7 @@ export function VaultPageContent({
   const vaultIds = useMemo(() => new Set([vaultId]), [vaultId]);
   return (
     <div className={controllerStyles.wrapper}>
-      <LoanDetails vaultId={vaultId} paprController={paprController} />
+      <Loans paprController={paprController} vaultId={vaultId} />
       <Collateral paprController={paprController} vaultId={vaultId} />
       <Activity paprController={paprController} vaultIds={vaultIds} />
       <TokenPerformance

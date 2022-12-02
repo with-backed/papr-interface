@@ -42,7 +42,7 @@ export function ControllerOverviewContent({
       <Collateral paprController={paprController} />
       <Activity paprController={paprController} />
       <Charts pricesData={pricesData} />
-      <Loans paprController={paprController} pricesData={pricesData} />
+      <Loans paprController={paprController} />
       <Auctions paprController={paprController} />
     </div>
   );

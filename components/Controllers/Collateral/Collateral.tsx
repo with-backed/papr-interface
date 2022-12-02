@@ -8,11 +8,10 @@ import { TooltipReference, useTooltipState } from 'reakit';
 import { Tooltip } from 'components/Tooltip';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ethers } from 'ethers';
-import { formatBigNum, formatPercent } from 'lib/numberFormat';
+import { formatPercent } from 'lib/numberFormat';
 import { CenterAsset } from 'components/CenterAsset';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
-import { computeLTVFromDebts } from 'lib/controllers';
 
 type CollateralProps = {
   paprController: PaprController;
@@ -68,23 +67,11 @@ function Tile({ address, tokenId, paprController, vault }: TileProps) {
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
   const result = useCollection({ network: centerNetwork as any, address });
-  const maxLTV = useAsyncValue(() => {
-    return paprController.maxLTV();
-  }, [paprController]);
-  const maxDebt = useAsyncValue(async () => {
-    if (!oracleInfo) return null;
-    return paprController.maxDebt([address], oracleInfo);
-  }, [paprController, address, oracleInfo]);
   const debt = useMemo(() => ethers.BigNumber.from(vault.debt), [vault.debt]);
-  const ltv = useMemo(() => {
-    if (!maxLTV || !maxDebt) return null;
-    return computeLTVFromDebts(
-      debt,
-      maxDebt,
-      maxLTV,
-      paprController.debtToken.decimals,
-    );
-  }, [maxLTV, maxDebt, debt, paprController.debtToken.decimals]);
+  const ltv = useAsyncValue(async () => {
+    if (!oracleInfo) return null;
+    return await paprController.ltv(debt, [address], oracleInfo);
+  }, [address, paprController, oracleInfo, debt]);
 
   const tooltip = useTooltipState();
   return (

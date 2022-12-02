@@ -1,18 +1,19 @@
 import React, { useMemo } from 'react';
-import { Fieldset } from 'components/Fieldset';
-import { VaultRow } from 'components/Controllers/Loans/VaultRow';
 import { PaprController } from 'lib/PaprController';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import styles from './Loans.module.css';
-import { computeLtv, convertOneScaledValue } from 'lib/controllers';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
-
+import { VaultRow } from './VaultRow';
 type LoanDetailsProps = {
   vaultId: string;
   paprController: PaprController;
 };
 
 export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const vault = useMemo(() => {
     return paprController.vaults?.find((v) => v.id === vaultId);
   }, [paprController, vaultId]);
@@ -21,16 +22,10 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
     [paprController],
   );
   const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
-  const ltv = useMemo(() => {
-    if (vault && norm) {
-      return convertOneScaledValue(
-        // TODO, punting on borrow page rework
-        computeLtv(vault.debt, 1, norm),
-        4,
-      );
-    }
-    return undefined;
-  }, [vault, norm]);
+  const ltv = useAsyncValue(async () => {
+    if (!vault || !oracleInfo) return 0;
+    return paprController.ltv(vault.debt, vault.collateralContract, oracleInfo);
+  }, [vault, oracleInfo, paprController]);
   return (
     <Fieldset legend={'💸 Loan Details'}>
       <Table className={styles.table}>
@@ -48,7 +43,7 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
             account={vault?.account}
             debt={vault!.debt}
             maxLTV={maxLTV}
-            ltv={ltv}
+            ltv={ltv || 0}
             controllerId={paprController.id}
           />
         </tbody>

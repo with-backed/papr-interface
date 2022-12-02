@@ -249,21 +249,56 @@ class PaprControllerInternal {
     collateralAssets: string[],
     oracleInfo: OracleInfo,
   ): Promise<ethers.BigNumber> {
-    const totalDebtPerCollateral = await Promise.all(
-      collateralAssets
-        .map((asset) =>
-          ethers.utils.parseUnits(
-            oracleInfo[getAddress(asset)].price.toString(),
-            this.underlying.decimals,
-          ),
-        )
-        .map(async (oraclePrice) => await this._contract.maxDebt(oraclePrice)),
+    const totalAtomic = this.totalCollateralValueAtomicUints(
+      collateralAssets,
+      oracleInfo,
     );
+    const totalUnderlying = totalAtomic.mul(await this.maxLTV());
+    return totalUnderlying.div(await this.target());
+  }
 
-    return totalDebtPerCollateral.reduce(
-      (a, b) => a.add(b),
-      ethers.BigNumber.from(0),
+  async ltv(
+    debt: ethers.BigNumber,
+    collateralAssets: string[],
+    oracleInfo: OracleInfo,
+  ): Promise<number> {
+    const totalCollateralValue = this.totalCollateralValueWholeUnits(
+      collateralAssets,
+      oracleInfo,
     );
+    const wholeUnitTarget = parseFloat(
+      ethers.utils.formatUnits(await this.target(), this.debtToken.decimals),
+    );
+    const totalCollaterValueInPapr = totalCollateralValue / wholeUnitTarget;
+    return (
+      totalCollaterValueInPapr /
+      parseFloat(ethers.utils.formatUnits(debt, this.debtToken.decimals))
+    );
+  }
+
+  totalCollateralValueAtomicUints(
+    collateralAssets: string[],
+    oracleInfo: OracleInfo,
+  ): ethers.BigNumber {
+    const total = this.totalCollateralValueWholeUnits(
+      collateralAssets,
+      oracleInfo,
+    );
+    const totalAtomic = ethers.utils.parseUnits(
+      total.toString(),
+      this.underlying.decimals,
+    );
+    return totalAtomic;
+  }
+
+  totalCollateralValueWholeUnits(
+    collateralAssets: string[],
+    oracleInfo: OracleInfo,
+  ): number {
+    if (collateralAssets.length == 0) return 0;
+    const price = oracleInfo[collateralAssets[0]].price;
+    const total = price * collateralAssets.length;
+    return total;
   }
 
   async purchaseLiquidationAuctionNFT(

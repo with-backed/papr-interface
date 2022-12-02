@@ -320,16 +320,3 @@ export async function getOracleInfoFromAllowedCollateral(
 
   return oracleInfoProxy(oracleInfo);
 }
-
-export function computeLTVFromDebts(
-  debt: ethers.BigNumber,
-  maxDebt: ethers.BigNumber,
-  maxLTV: ethers.BigNumber,
-  debtTokenDecimals: number,
-): number {
-  const maxNumber = parseFloat(formatBigNum(maxDebt, debtTokenDecimals));
-  const debtNumber = parseFloat(formatBigNum(debt, debtTokenDecimals));
-  return (
-    (debtNumber / maxNumber) * parseFloat(ethers.utils.formatEther(maxLTV))
-  );
-}
