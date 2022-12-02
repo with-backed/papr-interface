@@ -22,8 +22,8 @@ export function useLTVs(
         ).mul(v.collateral.length);
 
         return {
-          ...prev,
-          [v.id]: await paprController.ltv(
+          ...(await prev),
+          [v.id]: paprController.ltv(
             ethers.BigNumber.from(v.debt),
             [v.collateralContract],
             oracleInfo,

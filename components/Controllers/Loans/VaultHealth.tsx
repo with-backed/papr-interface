@@ -8,22 +8,38 @@ type VaultHealthProps = {
   maxLtv: ethers.BigNumber;
 };
 export function VaultHealth({ ltv, maxLtv }: VaultHealthProps) {
-  const maxLTV = convertOneScaledValue(maxLtv, 4);
-  const ratio = ltv / maxLTV;
+  // const maxLTV = convertOneScaledValue(maxLtv, 4);
+  // const ratio = ltv / maxLTV;
+  // console.log(ltv, maxLtv)
+
+  const ratio = useMemo(() => {
+    if (!ltv || !maxLtv) return null;
+    return ltv / parseFloat(ethers.utils.formatEther(maxLtv));
+  }, [ltv, maxLtv]);
 
   const indicator = useMemo(() => {
+    if (!ratio) return;
     // Ratio, but as a number out of 10 rather than a decimal out of 1
     const numHashes = Math.round(ratio * 10);
+    console.log(numHashes);
     const dashes = Array(10).fill('-');
     const hashes = Array(numHashes).fill('#');
     return hashes.concat(dashes).join('').substring(0, 10);
   }, [ratio]);
 
   return (
-    <span
-      className={ratio > 0.5 ? styles['indicator-danger'] : styles.indicator}>
-      {indicator}
-    </span>
+    <div>
+      {!ratio ? (
+        ''
+      ) : (
+        <span
+          className={
+            ratio > 0.5 ? styles['indicator-danger'] : styles.indicator
+          }>
+          {indicator}
+        </span>
+      )}
+    </div>
   );
 }
 

@@ -41,16 +41,20 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
             <th className={styles['center-align']}>Health</th>
           </tr>
         </thead>
-        <tbody>
-          <VaultRow
-            id={vaultId}
-            account={vault?.account}
-            debt={vault!.debt}
-            maxLTV={maxLTV}
-            ltv={ltv || 0}
-            controllerId={paprController.id}
-          />
-        </tbody>
+        {ltv == undefined ? (
+          ''
+        ) : (
+          <tbody>
+            <VaultRow
+              id={vaultId}
+              account={vault?.account}
+              debt={vault!.debt}
+              maxLTV={maxLTV}
+              ltv={ltv}
+              controllerId={paprController.id}
+            />
+          </tbody>
+        )}
       </Table>
     </Fieldset>
   );
