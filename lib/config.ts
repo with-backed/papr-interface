@@ -68,7 +68,7 @@ const paprHero: Config = {
       ? 'http://localhost:3000'
       : process.env.NEXT_PUBLIC_ENV === 'preview'
       ? 'https://v2-interface-rosy.vercel.app'
-      : 'https://papr.wtf',
+      : 'https://www.papr.wtf',
   paprUnderlyingAddress: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
