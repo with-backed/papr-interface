@@ -77,6 +77,15 @@ export function VaultDebtPicker({
 
   const userAndVaultNFTs = useMemo(() => {
     return userNFTsForVault
+      .filter(
+        // filter out nfts that are already in the vault, major assumption here is goldsky is faster than thegraph
+        (nft) =>
+          vault?.collateral.find(
+            (c) =>
+              getAddress(c.contractAddress) === getAddress(nft.address) &&
+              c.tokenId === nft.tokenId,
+          ) === undefined,
+      )
       .map((nft) => ({
         address: nft.address,
         tokenId: nft.tokenId,
