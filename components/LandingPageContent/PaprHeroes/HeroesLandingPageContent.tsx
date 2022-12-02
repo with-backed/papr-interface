@@ -55,28 +55,33 @@ export function HeroesLandingPageContent({
   return (
     <div className={controllerStyles.wrapper}>
       <Fieldset legend="🧮 join the game">
-        <p>
-          Papr Hero is a PvP competition where players compete to see who can
-          end up with the most <i>phUSDC</i>. Every player starts with a fixed
-          amount of <i>phUSDC</i> and eligible NFTs. Players can perform one or
-          more of the following actions to increase their <i>phUSDC</i> balance:
+        <p className={styles.join}>
+          Papr Hero is a testnet PvP competition where players compete to see
+          who can end up with the most Goerli phUSDC. The assets are not worth
+          anything, the game is just for fun, but testnet glory is still real
+          glory. Every player starts with a combination of phUSDC and eligible
+          NFTs for notional net worth of 50,000 phUSDC. Players can perform one
+          or more of the following actions to increase their phUSDC balance:
           <ol>
             <li>
-              Lock NFTs as collateral and borrow <i>phUSDC</i>
+              Use NFTs as collateral to mint paprHERO and
+              <ul>
+                <li>Swap to phUSDC + stake</li>
+                <li>LP in the paprHERO {`<>`} phUSDC Uniswap pool</li>
+              </ul>
             </li>
+            <li>Stake phUSDC for 10% APR</li>
             <li>
-              Stake <i>phUSDC</i> for 10% APR
+              Use phUSDC to purchase paprHERO and earn from possible price
+              appreciation
             </li>
-            <li>
-              Sell their NFTs for <i>phUSDC</i>
-            </li>
-            <li>
-              Buy NFTs with their <i>phUSDC</i>
-            </li>
+            <li>Trade NFTs</li>
           </ol>
-          At the end of the competition, a user&apos;s final <i>phUSDC</i> score
-          is the sum of their <i>phUSDC</i> balance as well as the value of
-          their NFTs (as calculated by the floor price of the collection)
+          At the end of the competition, a users final phUSDC score is the sum
+          of their phUSDC balance as well as the value of their NFTs (as
+          calculated by the floor price of the collection). The competition ends
+          with a snapshot on Sunday the 11th at midnight GMT, though the testnet
+          will continue.
         </p>
         <Claim />
       </Fieldset>

@@ -105,7 +105,7 @@
 
 .leaderboardTable th {
   text-transform: none !important;
-  font-size: var(--font-large);
+  font-size: var(--font-medium);
   letter-spacing: 0.08rem;
   font-weight: inherit;
   line-height: 1.2em;
@@ -145,4 +145,8 @@
 
 .leaderboardTable tr td:first-child {
   text-align: left;
+}
+
+.join {
+  margin: 0;
 }

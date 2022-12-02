@@ -130,7 +130,7 @@ export function YourPositions({
         {maxLoanAmountInUnderlying && <>${maxLoanAmountInUnderlying}</>}
       </div>
       <div>{totalPaprMemeDebt.isZero() && <p>No {tokenName} loans yet</p>}</div>
-      <div>
+      <div className={styles.paragraphs}>
         {!totalPaprMemeDebt.isZero() && totalPaprMemeDebtInUnderlying && (
           <p>
             You owe{' '}
