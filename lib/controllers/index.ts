@@ -327,6 +327,7 @@ export function computeLTVFromDebts(
   maxLTV: ethers.BigNumber,
   debtTokenDecimals: number,
 ): number {
+  if (maxDebt.isZero()) return 0;
   const maxNumber = parseFloat(formatBigNum(maxDebt, debtTokenDecimals));
   const debtNumber = parseFloat(formatBigNum(debt, debtTokenDecimals));
   return (
