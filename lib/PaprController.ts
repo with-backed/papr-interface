@@ -254,7 +254,7 @@ class PaprControllerInternal {
       oracleInfo,
     );
     const totalUnderlying = totalAtomic.mul(await this.maxLTV());
-    return totalUnderlying.div(await this.target());
+    return totalUnderlying.div(await this.newTarget());
   }
 
   async ltv(
@@ -267,7 +267,7 @@ class PaprControllerInternal {
       oracleInfo,
     );
     const wholeUnitTarget = parseFloat(
-      ethers.utils.formatUnits(await this.target(), this.debtToken.decimals),
+      ethers.utils.formatUnits(await this.newTarget(), this.debtToken.decimals),
     );
     const totalCollaterValueInPapr = totalCollateralValue / wholeUnitTarget;
     return (
