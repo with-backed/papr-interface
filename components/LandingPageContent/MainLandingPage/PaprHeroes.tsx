@@ -9,33 +9,11 @@ import { ButtonLink } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
 import Image from 'next/image';
 
-const Logo = () => <img src={PaprHeroesLogo.src} alt="" />;
-
-// TODO: make this dynamic when we have some scores
-function Leaderboard() {
-  return (
-    <div className={styles.leaderboard}>
-      <h3>LEADERBOARD</h3>
-      <dl>
-        <dt>
-          superdude.eth
-          <div className={styles.dotted} />
-        </dt>
-        <dd>18,239 USDC</dd>
-        <dt>
-          vitalik.eth
-          <div className={styles.dotted} />
-        </dt>
-        <dd>17,267 USDC</dd>
-        <dt>
-          0xa47381e
-          <div className={styles.dotted} />
-        </dt>
-        <dd>17,221 USDC</dd>
-      </dl>
-    </div>
-  );
-}
+const Logo = () => (
+  <div className={styles.img}>
+    <Image src={PaprHeroesLogo} alt="" placeholder="blur" />
+  </div>
+);
 
 function Rules() {
   const currencyName = <i>phUSDC</i>;
@@ -75,9 +53,9 @@ export function PaprHeroes() {
       <ButtonLink
         kind="outline"
         theme="hero"
-        href="https://backed.mirror.xyz/8SslPvU8of0h-fxoo6AybCpm51f30nd0qxPST8ep08c"
+        href="/tokens/paprHero/competition"
         newTab>
-        Coming soon! Subscribe for updates ↗
+        See the Leaderboard
       </ButtonLink>
       <div className={styles.heroes}>
         <Image src={Hero1} alt="" quality={100} />
@@ -85,7 +63,6 @@ export function PaprHeroes() {
         <Image src={Hero3} alt="" quality={100} />
         <Image src={Hero4} alt="" quality={100} />
       </div>
-      {/* <Leaderboard /> */}
     </div>
   );
 }
