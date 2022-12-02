@@ -23,7 +23,7 @@ export function useLTVs(
         ).mul(v.collateral.length);
 
         return {
-          ...prev,
+          ...(await prev),
           [v.id]: computeLTVFromDebts(
             ethers.BigNumber.from(v.debt),
             maxDebtForVault,

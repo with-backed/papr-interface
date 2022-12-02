@@ -73,8 +73,10 @@ function Tile({ address, tokenId, paprController, vault }: TileProps) {
   }, [paprController]);
   const maxDebt = useAsyncValue(async () => {
     if (!oracleInfo) return null;
-    return paprController.maxDebt([address], oracleInfo);
-  }, [paprController, address, oracleInfo]);
+    return (await paprController.maxDebt([address], oracleInfo)).mul(
+      vault.collateral.length,
+    );
+  }, [paprController, address, oracleInfo, vault.collateral.length]);
   const debt = useMemo(() => ethers.BigNumber.from(vault.debt), [vault.debt]);
   const ltv = useMemo(() => {
     if (!maxLTV || !maxDebt) return null;

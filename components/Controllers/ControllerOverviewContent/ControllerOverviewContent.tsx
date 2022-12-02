@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styles from 'components/Controllers/Controller.module.css';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import { PaprController } from 'lib/PaprController';
@@ -7,8 +7,14 @@ import { Activity } from 'components/Controllers/Activity';
 import { Loans } from 'components/Controllers/Loans';
 import { TokenPerformance } from 'components/Controllers/TokenPerformance';
 import dynamic from 'next/dynamic';
-import { YourPositions } from 'components/Controllers/YourPositions';
 import { Auctions } from 'components/Controllers/Auctions';
+import { YourPositions } from 'components/YourPositions/YourPositions';
+import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
+import { useAccount } from 'wagmi';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { useAccountNFTs } from 'hooks/useAccountNFTs';
+import { useConfig } from 'hooks/useConfig';
 
 /* lightweight-charts uses canvas and cannot be SSRed */
 const Charts = dynamic(() => import('components/Controllers/Charts/Charts'), {
@@ -16,25 +22,46 @@ const Charts = dynamic(() => import('components/Controllers/Charts/Charts'), {
 });
 
 export type ControllerPageProps = {
-  address: string;
   paprController: PaprController;
   pricesData: ControllerPricesData | null;
 };
 
 export function ControllerOverviewContent({
-  address,
   paprController,
   pricesData,
 }: ControllerPageProps) {
+  const config = useConfig();
+  const { address } = useAccount();
+  const oracleInfo = useOracleInfo(OraclePriceType.lower);
   const latestMarketPrice =
     pricesData?.markValues[pricesData?.markValues.length - 1]?.value || 1.0;
 
+  const { currentVaults, vaultsFetching } = useCurrentVaults(
+    paprController,
+    address,
+  );
+
+  const collateralContractAddresses = useMemo(() => {
+    return paprController.allowedCollateral.map((ac) => ac.contractAddress);
+  }, [paprController.allowedCollateral]);
+
+  const { userCollectionNFTs, nftsLoading } = useAccountNFTs(
+    address,
+    collateralContractAddresses,
+    config,
+  );
+
   return (
     <div className={styles.wrapper}>
-      <YourPositions
-        paprController={paprController}
-        latestMarketPrice={latestMarketPrice}
-      />
+      {oracleInfo && !vaultsFetching && !nftsLoading && (
+        <YourPositions
+          currentVaults={currentVaults}
+          latestMarketPrice={latestMarketPrice}
+          oracleInfo={oracleInfo}
+          paprController={paprController}
+          userNFTs={userCollectionNFTs}
+        />
+      )}
       <TokenPerformance
         pricesData={{ [paprController.id]: pricesData }}
         controllers={[paprController]}
