@@ -72,6 +72,9 @@ export function BorrowPageContent({
     return <></>;
   }
 
+  const latestMarketPrice =
+    pricesData?.markValues[pricesData?.markValues.length - 1]?.value || 1.0;
+
   return (
     <div className={controllerStyles.wrapper}>
       <YourBorrowPositions
@@ -79,6 +82,7 @@ export function BorrowPageContent({
         paprController={paprController}
         currentVaults={currentVaults}
         oracleInfo={oracleInfo}
+        latestMarketPrice={latestMarketPrice}
       />
       {!!address &&
         uniqueCollections.map((collection) => (

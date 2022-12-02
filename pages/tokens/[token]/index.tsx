@@ -47,7 +47,6 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 
   return {
     props: {
-      address: address,
       subgraphController: paprController,
       subgraphPool: pool,
     },
@@ -55,7 +54,6 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 };
 
 export default function ControllerPage({
-  address,
   subgraphController,
   subgraphPool,
 }: ServerSideProps) {
@@ -84,7 +82,6 @@ export default function ControllerPage({
     <OracleInfoProvider collections={collections}>
       <OpenGraph title={`${config.tokenName} | Performance`} />
       <ControllerOverviewContent
-        address={address}
         paprController={paprController}
         pricesData={pricesData}
       />

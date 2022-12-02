@@ -2,7 +2,7 @@ import styles from './YourBorrowPositions.module.css';
 import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
 import { Fieldset } from 'components/Fieldset';
 import { PaprController } from 'lib/PaprController';
-import { useAccount } from 'wagmi';
+import { erc20ABI, useAccount, useContractRead } from 'wagmi';
 import { useMemo } from 'react';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
@@ -16,13 +16,14 @@ import { ERC721__factory } from 'types/generated/abis';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { NewVaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { getAddress } from 'ethers/lib/utils';
-import { formatBigNum } from 'lib/numberFormat';
+import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
 
 export type YourBorrowPositionsProps = {
   paprController: PaprController;
   userNFTs: AccountNFTsResponse[];
   currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
   oracleInfo: OracleInfo;
+  latestMarketPrice: number;
 };
 
 export function YourBorrowPositions({
@@ -30,9 +31,23 @@ export function YourBorrowPositions({
   userNFTs,
   currentVaults,
   oracleInfo,
+  latestMarketPrice,
 }: YourBorrowPositionsProps) {
   const { address } = useAccount();
   const { tokenName } = useConfig();
+
+  const { data: rawPaprMEMEBalance, isFetching: balanceFetching } =
+    useContractRead({
+      address: paprController.debtToken.id,
+      abi: erc20ABI,
+      functionName: 'balanceOf',
+      args: [address as `0x${string}`],
+    });
+
+  const paprMemeBalance = useMemo(
+    () => ethers.BigNumber.from(rawPaprMEMEBalance || 0),
+    [rawPaprMEMEBalance],
+  );
 
   const uniqueCollections = useMemo(() => {
     const vaultAndUserAddresses = userNFTs
@@ -64,14 +79,15 @@ export function YourBorrowPositions({
         .reduce((a, b) => a.add(b), ethers.BigNumber.from(0)),
     );
 
-    if (maxLoanMinusCurrentDebt.isZero()) return ethers.BigNumber.from(0);
-    return getQuoteForSwap(
-      maxLoanMinusCurrentDebt,
-      paprController.debtToken.id,
-      paprController.underlying.id,
-      tokenName as SupportedToken,
+    return (
+      parseFloat(
+        ethers.utils.formatUnits(
+          maxLoanMinusCurrentDebt,
+          paprController.debtToken.decimals,
+        ),
+      ) * latestMarketPrice
     );
-  }, [tokenName, paprController, oracleInfo, userNFTs, currentVaults]);
+  }, [paprController, oracleInfo, userNFTs, currentVaults, latestMarketPrice]);
 
   const totalPaprMemeDebt = useMemo(() => {
     if (!currentVaults) return ethers.BigNumber.from(0);
@@ -115,11 +131,21 @@ export function YourBorrowPositions({
 
   return (
     <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>
+      <BalanceInfo
+        paprController={paprController}
+        latestMarketPrice={latestMarketPrice}
+      />
+      <div>
+        Based on the NFTs in your wallet, you&apos;re eligible for loans from{' '}
+        {uniqueCollections.length} collection(s), with a max loan amount of{' '}
+        {!maxLoanAmountInUnderlying && <span>...</span>}
+        {maxLoanAmountInUnderlying && <>${maxLoanAmountInUnderlying}</>}
+      </div>
       <div>{totalPaprMemeDebt.isZero() && <p>No {tokenName} loans yet</p>}</div>
       <div>
         {!totalPaprMemeDebt.isZero() && totalPaprMemeDebtInUnderlying && (
           <p>
-            You hold{' '}
+            You owe{' '}
             <b>
               {formatBigNum(
                 totalPaprMemeDebt,
@@ -136,20 +162,6 @@ export function YourBorrowPositions({
               {paprController.underlying.symbol}
             </b>
           </p>
-        )}
-      </div>
-      <div>
-        Based on the NFTs in your wallet, you&apos;re eligible for loans from{' '}
-        {uniqueCollections.length} collection(s), with a max loan amount of{' '}
-        {!maxLoanAmountInUnderlying && <span>...</span>}
-        {maxLoanAmountInUnderlying && (
-          <>
-            $
-            {formatBigNum(
-              maxLoanAmountInUnderlying,
-              paprController.underlying.decimals,
-            )}
-          </>
         )}
       </div>
       {currentVaults && (
@@ -268,5 +280,56 @@ export function VaultOverview({
         )}
       </td>
     </tr>
+  );
+}
+
+type BalanceInfoProps = {
+  paprController: PaprController;
+  latestMarketPrice?: number;
+};
+function BalanceInfo({ paprController, latestMarketPrice }: BalanceInfoProps) {
+  const { address } = useAccount();
+  const { data: rawPaprMEMEBalance, isFetching: balanceFetching } =
+    useContractRead({
+      address: paprController.debtToken.id,
+      abi: erc20ABI,
+      functionName: 'balanceOf',
+      args: [address as `0x${string}`],
+    });
+
+  const paprMemeBalance = useMemo(
+    () => ethers.BigNumber.from(rawPaprMEMEBalance || 0),
+    [rawPaprMEMEBalance],
+  );
+
+  const formattedBalance = useMemo(() => {
+    const convertedBalance = parseFloat(
+      ethers.utils.formatUnits(
+        paprMemeBalance,
+        paprController.debtToken.decimals,
+      ),
+    );
+    return (
+      formatTokenAmount(convertedBalance) +
+      ` ${paprController.debtToken.symbol}`
+    );
+  }, [paprMemeBalance, paprController.debtToken]);
+  const formattedValue = useMemo(() => {
+    if (!latestMarketPrice) {
+      return 'an unknown amount of USDC (no market data available)';
+    }
+
+    const convertedBalance = parseFloat(
+      ethers.utils.formatUnits(
+        paprMemeBalance,
+        paprController.debtToken.decimals,
+      ),
+    );
+    return formatTokenAmount(convertedBalance * latestMarketPrice) + ' USDC';
+  }, [paprController.debtToken, paprMemeBalance, latestMarketPrice]);
+  return (
+    <p>
+      You hold <b>{formattedBalance}</b> worth <b>{formattedValue}</b>.
+    </p>
   );
 }
