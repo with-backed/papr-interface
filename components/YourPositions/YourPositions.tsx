@@ -18,7 +18,7 @@ import { NewVaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { getAddress } from 'ethers/lib/utils';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
 
-export type YourPositions = {
+export type YourPositionsProps = {
   paprController: PaprController;
   userNFTs: AccountNFTsResponse[];
   currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
@@ -32,7 +32,7 @@ export function YourPositions({
   currentVaults,
   oracleInfo,
   latestMarketPrice,
-}: YourPositions) {
+}: YourPositionsProps) {
   const { address } = useAccount();
   const { tokenName } = useConfig();
 
