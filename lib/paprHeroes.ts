@@ -64,9 +64,7 @@ export async function calculateNetPhUSDCBalance(
   return {
     totalNFTWorth: parseFloat(ethers.utils.formatUnits(totalNFTWorth, 6)),
     totalPhUSDCBalance: parseFloat(ethers.utils.formatUnits(phUSDCBalance, 6)),
-    netPapr:
-      parseFloat(ethers.utils.formatUnits(netPaprInUnderlying, 6)) *
-      (netPapr.isNegative() ? -1 : 1),
+    netPapr: parseFloat(ethers.utils.formatUnits(netPaprInUnderlying, 6)),
     totalBalance: parseFloat(ethers.utils.formatUnits(totalBalance, 6)),
   };
 }
