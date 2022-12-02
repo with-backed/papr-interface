@@ -3,6 +3,7 @@ import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
 import { User } from 'types/generated/graphql/inKindSubgraph';
 import { configs } from './config';
+import { ONE } from './constants';
 import { makeProvider } from './contracts';
 import { getQuoteForSwap } from './controllers';
 import { formatBigNum } from './numberFormat';
@@ -28,7 +29,7 @@ export async function calculateNetPhUSDCBalance(
   const paprBalance = ethers.BigNumber.from(user.paprHoldings);
   const paprDebt = ethers.BigNumber.from(user.paprDebt);
   const netPapr = paprBalance.sub(paprDebt);
-  const netPaprInUnderlying = netPapr.mul(paprPrice);
+  const netPaprInUnderlying = netPapr.mul(paprPrice).div(ONE);
   const addressToCount = (address: string, user: User) => {
     switch (address.toLowerCase()) {
       case '0xabe17952e7fe468711826c26b04b047c0da53b86':
