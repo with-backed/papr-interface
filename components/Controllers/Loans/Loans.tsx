@@ -14,13 +14,17 @@ import { useLTVs } from 'hooks/useLTVs/useLTVs';
 type LoansProps = {
   paprController: PaprController;
   pricesData: ControllerPricesData | null;
+  vaultId?: string;
 };
 
-export function Loans({ paprController, pricesData }: LoansProps) {
+export function Loans({ paprController, vaultId }: LoansProps) {
   const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
   const activeVaults = useMemo(
-    () => paprController.vaults?.filter((v) => v.debt > 0) || [],
-    [paprController],
+    () =>
+      vaultId
+        ? paprController.vaults?.filter((v) => v.id === vaultId) || []
+        : paprController.vaults?.filter((v) => v.debt > 0) || [],
+    [paprController, vaultId],
   );
 
   const { ltvs } = useLTVs(paprController, activeVaults, maxLTV);
