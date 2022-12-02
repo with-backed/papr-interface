@@ -66,7 +66,9 @@ const paprHero: Config = {
   oracleBaseUrl:
     process.env.NEXT_PUBLIC_ENV === 'local'
       ? 'http://localhost:3000'
-      : 'https://v2-interface-rosy.vercel.app',
+      : process.env.NEXT_PUBLIC_ENV === 'preview'
+      ? 'https://v2-interface-rosy.vercel.app'
+      : 'https://papr.wtf',
   paprUnderlyingAddress: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
