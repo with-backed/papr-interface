@@ -50,12 +50,18 @@ export const getServerSideProps: GetServerSideProps<
       new Set(await getAllPaprHeroPlayers(token)),
     );
 
-    const paprPrice = await getQuoteForSwap(
-      ethers.BigNumber.from(1),
-      paprToken,
-      underlying,
-      'paprHero',
-    );
+    let paprPrice: ethers.BigNumber;
+    try {
+      paprPrice = await getQuoteForSwap(
+        ethers.BigNumber.from(1),
+        paprToken,
+        underlying,
+        'paprHero',
+      );
+    } catch (e) {
+      paprPrice = ethers.BigNumber.from('1');
+    }
+
     const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
       participatingPlayers.map(async (p) => [
         p.id,
