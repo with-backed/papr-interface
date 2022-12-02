@@ -282,6 +282,7 @@ function BalanceInfo({ paprController, latestMarketPrice }: BalanceInfoProps) {
       abi: erc20ABI,
       functionName: 'balanceOf',
       args: [address as `0x${string}`],
+      staleTime: 1000 * 60 * 2, // refresh balance every 2 minutes
     });
 
   const paprMemeBalance = useMemo(
