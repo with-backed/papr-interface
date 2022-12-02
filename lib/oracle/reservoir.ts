@@ -1,3 +1,4 @@
+import { captureException } from '@sentry/nextjs';
 import { ethers } from 'ethers';
 import { Config } from 'lib/config';
 import { ReservoirOracleUnderwriter } from 'types/generated/abis/PaprController';
@@ -26,12 +27,18 @@ export async function getSignedOracleFloorPriceMessage(
   collection: string,
   config: Config,
   kind: OraclePriceType,
-): Promise<ReservoirResponseData> {
-  const reservoirReq = await fetch(
-    `${config.reservoirAPI}/oracle/collections/${collection}/floor-ask/v3?kind=${kind}&currency=${config.paprUnderlyingAddress}&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,
-  );
-  const json = await reservoirReq.json();
-  return json;
+): Promise<ReservoirResponseData | null> {
+  let reservoirRes: Response;
+  try {
+    reservoirRes = await fetch(
+      `${config.reservoirAPI}/oracle/collections/${collection}/floor-ask/v3?kind=${kind}&currency=${config.paprUnderlyingAddress}&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,
+    );
+    const json = await reservoirRes.json();
+    return json;
+  } catch (e) {
+    captureException(e);
+    return null;
+  }
 }
 
 export function getOraclePayloadFromReservoirObject(
