@@ -284,8 +284,10 @@ class PaprControllerInternal {
       collateralAssets,
       oracleInfo,
     );
+    const decimals: number = this.underlying.decimals;
+    const scalar = 10 ** decimals;
     const totalAtomic = ethers.utils.parseUnits(
-      total.toString(),
+      (Math.floor(total * scalar) / scalar).toString(),
       this.underlying.decimals,
     );
     return totalAtomic;

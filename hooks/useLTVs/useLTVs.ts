@@ -25,7 +25,7 @@ export function useLTVs(
           ...prev,
           [v.id]: await paprController.ltv(
             ethers.BigNumber.from(v.debt),
-            v.collateralContract,
+            [v.collateralContract],
             oracleInfo,
           ),
         };

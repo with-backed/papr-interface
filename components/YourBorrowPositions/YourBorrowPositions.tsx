@@ -226,10 +226,7 @@ export function VaultOverview({
   ]);
 
   const maxDebtForVault = useAsyncValue(() => {
-    return paprController.maxDebt(
-      vaultInfo.collateral.map((c) => getAddress(c.contractAddress)),
-      oracleInfo,
-    );
+    return paprController.maxDebt([vaultInfo.collateralContract], oracleInfo);
   }, [paprController, vaultInfo, oracleInfo]);
 
   if (
