@@ -19,7 +19,7 @@ import {
 } from 'urql';
 import { CenterProvider } from '@center-inc/react';
 
-const prodChains = [chain.mainnet, chain.polygon, chain.optimism];
+const prodChains = [chain.mainnet, chain.goerli];
 const CHAINS =
   process.env.NEXT_PUBLIC_ENV === 'production'
     ? prodChains
