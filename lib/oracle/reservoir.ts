@@ -28,12 +28,12 @@ export async function getSignedOracleFloorPriceMessage(
   config: Config,
   kind: OraclePriceType,
 ): Promise<ReservoirResponseData | null> {
-  let reservoirReq: Response;
+  let reservoirRes: Response;
   try {
-    reservoirReq = await fetch(
+    reservoirRes = await fetch(
       `${config.reservoirAPI}/oracle/collections/${collection}/floor-ask/v3?kind=${kind}&currency=${config.paprUnderlyingAddress}&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,
     );
-    const json = await reservoirReq.json();
+    const json = await reservoirRes.json();
     return json;
   } catch (e) {
     captureException(e);
