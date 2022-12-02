@@ -14,9 +14,10 @@ import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindS
 import { Table } from 'components/Table';
 import { ERC721__factory } from 'types/generated/abis';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
-import { NewVaultHealth } from 'components/Controllers/Loans/VaultHealth';
+import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { getAddress } from 'ethers/lib/utils';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
+import { useLTVs } from 'hooks/useLTVs/useLTVs';
 
 export type YourPositionsProps = {
   paprController: PaprController;
@@ -201,6 +202,12 @@ export function VaultOverview({
 }: VaultOverviewProps) {
   const { tokenName } = useConfig();
   const signerOrProvider = useSignerOrProvider();
+  const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
+  const { ltvs } = useLTVs(
+    paprController,
+    useMemo(() => [vaultInfo], [vaultInfo]),
+    maxLTV,
+  );
   const connectedNFT = useMemo(() => {
     return ERC721__factory.connect(
       vaultInfo.collateralContract,
@@ -223,13 +230,6 @@ export function VaultOverview({
     paprController.debtToken.id,
     paprController.underlying.id,
   ]);
-
-  const maxDebtForVault = useAsyncValue(() => {
-    return paprController.maxDebt(
-      vaultInfo.collateral.map((c) => getAddress(c.contractAddress)),
-      oracleInfo,
-    );
-  }, [paprController, vaultInfo, oracleInfo]);
 
   if (
     ethers.BigNumber.from(vaultInfo.debt).isZero() &&
@@ -259,11 +259,8 @@ export function VaultOverview({
         </p>
       </td>
       <td>
-        {maxDebtForVault && (
-          <NewVaultHealth
-            debt={ethers.BigNumber.from(vaultInfo.debt)}
-            maxDebt={maxDebtForVault}
-          />
+        {maxLTV && (
+          <VaultHealth ltv={ltvs[vaultInfo.id] || 0} maxLtv={maxLTV} />
         )}
       </td>
     </tr>
