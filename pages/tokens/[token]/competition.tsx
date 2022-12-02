@@ -53,13 +53,13 @@ export const getServerSideProps: GetServerSideProps<
     let paprPrice: ethers.BigNumber;
     try {
       paprPrice = await getQuoteForSwap(
-        ethers.BigNumber.from(1),
+        ethers.BigNumber.from(10).pow(18),
         paprToken,
         underlying,
         'paprHero',
       );
     } catch (e) {
-      paprPrice = ethers.BigNumber.from('1');
+      paprPrice = ethers.BigNumber.from(10).pow(6);
     }
 
     const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
