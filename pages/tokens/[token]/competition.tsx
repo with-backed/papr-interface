@@ -23,6 +23,8 @@ const DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD: Set<string> = new Set([
   '0xE89CB2053A04Daf86ABaa1f4bC6D50744e57d39E'.toLowerCase(),
   // controller
   '0x3777b4b21489d2f0114e178c0cb2bb7332c8c3bd',
+  // uniswap
+  '0x8b39692e9d5959fd07d3251cece82de7a666f09d',
 ]);
 
 export const getServerSideProps: GetServerSideProps<
