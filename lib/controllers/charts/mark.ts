@@ -51,7 +51,7 @@ export async function markValues(
   const formattedSwapValues = sortedSwaps.map(({ sqrtPriceX96, timestamp }) => {
     return {
       value: parseFloat(
-        price(sqrtPriceX96, baseCurrency, quoteCurrency).toFixed(),
+        price(sqrtPriceX96, baseCurrency, quoteCurrency, pool.token0).toFixed(),
       ),
       time: parseInt(timestamp) as UTCTimestamp,
     };
@@ -91,12 +91,17 @@ function price(
   sqrtPriceX96: number,
   baseCurrency: UniSubgraphToken,
   quoteCurrency: UniSubgraphToken,
+  token0: UniSubgraphToken,
 ): Price<Token, Token> {
   return new Price(
     subgraphTokenToToken(baseCurrency),
     subgraphTokenToToken(quoteCurrency),
-    ethers.BigNumber.from(sqrtPriceX96).mul(sqrtPriceX96).toString(),
-    Q192.toString(),
+    token0.id !== quoteCurrency.id
+      ? Q192.toString()
+      : ethers.BigNumber.from(sqrtPriceX96).mul(sqrtPriceX96).toString(),
+    token0.id === quoteCurrency.id
+      ? Q192.toString()
+      : ethers.BigNumber.from(sqrtPriceX96).mul(sqrtPriceX96).toString(),
   );
 }
 
