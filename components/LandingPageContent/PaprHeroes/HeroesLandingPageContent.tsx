@@ -425,7 +425,7 @@ function LeaderboardEntry({
       <td>
         <p className={styles.position}>
           <TooltipReference {...addressTooltip}>
-            {position.toString().padEnd(4, ' ')}.
+            {(position.toString() + '.').padEnd(4, ' ')}
             <span>{formattedEnsOrAddress}</span>
             {address !== 'You' ? <span>...</span> : ''}
           </TooltipReference>
