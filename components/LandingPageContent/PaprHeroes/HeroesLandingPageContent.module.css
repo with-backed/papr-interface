@@ -150,3 +150,7 @@
 .join {
   margin: 0;
 }
+
+.position {
+  white-space: pre;
+}
