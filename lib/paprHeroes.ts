@@ -54,12 +54,9 @@ export async function calculateNetPhUSDCBalance(
     ethers.BigNumber.from(0),
   );
 
-  let totalBalance = phUSDCBalance.add(totalNFTWorth);
-  if (netPapr.isNegative()) {
-    totalBalance = totalBalance.sub(netPaprInUnderlying);
-  } else {
-    totalBalance = totalBalance.add(netPaprInUnderlying);
-  }
+  const totalBalance = phUSDCBalance
+    .add(totalNFTWorth)
+    .add(netPaprInUnderlying);
 
   return {
     totalNFTWorth: parseFloat(ethers.utils.formatUnits(totalNFTWorth, 6)),
