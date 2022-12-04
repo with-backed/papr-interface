@@ -127,7 +127,7 @@ export function RepayPerpetualButton({
   const { addCollateralCalldata, removeCollateralCalldata } =
     useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
 
-  const borrowPerpetualCalldata = useMemo(() => {
+  const repayPerpetualCalldata = useMemo(() => {
     if (!amount || amount.isZero()) return '';
 
     const args: ReduceDebtArgsStruct = {
@@ -146,10 +146,10 @@ export function RepayPerpetualButton({
     () =>
       [
         ...addCollateralCalldata,
+        repayPerpetualCalldata,
         ...removeCollateralCalldata,
-        borrowPerpetualCalldata,
       ].filter((c) => !!c),
-    [addCollateralCalldata, removeCollateralCalldata, borrowPerpetualCalldata],
+    [addCollateralCalldata, removeCollateralCalldata, repayPerpetualCalldata],
   );
 
   const { data, write } = useMulticallWrite(paprController, calldata, refresh);
