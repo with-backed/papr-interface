@@ -1,39 +1,38 @@
-import { ethers } from 'ethers';
-import { useConfig } from 'hooks/useConfig';
 import React, {
   createContext,
   PropsWithChildren,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 
 const TIMESTAMP_POLL_INTERVAL = 14000;
 
 /**
+ * Get an approximation of the current block timestamp.
+ * @returns timestamp 15 seconds ago
+ */
+function getTimestamp() {
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  return nowSeconds - 15;
+}
+
+/**
  * Exported only for use in stories. Please use TimestampProvider.
  */
-export const TimestampContext = createContext<number | null>(null);
+export const TimestampContext = createContext<number>(getTimestamp());
 
 export function TimestampProvider({ children }: PropsWithChildren<{}>) {
-  const [timestamp, setTimestamp] = useState<number | null>(null);
-  const { jsonRpcProvider, chainId } = useConfig();
-
-  const provider = useMemo(() => {
-    return new ethers.providers.JsonRpcProvider(jsonRpcProvider, chainId);
-  }, [chainId, jsonRpcProvider]);
+  const [timestamp, setTimestamp] = useState<number>(getTimestamp);
 
   useEffect(() => {
     const setLatestTimestamp = async () => {
-      const height = await provider.getBlockNumber();
-      const block = await provider.getBlock(height);
-      setTimestamp(block.timestamp);
+      setTimestamp(getTimestamp());
     };
     setLatestTimestamp();
     const intervalId = setInterval(setLatestTimestamp, TIMESTAMP_POLL_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [provider, setTimestamp]);
+  }, [setTimestamp]);
 
   return (
     <TimestampContext.Provider value={timestamp}>
