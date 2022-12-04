@@ -145,8 +145,8 @@ export function RepayPerpetualButton({
   const calldata = useMemo(
     () =>
       [
-        ...addCollateralCalldata,
         repayPerpetualCalldata,
+        ...addCollateralCalldata,
         ...removeCollateralCalldata,
       ].filter((c) => !!c),
     [addCollateralCalldata, removeCollateralCalldata, repayPerpetualCalldata],
@@ -233,8 +233,8 @@ export function RepayWithSwapButton({
   const calldata = useMemo(
     () =>
       [
-        ...addCollateralCalldata,
         repayWithSwapCalldata,
+        ...addCollateralCalldata,
         ...removeCollateralCalldata,
       ].filter((c) => !!c),
     [addCollateralCalldata, removeCollateralCalldata, repayWithSwapCalldata],
