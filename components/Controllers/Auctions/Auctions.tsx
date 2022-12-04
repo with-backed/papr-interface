@@ -151,10 +151,12 @@ function ActiveAuctionRow({
   );
   const symbol = useAsyncValue(() => assetContract.symbol(), [assetContract]);
   const priceBigNum = useMemo(() => {
-    if (!timestamp) {
-      return ethers.BigNumber.from(0);
+    var t = timestamp;
+    if (!t) {
+      // sub 15s to be behind tip/higher price
+      t = Math.floor(Date.now() / 1000) - 15;
     }
-    const secondsElapsed = timestamp - auction.start.timestamp;
+    const secondsElapsed = t - auction.start.timestamp;
     return currentPrice(
       ethers.BigNumber.from(auction.startPrice),
       secondsElapsed,
