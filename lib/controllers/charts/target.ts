@@ -12,6 +12,7 @@ import {
 import { computeRate, RatePeriod } from '..';
 import { UTCTimestamp } from 'lightweight-charts';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
+import { getAddress } from 'ethers/lib/utils';
 
 interface TargetUpdate {
   newTarget: string;
@@ -24,11 +25,14 @@ export async function targetValues(
   pool: Pool,
   token: SupportedToken,
 ): Promise<[TimeSeriesValue[], TimeSeriesValue[]]> {
-  const underlyingDecimals =
-    controller.underlying == pool ? pool.token0.decimals : pool.token1.decimals;
-  const result = await subgraphTargetalizationUpdatesForController(
-    controller.id,
-  );
+  let underlyingDecimals: number;
+  if (getAddress(controller.underlying.id) == getAddress(pool.token0.id)) {
+    underlyingDecimals = pool.token0.decimals;
+  } else {
+    underlyingDecimals = pool.token1.decimals;
+  }
+
+  const result = await subgraphTargetUpdatesForController(controller.id, token);
 
   const sortedTargets: TargetUpdate[] =
     result?.targetUpdates.sort(
@@ -87,11 +91,12 @@ async function getNewTarget(
   return (await s.newTarget()).toString();
 }
 
-async function subgraphTargetalizationUpdatesForController(controller: string) {
+async function subgraphTargetUpdatesForController(
+  controller: string,
+  token: SupportedToken,
+) {
   // TODO: dynamic client address
-  const client = clientFromUrl(
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.2/gn',
-  );
+  const client = clientFromUrl(configs[token].paprMemeSubgraph);
   const { data, error } = await client
     .query<TargetUpdatesByControllerQuery>(TargetUpdatesByControllerDocument, {
       controller,
