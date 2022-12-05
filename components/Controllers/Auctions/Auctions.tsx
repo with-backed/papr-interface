@@ -344,7 +344,11 @@ function PastAuctionRow({ auction }: { auction: PastAuction }) {
     [auction.startPrice],
   );
   const percentOfFloor = useMemo(
-    () => ethers.BigNumber.from(auction.endPrice).div(floorValue).toNumber(),
+    () =>
+      ethers.BigNumber.from(auction.endPrice)
+        .mul(1000)
+        .div(floorValue)
+        .toNumber() / 1000,
     [auction.endPrice, floorValue],
   );
   const duration = useMemo(() => {
