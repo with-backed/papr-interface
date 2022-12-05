@@ -62,7 +62,7 @@ const paprHero: Config = {
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph:
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.3/gn',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.4/gn',
   oracleBaseUrl:
     process.env.NEXT_PUBLIC_ENV === 'local'
       ? 'http://localhost:3000'
