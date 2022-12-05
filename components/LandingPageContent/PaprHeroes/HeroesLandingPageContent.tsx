@@ -26,6 +26,7 @@ import { formatTokenAmount } from 'lib/numberFormat';
 import { useTooltipState, TooltipReference } from 'reakit/Tooltip';
 import { Tooltip } from 'components/Tooltip';
 import { EtherscanAddressLink } from 'components/EtherscanLink';
+import { ShortDisplayAddress } from 'components/DisplayAddress/ShortDisplayAddress';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
@@ -385,54 +386,22 @@ function AllowedCollateral({
 }
 
 type LeaderboardEntryProps = {
-  address: string | 'You';
+  address: string;
   position: number;
   heroPlayerBalance: HeroPlayerBalance;
 };
-
-function shortenAddress(address: string) {
-  if (address.length < 9) {
-    return address;
-  } else {
-    return address.substring(0, 8);
-  }
-}
 
 function LeaderboardEntry({
   address,
   position,
   heroPlayerBalance,
 }: LeaderboardEntryProps) {
-  const addressTooltip = useTooltipState();
-  const ensOrAddress = useAsyncValue(async () => {
-    if (address === 'You') return address;
-
-    const ens = await addressToENS(
-      address,
-      'https://eth-mainnet.g.alchemy.com/v2/De3LMv_8CYuN9WzVEgoOI5w7ltnGIhnH',
-    );
-    return ens ?? address;
-  }, [address]);
-
-  const formattedEnsOrAddress = useMemo(() => {
-    if (!ensOrAddress) {
-      return null;
-    }
-    return shortenAddress(ensOrAddress);
-  }, [ensOrAddress]);
-
   return (
     <tr>
       <td>
         <p className={styles.position}>
-          <EtherscanAddressLink address={address}>
-            <TooltipReference {...addressTooltip}>
-              {(position.toString() + '.').padEnd(4, ' ')}
-              <span>{formattedEnsOrAddress}</span>
-              {address !== 'You' ? <span>...</span> : ''}
-            </TooltipReference>
-            <Tooltip {...addressTooltip}>{ensOrAddress}</Tooltip>
-          </EtherscanAddressLink>
+          {(position.toString() + '.').padEnd(4, ' ')}
+          <ShortDisplayAddress address={address} />
         </p>
       </td>
       <td className={styles.green}>
