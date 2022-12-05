@@ -25,6 +25,7 @@ import controllerStyles from 'components/Controllers/Controller.module.css';
 import { formatTokenAmount } from 'lib/numberFormat';
 import { useTooltipState, TooltipReference } from 'reakit/Tooltip';
 import { Tooltip } from 'components/Tooltip';
+import { EtherscanAddressLink } from 'components/EtherscanLink';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
@@ -424,12 +425,14 @@ function LeaderboardEntry({
     <tr>
       <td>
         <p className={styles.position}>
-          <TooltipReference {...addressTooltip}>
-            {(position.toString() + '.').padEnd(4, ' ')}
-            <span>{formattedEnsOrAddress}</span>
-            {address !== 'You' ? <span>...</span> : ''}
-          </TooltipReference>
-          <Tooltip {...addressTooltip}>{ensOrAddress}</Tooltip>
+          <EtherscanAddressLink address={address}>
+            <TooltipReference {...addressTooltip}>
+              {(position.toString() + '.').padEnd(4, ' ')}
+              <span>{formattedEnsOrAddress}</span>
+              {address !== 'You' ? <span>...</span> : ''}
+            </TooltipReference>
+            <Tooltip {...addressTooltip}>{ensOrAddress}</Tooltip>
+          </EtherscanAddressLink>
         </p>
       </td>
       <td className={styles.green}>
