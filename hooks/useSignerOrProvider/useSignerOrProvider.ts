@@ -16,3 +16,13 @@ export function useSignerOrProvider() {
 
   return signerOrProvider;
 }
+
+export function useJsonRpcProvider() {
+  const { jsonRpcProvider, tokenName } = useConfig();
+  const { data: signer } = useSigner();
+  const provider = useMemo(() => {
+    return makeProvider(jsonRpcProvider, tokenName as SupportedToken);
+  }, [jsonRpcProvider, tokenName]);
+
+  return provider;
+}

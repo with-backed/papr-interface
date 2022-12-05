@@ -1,46 +1,60 @@
 import { EtherscanAddressLink } from 'components/EtherscanLink';
 import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { addressToENS } from 'lib/account';
-import React, { FunctionComponent, useMemo } from 'react';
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useTooltipState, TooltipReference } from 'reakit/Tooltip';
 import { Tooltip } from 'components/Tooltip';
 import { useAccount } from 'wagmi';
+import { useJsonRpcProvider } from 'hooks/useSignerOrProvider';
 
 interface ShortDisplayAddress {
   address: string;
+}
+
+function useAddressRepresentation(address: string) {
+  const { address: connectedAddress } = useAccount();
+  const provider = useJsonRpcProvider();
+  const [rendered, setRendered] = useState({ shortened: '...', base: address });
+
+  const isConnectedAddress = useMemo(() => {
+    if (!connectedAddress) return false;
+    return address.toLowerCase() == connectedAddress.toLowerCase();
+  }, [address, connectedAddress]);
+
+  const representAddress = useCallback(async () => {
+    const ens = await provider.lookupAddress(address);
+    const base = ens ?? ethers.utils.getAddress(address);
+    setRendered({
+      base,
+      shortened: isConnectedAddress ? 'You' : shortenAddress(base),
+    });
+  }, [address, isConnectedAddress, provider]);
+
+  useEffect(() => {
+    representAddress();
+  }, [representAddress]);
+
+  return rendered;
 }
 
 export const ShortDisplayAddress: FunctionComponent<ShortDisplayAddress> = ({
   address,
 }) => {
   const addressTooltip = useTooltipState();
-  const connectedAddress = useAccount().address;
-  const isConnectedAddress = useMemo(() => {
-    if (!connectedAddress) return false;
-    return address.toLowerCase() == connectedAddress.toLowerCase();
-  }, [address, connectedAddress]);
-  const ensOrAddress = useAsyncValue(async () => {
-    if (isConnectedAddress) return 'You';
-
-    const ens = await addressToENS(address);
-    return ens ?? ethers.utils.getAddress(address);
-  }, [address, isConnectedAddress]);
-
-  const formattedEnsOrAddress = useMemo(() => {
-    if (!ensOrAddress) return '...';
-    if (isConnectedAddress) return ensOrAddress;
-
-    return shortenAddress(ensOrAddress);
-  }, [ensOrAddress, isConnectedAddress]);
+  const { base, shortened } = useAddressRepresentation(address);
   return (
     <div>
       <TooltipReference {...addressTooltip}>
         <EtherscanAddressLink address={address}>
-          <span>{formattedEnsOrAddress}</span>
+          <span>{shortened}</span>
         </EtherscanAddressLink>
       </TooltipReference>
-      <Tooltip {...addressTooltip}>{ensOrAddress}</Tooltip>
+      <Tooltip {...addressTooltip}>{base}</Tooltip>
     </div>
   );
 };
