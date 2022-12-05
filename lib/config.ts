@@ -50,7 +50,7 @@ const paprHero: Config = {
   centerNetwork: 'ethereum-goerli',
   chainId: 5,
   jsonRpcProvider:
-    'https://eth-goerli.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
+    'https://eth-goerli.g.alchemy.com/v2/aoKdUYwv3VnTO9uURR6JzpZaf-9ssuRz',
   alchemyId: developmentAlchemyKey,
   openSeaUrl: 'https://testnets.opensea.io',
   etherscanUrl: 'https://goerli.etherscan.io',
