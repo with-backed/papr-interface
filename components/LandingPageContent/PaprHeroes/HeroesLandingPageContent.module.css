@@ -152,5 +152,5 @@
 }
 
 .position {
-  white-space: pre;
+  display: flex;
 }

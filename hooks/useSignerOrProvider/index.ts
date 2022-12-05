@@ -1,1 +1,1 @@
-export { useSignerOrProvider } from './useSignerOrProvider';
+export { useSignerOrProvider, useJsonRpcProvider } from './useSignerOrProvider';
