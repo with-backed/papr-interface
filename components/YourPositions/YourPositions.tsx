@@ -2,7 +2,7 @@ import styles from './YourPositions.module.css';
 import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
 import { Fieldset } from 'components/Fieldset';
 import { PaprController } from 'lib/PaprController';
-import { erc20ABI, useAccount, useContractRead } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { useMemo } from 'react';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
