@@ -18,7 +18,7 @@ import {
   OraclePriceType,
 } from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ERC20 } from 'types/generated/abis';
 import { INFTEDA } from 'types/generated/abis/PaprController';
 import {
@@ -253,6 +253,9 @@ function BuyButton({
 }: BuyButtonProps) {
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const [buyingState, setBuyingState] = useState<
+    'idle' | 'approving' | 'buying'
+  >('idle');
   const handleClick = useCallback(async () => {
     if (!oracleInfo) {
       console.error('no oracle info, cannot buy');
@@ -275,8 +278,13 @@ function BuyButton({
   }, [address, auction, controller, maxPrice, oracleInfo, tokenContract]);
 
   return (
-    <TextButton disabled={!address} kind="clickable" onClick={handleClick}>
-      Buy
+    <TextButton
+      disabled={!address || buyingState !== 'idle'}
+      kind="clickable"
+      onClick={handleClick}>
+      {buyingState === 'idle' && <span>Buy</span>}
+      {buyingState === 'approving' && <span>Approving...</span>}
+      {buyingState === 'buying' && <span>Buying...</span>}
     </TextButton>
   );
 }
