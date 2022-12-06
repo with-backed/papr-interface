@@ -293,9 +293,9 @@ function Swap({
     const token1Symbol = paprController.subgraphPool.token1.symbol;
 
     if (event.amount0 < 0) {
-      return `${amount0} ${token0Symbol} traded for ${amount1} ${token1Symbol}`;
+      return `${amount1} ${token1Symbol} traded for ${amount0} ${token0Symbol}`;
     }
-    return `${amount1} ${token1Symbol} traded for ${amount0} ${token0Symbol}`;
+    return `${amount0} ${token0Symbol} traded for ${amount1} ${token1Symbol}`;
   }, [event, paprController]);
   return (
     <tr>
