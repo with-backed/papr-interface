@@ -12,6 +12,7 @@ import { getAddress } from 'ethers/lib/utils';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { Activity } from '../Activity';
+import { usePaprBalance } from 'hooks/usePaprBalance';
 
 export type BorrowPageProps = {
   controllerAddress: string;
@@ -44,10 +45,15 @@ export function BorrowPageContent({
     reexecuteQuery: refreshCurrentVaults,
   } = useCurrentVaults(paprController, address);
 
+  const { balance, refresh: refreshBalance } = usePaprBalance(
+    paprController.debtToken.id,
+  );
+
   const refresh = useCallback(() => {
     refreshAccountNFTs({ requestPolicy: 'network-only' });
     refreshCurrentVaults({ requestPolicy: 'network-only' });
-  }, [refreshAccountNFTs, refreshCurrentVaults]);
+    refreshBalance();
+  }, [refreshAccountNFTs, refreshBalance, refreshCurrentVaults]);
 
   const uniqueCollections = useMemo(() => {
     const userCollectionCollateral = userCollectionNFTs.map((nft) =>
@@ -83,6 +89,7 @@ export function BorrowPageContent({
         currentVaults={currentVaults}
         oracleInfo={oracleInfo}
         latestMarketPrice={latestMarketPrice}
+        balance={balance}
       />
       {!!address &&
         uniqueCollections.map((collection) => (

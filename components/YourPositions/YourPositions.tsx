@@ -25,6 +25,7 @@ export type YourPositionsProps = {
   currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
   oracleInfo: OracleInfo;
   latestMarketPrice: number;
+  balance: ethers.BigNumber | null;
 };
 
 export function YourPositions({
@@ -33,6 +34,7 @@ export function YourPositions({
   currentVaults,
   oracleInfo,
   latestMarketPrice,
+  balance,
 }: YourPositionsProps) {
   const { address } = useAccount();
   const { tokenName } = useConfig();
@@ -122,6 +124,7 @@ export function YourPositions({
       <BalanceInfo
         paprController={paprController}
         latestMarketPrice={latestMarketPrice}
+        balance={balance}
       />
       <div>
         Based on the NFTs in your wallet, you&apos;re eligible for loans from{' '}
@@ -268,23 +271,18 @@ export function VaultOverview({
 }
 
 type BalanceInfoProps = {
+  balance: ethers.BigNumber | null;
   paprController: PaprController;
   latestMarketPrice?: number;
 };
-function BalanceInfo({ paprController, latestMarketPrice }: BalanceInfoProps) {
-  const { address } = useAccount();
-  const { data: rawPaprMEMEBalance, isFetching: balanceFetching } =
-    useContractRead({
-      address: paprController.debtToken.id,
-      abi: erc20ABI,
-      functionName: 'balanceOf',
-      args: [address as `0x${string}`],
-      staleTime: 1000 * 60 * 2, // refresh balance every 2 minutes
-    });
-
+function BalanceInfo({
+  balance,
+  paprController,
+  latestMarketPrice,
+}: BalanceInfoProps) {
   const paprMemeBalance = useMemo(
-    () => ethers.BigNumber.from(rawPaprMEMEBalance || 0),
-    [rawPaprMEMEBalance],
+    () => ethers.BigNumber.from(balance || 0),
+    [balance],
   );
 
   const formattedBalance = useMemo(() => {
