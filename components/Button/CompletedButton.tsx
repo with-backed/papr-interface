@@ -2,7 +2,7 @@ import React from 'react';
 import { Checkmark } from 'components/Icons/Checkmark';
 import styles from './Button.module.css';
 import { ButtonSize } from './Button';
-import { Cross } from 'components/Icons/Cross';
+import { X } from 'components/Icons/X';
 
 interface CompletedButtonProps {
   buttonText: React.ReactNode;
@@ -41,7 +41,7 @@ export function CompletedButton({
         <div
           aria-hidden
           className={`${styles['button-completed-icon']} ${styles['failure']}`}>
-          <Cross />
+          <X />
         </div>
       )}
     </div>

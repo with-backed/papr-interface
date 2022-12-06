@@ -28,7 +28,7 @@ export function TransactionButton({
 }: TransactionButtonProps) {
   const [status, setStatus] = useState<
     'ready' | 'pending' | 'complete' | 'fail'
-  >('fail');
+  >('ready');
   useEffect(() => {
     if (transactionData) {
       setStatus('pending');
@@ -64,7 +64,7 @@ export function TransactionButton({
         break;
     }
     const transactionLink = (
-      <EtherscanTransactionLink transactionHash={''}>
+      <EtherscanTransactionLink transactionHash={transactionData!.hash}>
         view transaction
       </EtherscanTransactionLink>
     );
