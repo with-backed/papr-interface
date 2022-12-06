@@ -18,6 +18,7 @@ import {
   Provider as UrqlProvider,
 } from 'urql';
 import { CenterProvider } from '@center-inc/react';
+import { PaprBalanceProvider } from 'hooks/usePaprBalance';
 
 const prodChains = [chain.mainnet, chain.goerli];
 const CHAINS =
@@ -95,11 +96,13 @@ export const ApplicationProviders = ({
           <CenterProvider
             network={centerNetwork as any}
             apiKey={process.env.NEXT_PUBLIC_CENTER_KEY!}>
-            <TimestampProvider>
-              <CommunityGradientProvider>
-                <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-              </CommunityGradientProvider>
-            </TimestampProvider>
+            <PaprBalanceProvider>
+              <TimestampProvider>
+                <CommunityGradientProvider>
+                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
+                </CommunityGradientProvider>
+              </TimestampProvider>
+            </PaprBalanceProvider>
           </CenterProvider>
         </RainbowKitProvider>
       </WagmiConfig>
