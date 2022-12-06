@@ -15,6 +15,7 @@ import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useAccountNFTs } from 'hooks/useAccountNFTs';
 import { useConfig } from 'hooks/useConfig';
+import { usePaprBalance } from 'hooks/usePaprBalance';
 
 /* lightweight-charts uses canvas and cannot be SSRed */
 const Charts = dynamic(() => import('components/Controllers/Charts/Charts'), {
@@ -51,6 +52,8 @@ export function ControllerOverviewContent({
     config,
   );
 
+  const { balance } = usePaprBalance(paprController.debtToken.id);
+
   return (
     <div className={styles.wrapper}>
       {oracleInfo && !vaultsFetching && !nftsLoading && (
@@ -60,6 +63,7 @@ export function ControllerOverviewContent({
           oracleInfo={oracleInfo}
           paprController={paprController}
           userNFTs={userCollectionNFTs}
+          balance={balance}
         />
       )}
       <TokenPerformance
