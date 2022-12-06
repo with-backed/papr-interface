@@ -29,6 +29,10 @@ const DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD: Set<string> = new Set([
   '0x9EE41Ea35da2FD1e01D136EC06F8951E50156175'.toLowerCase(),
   '0xbDfcd0F4eB0a75589B2223be05Ef42bbF7184E72'.toLowerCase(),
   '0x9c742A4555e4eEF1123cfA3fcd9c44fd015417EE'.toLowerCase(),
+  //
+  '0x0eFA0e39e67C2D3D02d2537B79f584F110b47B18'.toLowerCase(),
+  '0x4A9E608e39ba076FC2EA14858132ddDc52c366e3'.toLowerCase(),
+  '0x21c3a619B73c8D5CdA7AE74f100b86721E73654E'.toLowerCase(),
 ]);
 
 export const getServerSideProps: GetServerSideProps<
