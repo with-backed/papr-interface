@@ -22,7 +22,7 @@ const sentryWebpackPluginOptions = {
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
-const SHOULD_INIT_SENTRY = !(process.env.GITHUB_ACTIONS === 'true');
+const SHOULD_INIT_SENTRY = process.env.VERCEL_ENV === 'production';
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
