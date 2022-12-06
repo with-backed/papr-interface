@@ -205,7 +205,7 @@
 }
 
 .failure {
-  background-color: inherit;
+  background-color: #F3D4DF;
 }
 
 .failure > svg {
