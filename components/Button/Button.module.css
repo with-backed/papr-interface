@@ -204,6 +204,14 @@
   user-select: none;
 }
 
+.failure {
+  background-color: inherit;
+}
+
+.failure > svg {
+  fill: var(--highlight-alert-100);
+}
+
 .button-link {
   text-align: center;
   display: inline-block;

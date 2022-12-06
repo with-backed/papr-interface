@@ -26,13 +26,16 @@ export function TransactionButton({
   size = 'big',
   ...props
 }: TransactionButtonProps) {
-  const [status, setStatus] = useState<'ready' | 'pending' | 'complete'>(
-    'ready',
-  );
+  const [status, setStatus] = useState<
+    'ready' | 'pending' | 'complete' | 'fail'
+  >('ready');
   useEffect(() => {
     if (transactionData) {
       setStatus('pending');
-      transactionData.wait().then(() => setStatus('complete'));
+      transactionData.wait().then((res) => {
+        if (res.status) setStatus('complete');
+        else setStatus('fail');
+      });
     }
   }, [transactionData]);
 
@@ -48,7 +51,18 @@ export function TransactionButton({
   }
 
   if (status !== 'ready') {
-    const message = status === 'pending' ? 'Pending...' : 'Success!';
+    let message: string;
+    switch (status) {
+      case 'pending':
+        message = 'Pending...';
+        break;
+      case 'complete':
+        message = 'Success!';
+        break;
+      case 'fail':
+        message = 'Failed';
+        break;
+    }
     const transactionLink = (
       <EtherscanTransactionLink transactionHash={transactionData!.hash}>
         view transaction
@@ -58,6 +72,7 @@ export function TransactionButton({
       <CompletedButton
         buttonText={text}
         success={status === 'complete'}
+        failure={status === 'fail'}
         size={size}
         message={
           <span>
