@@ -7,7 +7,7 @@ import Hero4 from 'public/landing-page-nfts/hero-4.png';
 import styles from './LandingPageContent.module.css';
 import { ButtonLink } from 'components/Button';
 import { Disclosure } from 'components/Disclosure';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 
 const Logo = () => (
   <div className={styles.img}>

@@ -9,7 +9,7 @@ import paprMemeTitle from 'public/logos/paprMEME-title.png';
 import paprHeroTitle from 'public/logos/paprHERO-title.png';
 import paprTrashTitle from 'public/logos/paprTRASH-title.png';
 import { useTheme } from 'hooks/useTheme';
-import Image, { StaticImageData } from 'next/image';
+import Image, { StaticImageData } from 'next/legacy/image';
 import { SupportedToken } from 'lib/config';
 
 type Page = {
