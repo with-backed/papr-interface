@@ -41,6 +41,7 @@ import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindS
 import { useAccount } from 'wagmi';
 import styles from './VaultDebtPicker.module.css';
 import { useTheme } from 'hooks/useTheme';
+import { usePaprBalance } from 'hooks/usePaprBalance';
 
 type VaultDebtPickerProps = {
   paprController: PaprController;
@@ -305,13 +306,9 @@ export function VaultDebtPicker({
       signerOrProvider,
     ).balanceOf(address);
   }, [paprController.underlying.id, signerOrProvider, address]);
-  const debtTokenBalance = useAsyncValue(async () => {
-    if (!address) return null;
-    return ERC20__factory.connect(
-      paprController.debtToken.id,
-      signerOrProvider,
-    ).balanceOf(address);
-  }, [paprController.debtToken.id, signerOrProvider, address]);
+  const { balance: debtTokenBalance } = usePaprBalance(
+    paprController.debtToken.id,
+  );
 
   const balanceErrorMessage = useMemo(() => {
     if (!underlyingBalance || !debtTokenBalance) return '';
