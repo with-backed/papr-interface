@@ -263,6 +263,7 @@ function BuyButton({
     }
 
     const approvalTx = await tokenContract.approve(controller.id, maxPrice);
+    setBuyingState('approving');
     await approvalTx.wait();
 
     const oracleDetails = oracleInfo[auction.auctionAssetContract];
@@ -273,6 +274,7 @@ function BuyButton({
       address!,
       oracleInfoStruct,
     );
+    setBuyingState('buying');
     await tx.wait();
     window.location.reload();
   }, [address, auction, controller, maxPrice, oracleInfo, tokenContract]);
