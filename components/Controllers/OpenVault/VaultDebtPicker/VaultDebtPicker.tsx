@@ -42,6 +42,11 @@ import { useAccount } from 'wagmi';
 import styles from './VaultDebtPicker.module.css';
 import { useTheme } from 'hooks/useTheme';
 import { usePaprBalance } from 'hooks/usePaprBalance';
+import { useQuery } from 'urql';
+import {
+  AuctionsByNftOwnerQuery,
+  AuctionsByNftOwnerDocument,
+} from 'types/generated/graphql/inKindSubgraph';
 
 type VaultDebtPickerProps = {
   paprController: PaprController;
@@ -76,6 +81,16 @@ export function VaultDebtPicker({
     );
   }, [vault?.collateral.length, depositNFTs, withdrawNFTs]);
 
+  const [{ data: auctionsByNftOwner, fetching, error }] =
+    useQuery<AuctionsByNftOwnerQuery>({
+      query: AuctionsByNftOwnerDocument,
+      variables: {
+        nftOwner: address!,
+      },
+    });
+
+  console.log({ auctionsByNftOwner });
+
   const userAndVaultNFTs = useMemo(() => {
     return userNFTsForVault
       .filter(
@@ -91,15 +106,28 @@ export function VaultDebtPicker({
         address: nft.address,
         tokenId: nft.tokenId,
         inVault: false,
+        isLiquidating: false,
+        isLiquidated: false,
       }))
       .concat(
         (vault?.collateral || []).map((c) => ({
           address: c.contractAddress,
           tokenId: c.tokenId,
           inVault: true,
+          isLiquidating: false,
+          isLiquidated: false,
+        })),
+      )
+      .concat(
+        (auctionsByNftOwner?.auctions || []).map((a) => ({
+          address: a.auctionAssetContract,
+          tokenId: a.auctionAssetID,
+          inVault: false,
+          isLiquidating: !a.endPrice,
+          isLiquidated: !!a.endPrice,
         })),
       );
-  }, [userNFTsForVault, vault?.collateral]);
+  }, [userNFTsForVault, vault?.collateral, auctionsByNftOwner?.auctions]);
 
   // debt variables
   const maxDebtPerNFTInPerpetual = useAsyncValue(async () => {
@@ -368,6 +396,8 @@ export function VaultDebtPicker({
                 tokenId={nft.tokenId}
                 floorPrice={oracleInfo[getAddress(nft.address)].price}
                 inVault={nft.inVault}
+                isLiquidating={nft.isLiquidating}
+                isLiquidated={nft.isLiquidated}
                 vaultHasCollateral={vaultHasCollateral}
                 maxBorrow={formatBigNum(
                   maxDebtPerNFTInUnderlying,
@@ -629,6 +659,8 @@ type CollateralRowProps = {
   floorPrice: number;
   maxBorrow: string;
   inVault: boolean;
+  isLiquidating: boolean;
+  isLiquidated: boolean;
   vaultHasCollateral: boolean;
   depositNFTs: string[];
   withdrawNFTs: string[];
@@ -642,6 +674,8 @@ function CollateralRow({
   floorPrice,
   maxBorrow,
   inVault,
+  isLiquidating,
+  isLiquidated,
   vaultHasCollateral,
   depositNFTs,
   withdrawNFTs,
@@ -677,7 +711,14 @@ function CollateralRow({
   );
 
   return (
-    <tr>
+    <tr
+      className={
+        isLiquidating
+          ? styles.liquidating
+          : isLiquidated
+          ? styles.liquidated
+          : ''
+      }>
       <td>
         <div className={styles.thumbnail}>
           <CenterAsset address={contractAddress} tokenId={tokenId} />
@@ -687,18 +728,24 @@ function CollateralRow({
         <p>#{tokenId}</p>
       </td>
       <td>
-        <p>${floorPrice}</p>
+        {isLiquidated && <p>---</p>}
+        {!isLiquidated && <p>${floorPrice}</p>}
       </td>
       <td>
-        <p>${maxBorrow}</p>
+        {isLiquidated && <p>---</p>}
+        {!isLiquidated && <p>${maxBorrow}</p>}
       </td>
       <td>
-        <input
-          type="checkbox"
-          disabled={inVault}
-          checked={checkedForDeposit || inVault}
-          onChange={() => handleInputBoxChecked('deposit', uniqueNFTId)}
-        />
+        {!isLiquidating && !isLiquidated && (
+          <input
+            type="checkbox"
+            disabled={inVault}
+            checked={checkedForDeposit || inVault}
+            onChange={() => handleInputBoxChecked('deposit', uniqueNFTId)}
+          />
+        )}
+        {isLiquidating && <p>Liquidating</p>}
+        {isLiquidated && <p>Liquidated</p>}
       </td>
       {vaultHasCollateral && (
         <td>
