@@ -25,6 +25,10 @@ const DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD: Set<string> = new Set([
   '0x3777b4b21489d2f0114e178c0cb2bb7332c8c3bd',
   // uniswap
   '0x8b39692e9d5959fd07d3251cece82de7a666f09d',
+  //cheaters
+  '0x9EE41Ea35da2FD1e01D136EC06F8951E50156175',
+  '0xbDfcd0F4eB0a75589B2223be05Ef42bbF7184E72',
+  '0x9c742A4555e4eEF1123cfA3fcd9c44fd015417EE',
 ]);
 
 export const getServerSideProps: GetServerSideProps<
