@@ -9,10 +9,8 @@ export function Custom404() {
       <p>
         {"If you think there's an error, let us know in "}
 
-        <Link href={DISCORD_URL} passHref>
-          <a target={'_blank'} rel="noreferrer">
-            {DISCORD_ERROR_CHANNEL} on Discord.
-          </a>
+        <Link href={DISCORD_URL} passHref target={'_blank'} rel="noreferrer">
+          {DISCORD_ERROR_CHANNEL}on Discord.
         </Link>
       </p>
     </div>

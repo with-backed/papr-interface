@@ -374,7 +374,8 @@ function AllowedCollateral({
             <td>
               <Link
                 href={`${configs.paprHero.reservoirMarketplace}/collections/${contractAddress}`}
-                passHref={true}>
+                passHref={true}
+                legacyBehavior>
                 <button className={styles.button}>Buy or Sell</button>
               </Link>
             </td>

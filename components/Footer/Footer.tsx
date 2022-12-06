@@ -42,8 +42,8 @@ export function Footer() {
         {LINKS.map((link) => {
           return (
             <li key={link.title}>
-              <Link href={link.href}>
-                <a target="_blank">{link.title}</a>
+              <Link href={link.href} target="_blank">
+                {link.title}
               </Link>
             </li>
           );

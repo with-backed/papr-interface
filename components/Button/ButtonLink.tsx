@@ -25,10 +25,11 @@ export function ButtonLink({
     styles[size],
   ].join(' ');
   return (
-    <Link {...props}>
-      <a className={className} target={newTab ? '_blank' : undefined}>
-        {children}
-      </a>
+    <Link
+      {...props}
+      className={className}
+      target={newTab ? '_blank' : undefined}>
+      {children}
     </Link>
   );
 }

@@ -112,18 +112,14 @@ function NavLinks({ activeRoute, isHomePage }: NavLinksProps) {
                 : p.externalRedirect
                 ? p.route
                 : `/tokens/${tokenName}/${p.route}`
-            }>
-            <a
-              className={
-                isActiveRoute(activeRoute, p, isHomePage)
-                  ? [styles.link, styles['link-active'], styles[theme]].join(
-                      ' ',
-                    )
-                  : [styles.link, styles[theme]].join(' ')
-              }
-              target={p.externalRedirect ? '_blank' : ''}>
-              {p.name}
-            </a>
+            }
+            className={
+              isActiveRoute(activeRoute, p, isHomePage)
+                ? [styles.link, styles['link-active'], styles[theme]].join(' ')
+                : [styles.link, styles[theme]].join(' ')
+            }
+            target={p.externalRedirect ? '_blank' : ''}>
+            {p.name}
           </Link>
         </li>
       ))}
@@ -146,12 +142,10 @@ function LogoLink({ isHomePage }: { isHomePage: boolean }) {
     return imageLookup[tokenName as SupportedToken];
   }, [isHomePage, tokenName]);
   return (
-    <Link href={`/`} passHref>
-      <a title="papr">
-        <div className={styles.logo}>
-          <Image src={image} alt="" placeholder="blur" />
-        </div>
-      </a>
+    <Link href={`/`} passHref title="papr">
+      <div className={styles.logo}>
+        <Image src={image} alt="" placeholder="blur" />
+      </div>
     </Link>
   );
 }
