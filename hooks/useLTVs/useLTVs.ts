@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 export function useLTVs(
   paprController: PaprController,
   activeVaults: PaprController['vaults'],
-  maxLTV: ethers.BigNumber | null,
+  maxLTV: ethers.BigNumber,
 ) {
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const [ltvs, setLTVs] = useState<{ [key: string]: number }>({});
@@ -16,7 +16,7 @@ export function useLTVs(
 
   useEffect(() => {
     const fetchLTVs = async () => {
-      if (!oracleInfo || !maxLTV || !activeVaults) return {};
+      if (!oracleInfo || !activeVaults) return {};
       return await activeVaults.reduce(async (prev, v) => {
         const maxDebtForVault: ethers.BigNumber = (
           await paprController.maxDebt([v.collateralContract], oracleInfo)
