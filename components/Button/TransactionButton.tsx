@@ -1,6 +1,6 @@
 import { Button } from 'components/Button';
 import { EtherscanTransactionLink } from 'components/EtherscanLink';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ButtonProps } from './Button';
 import { CompletedButton } from './CompletedButton';
 import { SendTransactionResult } from '@wagmi/core';
@@ -13,21 +13,25 @@ interface TransactionButtonProps extends ButtonProps {
   // when ordinarily we would show a TransactionButton, but we don't
   // need to (e.g., token already approved in the past)
   completed?: boolean;
+  // has the user spawned a tx in their wallet and confirming
+  error?: string | null;
 }
 
 export function TransactionButton({
   text,
   disabled = false,
+  onClick,
   type,
   transactionData,
   completed,
+  error,
   kind = 'regular',
   theme = 'papr',
   size = 'big',
   ...props
 }: TransactionButtonProps) {
   const [status, setStatus] = useState<
-    'ready' | 'pending' | 'complete' | 'fail'
+    'ready' | 'confirming' | 'pending' | 'complete' | 'fail'
   >('ready');
   useEffect(() => {
     if (transactionData) {
@@ -38,6 +42,16 @@ export function TransactionButton({
       });
     }
   }, [transactionData]);
+
+  useEffect(() => {
+    if (error?.startsWith('User rejected request')) setStatus('ready');
+  }, [error]);
+
+  const onClickWithConfirm = useCallback(() => {
+    if (!onClick) return;
+    setStatus('confirming');
+    onClick();
+  }, [onClick, setStatus]);
 
   if (completed) {
     return (
@@ -50,7 +64,7 @@ export function TransactionButton({
     );
   }
 
-  if (status !== 'ready') {
+  if (status !== 'ready' && status !== 'confirming') {
     let message: string;
     switch (status) {
       case 'pending':
@@ -85,13 +99,22 @@ export function TransactionButton({
 
   return (
     <Button
+      onClick={onClickWithConfirm}
       type={type}
-      disabled={disabled}
+      disabled={disabled || status !== 'ready'}
       kind={kind}
       theme={theme}
       size={size}
+      style={
+        status === 'confirming'
+          ? {
+              backgroundColor: '#0000c2',
+            }
+          : {}
+      }
       {...props}>
-      {text}
+      {status === 'confirming' && 'Confirm in Wallet'}
+      {status !== 'confirming' && text}
     </Button>
   );
 }

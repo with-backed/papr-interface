@@ -89,7 +89,11 @@ export function BorrowPerpetualButton({
     [addCollateralCalldata, removeCollateralCalldata, borrowPerpetualCalldata],
   );
 
-  const { data, write } = useMulticallWrite(paprController, calldata, refresh);
+  const { data, write, error } = useMulticallWrite(
+    paprController,
+    calldata,
+    refresh,
+  );
 
   return (
     <TransactionButton
@@ -98,6 +102,7 @@ export function BorrowPerpetualButton({
       theme="papr"
       onClick={write!}
       transactionData={data}
+      error={error?.message}
       text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
       disabled={disabled}
     />
@@ -152,7 +157,11 @@ export function RepayPerpetualButton({
     [addCollateralCalldata, removeCollateralCalldata, repayPerpetualCalldata],
   );
 
-  const { data, write } = useMulticallWrite(paprController, calldata, refresh);
+  const { data, write, error } = useMulticallWrite(
+    paprController,
+    calldata,
+    refresh,
+  );
 
   return (
     <TransactionButton
@@ -161,6 +170,7 @@ export function RepayPerpetualButton({
       theme="papr"
       onClick={write!}
       transactionData={data}
+      error={error?.message}
       text="Update Loan"
       disabled={disabled}
     />
@@ -240,7 +250,11 @@ export function RepayWithSwapButton({
     [addCollateralCalldata, removeCollateralCalldata, repayWithSwapCalldata],
   );
 
-  const { data, write } = useMulticallWrite(paprController, calldata, refresh);
+  const { data, write, error } = useMulticallWrite(
+    paprController,
+    calldata,
+    refresh,
+  );
 
   return (
     <TransactionButton
@@ -249,6 +263,7 @@ export function RepayWithSwapButton({
       theme="papr"
       onClick={write!}
       transactionData={data}
+      error={error?.message}
       text="Update Loan"
       disabled={disabled}
     />
@@ -316,7 +331,11 @@ export function BorrowWithSwapButton({
     [addCollateralCalldata, removeCollateralCalldata, borrowWithSwapCalldata],
   );
 
-  const { data, write } = useMulticallWrite(paprController, calldata, refresh);
+  const { data, write, error } = useMulticallWrite(
+    paprController,
+    calldata,
+    refresh,
+  );
 
   return (
     <TransactionButton
@@ -325,6 +344,7 @@ export function BorrowWithSwapButton({
       theme="papr"
       onClick={write!}
       transactionData={data}
+      error={error?.message}
       text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
       disabled={disabled}
     />
@@ -375,7 +395,7 @@ export function ApproveTokenButton({
     functionName: 'approve',
     args: [controller.id as `0x${string}`, ethers.constants.MaxInt256],
   });
-  const { data, write } = useContractWrite({
+  const { data, write, error } = useContractWrite({
     ...config,
     onSuccess: (data: any) => {
       data.wait().then(() => setTokenApproved(true));
@@ -391,6 +411,7 @@ export function ApproveTokenButton({
       theme="papr"
       onClick={write!}
       transactionData={data}
+      error={error?.message}
       text={`Approve ${symbol}`}
       completed={tokenApproved}
     />
@@ -413,7 +434,7 @@ export function ApproveNFTButton({
   const { address } = useAccount();
   const signerOrProvider = useSignerOrProvider();
   const [approvedLoading, setApprovedLoading] = useState<boolean>(true);
-  const [alreadyApproved, setAlreadyApproved] = useState(false);
+  const [alreadyApproved, setAlreadyApproved] = useState<boolean>(false);
 
   const collateralContract = useMemo(() => {
     return ERC721__factory.connect(collateralContractAddress, signerOrProvider);
@@ -443,7 +464,7 @@ export function ApproveNFTButton({
     functionName: 'setApprovalForAll',
     args: [paprController.id as `0x${string}`, true],
   });
-  const { data, write } = useContractWrite({
+  const { data, write, error } = useContractWrite({
     ...config,
     onSuccess: (data: any) => {
       data.wait().then(() => setApproved(true));
@@ -469,6 +490,7 @@ export function ApproveNFTButton({
       theme="papr"
       onClick={write!}
       transactionData={data}
+      error={error?.message}
       disabled={approvedLoading}
       text={symbol ? `Approve ${symbol}` : '...'}
     />
