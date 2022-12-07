@@ -89,35 +89,15 @@ export function VaultDebtPicker({
       },
     });
 
-  console.log({ auctionsByNftOwner });
-
   const userAndVaultNFTs = useMemo(() => {
-    return userNFTsForVault
-      .filter(
-        // filter out nfts that are already in the vault, major assumption here is goldsky is faster than thegraph
-        (nft) =>
-          vault?.collateral.find(
-            (c) =>
-              getAddress(c.contractAddress) === getAddress(nft.address) &&
-              c.tokenId === nft.tokenId,
-          ) === undefined,
-      )
-      .map((nft) => ({
-        address: nft.address,
-        tokenId: nft.tokenId,
-        inVault: false,
+    return (vault?.collateral || [])
+      .map((c) => ({
+        address: c.contractAddress,
+        tokenId: c.tokenId,
+        inVault: true,
         isLiquidating: false,
         isLiquidated: false,
       }))
-      .concat(
-        (vault?.collateral || []).map((c) => ({
-          address: c.contractAddress,
-          tokenId: c.tokenId,
-          inVault: true,
-          isLiquidating: false,
-          isLiquidated: false,
-        })),
-      )
       .concat(
         (auctionsByNftOwner?.auctions || []).map((a) => ({
           address: a.auctionAssetContract,
@@ -126,6 +106,25 @@ export function VaultDebtPicker({
           isLiquidating: !a.endPrice,
           isLiquidated: !!a.endPrice,
         })),
+      )
+      .concat(
+        userNFTsForVault
+          .filter(
+            // filter out nfts that are already in the vault, major assumption here is goldsky is faster than thegraph
+            (nft) =>
+              vault?.collateral.find(
+                (c) =>
+                  getAddress(c.contractAddress) === getAddress(nft.address) &&
+                  c.tokenId === nft.tokenId,
+              ) === undefined,
+          )
+          .map((nft) => ({
+            address: nft.address,
+            tokenId: nft.tokenId,
+            inVault: false,
+            isLiquidating: false,
+            isLiquidated: false,
+          })),
       );
   }, [userNFTsForVault, vault?.collateral, auctionsByNftOwner?.auctions]);
 

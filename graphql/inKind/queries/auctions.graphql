@@ -5,7 +5,11 @@ query auctions {
 }
 
 query auctionsByNFTOwner($nftOwner: Bytes) {
-  auctions(where: { nftOwner: $nftOwner }) {
+  auctions(
+    where: { nftOwner: $nftOwner }
+    orderBy: endPrice
+    orderDirection: desc
+  ) {
     ...allAuctionProperties
   }
 }
