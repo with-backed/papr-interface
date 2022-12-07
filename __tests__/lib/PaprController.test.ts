@@ -14,6 +14,7 @@ const subgraphController: SubgraphController = {
   underlying: '0x3089b47853df1b82877beef6d904a0ce98a12553',
   target: '1000000000000000000',
   paprToken: '0xb5e5f51e3e112634975fb44e6351380413f653ac',
+  maxLTV: '',
   vaults: [],
   allowedCollateral: [
     {

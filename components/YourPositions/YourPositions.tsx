@@ -205,7 +205,10 @@ export function VaultOverview({
 }: VaultOverviewProps) {
   const { tokenName } = useConfig();
   const signerOrProvider = useSignerOrProvider();
-  const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
+  const maxLTV = useMemo(
+    () => ethers.BigNumber.from(paprController.maxLTV),
+    [paprController],
+  );
   const { ltvs } = useLTVs(
     paprController,
     useMemo(() => [vaultInfo], [vaultInfo]),

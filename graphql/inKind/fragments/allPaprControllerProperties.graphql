@@ -4,6 +4,7 @@ fragment allPaprControllerProperties on PaprController {
   poolAddress
   underlying
   paprToken
+  maxLTV
   target
   allowedCollateral(where: { allowed: true }) {
     id

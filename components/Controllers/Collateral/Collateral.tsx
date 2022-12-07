@@ -68,8 +68,8 @@ function Tile({ address, tokenId, paprController, vault }: TileProps) {
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
   const result = useCollection({ network: centerNetwork as any, address });
-  const maxLTV = useAsyncValue(() => {
-    return paprController.maxLTV();
+  const maxLTV = useMemo(() => {
+    return ethers.BigNumber.from(paprController.maxLTV);
   }, [paprController]);
   const maxDebt = useAsyncValue(async () => {
     if (!oracleInfo) return null;

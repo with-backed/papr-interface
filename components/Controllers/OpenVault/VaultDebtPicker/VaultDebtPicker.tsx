@@ -305,7 +305,7 @@ export function VaultDebtPicker({
   }, [collateralContractAddress, signerOrProvider]);
   const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
 
-  const maxLTV = useAsyncValue(
+  const maxLTV = useMemo(
     () => paprController.maxLTVPercent(),
     [paprController],
   );

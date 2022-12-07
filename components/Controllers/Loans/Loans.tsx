@@ -17,7 +17,10 @@ type LoansProps = {
 };
 
 export function Loans({ paprController, pricesData }: LoansProps) {
-  const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
+  const maxLTV = useMemo(
+    () => ethers.BigNumber.from(paprController.maxLTV),
+    [paprController],
+  );
   const activeVaults = useMemo(
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
     [paprController],
