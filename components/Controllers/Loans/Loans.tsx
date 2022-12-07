@@ -16,7 +16,7 @@ type LoansProps = {
   pricesData: ControllerPricesData | null;
 };
 
-export function Loans({ paprController, pricesData }: LoansProps) {
+export function Loans({ paprController }: LoansProps) {
   const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
   const activeVaults = useMemo(
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
