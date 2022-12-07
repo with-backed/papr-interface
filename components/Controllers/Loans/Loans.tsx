@@ -18,7 +18,7 @@ type LoansProps = {
 
 export function Loans({ paprController, pricesData }: LoansProps) {
   const maxLTV = useMemo(
-    () => ethers.BigNumber.from(paprController.maxLTV),
+    () => ethers.BigNumber.from(paprController.maxLTVBigNum),
     [paprController],
   );
   const activeVaults = useMemo(

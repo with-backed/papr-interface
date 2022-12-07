@@ -94,8 +94,10 @@ class PaprControllerInternal {
   token0: ERC20;
   token1: ERC20;
   collateralContracts: ERC721[];
-  cachedNewTarget: ethers.BigNumber | null;
-  targetLastFetched: number;
+  maxLTVBigNum: ethers.BigNumber;
+  maxLTVPercent: number;
+  _cachedNewTarget: ethers.BigNumber | null;
+  _targetLastFetched: number;
 
   constructor(
     subgraphController: SubgraphController,
@@ -125,8 +127,13 @@ class PaprControllerInternal {
         return ERC721__factory.connect(c.contractAddress, signerOrProvider);
       },
     );
-    this.cachedNewTarget = null;
-    this.targetLastFetched = new Date().getTime() / 1000;
+    this.maxLTVBigNum = ethers.BigNumber.from(this._subgraphController.maxLTV);
+    this.maxLTVPercent = convertOneScaledValue(
+      ethers.BigNumber.from(this._subgraphController.maxLTV),
+      2,
+    );
+    this._cachedNewTarget = null;
+    this._targetLastFetched = Date.now() / 1000;
   }
 
   index() {
@@ -137,25 +144,19 @@ class PaprControllerInternal {
     return this._contract.lastUpdated();
   }
 
-  maxLTVPercent() {
-    const maxLTV = ethers.BigNumber.from(this._subgraphController.maxLTV);
-    return convertOneScaledValue(maxLTV, 2);
-  }
-
   multiplier() {
     return this._contract.multiplier();
   }
 
   async newTarget() {
-    const now = new Date().getTime() / 1000;
-    if (now - this.targetLastFetched > 10 || !this.cachedNewTarget) {
-      console.log('rpc call made');
+    const now = Date.now() / 1000;
+    if (now - this._targetLastFetched > 10 || !this._cachedNewTarget) {
       const newTarget = await this._contract.newTarget();
-      this.cachedNewTarget = newTarget;
-      this.targetLastFetched = now;
+      this._cachedNewTarget = newTarget;
+      this._targetLastFetched = now;
       return newTarget;
     }
-    return this.cachedNewTarget;
+    return this._cachedNewTarget;
   }
 
   target() {

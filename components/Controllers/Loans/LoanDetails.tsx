@@ -21,10 +21,7 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
     () => paprController.newTarget(),
     [paprController],
   );
-  const maxLTV = useMemo(
-    () => ethers.BigNumber.from(paprController.maxLTV),
-    [paprController],
-  );
+  const maxLTV = useMemo(() => paprController.maxLTVBigNum, [paprController]);
   const ltv = useMemo(() => {
     if (vault && norm) {
       return convertOneScaledValue(
