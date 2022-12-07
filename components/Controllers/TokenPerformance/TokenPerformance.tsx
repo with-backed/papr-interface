@@ -29,6 +29,7 @@ import { Table } from 'components/Table';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
+import { targetValues } from 'lib/controllers/charts/target';
 
 export type ControllerSummaryProps = {
   controllers: PaprController[];
@@ -133,11 +134,12 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
     if (!pricesData) {
       return null;
     }
-    const { markValues } = pricesData;
+    const { markValues, targetValues } = pricesData;
     const mark = markValues[markValues.length - 1].value;
+    const target = targetValues[targetValues.length - 1].value;
     const valueADayAgo = getValueDaysAgo(markValues, 1).value;
     const change = percentChange(valueADayAgo, mark);
-    return { mark, change };
+    return { mark, target, change };
   }, [pricesData]);
   const targetOverMarketAndChange = useMemo(() => {
     if (!pricesData || !markAndChange) {
@@ -213,7 +215,12 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
             </span>
           </div>
         </TooltipReference>
-        <TargetMarketTooltip tooltip={targetMarketTooltip} />
+        <TargetMarketTooltip
+          tooltip={{ ...targetMarketTooltip, visible: true }}
+          mark={markAndChange?.mark}
+          target={markAndChange?.target}
+          underlyingSymbol={controller.underlying.symbol}
+        />
       </td>
       <td>
         <TooltipReference {...contractAPRTooltip}>

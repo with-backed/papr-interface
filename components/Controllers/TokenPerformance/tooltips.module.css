@@ -5,12 +5,16 @@
     flex-wrap: wrap;
 }
 
+.nftCapTooltip p {
+    margin: 0;
+}
+
 .nftCapTooltip .value {
-    width: 30%;
+    width: 20%;
 }
 
 .nftCapTooltip .description {
-    width: 70%;
+    width: 80%;
 }
 
 .mktCtrTooltip {

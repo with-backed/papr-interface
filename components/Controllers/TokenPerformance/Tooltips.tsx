@@ -22,14 +22,39 @@ export function MarketPriceTooltip({ tooltip }: TooltipProps) {
   );
 }
 
-export function TargetMarketTooltip({ tooltip }: TooltipProps) {
+export function TargetMarketTooltip({
+  tooltip,
+  mark,
+  target,
+  underlyingSymbol,
+}: TooltipProps & {
+  mark?: number;
+  target?: number;
+  underlyingSymbol: string;
+}) {
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
         “Target” is the papr contract’s internal valuation of papr, which
-        incorporates interest payments in response to the Market price. When
-        this ratio ratio is below 1, the contract is trying to slow the growth
-        of papr.
+        incorporates interest payments in response to the Market price.
+      </div>
+      <div className={styles.nftCapTooltip}>
+        <div className={styles.value}>
+          <p>
+            {mark?.toFixed(2)} {underlyingSymbol}
+          </p>
+        </div>
+        <div className={styles.description}>
+          <p>Mark</p>
+        </div>
+        <div className={styles.value}>
+          <p>
+            {target?.toFixed(2)} {underlyingSymbol}
+          </p>
+        </div>
+        <div className={styles.description}>
+          <p>Target</p>
+        </div>
       </div>
     </Tooltip>
   );
@@ -39,9 +64,9 @@ export function ContractAPRTooltip({ tooltip }: TooltipProps) {
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
-        This is interest rate the contract is currently charging to borrowers,
-        measured by the current rate of increase in the contract’s “Target”
-        valuation of papr, which is used in assessing loan values and
+        This is the effective interest rate the contract is charging to
+        borrowers, measured by the rate of increase in the contract&apos;s
+        target valuation of papr, which is used in assessing loan values and
         liquidations.
       </div>
     </Tooltip>
@@ -52,7 +77,7 @@ export function RealizedAPRTooltip({ tooltip }: TooltipProps) {
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
-        Increase in the market price of papr over the last 30 days, expressed as
+        Change in the market price of papr over the last 30 days, expressed as
         the annualized return an investor would realize if they bought and held
         papr.
       </div>

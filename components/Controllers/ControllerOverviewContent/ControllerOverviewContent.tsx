@@ -56,7 +56,7 @@ export function ControllerOverviewContent({
 
   return (
     <div className={styles.wrapper}>
-      {oracleInfo && !vaultsFetching && !nftsLoading && (
+      {/* {oracleInfo && !vaultsFetching && !nftsLoading && (
         <YourPositions
           currentVaults={currentVaults}
           latestMarketPrice={latestMarketPrice}
@@ -65,16 +65,16 @@ export function ControllerOverviewContent({
           userNFTs={userCollectionNFTs}
           balance={balance}
         />
-      )}
+      )} */}
       <TokenPerformance
         pricesData={{ [paprController.id]: pricesData }}
         controllers={[paprController]}
       />
-      <Collateral paprController={paprController} />
+      {/* <Collateral paprController={paprController} />
       <Activity paprController={paprController} />
       <Charts pricesData={pricesData} />
       <Loans paprController={paprController} pricesData={pricesData} />
-      <Auctions paprController={paprController} />
+      <Auctions paprController={paprController} /> */}
     </div>
   );
 }
