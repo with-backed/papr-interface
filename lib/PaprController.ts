@@ -94,6 +94,10 @@ class PaprControllerInternal {
   token0: ERC20;
   token1: ERC20;
   collateralContracts: ERC721[];
+  maxLTVBigNum: ethers.BigNumber;
+  maxLTVPercent: number;
+  _cachedNewTarget: ethers.BigNumber | null;
+  _targetLastFetched: number;
 
   constructor(
     subgraphController: SubgraphController,
@@ -123,6 +127,13 @@ class PaprControllerInternal {
         return ERC721__factory.connect(c.contractAddress, signerOrProvider);
       },
     );
+    this.maxLTVBigNum = ethers.BigNumber.from(this._subgraphController.maxLTV);
+    this.maxLTVPercent = convertOneScaledValue(
+      ethers.BigNumber.from(this._subgraphController.maxLTV),
+      2,
+    );
+    this._cachedNewTarget = null;
+    this._targetLastFetched = Date.now() / 1000;
   }
 
   index() {
@@ -133,21 +144,19 @@ class PaprControllerInternal {
     return this._contract.lastUpdated();
   }
 
-  maxLTV() {
-    return this._contract.maxLTV();
-  }
-
-  async maxLTVPercent() {
-    const maxLTV = await this._contract.maxLTV();
-    return convertOneScaledValue(maxLTV, 2);
-  }
-
   multiplier() {
     return this._contract.multiplier();
   }
 
-  newTarget() {
-    return this._contract.newTarget();
+  async newTarget() {
+    const now = Date.now() / 1000;
+    if (now - this._targetLastFetched > 10 || !this._cachedNewTarget) {
+      const newTarget = await this._contract.newTarget();
+      this._cachedNewTarget = newTarget;
+      this._targetLastFetched = now;
+      return newTarget;
+    }
+    return this._cachedNewTarget;
   }
 
   target() {
@@ -245,19 +254,26 @@ class PaprControllerInternal {
       : this.subgraphPool.token0;
   }
 
+  async _maxDebt(totalCollateraValue: ethers.BigNumber) {
+    const maxLoanUnderlying = totalCollateraValue.mul(
+      ethers.BigNumber.from(this._subgraphController.maxLTV),
+    );
+    return maxLoanUnderlying.div(await this.newTarget());
+  }
+
   async maxDebt(
     collateralAssets: string[],
     oracleInfo: OracleInfo,
   ): Promise<ethers.BigNumber> {
     const totalDebtPerCollateral = await Promise.all(
-      collateralAssets
-        .map((asset) =>
+      collateralAssets.map(async (asset) =>
+        this._maxDebt(
           ethers.utils.parseUnits(
             oracleInfo[getAddress(asset)].price.toString(),
             this.underlying.decimals,
           ),
-        )
-        .map(async (oraclePrice) => await this._contract.maxDebt(oraclePrice)),
+        ),
+      ),
     );
 
     return totalDebtPerCollateral.reduce(

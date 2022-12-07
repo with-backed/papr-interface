@@ -6,6 +6,7 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import styles from './Loans.module.css';
 import { computeLtv, convertOneScaledValue } from 'lib/controllers';
 import { Table } from 'components/Table';
+import { ethers } from 'ethers';
 
 type LoanDetailsProps = {
   vaultId: string;
@@ -20,7 +21,7 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
     () => paprController.newTarget(),
     [paprController],
   );
-  const maxLTV = useAsyncValue(() => paprController.maxLTV(), [paprController]);
+  const maxLTV = useMemo(() => paprController.maxLTVBigNum, [paprController]);
   const ltv = useMemo(() => {
     if (vault && norm) {
       return convertOneScaledValue(

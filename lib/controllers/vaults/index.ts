@@ -24,7 +24,7 @@ export async function getVaultInfo(
   );
   const { debt, count } = await controllerContract.vaultInfo(account, asset);
 
-  const maxLTV = await controller.maxLTVPercent();
+  const maxLTV = controller.maxLTVPercent;
   // TODO need oracle price
   const collateralValue = ethers.BigNumber.from(count * 1);
   const maxUnderlying = collateralValue.mul(maxLTV).div(ONE);
