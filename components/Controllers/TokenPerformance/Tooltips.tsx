@@ -39,22 +39,14 @@ export function TargetMarketTooltip({
         incorporates interest payments in response to the Market price.
       </div>
       <div className={styles.nftCapTooltip}>
-        <div className={styles.value}>
-          <p>
-            {mark?.toFixed(2)} {underlyingSymbol}
-          </p>
-        </div>
-        <div className={styles.description}>
-          <p>Mark</p>
-        </div>
-        <div className={styles.value}>
-          <p>
-            {target?.toFixed(2)} {underlyingSymbol}
-          </p>
-        </div>
-        <div className={styles.description}>
-          <p>Target</p>
-        </div>
+        <p className={styles.value}>
+          {mark?.toFixed(2)} {underlyingSymbol}
+        </p>
+        <p className={styles.description}>Mark</p>
+        <p className={styles.value}>
+          {target?.toFixed(2)} {underlyingSymbol}
+        </p>
+        <p className={styles.description}>Target</p>
       </div>
     </Tooltip>
   );
@@ -98,24 +90,16 @@ export function NFTCapTooltip({
   return (
     <Tooltip {...tooltip}>
       <div className={styles.nftCapTooltip}>
-        <div className={styles.value}>
-          <p>${formatTokenAmount(nftMarketCap)}</p>
-        </div>
-        <div className={styles.description}>
-          <p>(NFT) Floor value of all deposited collateral</p>
-        </div>
-        <div className={styles.value}>
-          <p>${formatTokenAmount(debtTokenMarketCap)}</p>
-        </div>
-        <div className={styles.description}>
-          <p>(CAP) Market value of {paprSymbol}</p>
-        </div>
-        <div className={styles.value}>
-          <p>{(nftMarketCap / debtTokenMarketCap).toFixed(2)}</p>
-        </div>
-        <div className={styles.description}>
-          <p>Ratio of collateral to debt</p>
-        </div>
+        <p className={styles.value}>${formatTokenAmount(nftMarketCap)}</p>
+        <p className={styles.description}>
+          (NFT) Floor value of all deposited collateral
+        </p>
+        <p className={styles.value}>${formatTokenAmount(debtTokenMarketCap)}</p>
+        <p className={styles.description}>(CAP) Market value of {paprSymbol}</p>
+        <p className={styles.value}>
+          {(nftMarketCap / debtTokenMarketCap).toFixed(2)}
+        </p>
+        <p className={styles.description}>Ratio of collateral to debt</p>
       </div>
     </Tooltip>
   );
