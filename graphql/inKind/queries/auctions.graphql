@@ -3,13 +3,3 @@ query auctions {
     ...allAuctionProperties
   }
 }
-
-query auctionsByNFTOwner($nftOwner: Bytes) {
-  auctions(
-    where: { nftOwner: $nftOwner }
-    orderBy: endPrice
-    orderDirection: desc
-  ) {
-    ...allAuctionProperties
-  }
-}
