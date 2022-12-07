@@ -216,7 +216,7 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
           </div>
         </TooltipReference>
         <TargetMarketTooltip
-          tooltip={{ ...targetMarketTooltip, visible: true }}
+          tooltip={targetMarketTooltip}
           mark={markAndChange?.mark}
           target={markAndChange?.target}
           underlyingSymbol={controller.underlying.symbol}
