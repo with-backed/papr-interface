@@ -18,7 +18,7 @@ import {
   OraclePriceType,
 } from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ERC20 } from 'types/generated/abis';
 import { INFTEDA } from 'types/generated/abis/PaprController';
 import {
@@ -270,7 +270,6 @@ function BuyButton({
   const [buyingState, setBuyingState] = useState<
     'idle' | 'approving' | 'buying'
   >('idle');
-
   const handleClick = useCallback(async () => {
     if (!oracleInfo) {
       console.error('no oracle info, cannot buy');
