@@ -18,7 +18,7 @@ import {
   OraclePriceType,
 } from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ERC20 } from 'types/generated/abis';
 import { INFTEDA } from 'types/generated/abis/PaprController';
 import {
@@ -93,6 +93,14 @@ function ActiveAuctions({
     () => erc20Contract(controller.debtToken.id, signerOrProvider),
     [controller.debtToken.id, signerOrProvider],
   );
+  const paprApproved = useAsyncValue(async () => {
+    if (!address) return null;
+    return (
+      (await tokenContract.allowance(address, controller.id)) >
+      ethers.BigNumber.from(0)
+    );
+  }, [tokenContract, address, controller.id]);
+
   const legend = '🔨 Active Auctions';
   if (fetching) {
     return <Fieldset legend={legend}>Loading auctions...</Fieldset>;
@@ -122,6 +130,7 @@ function ActiveAuctions({
               auction={auction}
               controller={controller}
               tokenContract={tokenContract}
+              paprApproved={paprApproved}
             />
           ))}
         </tbody>
@@ -134,10 +143,12 @@ function ActiveAuctionRow({
   auction,
   controller,
   tokenContract,
+  paprApproved,
 }: {
   auction: ActiveAuction;
   controller: PaprController;
   tokenContract: ERC20;
+  paprApproved: boolean | null;
 }) {
   const timestamp = useTimestamp();
   const signerOrProvider = useSignerOrProvider();
@@ -233,6 +244,7 @@ function ActiveAuctionRow({
           controller={controller}
           maxPrice={priceBigNum}
           tokenContract={tokenContract}
+          paprApproved={paprApproved}
         />
       </td>
     </tr>
@@ -244,27 +256,32 @@ type BuyButtonProps = {
   controller: PaprController;
   maxPrice: ethers.BigNumber;
   tokenContract: ERC20;
+  paprApproved: boolean | null;
 };
 function BuyButton({
   auction,
   controller,
   maxPrice,
   tokenContract,
+  paprApproved,
 }: BuyButtonProps) {
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const [buyingState, setBuyingState] = useState<
     'idle' | 'approving' | 'buying'
   >('idle');
+
   const handleClick = useCallback(async () => {
     if (!oracleInfo) {
       console.error('no oracle info, cannot buy');
       return;
     }
 
-    const approvalTx = await tokenContract.approve(controller.id, maxPrice);
-    setBuyingState('approving');
-    await approvalTx.wait();
+    if (!paprApproved) {
+      const approvalTx = await tokenContract.approve(controller.id, maxPrice);
+      setBuyingState('approving');
+      await approvalTx.wait();
+    }
 
     const oracleDetails = oracleInfo[auction.auctionAssetContract];
     const oracleInfoStruct = getOraclePayloadFromReservoirObject(oracleDetails);
@@ -277,7 +294,15 @@ function BuyButton({
     setBuyingState('buying');
     await tx.wait();
     window.location.reload();
-  }, [address, auction, controller, maxPrice, oracleInfo, tokenContract]);
+  }, [
+    address,
+    auction,
+    controller,
+    maxPrice,
+    oracleInfo,
+    tokenContract,
+    paprApproved,
+  ]);
 
   return (
     <TextButton
