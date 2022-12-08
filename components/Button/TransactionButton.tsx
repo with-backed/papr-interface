@@ -105,13 +105,7 @@ export function TransactionButton({
       kind={kind}
       theme={theme}
       size={size}
-      style={
-        status === 'confirming'
-          ? {
-              backgroundColor: '#0000c2',
-            }
-          : {}
-      }
+      additionalClassNames={status === 'confirming' ? ['confirming'] : []}
       {...props}>
       {status === 'confirming' && 'Confirm in Wallet'}
       {status !== 'confirming' && text}

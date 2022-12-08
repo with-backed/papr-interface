@@ -13,6 +13,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   kind?: ButtonKind;
   theme?: ButtonTheme;
   size?: ButtonSize;
+  additionalClassNames?: string[];
 }
 
 export function Button({
@@ -20,11 +21,18 @@ export function Button({
   kind = 'regular',
   theme = 'papr',
   size = 'big',
+  additionalClassNames = [],
   ...props
 }: ButtonProps) {
   const className = useMemo(
-    () => [styles[kind], styles[theme], styles[size]].join(' '),
-    [kind, theme, size],
+    () =>
+      [
+        styles[kind],
+        styles[theme],
+        styles[size],
+        ...additionalClassNames.map((cn) => styles[cn]),
+      ].join(' '),
+    [kind, theme, size, additionalClassNames],
   );
   return (
     <button className={className} {...props}>

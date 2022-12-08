@@ -35,6 +35,9 @@
 .regular.papr {
   background-color: var(--papr-100);
 }
+.regular.papr.confirming {
+  background-color: var(--papr-110) !important;
+}
 .regular.papr:hover {
   background-color: var(--papr-110);
 }
