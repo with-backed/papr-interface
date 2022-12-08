@@ -19,12 +19,12 @@ export function useMulticallWrite(
     args: [calldata as `0x${string}`[]],
     overrides,
   });
-  const { data, write } = useContractWrite({
+  const { data, write, error } = useContractWrite({
     ...multicallConfig,
     onSuccess: (data: any) => {
       data.wait().then(refresh);
     },
   } as any);
 
-  return { data, write };
+  return { data, write, error };
 }
