@@ -48,14 +48,14 @@ export const ShortDisplayAddress: FunctionComponent<ShortDisplayAddress> = ({
   const addressTooltip = useTooltipState();
   const { base, shortened } = useAddressRepresentation(address);
   return (
-    <div>
+    <>
       <TooltipReference {...addressTooltip}>
         <EtherscanAddressLink address={address}>
           <span>{shortened}</span>
         </EtherscanAddressLink>
       </TooltipReference>
       <Tooltip {...addressTooltip}>{base}</Tooltip>
-    </div>
+    </>
   );
 };
 

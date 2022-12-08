@@ -8,9 +8,9 @@ import { TooltipReference, useTooltipState } from 'reakit';
 import { Tooltip } from 'components/Tooltip';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { ethers } from 'ethers';
-import { formatBigNum, formatPercent } from 'lib/numberFormat';
+import { formatPercent } from 'lib/numberFormat';
 import { CenterAsset } from 'components/CenterAsset';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { computeLTVFromDebts } from 'lib/controllers';
 
@@ -30,6 +30,17 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
     return paprController.vaults || [];
   }, [paprController, vaultId]);
 
+  // Until we figure out pagination, subset this
+  const collateralSubset = useMemo(() => {
+    return vaults
+      .flatMap((vault) =>
+        vault.collateral.map((collateral) => ({ vault, collateral })),
+      )
+      .slice(0, 30);
+  }, [vaults]);
+
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
+
   if (!vaults || vaults.length === 0) {
     return (
       <Fieldset legend="🖼 Collateral">
@@ -41,17 +52,16 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
   return (
     <Fieldset legend="🖼 Collateral">
       <div className={styles.wrapper}>
-        {vaults.flatMap((v) =>
-          v.collateral.map((c) => (
-            <Tile
-              key={c.id}
-              address={c.contractAddress}
-              tokenId={c.tokenId}
-              paprController={paprController}
-              vault={v}
-            />
-          )),
-        )}
+        {collateralSubset.map(({ vault: v, collateral: c }) => (
+          <Tile
+            key={c.id}
+            address={c.contractAddress}
+            tokenId={c.tokenId}
+            paprController={paprController}
+            vault={v}
+            oracleInfo={oracleInfo}
+          />
+        ))}
       </div>
     </Fieldset>
   );
@@ -62,10 +72,16 @@ type TileProps = {
   tokenId: string;
   paprController: PaprController;
   vault: NonNullable<PaprController['vaults']>['0'];
+  oracleInfo?: OracleInfo;
 };
-function Tile({ address, tokenId, paprController, vault }: TileProps) {
+function Tile({
+  address,
+  tokenId,
+  paprController,
+  vault,
+  oracleInfo,
+}: TileProps) {
   const { centerNetwork } = useConfig();
-  const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
   const result = useCollection({ network: centerNetwork as any, address });
   const maxLTV = useMemo(() => {

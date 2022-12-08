@@ -4,19 +4,16 @@
 
 import * as Sentry from '@sentry/nextjs';
 
-const shouldInitialize = !process.env.GITHUB_ACTIONS;
-const SENTRY_DSN = process.env.SENTRY_DSN;
+const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
 
-shouldInitialize &&
-  Sentry.init({
-    dsn:
-      SENTRY_DSN ||
-      'https://7e7528c337a44263b8b757289e80e7fc@o1195560.ingest.sentry.io/6318688',
-    // Adjust this value in production, or use tracesSampler for greater control
-    tracesSampleRate: 0.2,
-    environment: process.env.NEXT_PUBLIC_CHAIN_ID,
-    // ...
-    // Note: if you want to override the automatic release value, do not set a
-    // `release` value here - use the environment variable `SENTRY_RELEASE`, so
-    // that it will also get attached to your source maps
-  });
+Sentry.init({
+  dsn:
+    SENTRY_DSN ||
+    'https://83bd981fed184ac383181fabfb7b8301@o1195560.ingest.sentry.io/4504283563753472',
+  // Adjust this value in production, or use tracesSampler for greater control
+  tracesSampleRate: 1.0,
+  // ...
+  // Note: if you want to override the automatic release value, do not set a
+  // `release` value here - use the environment variable `SENTRY_RELEASE`, so
+  // that it will also get attached to your source maps
+});

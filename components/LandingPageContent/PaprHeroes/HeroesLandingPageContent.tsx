@@ -15,27 +15,18 @@ import Link from 'next/link';
 import { Table } from 'components/Table';
 import { getAddress } from 'ethers/lib/utils';
 import { HeroPlayerBalance } from 'lib/paprHeroes';
-import { addressToENS } from 'lib/account';
-import { useConfig } from 'hooks/useConfig';
 import { HeroClaim__factory } from 'types/generated/abis/factories/HeroClaim__factory';
 import airdropInput from 'lib/heroClaims/airdropInput.json';
 import airdropOutput from 'lib/heroClaims/airdropOutput.json';
 import { TransactionButton } from 'components/Button';
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { formatTokenAmount } from 'lib/numberFormat';
-import { useTooltipState, TooltipReference } from 'reakit/Tooltip';
-import { Tooltip } from 'components/Tooltip';
-import { EtherscanAddressLink } from 'components/EtherscanLink';
 import { ShortDisplayAddress } from 'components/DisplayAddress/ShortDisplayAddress';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
   oracleInfo: { [key: string]: ReservoirResponseData };
   rankedPlayers: [string, HeroPlayerBalance][];
-};
-
-const longestString = (arr: string[]) => {
-  return arr.reduce((a, b) => (a.length > b.length ? a : b), '');
 };
 
 export function HeroesLandingPageContent({
@@ -64,21 +55,23 @@ export function HeroesLandingPageContent({
           glory. Every player starts with a combination of phUSDC and eligible
           NFTs for notional net worth of 50,000 phUSDC. Players can perform one
           or more of the following actions to increase their phUSDC balance:
-          <ol>
-            <li>
-              Use NFTs as collateral to mint paprHERO and
-              <ul>
-                <li>Swap to phUSDC + stake</li>
-                <li>LP in the paprHERO {`<>`} phUSDC Uniswap pool</li>
-              </ul>
-            </li>
-            <li>Stake phUSDC for 10% APR</li>
-            <li>
-              Use phUSDC to purchase paprHERO and earn from possible price
-              appreciation
-            </li>
-            <li>Trade NFTs</li>
-          </ol>
+        </p>
+        <ol>
+          <li>
+            Use NFTs as collateral to mint paprHERO and
+            <ul>
+              <li>Swap to phUSDC + stake</li>
+              <li>LP in the paprHERO {`<>`} phUSDC Uniswap pool</li>
+            </ul>
+          </li>
+          <li>Stake phUSDC for 10% APR</li>
+          <li>
+            Use phUSDC to purchase paprHERO and earn from possible price
+            appreciation
+          </li>
+          <li>Trade NFTs</li>
+        </ol>
+        <p>
           At the end of the competition, a users final phUSDC score is the sum
           of their phUSDC balance as well as the value of their NFTs (as
           calculated by the floor price of the collection). The competition ends
@@ -130,13 +123,12 @@ export function HeroesLandingPageContent({
                 />
               ))}
             </tbody>
-            <br />
-            <tbody>
-              {!!connectedRankedPlayer && (
+            <tbody className={styles.you}>
+              {!!connectedRankedPlayer && address && (
                 <>
                   <LeaderboardEntry
                     key={address}
-                    address={'You'}
+                    address={address}
                     heroPlayerBalance={connectedRankedPlayer[1]}
                     position={
                       rankedPlayers.findIndex(
@@ -374,7 +366,8 @@ function AllowedCollateral({
             <td>
               <Link
                 href={`${configs.paprHero.reservoirMarketplace}/collections/${contractAddress}`}
-                passHref={true}>
+                passHref={true}
+                legacyBehavior>
                 <button className={styles.button}>Buy or Sell</button>
               </Link>
             </td>
@@ -399,26 +392,24 @@ function LeaderboardEntry({
   return (
     <tr>
       <td>
-        <p className={styles.position}>
-          {(position.toString() + '.').padEnd(4, ' ')}
+        <span className={styles.position}>
+          {(position.toString() + '.').padEnd(5, ' ')}
           <ShortDisplayAddress address={address} />
-        </p>
+        </span>
       </td>
       <td className={styles.green}>
-        <p>{formatTokenAmount(heroPlayerBalance.totalNFTWorth)}</p>
+        {formatTokenAmount(heroPlayerBalance.totalNFTWorth)}
       </td>
       <td className={styles.green}>
-        <p>{formatTokenAmount(heroPlayerBalance.totalPhUSDCBalance)}</p>
+        {formatTokenAmount(heroPlayerBalance.totalPhUSDCBalance)}
       </td>
       <td
         className={`${
           heroPlayerBalance.netPapr >= 0 ? styles.green : styles.red
         }`}>
-        <p>{formatTokenAmount(heroPlayerBalance.netPapr)}</p>
+        {formatTokenAmount(heroPlayerBalance.netPapr)}
       </td>
-      <td>
-        <p>{formatTokenAmount(heroPlayerBalance.totalBalance)}</p>
-      </td>
+      <td>{formatTokenAmount(heroPlayerBalance.totalBalance)}</td>
     </tr>
   );
 }

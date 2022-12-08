@@ -1,7 +1,7 @@
 import React from 'react';
 import LandingPageScale from 'public/landingpage-scale.png';
 import styles from './LandingPageContent.module.css';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { Tables } from './Tables';
 import { DashedLine } from './DashedLine';
 import { Whitepaper } from './Whitepaper';

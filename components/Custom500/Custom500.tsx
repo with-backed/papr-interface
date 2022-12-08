@@ -9,10 +9,8 @@ export function Custom500() {
       <p>
         {'If refreshing does not work, let us know in '}
 
-        <Link href={DISCORD_URL} passHref>
-          <a target={'_blank'} rel="noreferrer">
-            {DISCORD_ERROR_CHANNEL} on Discord.
-          </a>
+        <Link href={DISCORD_URL} passHref target={'_blank'} rel="noreferrer">
+          {DISCORD_ERROR_CHANNEL} on Discord.
         </Link>
       </p>
     </div>

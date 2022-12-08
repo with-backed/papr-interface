@@ -107,7 +107,7 @@ export function Activity({ paprController, vaultIds }: ActivityProps) {
                       activityData?.debtIncreasedEvents || []
                     }
                     paprController={paprController}
-                    key={event.id}
+                    key={event.id + event.__typename}
                   />
                 );
               case 'RemoveCollateralEvent':
@@ -118,24 +118,29 @@ export function Activity({ paprController, vaultIds }: ActivityProps) {
                       activityData?.debtDecreasedEvents || []
                     }
                     paprController={paprController}
-                    key={event.id}
+                    key={event.id + event.__typename}
                   />
                 );
               case 'Swap':
                 return (
                   <Swap
                     event={event}
-                    key={event.id}
+                    key={event.id + event.__typename}
                     paprController={paprController}
                   />
                 );
               case 'AuctionStartEvent':
-                return <AuctionStart event={event} key={event.id} />;
+                return (
+                  <AuctionStart
+                    event={event}
+                    key={event.id + event.__typename}
+                  />
+                );
               case 'AuctionEndEvent':
                 return (
                   <AuctionEnd
                     event={event}
-                    key={event.id}
+                    key={event.id + event.__typename}
                     paprController={paprController}
                   />
                 );

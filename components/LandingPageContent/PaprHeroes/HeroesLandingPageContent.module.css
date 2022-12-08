@@ -154,3 +154,9 @@
 .position {
   display: flex;
 }
+
+.you::before {
+  height: 16px;
+  display: table-row;
+  content: '';
+}

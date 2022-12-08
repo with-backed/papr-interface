@@ -26,7 +26,7 @@ export function VaultRow({
   return (
     <tr>
       <td>
-        <Link href={`/tokens/${tokenName}/vaults/${id}`}>
+        <Link href={`/tokens/${tokenName}/vaults/${id}`} legacyBehavior>
           {account.substring(0, 7)}
         </Link>
       </td>

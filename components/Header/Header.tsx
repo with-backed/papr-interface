@@ -1,16 +1,22 @@
-import { ConnectWallet } from 'components/ConnectWallet';
 import { useConfig } from 'hooks/useConfig';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useMemo } from 'react';
+import React, { ComponentProps, useMemo } from 'react';
 import styles from './Header.module.css';
 import paprTitle from 'public/logos/papr-title.png';
 import paprMemeTitle from 'public/logos/paprMEME-title.png';
 import paprHeroTitle from 'public/logos/paprHERO-title.png';
 import paprTrashTitle from 'public/logos/paprTRASH-title.png';
 import { useTheme } from 'hooks/useTheme';
-import Image from 'next/image';
+import Image, { StaticImageData } from 'next/legacy/image';
 import { SupportedToken } from 'lib/config';
+import dynamic from 'next/dynamic';
+import { ConnectWallet as ConnectWalletComponent } from 'components/ConnectWallet';
+
+const ConnectWallet = dynamic<ComponentProps<typeof ConnectWalletComponent>>(
+  () => import('components/ConnectWallet').then((mod) => mod.ConnectWallet),
+  { ssr: false },
+);
 
 type Page = {
   name: string;
@@ -112,18 +118,14 @@ function NavLinks({ activeRoute, isHomePage }: NavLinksProps) {
                 : p.externalRedirect
                 ? p.route
                 : `/tokens/${tokenName}/${p.route}`
-            }>
-            <a
-              className={
-                isActiveRoute(activeRoute, p, isHomePage)
-                  ? [styles.link, styles['link-active'], styles[theme]].join(
-                      ' ',
-                    )
-                  : [styles.link, styles[theme]].join(' ')
-              }
-              target={p.externalRedirect ? '_blank' : ''}>
-              {p.name}
-            </a>
+            }
+            className={
+              isActiveRoute(activeRoute, p, isHomePage)
+                ? [styles.link, styles['link-active'], styles[theme]].join(' ')
+                : [styles.link, styles[theme]].join(' ')
+            }
+            target={p.externalRedirect ? '_blank' : ''}>
+            {p.name}
           </Link>
         </li>
       ))}
@@ -146,12 +148,10 @@ function LogoLink({ isHomePage }: { isHomePage: boolean }) {
     return imageLookup[tokenName as SupportedToken];
   }, [isHomePage, tokenName]);
   return (
-    <Link href={`/`} passHref>
-      <a title="papr">
-        <div className={styles.logo}>
-          <Image src={image} alt="" placeholder="blur" />
-        </div>
-      </a>
+    <Link href={`/`} passHref title="papr">
+      <div className={styles.logo}>
+        <Image src={image} alt="" placeholder="blur" />
+      </div>
     </Link>
   );
 }

@@ -6,7 +6,10 @@ import { useRouter } from 'next/router';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 
 jest.mock('hooks/useGlobalMessages');
-jest.mock('next/router');
+jest.mock('next/router', () => ({
+  ...jest.requireActual('next/router'),
+  useRouter: jest.fn(),
+}));
 jest.mock('wagmi');
 
 const mockedUseNetwork = useNetwork as jest.MockedFunction<typeof useNetwork>;

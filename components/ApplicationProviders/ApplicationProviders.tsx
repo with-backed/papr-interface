@@ -4,7 +4,6 @@ import {
   RainbowKitProvider,
   DisclaimerComponent,
 } from '@rainbow-me/rainbowkit';
-import { CommunityGradientProvider } from 'hooks/useCommunityGradient';
 import { useConfig } from 'hooks/useConfig';
 import { GlobalMessagingProvider } from 'hooks/useGlobalMessages';
 import { TimestampProvider } from 'hooks/useTimestamp/useTimestamp';
@@ -98,9 +97,7 @@ export const ApplicationProviders = ({
             apiKey={process.env.NEXT_PUBLIC_CENTER_KEY!}>
             <PaprBalanceProvider>
               <TimestampProvider>
-                <CommunityGradientProvider>
-                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-                </CommunityGradientProvider>
+                <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
               </TimestampProvider>
             </PaprBalanceProvider>
           </CenterProvider>
