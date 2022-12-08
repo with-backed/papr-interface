@@ -5,6 +5,10 @@
     flex-wrap: wrap;
 }
 
+.nftCapTooltip p {
+    margin: 0;
+}
+
 .nftCapTooltip .value {
     width: 30%;
 }

@@ -22,14 +22,31 @@ export function MarketPriceTooltip({ tooltip }: TooltipProps) {
   );
 }
 
-export function TargetMarketTooltip({ tooltip }: TooltipProps) {
+export function TargetMarketTooltip({
+  tooltip,
+  mark,
+  target,
+  underlyingSymbol,
+}: TooltipProps & {
+  mark?: number;
+  target?: number;
+  underlyingSymbol: string;
+}) {
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
         “Target” is the papr contract’s internal valuation of papr, which
-        incorporates interest payments in response to the Market price. When
-        this ratio ratio is below 1, the contract is trying to slow the growth
-        of papr.
+        incorporates interest payments in response to the Market price.
+      </div>
+      <div className={styles.nftCapTooltip}>
+        <p className={styles.value}>
+          {mark?.toFixed(2)} {underlyingSymbol}
+        </p>
+        <p className={styles.description}>Mark</p>
+        <p className={styles.value}>
+          {target?.toFixed(2)} {underlyingSymbol}
+        </p>
+        <p className={styles.description}>Target</p>
       </div>
     </Tooltip>
   );
@@ -39,9 +56,9 @@ export function ContractAPRTooltip({ tooltip }: TooltipProps) {
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
-        This is interest rate the contract is currently charging to borrowers,
-        measured by the current rate of increase in the contract’s “Target”
-        valuation of papr, which is used in assessing loan values and
+        This is the effective interest rate the contract is charging to
+        borrowers, measured by the rate of increase in the contract&apos;s
+        target valuation of papr, which is used in assessing loan values and
         liquidations.
       </div>
     </Tooltip>
@@ -52,7 +69,7 @@ export function RealizedAPRTooltip({ tooltip }: TooltipProps) {
   return (
     <Tooltip {...tooltip}>
       <div className={styles.tooltip}>
-        Increase in the market price of papr over the last 30 days, expressed as
+        Change in the market price of papr over the last 30 days, expressed as
         the annualized return an investor would realize if they bought and held
         papr.
       </div>
@@ -73,24 +90,16 @@ export function NFTCapTooltip({
   return (
     <Tooltip {...tooltip}>
       <div className={styles.nftCapTooltip}>
-        <div className={styles.value}>
-          <p>${formatTokenAmount(nftMarketCap)}</p>
-        </div>
-        <div className={styles.description}>
-          <p>(NFT) Floor value of all deposited collateral</p>
-        </div>
-        <div className={styles.value}>
-          <p>${formatTokenAmount(debtTokenMarketCap)}</p>
-        </div>
-        <div className={styles.description}>
-          <p>(CAP) Market value of {paprSymbol}</p>
-        </div>
-        <div className={styles.value}>
-          <p>{(nftMarketCap / debtTokenMarketCap).toFixed(2)}</p>
-        </div>
-        <div className={styles.description}>
-          <p>Ratio of collateral to debt</p>
-        </div>
+        <p className={styles.value}>${formatTokenAmount(nftMarketCap)}</p>
+        <p className={styles.description}>
+          (NFT) Floor value of all deposited collateral
+        </p>
+        <p className={styles.value}>${formatTokenAmount(debtTokenMarketCap)}</p>
+        <p className={styles.description}>(CAP) Market value of {paprSymbol}</p>
+        <p className={styles.value}>
+          {(nftMarketCap / debtTokenMarketCap).toFixed(2)}
+        </p>
+        <p className={styles.description}>Ratio of collateral to debt</p>
       </div>
     </Tooltip>
   );
