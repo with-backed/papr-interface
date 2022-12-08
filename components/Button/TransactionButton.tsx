@@ -13,7 +13,7 @@ interface TransactionButtonProps extends ButtonProps {
   // when ordinarily we would show a TransactionButton, but we don't
   // need to (e.g., token already approved in the past)
   completed?: boolean;
-  // has the user spawned a tx in their wallet and confirming
+  // used to determine if user has denied tx request in their wallet
   error?: string | null;
 }
 
