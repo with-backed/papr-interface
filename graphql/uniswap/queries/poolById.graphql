@@ -1,6 +1,5 @@
 query poolById($id: ID!) {
   pool(id: $id) {
-    id
     token0 {
       id
       decimals
