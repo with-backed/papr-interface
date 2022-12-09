@@ -14,7 +14,7 @@ import { getAddress } from 'ethers/lib/utils';
 import { PaprController } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
-import { PoolContract, PositionManager, Quoter } from 'lib/contracts';
+import { PositionManager, Quoter } from 'lib/contracts';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { formatBigNum } from 'lib/numberFormat';
 import { nearestUsableTick, Pool, Position } from '@uniswap/v3-sdk';

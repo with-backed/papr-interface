@@ -87,15 +87,6 @@ export function PositionManager(
   );
 }
 
-export function PoolContract(
-  poolAddress: string,
-  jsonRpcProvider: string,
-  token: SupportedToken,
-) {
-  const provider = makeProvider(jsonRpcProvider, token);
-  return IUniswapV3Pool__factory.connect(poolAddress, provider);
-}
-
 export function controllerContract(
   address: string,
   jsonRpcProvider: string,
