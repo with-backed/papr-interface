@@ -24,6 +24,7 @@ import { NftsForAccountAndCollectionDocument } from 'types/generated/graphql/erc
 import { makeProvider } from 'lib/contracts';
 import { PaprControllerByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+import { captureException } from '@sentry/nextjs';
 
 dayjs.extend(duration);
 
@@ -387,6 +388,7 @@ export async function getLiquidityAndFeesForPosition(
       return ZERO_LP_POSITION;
     }
   } catch (e) {
+    captureException(e);
     return ZERO_LP_POSITION;
   }
 
@@ -428,6 +430,7 @@ export async function getLiquidityAndFeesForPosition(
       amount1Max: MAX_UINT128,
     });
   } catch (e) {
+    captureException(e);
     return ZERO_LP_POSITION;
   }
 
