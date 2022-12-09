@@ -1,11 +1,22 @@
+import { Pool } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
 import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
-import { User } from 'types/generated/graphql/inKindSubgraph';
+import {
+  PaprControllerByIdQuery,
+  User,
+} from 'types/generated/graphql/inKindSubgraph';
+import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 import { configs } from './config';
 import { ONE } from './constants';
 import { makeProvider } from './contracts';
-import { getQuoteForSwap } from './controllers';
+import {
+  getLiquidityAndFeesForPosition,
+  getQuoteForSwap,
+  getUniswapLPTokenIds,
+  LiquidityAndFees,
+  ZERO_LP_POSITION,
+} from './controllers';
 import { formatBigNum } from './numberFormat';
 import { ReservoirResponseData } from './oracle/reservoir';
 import { getAllVaultsForControllerForUser } from './pAPRSubgraph';
@@ -19,14 +30,43 @@ export type HeroPlayerBalance = {
 
 export async function calculateNetPhUSDCBalance(
   user: User,
+  subgraphController: NonNullable<PaprControllerByIdQuery['paprController']>,
+  uniswapPool: Pool,
   paprPrice: ethers.BigNumber,
   oracleInfo: { [key: string]: ReservoirResponseData },
-  underlying: string,
 ): Promise<HeroPlayerBalance> {
+  const uniswapLPTokenIds = await getUniswapLPTokenIds(user.id, 'paprHero');
+  const allPositionsInfo = await Promise.all(
+    uniswapLPTokenIds.map((id) =>
+      getLiquidityAndFeesForPosition(
+        user.id,
+        id,
+        subgraphController,
+        uniswapPool,
+        'paprHero',
+      ),
+    ),
+  );
+
+  const totalLiquidityAndFees = allPositionsInfo.reduce(
+    (accumulator, current) => ({
+      underlyingAmount: accumulator.underlyingAmount.add(
+        current.underlyingAmount,
+      ),
+      debtTokenAmount: accumulator.debtTokenAmount.add(current.debtTokenAmount),
+      feesDebtToken: accumulator.feesDebtToken.add(current.feesDebtToken),
+      feesUnderlying: accumulator.feesUnderlying.add(current.feesUnderlying),
+    }),
+    ZERO_LP_POSITION,
+  );
+
   const provider = makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero');
-  const connectedPhUSDC = PHUSDC__factory.connect(underlying, provider);
-  const phUSDCBalance = ethers.BigNumber.from(user.phUSDCHoldings); //await connectedPhUSDC.balanceOf(user.id);
-  const paprBalance = ethers.BigNumber.from(user.paprHoldings);
+  const phUSDCBalance = ethers.BigNumber.from(user.phUSDCHoldings)
+    .add(totalLiquidityAndFees.underlyingAmount)
+    .add(totalLiquidityAndFees.feesUnderlying); //await connectedPhUSDC.balanceOf(user.id);
+  const paprBalance = ethers.BigNumber.from(user.paprHoldings)
+    .add(totalLiquidityAndFees.debtTokenAmount)
+    .add(totalLiquidityAndFees.feesDebtToken);
   const paprDebt = ethers.BigNumber.from(user.paprDebt);
   const netPapr = paprBalance.sub(paprDebt);
   const netPaprInUnderlying = netPapr.mul(paprPrice).div(ONE);
