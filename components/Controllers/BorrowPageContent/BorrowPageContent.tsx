@@ -1,5 +1,5 @@
 import { ControllerPricesData } from 'lib/controllers/charts';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
@@ -13,6 +13,7 @@ import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { Activity } from '../Activity';
 import { usePaprBalance } from 'hooks/usePaprBalance';
+import { getLiquidityAndFeesForPosition } from 'lib/controllers';
 
 export type BorrowPageProps = {
   controllerAddress: string;
@@ -28,6 +29,15 @@ export function BorrowPageContent({
   const config = useConfig();
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
+
+  useEffect(() => {
+    getLiquidityAndFeesForPosition(
+      address!,
+      paprController,
+      '46447',
+      'paprHero',
+    );
+  });
 
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.contractAddress);

@@ -5,7 +5,7 @@ import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import styles from './HeroesLandingPageContent.module.css';
 import { ERC721__factory } from 'types/generated/abis';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { CenterAsset } from 'components/CenterAsset';
@@ -22,6 +22,7 @@ import { TransactionButton } from 'components/Button';
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { formatTokenAmount } from 'lib/numberFormat';
 import { ShortDisplayAddress } from 'components/DisplayAddress/ShortDisplayAddress';
+import { getLiquidityAndFeesForPosition } from 'lib/controllers';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
