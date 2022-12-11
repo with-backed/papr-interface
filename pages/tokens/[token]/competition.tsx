@@ -138,7 +138,7 @@ export const getServerSideProps: GetServerSideProps<
       });
     });
     const rankedJsonString = JSON.stringify(rankedJson);
-    fs.writeFileSync('ranked.json', rankedJsonString);
+    fs.writeFileSync('finalPaprHeroStandings.json', rankedJsonString);
 
     return {
       props: {
