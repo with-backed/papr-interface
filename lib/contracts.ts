@@ -4,10 +4,8 @@ import {
   ERC721,
   ERC721__factory,
   IQuoter__factory,
-  IUniswapV3Pool__factory,
   PaprController__factory,
 } from 'types/generated/abis';
-import { UniswapPositionManager__factory } from 'types/generated/abis/factories/UniswapPositionManager__factory';
 import { configs, SupportedToken } from './config';
 
 export function makeProvider(jsonRpcProvider: string, token: SupportedToken) {
@@ -72,17 +70,6 @@ export function Quoter(jsonRpcProvider: string, token: SupportedToken) {
   const provider = makeProvider(jsonRpcProvider, token);
   return IQuoter__factory.connect(
     process.env.NEXT_PUBLIC_QUOTER as string,
-    provider,
-  );
-}
-
-export function PositionManager(
-  jsonRpcProvider: string,
-  token: SupportedToken,
-) {
-  const provider = makeProvider(jsonRpcProvider, token);
-  return UniswapPositionManager__factory.connect(
-    process.env.NEXT_PUBLIC_POSITION_MANAGER as string,
     provider,
   );
 }
