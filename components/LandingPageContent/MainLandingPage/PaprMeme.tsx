@@ -1,6 +1,6 @@
+import { Button } from 'components/Button';
+import { Disclosure } from 'components/Disclosure';
 import Image from 'next/legacy/image';
-import React from 'react';
-import PaprMemeLogo from 'public/logos/paprMeme.png';
 import Meme1 from 'public/landing-page-nfts/meme-1.png';
 import Meme2 from 'public/landing-page-nfts/meme-2.png';
 import Meme3 from 'public/landing-page-nfts/meme-3.png';
@@ -9,9 +9,10 @@ import Meme5 from 'public/landing-page-nfts/meme-5.png';
 import Meme6 from 'public/landing-page-nfts/meme-6.png';
 import Meme7 from 'public/landing-page-nfts/meme-7.png';
 import Meme8 from 'public/landing-page-nfts/meme-8.png';
+import PaprMemeLogo from 'public/logos/paprMeme.png';
+import React from 'react';
+
 import styles from './LandingPageContent.module.css';
-import { Button } from 'components/Button';
-import { Disclosure } from 'components/Disclosure';
 
 function FAQ() {
   return (

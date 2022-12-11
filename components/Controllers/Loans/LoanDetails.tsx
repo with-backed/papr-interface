@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
-import { Fieldset } from 'components/Fieldset';
 import { VaultRow } from 'components/Controllers/Loans/VaultRow';
-import { PaprController } from 'lib/PaprController';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import styles from './Loans.module.css';
-import { computeLtv, convertOneScaledValue } from 'lib/controllers';
+import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
-import { ethers } from 'ethers';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { computeLtv, convertOneScaledValue } from 'lib/controllers';
+import { PaprController } from 'lib/PaprController';
+import React, { useMemo } from 'react';
+
+import styles from './Loans.module.css';
 
 type LoanDetailsProps = {
   vaultId: string;

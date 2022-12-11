@@ -26,7 +26,7 @@ export function DisplayAddress({
       setName(null);
       try {
         // TODO: can we always use ethereum ENS lookup?
-        let name = await addressToENS(address, jsonRpcProvider);
+        const name = await addressToENS(address, jsonRpcProvider);
 
         setGotResponse(true);
         if (name) {

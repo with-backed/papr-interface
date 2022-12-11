@@ -1,4 +1,4 @@
-import { withSentry, captureException } from '@sentry/nextjs';
+import { captureException, withSentry } from '@sentry/nextjs';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 // Change host appropriately if you run your own Sentry instance.

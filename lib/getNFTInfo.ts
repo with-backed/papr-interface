@@ -1,6 +1,7 @@
-import { captureException } from '@sentry/nextjs';
-import { ethers } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import IPFSGatewayTools from '@pinata/ipfs-gateway-tools/dist/node';
+import { captureException } from '@sentry/nextjs';
+
 import { SupportedToken } from './config';
 
 const DATA_URI_MIME_REGEXP = /data:([^;]*)/;
@@ -20,11 +21,11 @@ export interface GetNFTInfoResponse {
   description: string;
   mediaUrl: string;
   mediaMimeType: string;
-  id: ethers.BigNumber;
+  id: BigNumber;
 }
 
 type NFTInfoParams = {
-  collateralTokenId: ethers.BigNumber;
+  collateralTokenId: BigNumber;
   collateralContractAddress: string;
   token: SupportedToken;
   forceImage?: boolean;
@@ -49,7 +50,7 @@ export async function getNFTInfoFromTokenInfo({
 
     return {
       ...NFTInfo,
-      id: ethers.BigNumber.from(NFTInfo.tokenId),
+      id: BigNumber.from(NFTInfo.tokenId),
       mediaUrl,
       mediaMimeType,
     };

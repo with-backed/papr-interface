@@ -22,7 +22,9 @@ function getTimestamp() {
  */
 export const TimestampContext = createContext<number>(getTimestamp());
 
-export function TimestampProvider({ children }: PropsWithChildren<{}>) {
+export function TimestampProvider({
+  children,
+}: PropsWithChildren<Record<never, any>>) {
   const [timestamp, setTimestamp] = useState<number>(getTimestamp);
 
   useEffect(() => {

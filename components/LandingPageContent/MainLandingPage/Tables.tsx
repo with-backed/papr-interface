@@ -1,5 +1,5 @@
-import { ButtonLink } from 'components/Button';
-import React, { FunctionComponent } from 'react';
+import React, { PropsWithChildren } from 'react';
+
 import styles from './LandingPageContent.module.css';
 
 const BORROWER_ENTRIES = [
@@ -30,10 +30,10 @@ function Row({ emoji, text }: RowProps) {
   );
 }
 
-const Header: FunctionComponent<{}> = ({ children }) => (
+const Header = (props: PropsWithChildren<Record<never, any>>) => (
   <thead>
     <tr>
-      <th colSpan={2}>{children}</th>
+      <th colSpan={2}>{props.children}</th>
     </tr>
   </thead>
 );

@@ -1,18 +1,18 @@
-import { Fieldset } from 'components/Fieldset';
-import { PaprController } from 'lib/PaprController';
 import { useCollection } from '@center-inc/react';
-import React, { useMemo } from 'react';
-import styles from './Collateral.module.css';
-import { useConfig } from 'hooks/useConfig';
-import { TooltipReference, useTooltipState } from 'reakit';
+import { CenterAsset } from 'components/CenterAsset';
+import { Fieldset } from 'components/Fieldset';
 import { Tooltip } from 'components/Tooltip';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ethers } from 'ethers';
-import { formatPercent } from 'lib/numberFormat';
-import { CenterAsset } from 'components/CenterAsset';
+import { useConfig } from 'hooks/useConfig';
 import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { OraclePriceType } from 'lib/oracle/reservoir';
 import { computeLTVFromDebts } from 'lib/controllers';
+import { formatPercent } from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { PaprController } from 'lib/PaprController';
+import React, { useMemo } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit';
+
+import styles from './Collateral.module.css';
 
 type CollateralProps = {
   paprController: PaprController;
@@ -93,7 +93,7 @@ function Tile({
       vault.collateral.length,
     );
   }, [paprController, address, oracleInfo, vault.collateral.length]);
-  const debt = useMemo(() => ethers.BigNumber.from(vault.debt), [vault.debt]);
+  const debt = useMemo(() => BigNumber.from(vault.debt), [vault.debt]);
   const ltv = useMemo(() => {
     if (!maxLTV || !maxDebt) return null;
     return computeLTVFromDebts(

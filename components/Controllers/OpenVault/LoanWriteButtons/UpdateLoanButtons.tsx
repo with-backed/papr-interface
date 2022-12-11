@@ -1,8 +1,18 @@
-import { ethers } from 'ethers';
-import { PaprController } from 'lib/PaprController';
-import { ReservoirOracleUnderwriter } from 'types/generated/abis/PaprController';
 import PaprControllerABI from 'abis/PaprController.json';
+import { TransactionButton } from 'components/Button';
+import { ethers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
+import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { oracleInfoArgEncoded } from 'lib/constants';
+import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
+import { PaprController } from 'lib/PaprController';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ERC20, ERC721__factory } from 'types/generated/abis';
+import { ReservoirOracleUnderwriter } from 'types/generated/abis/PaprController';
 import {
   erc20ABI,
   erc721ABI,
@@ -10,16 +20,6 @@ import {
   useContractWrite,
   usePrepareContractWrite,
 } from 'wagmi';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { TransactionButton } from 'components/Button';
-import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
-import { oracleInfoArgEncoded } from 'lib/constants';
-import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
-import { getAddress } from 'ethers/lib/utils';
-import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ERC20, ERC721__factory } from 'types/generated/abis';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
 
@@ -28,7 +28,7 @@ const increaseDebtEncoderString = `increaseDebt(address mintTo, address asset, u
 interface IncreaseDebtArgsStruct {
   mintTo: string;
   asset: string;
-  amount: ethers.BigNumber;
+  amount: BigNumber;
   oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
 
@@ -37,7 +37,7 @@ type BorrowOrRepayPerpetualButtonProps = {
   collateralContractAddress: string;
   depositNFTs: string[];
   withdrawNFTs: string[];
-  amount: ethers.BigNumber | null;
+  amount: BigNumber | null;
   oracleInfo: OracleInfo;
   vaultHasDebt: boolean;
   disabled: boolean;
@@ -114,7 +114,7 @@ const reduceDebtEncoderString = `reduceDebt(address account, address asset, uint
 interface ReduceDebtArgsStruct {
   account: string;
   asset: string;
-  amount: ethers.BigNumber;
+  amount: BigNumber;
 }
 
 export function RepayPerpetualButton({
@@ -183,9 +183,9 @@ export const BuyAndReduceEncoderString =
 export interface BuyAndReduceArgsStruct {
   account: string;
   collateralAsset: string;
-  underlyingAmount: ethers.BigNumber;
-  minOut: ethers.BigNumber;
-  sqrtPriceLimitX96: ethers.BigNumber;
+  underlyingAmount: BigNumber;
+  minOut: BigNumber;
+  sqrtPriceLimitX96: BigNumber;
   proceedsTo: string;
 }
 
@@ -194,8 +194,8 @@ type BorrowOrRepayWithSwapButtonProps = {
   collateralContractAddress: string;
   depositNFTs: string[];
   withdrawNFTs: string[];
-  amount: ethers.BigNumber | null;
-  quote: ethers.BigNumber | null;
+  amount: BigNumber | null;
+  quote: BigNumber | null;
   oracleInfo: OracleInfo;
   vaultHasDebt: boolean;
   disabled: boolean;
@@ -226,7 +226,7 @@ export function RepayWithSwapButton({
       collateralAsset: collateralContractAddress,
       underlyingAmount: amount,
       minOut: quote,
-      sqrtPriceLimitX96: ethers.BigNumber.from(0),
+      sqrtPriceLimitX96: BigNumber.from(0),
       proceedsTo: address!,
     };
 
@@ -274,9 +274,9 @@ export const MintAndSwapEncoderString = `mintAndSellDebt(address collateralAsset
 
 export interface MintAndSwapArgsStruct {
   collateralAsset: string;
-  debt: ethers.BigNumber;
-  minOut: ethers.BigNumber;
-  sqrtPriceLimitX96: ethers.BigNumber;
+  debt: BigNumber;
+  minOut: BigNumber;
+  sqrtPriceLimitX96: BigNumber;
   proceedsTo: string;
   oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
@@ -304,7 +304,7 @@ export function BorrowWithSwapButton({
       collateralAsset: collateralContractAddress,
       debt: amount,
       minOut: quote,
-      sqrtPriceLimitX96: ethers.BigNumber.from(0),
+      sqrtPriceLimitX96: BigNumber.from(0),
       proceedsTo: address!,
       oracleInfo: getOraclePayloadFromReservoirObject(
         oracleInfo[getAddress(collateralContractAddress)],
@@ -377,7 +377,7 @@ export function ApproveTokenButton({
       : controller.token1;
     if (
       (await connectedToken.allowance(address, controller.id)) >
-      ethers.BigNumber.from(0)
+      BigNumber.from(0)
     ) {
       setTokenApproved(true);
     }

@@ -1,15 +1,15 @@
+import PaprControllerABI from 'abis/PaprController.json';
 import { ethers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { oracleInfoArgEncoded } from 'lib/constants';
 import { deconstructFromId } from 'lib/controllers';
+import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { useMemo } from 'react';
 import {
   IPaprController,
   ReservoirOracleUnderwriter,
 } from 'types/generated/abis/PaprController';
-import PaprControllerABI from 'abis/PaprController.json';
-import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
-import { getAddress } from 'ethers/lib/utils';
 
 const AddCollateralEncoderString =
   'addCollateral(tuple(address addr, uint256 id) collateral)';
@@ -43,7 +43,7 @@ export function useModifyCollateralCalldata(
       contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
         collateral: {
           addr: contractAddress,
-          id: ethers.BigNumber.from(tokenId),
+          id: BigNumber.from(tokenId),
         },
       }));
 
@@ -66,7 +66,7 @@ export function useModifyCollateralCalldata(
         sendTo: address!,
         collateral: {
           addr: contractAddress,
-          id: ethers.BigNumber.from(tokenId),
+          id: BigNumber.from(tokenId),
         },
         oracleInfo: getOraclePayloadFromReservoirObject(
           oracleInfo[getAddress(contractAddress)],

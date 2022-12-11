@@ -1,8 +1,8 @@
-import { ethers } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 
 export interface NFTEntity {
   id: string;
-  identifier: ethers.BigNumber;
+  identifier: BigNumber;
   uri?: string | null;
   registry: {
     symbol?: string | null;

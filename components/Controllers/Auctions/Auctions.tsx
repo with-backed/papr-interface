@@ -27,6 +27,7 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
+
 import styles from './Auctions.module.css';
 
 type Auction = AuctionsQuery['auctions'][number];
@@ -97,7 +98,7 @@ function ActiveAuctions({
     if (!address) return null;
     return (
       (await tokenContract.allowance(address, controller.id)) >
-      ethers.BigNumber.from(0)
+      BigNumber.from(0)
     );
   }, [tokenContract, address, controller.id]);
 
@@ -163,15 +164,15 @@ function ActiveAuctionRow({
   const symbol = useAsyncValue(() => assetContract.symbol(), [assetContract]);
   const priceBigNum = useMemo(() => {
     if (!timestamp) {
-      return ethers.BigNumber.from(0);
+      return BigNumber.from(0);
     }
     const secondsElapsed = timestamp - auction.start.timestamp;
     return currentPrice(
-      ethers.BigNumber.from(auction.startPrice),
+      BigNumber.from(auction.startPrice),
       secondsElapsed,
       parseInt(auction.secondsInPeriod),
       convertOneScaledValue(
-        ethers.BigNumber.from(auction.perPeriodDecayPercentWad),
+        BigNumber.from(auction.perPeriodDecayPercentWad),
         4,
       ),
     );
@@ -179,16 +180,16 @@ function ActiveAuctionRow({
 
   const priceBigNumAnHourAgo = useMemo(() => {
     if (!timestamp) {
-      return ethers.BigNumber.from(0);
+      return BigNumber.from(0);
     }
     const secondsElapsed =
       timestamp - ONE_HOUR_IN_SECONDS - auction.start.timestamp;
     return currentPrice(
-      ethers.BigNumber.from(auction.startPrice),
+      BigNumber.from(auction.startPrice),
       secondsElapsed,
       parseInt(auction.secondsInPeriod),
       convertOneScaledValue(
-        ethers.BigNumber.from(auction.perPeriodDecayPercentWad),
+        BigNumber.from(auction.perPeriodDecayPercentWad),
         4,
       ),
     );
@@ -201,7 +202,7 @@ function ActiveAuctionRow({
 
   const floorValue = useMemo(
     // Auctions start at 3x the floor value, so we can derive floor by dividing
-    () => ethers.BigNumber.from(auction.startPrice).div(3),
+    () => BigNumber.from(auction.startPrice).div(3),
     [auction.startPrice],
   );
 
@@ -254,7 +255,7 @@ function ActiveAuctionRow({
 type BuyButtonProps = {
   auction: ActiveAuction;
   controller: PaprController;
-  maxPrice: ethers.BigNumber;
+  maxPrice: BigNumber;
   tokenContract: ERC20;
   paprApproved: boolean | null;
 };
@@ -374,15 +375,13 @@ function PastAuctionRow({ auction }: { auction: PastAuction }) {
   );
   const floorValue = useMemo(
     // Auctions start at 3x the floor value, so we can derive floor by dividing
-    () => ethers.BigNumber.from(auction.startPrice).div(3),
+    () => BigNumber.from(auction.startPrice).div(3),
     [auction.startPrice],
   );
   const percentOfFloor = useMemo(
     () =>
-      ethers.BigNumber.from(auction.endPrice)
-        .mul(1000)
-        .div(floorValue)
-        .toNumber() / 1000,
+      BigNumber.from(auction.endPrice).mul(1000).div(floorValue).toNumber() /
+      1000,
     [auction.endPrice, floorValue],
   );
   const duration = useMemo(() => {

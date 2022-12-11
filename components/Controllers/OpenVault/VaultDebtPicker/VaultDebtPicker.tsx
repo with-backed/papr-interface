@@ -1,7 +1,5 @@
 import { Button } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
-import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
-import { Fieldset } from 'components/Fieldset';
 import {
   ApproveNFTButton,
   ApproveTokenButton,
@@ -10,15 +8,19 @@ import {
   RepayPerpetualButton,
   RepayWithSwapButton,
 } from 'components/Controllers/OpenVault/LoanWriteButtons/UpdateLoanButtons';
+import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
+import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { Toggle } from 'components/Toggle';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { usePaprBalance } from 'hooks/usePaprBalance';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useTheme } from 'hooks/useTheme';
 import { SupportedToken } from 'lib/config';
 import {
   computeSlippageForSwap,
@@ -38,15 +40,14 @@ import {
 } from 'react';
 import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
-import { useAccount } from 'wagmi';
-import styles from './VaultDebtPicker.module.css';
-import { useTheme } from 'hooks/useTheme';
-import { usePaprBalance } from 'hooks/usePaprBalance';
-import { useQuery } from 'urql';
 import {
-  AuctionsByNftOwnerQuery,
   AuctionsByNftOwnerDocument,
+  AuctionsByNftOwnerQuery,
 } from 'types/generated/graphql/inKindSubgraph';
+import { useQuery } from 'urql';
+import { useAccount } from 'wagmi';
+
+import styles from './VaultDebtPicker.module.css';
 
 type VaultDebtPickerProps = {
   paprController: PaprController;
@@ -156,7 +157,7 @@ export function VaultDebtPicker({
 
   const vaultHasDebt = useMemo(() => {
     if (!vault) return false;
-    return !ethers.BigNumber.from(vault.debt).isZero();
+    return !BigNumber.from(vault.debt).isZero();
   }, [vault]);
   const vaultHasCollateral = useMemo(() => {
     if (!vault) return false;
@@ -165,13 +166,13 @@ export function VaultDebtPicker({
 
   useEffect(() => {
     if (!!maxDebt && maxDebt.isZero()) {
-      setChosenDebt(ethers.BigNumber.from(0));
+      setChosenDebt(BigNumber.from(0));
       setControlledSliderValue(0);
     }
   }, [maxDebt]);
 
   const currentVaultDebt = useMemo(() => {
-    return ethers.BigNumber.from(vault?.debt || 0);
+    return BigNumber.from(vault?.debt || 0);
   }, [vault]);
   const currentVaultDebtNumber = useMemo(() => {
     return parseFloat(
@@ -185,8 +186,8 @@ export function VaultDebtPicker({
   const [controlledSliderValue, setControlledSliderValue] = useState<number>(
     currentVaultDebtNumber,
   );
-  const [chosenDebt, setChosenDebt] = useState<ethers.BigNumber>(
-    ethers.BigNumber.from(vault?.debt || 0),
+  const [chosenDebt, setChosenDebt] = useState<BigNumber>(
+    BigNumber.from(vault?.debt || 0),
   );
 
   // toggle variables
@@ -205,10 +206,10 @@ export function VaultDebtPicker({
     return currentVaultDebt.sub(chosenDebt);
   }, [chosenDebt, currentVaultDebt]);
 
-  const underlyingBorrowQuote: [ethers.BigNumber, number] | null =
+  const underlyingBorrowQuote: [BigNumber, number] | null =
     useAsyncValue(async () => {
       if (debtToBorrowOrRepay.isZero() || !isBorrowing)
-        return [ethers.BigNumber.from(0), 0];
+        return [BigNumber.from(0), 0];
       const quote = await getQuoteForSwap(
         debtToBorrowOrRepay,
         paprController.debtToken.id,
@@ -232,7 +233,7 @@ export function VaultDebtPicker({
       tokenName,
     ]);
   const underlyingToBorrow = useMemo(() => {
-    if (!underlyingBorrowQuote) return ethers.BigNumber.from(0);
+    if (!underlyingBorrowQuote) return BigNumber.from(0);
     return underlyingBorrowQuote[0];
   }, [underlyingBorrowQuote]);
   const slippageForBorrow = useMemo(() => {
@@ -240,10 +241,10 @@ export function VaultDebtPicker({
     return underlyingBorrowQuote[1];
   }, [underlyingBorrowQuote]);
 
-  const underlyingRepayQuote: [ethers.BigNumber, number] | null =
+  const underlyingRepayQuote: [BigNumber, number] | null =
     useAsyncValue(async () => {
       if (isBorrowing || debtToBorrowOrRepay.isZero())
-        return [ethers.BigNumber.from(0), 0];
+        return [BigNumber.from(0), 0];
       const quote = await getQuoteForSwapOutput(
         debtToBorrowOrRepay,
         paprController.underlying.id,
@@ -267,7 +268,7 @@ export function VaultDebtPicker({
       tokenName,
     ]);
   const underlyingToRepay = useMemo(() => {
-    if (!underlyingRepayQuote) return ethers.BigNumber.from(0);
+    if (!underlyingRepayQuote) return BigNumber.from(0);
     return underlyingRepayQuote[0];
   }, [underlyingRepayQuote]);
   const slippageForRepay = useMemo(() => {
@@ -571,10 +572,10 @@ export function VaultDebtPicker({
 type AmountToBorrowOrRepayInputProps = {
   paprController: PaprController;
   isBorrowing: boolean;
-  currentVaultDebt: ethers.BigNumber;
-  debtToBorrowOrRepay: ethers.BigNumber;
+  currentVaultDebt: BigNumber;
+  debtToBorrowOrRepay: BigNumber;
   setControlledSliderValue: (val: number) => void;
-  setChosenDebt: (val: ethers.BigNumber) => void;
+  setChosenDebt: (val: BigNumber) => void;
 };
 
 function AmountToBorrowOrRepayInput({
@@ -596,9 +597,9 @@ function AmountToBorrowOrRepayInput({
   const [editingInput, setEditingInput] = useState<boolean>(false);
 
   const inputValue = useMemo(() => {
-    const amountBigNumber = !!amount
+    const amountBigNumber = amount
       ? ethers.utils.parseUnits(amount, decimals)
-      : ethers.BigNumber.from(0);
+      : BigNumber.from(0);
     return formatBigNum(amountBigNumber, decimals);
   }, [amount, decimals]);
 
@@ -611,10 +612,7 @@ function AmountToBorrowOrRepayInput({
 
       setAmount(val);
 
-      const debtDelta: ethers.BigNumber = ethers.utils.parseUnits(
-        val,
-        decimals,
-      );
+      const debtDelta: BigNumber = ethers.utils.parseUnits(val, decimals);
 
       const newDebt = isBorrowing
         ? currentVaultDebt.add(debtDelta)
@@ -761,8 +759,8 @@ type LoanActionSummaryProps = {
   controller: PaprController;
   isBorrowing: boolean;
   usingPerpetual: boolean;
-  debtToBorrowOrRepay: ethers.BigNumber;
-  quote: ethers.BigNumber | null;
+  debtToBorrowOrRepay: BigNumber;
+  quote: BigNumber | null;
   slippage: number | null;
   setUsingPerpetual: (val: boolean) => void;
   errorMessage: string;

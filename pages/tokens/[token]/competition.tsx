@@ -1,20 +1,17 @@
-import { GetServerSideProps } from 'next';
-import React from 'react';
 import { captureException } from '@sentry/nextjs';
-import { configs, SupportedToken, validateToken } from 'lib/config';
-import { OpenGraph } from 'components/OpenGraph';
 import { HeroesLandingPageContent } from 'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent';
+import { OpenGraph } from 'components/OpenGraph';
+import { configs, SupportedToken, validateToken } from 'lib/config';
 import {
   getOracleInfoFromAllowedCollateral,
   getQuoteForSwap,
 } from 'lib/controllers';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
-import { calculateNetPhUSDCBalance, HeroPlayerBalance } from 'lib/paprHeroes';
 import { fetchSubgraphData } from 'lib/PaprController';
+import { calculateNetPhUSDCBalance, HeroPlayerBalance } from 'lib/paprHeroes';
 import { getAllPaprHeroPlayers } from 'lib/pAPRSubgraph';
-import { ONE } from 'lib/constants';
-import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
+import { GetServerSideProps } from 'next';
+import React from 'react';
 
 const DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD: Set<string> = new Set([
   // Claim contract
@@ -73,16 +70,16 @@ export const getServerSideProps: GetServerSideProps<
         !DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD.has(p.id.toLowerCase()),
     );
 
-    let paprPrice: ethers.BigNumber;
+    let paprPrice: BigNumber;
     try {
       paprPrice = await getQuoteForSwap(
-        ethers.BigNumber.from(10).pow(18),
+        BigNumber.from(10).pow(18),
         paprToken,
         underlying,
         'paprHero',
       );
     } catch (e) {
-      paprPrice = ethers.BigNumber.from(10).pow(6);
+      paprPrice = BigNumber.from(10).pow(6);
     }
 
     const playerScores: [string, HeroPlayerBalance][] = await Promise.all(

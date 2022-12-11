@@ -1,18 +1,19 @@
-import { ControllerPricesData } from 'lib/controllers/charts';
-import React, { useCallback, useMemo } from 'react';
 import controllerStyles from 'components/Controllers/Controller.module.css';
-import { useConfig } from 'hooks/useConfig';
-import { useAccount } from 'wagmi';
-import { useAccountNFTs } from 'hooks/useAccountNFTs';
-import { PaprController } from 'lib/PaprController';
-import { YourPositions } from 'components/YourPositions/YourPositions';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { VaultDebtPicker } from 'components/Controllers/OpenVault/VaultDebtPicker/VaultDebtPicker';
+import { YourPositions } from 'components/YourPositions/YourPositions';
 import { getAddress } from 'ethers/lib/utils';
+import { useAccountNFTs } from 'hooks/useAccountNFTs';
+import { useConfig } from 'hooks/useConfig';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
-import { OraclePriceType } from 'lib/oracle/reservoir';
-import { Activity } from '../Activity';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePaprBalance } from 'hooks/usePaprBalance';
+import { ControllerPricesData } from 'lib/controllers/charts';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { PaprController } from 'lib/PaprController';
+import React, { useCallback, useMemo } from 'react';
+import { useAccount } from 'wagmi';
+
+import { Activity } from '../Activity';
 
 export type BorrowPageProps = {
   controllerAddress: string;

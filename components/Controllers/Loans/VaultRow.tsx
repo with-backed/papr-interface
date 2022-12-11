@@ -1,16 +1,15 @@
-import { useConfig } from 'hooks/useConfig';
-import React from 'react';
-import { ethers } from 'ethers';
-import { formatPercent } from 'lib/numberFormat';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
+import { useConfig } from 'hooks/useConfig';
+import { formatPercent } from 'lib/numberFormat';
 import Link from 'next/link';
+import React from 'react';
 
 type VaultRowProps = {
   id: string;
   account: string;
   debt: string;
   ltv?: number;
-  maxLTV: ethers.BigNumber | null;
+  maxLTV: BigNumber | null;
   controllerId: string;
 };
 export function VaultRow({

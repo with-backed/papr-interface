@@ -1,12 +1,13 @@
 import { ButtonTheme } from 'components/Button/Button';
 import ReactSlider from 'react-slider';
+
 import styles from './Slider.module.css';
 
 export type SliderProps = {
   min: number;
   max: number;
-  onChange: (value: number, index: number) => void;
-  onAfterChange: (value: number, index: number) => void;
+  onChange?: (value: number, index: number) => void;
+  onAfterChange?: (value: number, index: number) => void;
   renderThumb: (
     props: any,
     state: { index: number; value: number; valueNow: number },

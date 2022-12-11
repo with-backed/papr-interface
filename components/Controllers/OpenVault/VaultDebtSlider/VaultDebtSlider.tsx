@@ -1,9 +1,10 @@
 import { Slider } from 'components/Slider';
-import { PaprController } from 'lib/PaprController';
-import { formatPercent } from 'lib/numberFormat';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import styles from '../VaultDebtPicker/VaultDebtPicker.module.css';
 import { useTheme } from 'hooks/useTheme';
+import { formatPercent } from 'lib/numberFormat';
+import { PaprController } from 'lib/PaprController';
+import { useCallback, useEffect, useState } from 'react';
+
+import styles from '../VaultDebtPicker/VaultDebtPicker.module.css';
 
 type VaultDebtSliderProps = {
   controller: PaprController;

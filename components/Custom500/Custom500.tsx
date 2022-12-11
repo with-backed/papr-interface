@@ -1,6 +1,7 @@
-import Link from 'next/link';
-import styles from './Custom500.module.css';
 import { DISCORD_ERROR_CHANNEL, DISCORD_URL } from 'lib/constants';
+import Link from 'next/link';
+
+import styles from './Custom500.module.css';
 
 export function Custom500() {
   return (

@@ -1,7 +1,8 @@
-import { ethers } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+
 import { SECONDS_IN_A_DAY } from './constants';
 
 dayjs.extend(duration);
@@ -33,28 +34,28 @@ export function secondsToDays(seconds: number) {
   return seconds / SECONDS_IN_A_DAY;
 }
 
-export function secondsBigNumToDaysBigNum(seconds: ethers.BigNumber) {
+export function secondsBigNumToDaysBigNum(seconds: BigNumber) {
   return seconds.div(SECONDS_IN_A_DAY);
 }
 
-export function secondsBigNumToDays(seconds: ethers.BigNumber) {
+export function secondsBigNumToDays(seconds: BigNumber) {
   return seconds.toNumber() / SECONDS_IN_A_DAY;
 }
 
 export function daysToSecondsBigNum(days: number) {
-  return ethers.BigNumber.from(days * SECONDS_IN_A_DAY);
+  return BigNumber.from(days * SECONDS_IN_A_DAY);
 }
 
-export const getCurrentUnixTime = (): ethers.BigNumber =>
-  ethers.BigNumber.from(Math.floor(new Date().getTime() / 1000));
+export const getCurrentUnixTime = (): BigNumber =>
+  BigNumber.from(Math.floor(new Date().getTime() / 1000));
 
 export const computeInitialRemaining = (
-  lastAccumulatedInterest: ethers.BigNumber,
-  loanDuration: ethers.BigNumber,
-  now: ethers.BigNumber,
-): ethers.BigNumber => {
+  lastAccumulatedInterest: BigNumber,
+  loanDuration: BigNumber,
+  now: BigNumber,
+): BigNumber => {
   if (lastAccumulatedInterest.add(loanDuration).lt(now))
-    return ethers.BigNumber.from(0);
+    return BigNumber.from(0);
   return lastAccumulatedInterest.add(loanDuration).sub(now);
 };
 

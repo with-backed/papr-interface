@@ -1,6 +1,7 @@
 import Image from 'next/legacy/image';
 import Diagram from 'public/landingpage-diagram.png';
 import React from 'react';
+
 import styles from './LandingPageContent.module.css';
 
 const DiagramBackground = () => (

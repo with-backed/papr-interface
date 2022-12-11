@@ -4,6 +4,7 @@ import { PaprController, SubgraphController } from 'lib/PaprController';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { UTCTimestamp } from 'lightweight-charts';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
+
 import { markValues } from './mark';
 import { targetValues } from './target';
 
@@ -36,10 +37,10 @@ export async function controllerPricesData(
 
   const index = 1;
 
-  var markDPRs: TimeSeriesValue[] = [];
-  var marks: TimeSeriesValue[] = [];
-  var targets: TimeSeriesValue[] = [];
-  var targetDPRs: TimeSeriesValue[] = [];
+  let markDPRs: TimeSeriesValue[] = [];
+  let marks: TimeSeriesValue[] = [];
+  let targets: TimeSeriesValue[] = [];
+  let targetDPRs: TimeSeriesValue[] = [];
   if (subgraphUniswapPool) {
     [marks, markDPRs] = await markValues(
       now,

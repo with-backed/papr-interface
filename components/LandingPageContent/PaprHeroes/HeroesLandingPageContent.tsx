@@ -1,27 +1,28 @@
 import { SendTransactionResult } from '@wagmi/core';
-import { Fieldset } from 'components/Fieldset';
-import { configs } from 'lib/config';
-import { ReservoirResponseData } from 'lib/oracle/reservoir';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
-import styles from './HeroesLandingPageContent.module.css';
-import { ERC721__factory } from 'types/generated/abis';
-import { useCallback, useMemo, useState } from 'react';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { TransactionButton } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
-import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
-import { ethers } from 'ethers';
-import Link from 'next/link';
+import controllerStyles from 'components/Controllers/Controller.module.css';
+import { ShortDisplayAddress } from 'components/DisplayAddress/ShortDisplayAddress';
+import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
+import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
-import { HeroPlayerBalance } from 'lib/paprHeroes';
-import { HeroClaim__factory } from 'types/generated/abis/factories/HeroClaim__factory';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { configs } from 'lib/config';
 import airdropInput from 'lib/heroClaims/airdropInput.json';
 import airdropOutput from 'lib/heroClaims/airdropOutput.json';
-import { TransactionButton } from 'components/Button';
-import controllerStyles from 'components/Controllers/Controller.module.css';
 import { formatTokenAmount } from 'lib/numberFormat';
-import { ShortDisplayAddress } from 'components/DisplayAddress/ShortDisplayAddress';
+import { ReservoirResponseData } from 'lib/oracle/reservoir';
+import { HeroPlayerBalance } from 'lib/paprHeroes';
+import Link from 'next/link';
+import { useCallback, useMemo, useState } from 'react';
+import { ERC721__factory } from 'types/generated/abis';
+import { HeroClaim__factory } from 'types/generated/abis/factories/HeroClaim__factory';
+import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
+import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+
+import styles from './HeroesLandingPageContent.module.css';
 
 type HeroesLandingPageContentProps = {
   collateral: string[];
@@ -202,7 +203,7 @@ function PHUSDC() {
     functionName: 'stake',
     args: [amountToStake],
     overrides: {
-      gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
+      gasLimit: BigNumber.from(hexValue(3000000)),
     },
   });
 
@@ -219,7 +220,7 @@ function PHUSDC() {
     functionName: 'unstake',
     args: [],
     overrides: {
-      gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
+      gasLimit: BigNumber.from(hexValue(3000000)),
     },
   });
 
@@ -260,7 +261,7 @@ function PHUSDC() {
             <tr>
               <td>
                 <p>
-                  {!!currentBalance
+                  {currentBalance
                     ? parseFloat(
                         ethers.utils.formatUnits(currentBalance, decimals),
                       ).toFixed(2)
@@ -270,9 +271,9 @@ function PHUSDC() {
               <td>
                 <input
                   value={
-                    !!value
+                    value
                       ? value
-                      : !!stakeInfo
+                      : stakeInfo
                       ? ethers.utils.formatUnits(stakeInfo[0], decimals)
                       : 0
                   }
@@ -478,7 +479,7 @@ function Claim() {
       },
       claimOutputForAccount,
       {
-        gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
+        gasLimit: BigNumber.from(hexValue(3000000)),
       },
     );
     setTx({

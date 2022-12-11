@@ -6,6 +6,7 @@ import {
   SwapsByPoolDocument,
   SwapsByPoolQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
+
 import { clientFromUrl } from './urql';
 
 export async function subgraphUniswapPriceByPool(
@@ -31,7 +32,7 @@ export async function subgraphUniswapSwapsByPool(
 ) {
   const client = clientFromUrl(uniswapSubgraphUrl);
   const { data, error } = await client
-    .query<SwapsByPoolQuery>(SwapsByPoolDocument, { pool: pool })
+    .query<SwapsByPoolQuery>(SwapsByPoolDocument, { pool })
     .toPromise();
 
   if (error) {

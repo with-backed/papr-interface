@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react';
-import { PaprController } from 'lib/PaprController';
-import { LoanDetails } from 'components/Controllers/Loans/LoanDetails';
-import controllerStyles from '../Controller.module.css';
-import { Collateral } from 'components/Controllers/Collateral';
 import { Activity } from 'components/Controllers/Activity';
+import { Collateral } from 'components/Controllers/Collateral';
+import { LoanDetails } from 'components/Controllers/Loans/LoanDetails';
 import { TokenPerformance } from 'components/Controllers/TokenPerformance';
 import { ControllerPricesData } from 'lib/controllers/charts';
+import { PaprController } from 'lib/PaprController';
+import React, { useMemo } from 'react';
+
+import controllerStyles from '../Controller.module.css';
 
 type VaultPageContentProps = {
   paprController: PaprController;

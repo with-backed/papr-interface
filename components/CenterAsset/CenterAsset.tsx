@@ -1,6 +1,7 @@
-import React, { ComponentProps } from 'react';
-import styles from './CenterAsset.module.css';
 import { Asset } from '@center-inc/react';
+import React, { ComponentProps } from 'react';
+
+import styles from './CenterAsset.module.css';
 
 type CenterAssetProps = Exclude<
   ComponentProps<typeof Asset>,

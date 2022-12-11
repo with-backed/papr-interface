@@ -1,5 +1,6 @@
 import { ButtonTheme } from 'components/Button/Button';
 import React, { FunctionComponent } from 'react';
+
 import { Slider } from './Slider';
 
 const Wrapper: FunctionComponent = ({ children }) => (
@@ -24,8 +25,6 @@ export const Sliders = () => (
         key={theme}
         min={0}
         max={100}
-        onChange={() => {}}
-        onAfterChange={() => {}}
         renderThumb={(props) => <div {...props}></div>}
         renderTrack={(props) => <div {...props}></div>}
         blackTrackWidth={'50px'}

@@ -1,23 +1,24 @@
-import styles from './YourPositions.module.css';
-import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
-import { Fieldset } from 'components/Fieldset';
-import { PaprController } from 'lib/PaprController';
-import { useAccount } from 'wagmi';
-import { useMemo } from 'react';
-import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { SupportedToken } from 'lib/config';
-import { useConfig } from 'hooks/useConfig';
-import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
-import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
-import { Table } from 'components/Table';
-import { ERC721__factory } from 'types/generated/abis';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
+import { Fieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
+import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
-import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
+import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useConfig } from 'hooks/useConfig';
 import { useLTVs } from 'hooks/useLTVs/useLTVs';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { SupportedToken } from 'lib/config';
+import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
+import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
+import { PaprController } from 'lib/PaprController';
+import { useMemo } from 'react';
+import { ERC721__factory } from 'types/generated/abis';
+import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
+import { useAccount } from 'wagmi';
+
+import styles from './YourPositions.module.css';
 
 export type YourPositionsProps = {
   paprController: PaprController;
@@ -25,7 +26,7 @@ export type YourPositionsProps = {
   currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
   oracleInfo: OracleInfo;
   latestMarketPrice: number;
-  balance: ethers.BigNumber | null;
+  balance: BigNumber | null;
 };
 
 export function YourPositions({
@@ -65,8 +66,8 @@ export function YourPositions({
     );
     const maxLoanMinusCurrentDebt = maxLoanInDebtTokens.sub(
       (currentVaults || [])
-        .map((v) => ethers.BigNumber.from(v.debt))
-        .reduce((a, b) => a.add(b), ethers.BigNumber.from(0)),
+        .map((v) => BigNumber.from(v.debt))
+        .reduce((a, b) => a.add(b), BigNumber.from(0)),
     );
 
     return (
@@ -80,12 +81,12 @@ export function YourPositions({
   }, [paprController, oracleInfo, userNFTs, currentVaults, latestMarketPrice]);
 
   const totalPaprMemeDebt = useMemo(() => {
-    if (!currentVaults) return ethers.BigNumber.from(0);
+    if (!currentVaults) return BigNumber.from(0);
     return currentVaults
       .map((vault) => vault.debt)
       .reduce(
-        (a, b) => ethers.BigNumber.from(a).add(ethers.BigNumber.from(b)),
-        ethers.BigNumber.from(0),
+        (a, b) => BigNumber.from(a).add(BigNumber.from(b)),
+        BigNumber.from(0),
       );
   }, [currentVaults]);
 
@@ -219,10 +220,9 @@ export function VaultOverview({
   }, [vaultInfo.collateralContract, signerOrProvider]);
   const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
   const costToClose = useAsyncValue(async () => {
-    if (ethers.BigNumber.from(vaultInfo.debt).isZero())
-      return ethers.BigNumber.from(0);
+    if (BigNumber.from(vaultInfo.debt).isZero()) return BigNumber.from(0);
     return getQuoteForSwapOutput(
-      ethers.BigNumber.from(vaultInfo.debt),
+      BigNumber.from(vaultInfo.debt),
       paprController.underlying.id,
       paprController.debtToken.id,
       tokenName as SupportedToken,
@@ -235,7 +235,7 @@ export function VaultOverview({
   ]);
 
   if (
-    ethers.BigNumber.from(vaultInfo.debt).isZero() &&
+    BigNumber.from(vaultInfo.debt).isZero() &&
     vaultInfo.collateral.length === 0
   )
     return <></>;
@@ -271,7 +271,7 @@ export function VaultOverview({
 }
 
 type BalanceInfoProps = {
-  balance: ethers.BigNumber | null;
+  balance: BigNumber | null;
   paprController: PaprController;
   latestMarketPrice?: number;
 };
@@ -281,7 +281,7 @@ function BalanceInfo({
   latestMarketPrice,
 }: BalanceInfoProps) {
   const paprMemeBalance = useMemo(
-    () => ethers.BigNumber.from(balance || 0),
+    () => BigNumber.from(balance || 0),
     [balance],
   );
 

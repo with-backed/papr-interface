@@ -1,10 +1,9 @@
-import { PaprController } from 'lib/PaprController';
 import PaprControllerABI from 'abis/PaprController.json';
+import { PaprController } from 'lib/PaprController';
 import { useContractWrite, usePrepareContractWrite } from 'wagmi';
-import { ethers } from 'ethers';
 
 const overrides = {
-  gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
+  gasLimit: BigNumber.from(hexValue(3000000)),
 };
 
 export function useMulticallWrite(

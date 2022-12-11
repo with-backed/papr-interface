@@ -1,7 +1,5 @@
-import { ethers } from 'ethers';
-
 export function currentPrice(
-  startPrice: ethers.BigNumber,
+  startPrice: BigNumber,
   secondsElapsed: number,
   secondsInPeriod: number,
   perPeriodDecayPercent: number,

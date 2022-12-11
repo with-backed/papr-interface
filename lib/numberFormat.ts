@@ -1,4 +1,5 @@
-import { ethers } from 'ethers';
+import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
+import { formatUnits } from '@ethersproject/units';
 
 const LOCALE = 'en-US';
 const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
@@ -12,11 +13,8 @@ const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
  * @returns amount as string, e.g.: `939`, `2.34k`
  */
 
-export function formatBigNum(
-  num: ethers.BigNumber,
-  decimals: ethers.BigNumberish,
-): string {
-  return parseFloat(ethers.utils.formatUnits(num, decimals)).toFixed(3);
+export function formatBigNum(num: BigNumber, decimals: BigNumberish): string {
+  return parseFloat(formatUnits(num, decimals)).toFixed(3);
 }
 
 export function formatTokenAmount(amount: number) {

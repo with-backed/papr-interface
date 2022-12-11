@@ -1,17 +1,18 @@
-import { ethers } from 'ethers';
-import { SECONDS_IN_A_DAY } from 'lib/constants';
-import { ERC20, ERC721 } from 'types/generated/abis';
-import { ONE } from './constants';
-import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
-import { PaprController } from 'lib/PaprController';
-import { configs, SupportedToken } from 'lib/config';
-import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
-import { Quoter } from 'lib/contracts';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { lambertW0 } from 'lambert-w-function';
+import { configs, SupportedToken } from 'lib/config';
+import { SECONDS_IN_A_DAY } from 'lib/constants';
+import { Quoter } from 'lib/contracts';
 import { formatBigNum } from 'lib/numberFormat';
+import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
+import { PaprController } from 'lib/PaprController';
+import { ERC20, ERC721 } from 'types/generated/abis';
+
+import { ONE } from './constants';
 
 dayjs.extend(duration);
 
@@ -28,10 +29,7 @@ export type ERC721Token = {
   symbol: string;
 };
 
-export function convertOneScaledValue(
-  n: ethers.BigNumber,
-  decimals: number,
-): number {
+export function convertOneScaledValue(n: BigNumber, decimals: number): number {
   return n.div(ONE.div(10 ** decimals)).toNumber() / 10 ** decimals;
 }
 
@@ -50,8 +48,8 @@ export enum RatePeriod {
 }
 
 export function computeRate(
-  value1: ethers.BigNumber,
-  value2: ethers.BigNumber,
+  value1: BigNumber,
+  value2: BigNumber,
   time1: number,
   time2: number,
   ratePeriod: RatePeriod,
@@ -74,7 +72,7 @@ export function computeRate(
 export function rateFromMultiplier(
   now: number,
   lastUpdated: number,
-  multiplier: ethers.BigNumber,
+  multiplier: BigNumber,
   ratePeriod: RatePeriod,
 ) {
   const delta = now - lastUpdated;
@@ -97,11 +95,11 @@ export function secondsForRatePeriod(period: RatePeriod): number {
 // TODO(adamgobes): figure out how to do powWad locally in JS
 export async function multiplier(
   controller: PaprController,
-  now: ethers.BigNumber,
-  mark: ethers.BigNumber,
+  now: BigNumber,
+  mark: BigNumber,
 ) {
   const lastUpdated = await controller.lastUpdated();
-  const PERIOD = ethers.BigNumber.from(28 * SECONDS_IN_A_DAY);
+  const PERIOD = BigNumber.from(28 * SECONDS_IN_A_DAY);
   const prevNorm = await controller.target();
 
   const period = now.sub(lastUpdated);
@@ -110,16 +108,16 @@ export async function multiplier(
 
   /// TODO fetch actual indexMark min and max from contract
   if (indexMarkRatio.gt(14e17)) {
-    indexMarkRatio = ethers.BigNumber.from(14e17);
+    indexMarkRatio = BigNumber.from(14e17);
   } else {
-    indexMarkRatio = ethers.BigNumber.from(8e17);
+    indexMarkRatio = BigNumber.from(8e17);
   }
 
   return indexMarkRatio.pow(periodRatio);
 }
 
 export async function getQuoteForSwap(
-  amount: ethers.BigNumber,
+  amount: BigNumber,
   tokenIn: string,
   tokenOut: string,
   tokenName: SupportedToken,
@@ -128,7 +126,7 @@ export async function getQuoteForSwap(
   const q = await quoter.callStatic.quoteExactInputSingle(
     tokenIn,
     tokenOut,
-    ethers.BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
+    BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
     amount,
     0,
   );
@@ -136,7 +134,7 @@ export async function getQuoteForSwap(
 }
 
 export async function getQuoteForSwapOutput(
-  amount: ethers.BigNumber,
+  amount: BigNumber,
   tokenIn: string,
   tokenOut: string,
   tokenName: SupportedToken,
@@ -145,7 +143,7 @@ export async function getQuoteForSwapOutput(
   const q = await quoter.callStatic.quoteExactOutputSingle(
     tokenIn,
     tokenOut,
-    ethers.BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
+    BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
     amount,
     0,
   );
@@ -153,8 +151,8 @@ export async function getQuoteForSwapOutput(
 }
 
 export async function computeLiquidationEstimation(
-  debt: ethers.BigNumber,
-  max: ethers.BigNumber,
+  debt: BigNumber,
+  max: BigNumber,
   controller: PaprController,
 ) {
   const debtTaken = parseFloat(
@@ -193,20 +191,20 @@ export async function computeLiquidationEstimation(
 }
 
 export async function computeSlippageForSwap(
-  quoteWithSlippage: ethers.BigNumber,
+  quoteWithSlippage: BigNumber,
   tokenIn: ERC20Token,
   tokenOut: ERC20Token,
-  amount: ethers.BigNumber,
+  amount: BigNumber,
   useExactInput: boolean,
   tokenName: SupportedToken,
 ) {
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
-  let quoteWithoutSlippage: ethers.BigNumber;
+  let quoteWithoutSlippage: BigNumber;
   if (useExactInput) {
     quoteWithoutSlippage = await quoter.callStatic.quoteExactInputSingle(
       tokenIn.id,
       tokenOut.id,
-      ethers.BigNumber.from(10).pow(4),
+      BigNumber.from(10).pow(4),
       ethers.utils.parseUnits('1', tokenIn.decimals),
       0,
     );
@@ -214,7 +212,7 @@ export async function computeSlippageForSwap(
     quoteWithoutSlippage = await quoter.callStatic.quoteExactOutputSingle(
       tokenIn.id,
       tokenOut.id,
-      ethers.BigNumber.from(10).pow(4),
+      BigNumber.from(10).pow(4),
       ethers.utils.parseUnits('1', tokenIn.decimals),
       0,
     );
@@ -223,13 +221,13 @@ export async function computeSlippageForSwap(
   const quoteWithSlippageFloat = parseFloat(
     ethers.utils.formatUnits(
       quoteWithSlippage,
-      ethers.BigNumber.from(tokenOut.decimals),
+      BigNumber.from(tokenOut.decimals),
     ),
   );
   const quoteWithoutSlippageFloat = parseFloat(
     ethers.utils.formatUnits(
       quoteWithoutSlippage,
-      ethers.BigNumber.from(tokenOut.decimals),
+      BigNumber.from(tokenOut.decimals),
     ),
   );
 
@@ -237,7 +235,7 @@ export async function computeSlippageForSwap(
   const quoteWithoutSlippageScaled =
     quoteWithoutSlippageFloat *
     parseFloat(
-      ethers.utils.formatUnits(amount, ethers.BigNumber.from(tokenIn.decimals)),
+      ethers.utils.formatUnits(amount, BigNumber.from(tokenIn.decimals)),
     );
 
   const priceImpact =
@@ -270,14 +268,14 @@ export const deconstructFromId = (id: string): [string, string] => {
 };
 
 export function computeLtv(
-  debt: ethers.BigNumberish,
-  totalCollateralValue: ethers.BigNumberish,
-  norm: ethers.BigNumberish,
+  debt: BigNumberish,
+  totalCollateralValue: BigNumberish,
+  norm: BigNumberish,
 ) {
-  const valueNormRatio = ethers.BigNumber.from(totalCollateralValue).div(norm);
-  if (valueNormRatio.isZero()) return ethers.BigNumber.from(0);
+  const valueNormRatio = BigNumber.from(totalCollateralValue).div(norm);
+  if (valueNormRatio.isZero()) return BigNumber.from(0);
 
-  return ethers.BigNumber.from(debt).div(valueNormRatio);
+  return BigNumber.from(debt).div(valueNormRatio);
 }
 
 export function oracleInfoProxy<T>(obj: { [key: string]: T }) {
@@ -322,9 +320,9 @@ export async function getOracleInfoFromAllowedCollateral(
 }
 
 export function computeLTVFromDebts(
-  debt: ethers.BigNumber,
-  maxDebt: ethers.BigNumber,
-  maxLTV: ethers.BigNumber,
+  debt: BigNumber,
+  maxDebt: BigNumber,
+  maxLTV: BigNumber,
   debtTokenDecimals: number,
 ): number {
   if (maxDebt.isZero()) return 0;

@@ -1,11 +1,12 @@
 import { ethers } from 'ethers';
 import {
+  _TypedDataEncoder,
   arrayify,
   defaultAbiCoder,
   getAddress,
-  _TypedDataEncoder,
 } from 'ethers/lib/utils';
 import { Config } from 'lib/config';
+
 import { OraclePriceType, ReservoirResponseData } from './reservoir';
 
 export const dummyOracleInfoMap = {

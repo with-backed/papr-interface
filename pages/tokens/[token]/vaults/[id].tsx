@@ -1,17 +1,18 @@
+import { VaultPageContent } from 'components/Controllers/VaultPageContent';
+import { OpenGraph } from 'components/OpenGraph';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
+import { usePaprController } from 'hooks/usePaprController';
 import { configs, getConfig, SupportedToken } from 'lib/config';
+import { controllerPricesData } from 'lib/controllers/charts';
 import {
   fetchSubgraphData,
-  SubgraphPool,
   SubgraphController,
+  SubgraphPool,
 } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
+
 import styles from '../controller.module.css';
-import { usePaprController } from 'hooks/usePaprController';
-import { VaultPageContent } from 'components/Controllers/VaultPageContent';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { controllerPricesData } from 'lib/controllers/charts';
-import { OpenGraph } from 'components/OpenGraph';
 
 type ServerSideProps = {
   vaultId: string;

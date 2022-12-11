@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { computeLTVFromDebts } from 'lib/controllers';
 import { OraclePriceType } from 'lib/oracle/reservoir';
@@ -8,7 +7,7 @@ import { useEffect, useState } from 'react';
 export function useLTVs(
   paprController: PaprController,
   activeVaults: PaprController['vaults'],
-  maxLTV: ethers.BigNumber,
+  maxLTV: BigNumber,
 ) {
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const [ltvs, setLTVs] = useState<{ [key: string]: number }>({});
@@ -18,14 +17,14 @@ export function useLTVs(
     const fetchLTVs = async () => {
       if (!oracleInfo || !activeVaults) return {};
       return await activeVaults.reduce(async (prev, v) => {
-        const maxDebtForVault: ethers.BigNumber = (
+        const maxDebtForVault: BigNumber = (
           await paprController.maxDebt([v.collateralContract], oracleInfo)
         ).mul(v.collateral.length);
 
         return {
           ...(await prev),
           [v.id]: computeLTVFromDebts(
-            ethers.BigNumber.from(v.debt),
+            BigNumber.from(v.debt),
             maxDebtForVault,
             maxLTV,
             paprController.debtToken.decimals,

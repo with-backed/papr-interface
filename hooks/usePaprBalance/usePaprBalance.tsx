@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BigNumber } from '@ethersproject/bignumber';
 import { getAddress } from 'ethers/lib/utils';
 import {
   createContext,
@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { erc20ABI, useAccount, useContractRead } from 'wagmi';
 
-type Balance = ethers.BigNumber | null;
+type Balance = BigNumber | null;
 type ContextValue = {
   balance: Balance;
   refresh: () => void;
@@ -20,7 +20,9 @@ type ContextValue = {
 
 const PaprBalanceContext = createContext<ContextValue>({} as any);
 
-export function PaprBalanceProvider({ children }: PropsWithChildren<{}>) {
+export function PaprBalanceProvider({
+  children,
+}: PropsWithChildren<Record<never, any>>) {
   const { address: connectedAddress } = useAccount();
   const [debtTokenAddress, setDebtTokenAddress] = useState<string | undefined>(
     undefined,
@@ -40,7 +42,7 @@ export function PaprBalanceProvider({ children }: PropsWithChildren<{}>) {
     if (!rawPaprBalance) {
       return null;
     }
-    return ethers.BigNumber.from(rawPaprBalance);
+    return BigNumber.from(rawPaprBalance);
   }, [rawPaprBalance]);
 
   const register = useCallback(

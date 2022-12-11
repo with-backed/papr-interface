@@ -1,12 +1,12 @@
 import { TestPageContent } from 'components/Controllers/TestPageContent';
+import { usePaprController } from 'hooks/usePaprController';
 import { configs, SupportedToken } from 'lib/config';
 import {
   fetchSubgraphData,
-  SubgraphPool,
   SubgraphController,
+  SubgraphPool,
 } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
-import { usePaprController } from 'hooks/usePaprController';
 
 export type TestProps = {
   subgraphController: SubgraphController;

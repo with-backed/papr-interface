@@ -1,5 +1,7 @@
 import { EtherscanAddressLink } from 'components/EtherscanLink';
+import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
+import { useJsonRpcProvider } from 'hooks/useSignerOrProvider';
 import React, {
   FunctionComponent,
   useCallback,
@@ -7,10 +9,8 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useTooltipState, TooltipReference } from 'reakit/Tooltip';
-import { Tooltip } from 'components/Tooltip';
+import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
 import { useAccount } from 'wagmi';
-import { useJsonRpcProvider } from 'hooks/useSignerOrProvider';
 
 interface ShortDisplayAddress {
   address: string;

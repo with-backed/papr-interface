@@ -1,13 +1,21 @@
+import { Provider } from '@ethersproject/abstract-provider';
+import { Signer } from '@ethersproject/abstract-signer';
+import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
+import { hexValue } from '@ethersproject/bytes';
+import { Overrides } from '@ethersproject/contracts';
+import { AlchemyProvider } from '@ethersproject/providers';
+import { parseUnits } from '@ethersproject/units';
 import { Pool } from '@uniswap/v3-sdk';
-import { ethers, Overrides, providers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import {
-  PaprController__factory,
-  PaprController as GenPaprController,
-  IUniswapV3Pool__factory,
-  ERC20__factory,
   ERC20,
+  ERC20__factory,
   ERC721,
   ERC721__factory,
+  IUniswapV3Pool__factory,
+  PaprController as GenPaprController,
+  PaprController__factory,
 } from 'types/generated/abis';
 import {
   INFTEDA,
@@ -15,21 +23,19 @@ import {
 } from 'types/generated/abis/PaprController';
 import { PaprControllerByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+
 import { Config, SupportedToken } from './config';
-import { ReservoirResponseData } from './oracle/reservoir';
-import { subgraphControllerByAddress } from './pAPRSubgraph';
 import { buildToken, convertOneScaledValue } from './controllers';
 import { getPool } from './controllers/uniswap';
+import { subgraphControllerByAddress } from './pAPRSubgraph';
 import { subgraphUniswapPoolById } from './uniswapSubgraph';
-import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { getAddress } from 'ethers/lib/utils';
 
 export type PaprController = SubgraphController & PaprControllerInternal;
 export type SubgraphController = NonNullable<
   PaprControllerByIdQuery['paprController']
 >;
 export type SubgraphPool = NonNullable<PoolByIdQuery['pool']>;
-type SignerOrProvider = ethers.Signer | ethers.providers.Provider;
+type SignerOrProvider = Signer | Provider;
 
 /**
  * PaprController factory function, merges the class definition with
@@ -53,9 +59,9 @@ export function makePaprController(
   const instance = new PaprControllerInternal(
     subgraphController,
     subgraphPool,
-    !!signerOrProvider
+    signerOrProvider
       ? signerOrProvider
-      : new providers.AlchemyProvider(config.network, config.alchemyId),
+      : new AlchemyProvider(config.network, config.alchemyId),
     config,
   );
 
@@ -94,9 +100,9 @@ class PaprControllerInternal {
   token0: ERC20;
   token1: ERC20;
   collateralContracts: ERC721[];
-  maxLTVBigNum: ethers.BigNumber;
+  maxLTVBigNum: BigNumber;
   maxLTVPercent: number;
-  _cachedNewTarget: ethers.BigNumber | null;
+  _cachedNewTarget: BigNumber | null;
   _targetLastFetched: number;
 
   constructor(
@@ -127,9 +133,9 @@ class PaprControllerInternal {
         return ERC721__factory.connect(c.contractAddress, signerOrProvider);
       },
     );
-    this.maxLTVBigNum = ethers.BigNumber.from(this._subgraphController.maxLTV);
+    this.maxLTVBigNum = BigNumber.from(this._subgraphController.maxLTV);
     this.maxLTVPercent = convertOneScaledValue(
-      ethers.BigNumber.from(this._subgraphController.maxLTV),
+      BigNumber.from(this._subgraphController.maxLTV),
       2,
     );
     this._cachedNewTarget = null;
@@ -192,9 +198,9 @@ class PaprControllerInternal {
 
   async mintAndSellDebt(
     collateralAsset: string,
-    debt: ethers.BigNumberish,
-    minOut: ethers.BigNumberish,
-    sqrtPriceLimitX96: ethers.BigNumberish,
+    debt: BigNumberish,
+    minOut: BigNumberish,
+    sqrtPriceLimitX96: BigNumberish,
     proceedsTo: string,
     oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct,
     overrides?: Overrides & { from?: string | Promise<string> },
@@ -213,9 +219,9 @@ class PaprControllerInternal {
   async buyAndReduceDebt(
     account: string,
     collateralAsset: string,
-    underlyingAmount: ethers.BigNumberish,
-    minOut: ethers.BigNumberish,
-    sqrtPriceLimitX96: ethers.BigNumberish,
+    underlyingAmount: BigNumberish,
+    minOut: BigNumberish,
+    sqrtPriceLimitX96: BigNumberish,
     proceedsTo: string,
     overrides?: Overrides & { from?: string | Promise<string> },
   ) {
@@ -233,7 +239,7 @@ class PaprControllerInternal {
   async reduceDebt(
     account: string,
     collateralAsset: string,
-    amount: ethers.BigNumberish,
+    amount: BigNumberish,
   ) {
     return this._contract.reduceDebt(account, collateralAsset, amount);
   }
@@ -254,9 +260,9 @@ class PaprControllerInternal {
       : this.subgraphPool.token0;
   }
 
-  async _maxDebt(totalCollateraValue: ethers.BigNumber) {
+  async _maxDebt(totalCollateraValue: BigNumber) {
     const maxLoanUnderlying = totalCollateraValue.mul(
-      ethers.BigNumber.from(this._subgraphController.maxLTV),
+      BigNumber.from(this._subgraphController.maxLTV),
     );
     return maxLoanUnderlying.div(await this.newTarget());
   }
@@ -264,11 +270,11 @@ class PaprControllerInternal {
   async maxDebt(
     collateralAssets: string[],
     oracleInfo: OracleInfo,
-  ): Promise<ethers.BigNumber> {
+  ): Promise<BigNumber> {
     const totalDebtPerCollateral = await Promise.all(
       collateralAssets.map(async (asset) =>
         this._maxDebt(
-          ethers.utils.parseUnits(
+          parseUnits(
             oracleInfo[getAddress(asset)].price.toString(),
             this.underlying.decimals,
           ),
@@ -276,15 +282,12 @@ class PaprControllerInternal {
       ),
     );
 
-    return totalDebtPerCollateral.reduce(
-      (a, b) => a.add(b),
-      ethers.BigNumber.from(0),
-    );
+    return totalDebtPerCollateral.reduce((a, b) => a.add(b), BigNumber.from(0));
   }
 
   async purchaseLiquidationAuctionNFT(
     auction: INFTEDA.AuctionStruct,
-    maxPrice: ethers.BigNumberish,
+    maxPrice: BigNumberish,
     sendTo: string,
     oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct,
   ) {
@@ -293,7 +296,7 @@ class PaprControllerInternal {
       maxPrice,
       sendTo,
       oracleInfo,
-      { gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)) },
+      { gasLimit: BigNumber.from(hexValue(3000000)) },
     );
   }
 }
