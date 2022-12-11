@@ -5,6 +5,7 @@ import { configs, SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import { HeroesLandingPageContent } from 'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent';
 import {
+  buildToken,
   getOracleInfoFromAllowedCollateral,
   getQuoteForSwap,
 } from 'lib/controllers';
@@ -15,6 +16,9 @@ import { getAllPaprHeroPlayers } from 'lib/pAPRSubgraph';
 import { ONE } from 'lib/constants';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
+import { getPool } from 'lib/controllers/uniswap';
+import { ERC20__factory, IUniswapV3Pool__factory } from 'types/generated/abis';
+import { makeProvider } from 'lib/contracts';
 
 const DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD: Set<string> = new Set([
   // Claim contract
@@ -54,7 +58,7 @@ export const getServerSideProps: GetServerSideProps<
       };
     }
 
-    const { paprController } = controllerSubgraphData;
+    const { paprController, pool } = controllerSubgraphData;
     const allowedCollateral = paprController.allowedCollateral.map(
       (ac: any) => ac.contractAddress,
     );
@@ -85,12 +89,39 @@ export const getServerSideProps: GetServerSideProps<
       paprPrice = ethers.BigNumber.from(10).pow(6);
     }
 
+    const provider = makeProvider(configs[token].jsonRpcProvider, 'paprHero');
+    const poolContract = IUniswapV3Pool__factory.connect(pool.id, provider);
+
+    const token0Address = pool.token0.id;
+    const token1Address = pool.token1.id;
+    const [token0, token1] = await Promise.all([
+      buildToken(ERC20__factory.connect(token0Address, provider)),
+      buildToken(ERC20__factory.connect(token1Address, provider)),
+    ]);
+
+    const uniswapPool = await getPool(
+      poolContract,
+      token0,
+      token1,
+      configs[token].chainId,
+    );
+
+    console.log('successfully got uniswapPool');
+
     const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
       participatingPlayers.map(async (p) => [
         p.id,
-        await calculateNetPhUSDCBalance(p, paprPrice, oracleInfo, underlying),
+        await calculateNetPhUSDCBalance(
+          p,
+          paprController,
+          uniswapPool,
+          paprPrice,
+          oracleInfo,
+        ),
       ]),
     );
+
+    console.log('successfully got playerScores');
 
     const rankedPlayers = playerScores.sort(
       (a, b) => b[1].totalBalance - a[1].totalBalance,

@@ -1,6 +1,11 @@
 import { ethers } from 'ethers';
 import { SECONDS_IN_A_DAY } from 'lib/constants';
-import { ERC20, ERC721 } from 'types/generated/abis';
+import {
+  ERC20,
+  ERC20__factory,
+  ERC721,
+  IUniswapV3Pool__factory,
+} from 'types/generated/abis';
 import { ONE } from './constants';
 import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
@@ -9,9 +14,17 @@ import { getAddress } from 'ethers/lib/utils';
 import { PaprController } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
-import { Quoter } from 'lib/contracts';
+import { PositionManager, Quoter } from 'lib/contracts';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { formatBigNum } from 'lib/numberFormat';
+import { nearestUsableTick, Pool, Position } from '@uniswap/v3-sdk';
+import { getPool } from './uniswap';
+import { clientFromUrl } from 'lib/urql';
+import { NftsForAccountAndCollectionDocument } from 'types/generated/graphql/erc721';
+import { makeProvider } from 'lib/contracts';
+import { PaprControllerByIdQuery } from 'types/generated/graphql/inKindSubgraph';
+import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+import { captureException } from '@sentry/nextjs';
 
 dayjs.extend(duration);
 
@@ -333,4 +346,121 @@ export function computeLTVFromDebts(
   return (
     (debtNumber / maxNumber) * parseFloat(ethers.utils.formatEther(maxLTV))
   );
+}
+
+export type LiquidityAndFees = {
+  underlyingAmount: ethers.BigNumber;
+  debtTokenAmount: ethers.BigNumber;
+  feesUnderlying: ethers.BigNumber;
+  feesDebtToken: ethers.BigNumber;
+};
+
+export const ZERO_LP_POSITION = {
+  underlyingAmount: ethers.BigNumber.from(0),
+  debtTokenAmount: ethers.BigNumber.from(0),
+  feesUnderlying: ethers.BigNumber.from(0),
+  feesDebtToken: ethers.BigNumber.from(0),
+};
+
+export async function getLiquidityAndFeesForPosition(
+  address: string,
+  tokenId: string,
+  subgraphController: NonNullable<PaprControllerByIdQuery['paprController']>,
+  uniswapPool: Pool,
+  token: SupportedToken,
+): Promise<LiquidityAndFees> {
+  const token0IsUnderlying =
+    getAddress(subgraphController.underlying) ===
+    getAddress(uniswapPool.token0.address);
+
+  const amount0Decimals = token0IsUnderlying ? 6 : 18;
+  const amount1Decimals = token0IsUnderlying ? 18 : 6;
+
+  const positionManager = PositionManager(
+    configs[token].jsonRpcProvider,
+    token,
+  );
+
+  let positionCall;
+  try {
+    positionCall = await positionManager.positions(tokenId);
+    if (positionCall.liquidity.isZero()) {
+      return ZERO_LP_POSITION;
+    }
+  } catch (e) {
+    captureException(e);
+    return ZERO_LP_POSITION;
+  }
+
+  const position = new Position({
+    pool: uniswapPool,
+    liquidity: positionCall.liquidity.toString(),
+    tickLower: nearestUsableTick(
+      positionCall.tickLower,
+      uniswapPool.tickSpacing,
+    ),
+    tickUpper: nearestUsableTick(
+      positionCall.tickUpper,
+      uniswapPool.tickSpacing,
+    ),
+  });
+
+  const underlyingAmount = ethers.utils.parseUnits(
+    token0IsUnderlying
+      ? position.amount0.toFixed()
+      : position.amount1.toFixed(),
+    token0IsUnderlying ? amount0Decimals : amount1Decimals,
+  );
+
+  const debtTokenAmount = ethers.utils.parseUnits(
+    token0IsUnderlying
+      ? position.amount1.toFixed()
+      : position.amount0.toFixed(),
+    token0IsUnderlying ? amount1Decimals : amount0Decimals,
+  );
+
+  const MAX_UINT128 = ethers.BigNumber.from(2).pow(128).sub(1);
+
+  let feesResult;
+  try {
+    feesResult = await positionManager.callStatic.collect({
+      tokenId,
+      recipient: address,
+      amount0Max: MAX_UINT128,
+      amount1Max: MAX_UINT128,
+    });
+  } catch (e) {
+    captureException(e);
+    return ZERO_LP_POSITION;
+  }
+
+  const feesUnderlying = token0IsUnderlying
+    ? feesResult.amount0
+    : feesResult.amount1;
+  const feesDebtToken = token0IsUnderlying
+    ? feesResult.amount1
+    : feesResult.amount0;
+
+  return { underlyingAmount, debtTokenAmount, feesUnderlying, feesDebtToken };
+}
+
+// write a function called getUniswapLPTokenIds that uses our erc721 subgraph to get all the nfts a user owns from the position manager contract
+export async function getUniswapLPTokenIds(
+  address: string,
+  token: SupportedToken,
+): Promise<string[]> {
+  const client = clientFromUrl(configs[token].erc721Subgraph);
+  const { data, error } = await client
+    .query(NftsForAccountAndCollectionDocument, {
+      collections: [process.env.NEXT_PUBLIC_POSITION_MANAGER!.toLowerCase()],
+      owner: address,
+    })
+    .toPromise();
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data?.tokens.map((token) => token.identifier) ?? [];
 }
