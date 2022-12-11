@@ -1,4 +1,5 @@
 import { GetServerSideProps } from 'next';
+import fs from 'fs';
 import React from 'react';
 import { captureException } from '@sentry/nextjs';
 import { configs, SupportedToken, validateToken } from 'lib/config';
@@ -122,6 +123,22 @@ export const getServerSideProps: GetServerSideProps<
     const rankedPlayers = playerScores.sort(
       (a, b) => b[1].totalBalance - a[1].totalBalance,
     );
+
+    const rankedJson: {
+      position: number;
+      address: string;
+      balance: HeroPlayerBalance;
+    }[] = [];
+
+    rankedPlayers.forEach((player, i) => {
+      rankedJson.push({
+        position: i + 1,
+        address: player[0],
+        balance: player[1],
+      });
+    });
+    const rankedJsonString = JSON.stringify(rankedJson);
+    fs.writeFileSync('ranked.json', rankedJsonString);
 
     return {
       props: {
