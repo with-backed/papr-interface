@@ -106,6 +106,8 @@ export const getServerSideProps: GetServerSideProps<
       configs[token].chainId,
     );
 
+    console.log('successfully got uniswapPool');
+
     const playerScores: [string, HeroPlayerBalance][] = await Promise.all(
       participatingPlayers.map(async (p) => [
         p.id,
@@ -118,6 +120,8 @@ export const getServerSideProps: GetServerSideProps<
         ),
       ]),
     );
+
+    console.log('successfully got playerScores');
 
     const rankedPlayers = playerScores.sort(
       (a, b) => b[1].totalBalance - a[1].totalBalance,

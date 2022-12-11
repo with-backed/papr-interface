@@ -36,6 +36,7 @@ export async function calculateNetPhUSDCBalance(
   oracleInfo: { [key: string]: ReservoirResponseData },
 ): Promise<HeroPlayerBalance> {
   const uniswapLPTokenIds = await getUniswapLPTokenIds(user.id, 'paprHero');
+  console.log(`successfully obtained uniswapLPTokenIds for ${user.id}`);
   const allPositionsInfo = await Promise.all(
     uniswapLPTokenIds.map((id) =>
       getLiquidityAndFeesForPosition(
@@ -47,6 +48,7 @@ export async function calculateNetPhUSDCBalance(
       ),
     ),
   );
+  console.log(`successfully obtained allPositionsInfo for ${user.id}`);
 
   const totalLiquidityAndFees = allPositionsInfo.reduce(
     (accumulator, current) => ({
