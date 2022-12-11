@@ -14,12 +14,6 @@ import { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-// const networks = (
-//   process.env.NEXT_PUBLIC_ENV === 'production'
-//     ? prodConfigs.map(({ tokenName }) => tokenName)
-//     : [...prodConfigs, ...devConfigs].map(({ tokenName }) => tokenName)
-// ) as SupportedToken[];
-
 const TOKEN_FROM_PATH_REGEXP = /\/tokens\/([^/]+)/;
 function tokenFromPath(path: string): SupportedToken {
   const match = path.match(TOKEN_FROM_PATH_REGEXP);
