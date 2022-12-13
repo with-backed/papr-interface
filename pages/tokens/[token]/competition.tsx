@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next';
-import React from 'react';
+import React, { ComponentProps } from 'react';
 import { captureException } from '@sentry/nextjs';
 import { configs, SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
@@ -12,9 +12,16 @@ import { ReservoirResponseData } from 'lib/oracle/reservoir';
 import { calculateNetPhUSDCBalance, HeroPlayerBalance } from 'lib/paprHeroes';
 import { fetchSubgraphData } from 'lib/PaprController';
 import { getAllPaprHeroPlayers } from 'lib/pAPRSubgraph';
-import { ONE } from 'lib/constants';
 import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
+import dynamic from 'next/dynamic';
+
+const Content = dynamic<ComponentProps<typeof HeroesLandingPageContent>>(
+  () =>
+    import(
+      'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent'
+    ).then((mod) => mod.HeroesLandingPageContent),
+  { ssr: false },
+);
 
 const DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD: Set<string> = new Set([
   // Claim contract
@@ -127,7 +134,7 @@ export default function HeroesLandingPage({
   return (
     <>
       <OpenGraph title={`paprHero | Competition`} />
-      <HeroesLandingPageContent
+      <Content
         collateral={allowedCollateral}
         oracleInfo={oracleInfo}
         rankedPlayers={rankedPlayers}
