@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { Button } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
 import {

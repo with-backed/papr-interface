@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { captureException } from '@sentry/nextjs';
 import { HeroesLandingPageContent } from 'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent';
 import { OpenGraph } from 'components/OpenGraph';

@@ -1,3 +1,5 @@
+import { BigNumber } from '@ethersproject/bignumber';
+
 export type Loan = {
   id: BigNumber;
   loanAssetContractAddress: string;

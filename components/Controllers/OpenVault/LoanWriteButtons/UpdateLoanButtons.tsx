@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import PaprControllerABI from 'abis/PaprController.json';
 import { TransactionButton } from 'components/Button';
 import { ethers } from 'ethers';

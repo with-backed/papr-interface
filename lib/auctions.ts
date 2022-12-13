@@ -1,3 +1,5 @@
+import { BigNumber } from '@ethersproject/bignumber';
+
 export function currentPrice(
   startPrice: BigNumber,
   secondsElapsed: number,

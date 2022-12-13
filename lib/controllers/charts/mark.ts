@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { Price, Token } from '@uniswap/sdk-core';
 import { getAddress } from 'ethers/lib/utils';
 import { Q192, SECONDS_IN_A_DAY } from 'lib/constants';

@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import { currentPrice } from 'lib/auctions';
 import { ONE } from 'lib/constants';
 import { convertOneScaledValue } from 'lib/controllers';
+import { BigNumber } from '@ethersproject/bignumber';
 
 const oneDayInSeconds = 60 * 60 * 24;
 const startPrice = BigNumber.from(10).pow(18);

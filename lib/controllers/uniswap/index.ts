@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { Token as UniswapToken } from '@uniswap/sdk-core';
 import { Pool } from '@uniswap/v3-sdk';
 import { ERC20Token } from 'lib/controllers/index';

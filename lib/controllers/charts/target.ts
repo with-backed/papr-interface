@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { configs, SupportedToken } from 'lib/config';

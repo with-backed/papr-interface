@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { SendTransactionResult } from '@wagmi/core';
 import { TransactionButton } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';

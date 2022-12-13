@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { ethers } from 'ethers';
 import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
 import { User } from 'types/generated/graphql/inKindSubgraph';

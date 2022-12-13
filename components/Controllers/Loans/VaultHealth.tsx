@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { Tooltip } from 'components/Tooltip';
 import { convertOneScaledValue } from 'lib/controllers';
 import { formatPercent } from 'lib/numberFormat';

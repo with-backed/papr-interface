@@ -1,3 +1,4 @@
+import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { ethers } from 'ethers';

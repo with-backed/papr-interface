@@ -10,6 +10,7 @@ import {
   IPaprController,
   ReservoirOracleUnderwriter,
 } from 'types/generated/abis/PaprController';
+import { BigNumber } from '@ethersproject/bignumber';
 
 const AddCollateralEncoderString =
   'addCollateral(tuple(address addr, uint256 id) collateral)';

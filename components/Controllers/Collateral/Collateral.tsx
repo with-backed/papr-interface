@@ -1,4 +1,5 @@
 import { useCollection } from '@center-inc/react';
+import { BigNumber } from '@ethersproject/bignumber';
 import { CenterAsset } from 'components/CenterAsset';
 import { Fieldset } from 'components/Fieldset';
 import { Tooltip } from 'components/Tooltip';

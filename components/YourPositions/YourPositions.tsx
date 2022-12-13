@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';

@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { TextButton } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
 import { EtherscanTransactionLink } from 'components/EtherscanLink';

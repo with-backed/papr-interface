@@ -3,6 +3,7 @@ import { computeLTVFromDebts } from 'lib/controllers';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
 import { useEffect, useState } from 'react';
+import { BigNumber } from '@ethersproject/bignumber';
 
 export function useLTVs(
   paprController: PaprController,

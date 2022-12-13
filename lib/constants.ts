@@ -1,3 +1,5 @@
+import { BigNumber } from '@ethersproject/bignumber';
+
 export const ONE = BigNumber.from(10).pow(18);
 export const SECONDS_IN_A_DAY = 60 * 60 * 24;
 export const SECONDS_IN_AN_HOUR = 60 * 60;

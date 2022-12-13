@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { useConfig } from 'hooks/useConfig';
 import { formatPercent } from 'lib/numberFormat';

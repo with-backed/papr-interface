@@ -1,3 +1,4 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { ethers } from 'ethers';
