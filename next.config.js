@@ -8,6 +8,7 @@ const { withSentryConfig } = require('@sentry/nextjs');
 const moduleExports = {
   // Your existing module.exports
   optimizeFonts: false,
+  productionBrowserSourceMaps: true,
 };
 
 const sentryWebpackPluginOptions = {
