@@ -18,6 +18,7 @@ import { Table } from 'components/Table';
 import { erc721Contract } from 'lib/contracts';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useShowMore } from 'hooks/useShowMore';
 
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -69,21 +70,8 @@ export function Activity({ paprController, vaultIds }: ActivityProps) {
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
   }, [activityData, paprController.id, swapsData, vaultIds]);
 
-  const [feed, setFeed] = useState<typeof allEvents>([]);
-  const [remaining, setRemaining] = useState<typeof allEvents>([]);
-
-  const handleShowMore = useCallback(() => {
-    const nextFive = remaining.slice(0, EVENT_INCREMENT);
-    setRemaining((prev) => prev.slice(EVENT_INCREMENT));
-    setFeed((prev) => prev.concat(nextFive));
-  }, [remaining]);
-
-  useEffect(() => {
-    if (allEvents.length > 0) {
-      setFeed(allEvents.slice(0, EVENT_INCREMENT));
-      setRemaining(allEvents.slice(EVENT_INCREMENT));
-    }
-  }, [allEvents]);
+  const { feed, amountThatWillShowNext, remainingLength, showMore } =
+    useShowMore(allEvents, EVENT_INCREMENT);
 
   if (swapsFetching || activityFetching) {
     return <Fieldset legend="🐝 Activity">Loading...</Fieldset>;
@@ -148,11 +136,10 @@ export function Activity({ paprController, vaultIds }: ActivityProps) {
           })}
         </tbody>
       </Table>
-      {remaining.length > 0 && (
+      {remainingLength > 0 && (
         <div className={styles['button-container']}>
-          <TextButton kind="clickable" onClick={handleShowMore}>
-            Load {Math.min(EVENT_INCREMENT, remaining.length)} more (of{' '}
-            {remaining.length})
+          <TextButton kind="clickable" onClick={showMore}>
+            Load {amountThatWillShowNext} more (of {remainingLength})
           </TextButton>
         </div>
       )}

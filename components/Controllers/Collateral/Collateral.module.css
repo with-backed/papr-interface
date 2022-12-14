@@ -1,7 +1,7 @@
 .wrapper {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 9px;
   justify-content: center;
 }
 
@@ -13,4 +13,9 @@
 .tile img {
   height: 48px;
   width: 48px;
+}
+
+.button-container {
+  text-align: center;
+  margin-top: 1.5rem;
 }
