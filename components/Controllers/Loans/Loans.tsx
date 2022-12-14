@@ -95,6 +95,9 @@ export function Loans({ paprController, pricesData }: LoansProps) {
         </thead>
         <tbody>
           {feed.map((v, i) => {
+            // TODO: I'm sure there was a reason we calculated all of the LTVs
+            // as a big block, but now that we're only rendering a subset at
+            // a time, we should also defer calculating LTVs for the hidden ones.
             const ltv = ltvs ? ltvs[v.id] : 0;
             const formattedDebt = formattedDebts[i];
             return (
