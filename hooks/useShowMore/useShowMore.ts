@@ -11,9 +11,9 @@ export function useShowMore<T>(allData: T[], increment = 5) {
   const [remaining, setRemaining] = useState<T[]>([]);
 
   const showMore = useCallback(() => {
-    const nextFive = remaining.slice(0, increment);
+    const nextBatch = remaining.slice(0, increment);
     setRemaining((prev) => prev.slice(increment));
-    setFeed((prev) => prev.concat(nextFive));
+    setFeed((prev) => prev.concat(nextBatch));
   }, [increment, remaining]);
 
   const amountThatWillShowNext = useMemo(
