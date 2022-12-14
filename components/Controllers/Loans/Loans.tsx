@@ -10,6 +10,8 @@ import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
 import { VaultHealth } from './VaultHealth';
 import { useLTVs } from 'hooks/useLTVs/useLTVs';
+import { useShowMore } from 'hooks/useShowMore';
+import { TextButton } from 'components/Button';
 
 type LoansProps = {
   paprController: PaprController;
@@ -59,6 +61,9 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     return debts;
   }, [activeVaults, paprController.debtToken.decimals]);
 
+  const { feed, remainingLength, showMore, amountThatWillShowNext } =
+    useShowMore(activeVaults);
+
   return (
     <Fieldset legend="💸 Loans">
       <Table className={styles.table} fixed>
@@ -89,7 +94,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
           </tr>
         </thead>
         <tbody>
-          {activeVaults.map((v, i) => {
+          {feed.map((v, i) => {
             const ltv = ltvs ? ltvs[v.id] : 0;
             const formattedDebt = formattedDebts[i];
             return (
@@ -106,6 +111,13 @@ export function Loans({ paprController, pricesData }: LoansProps) {
           })}
         </tbody>
       </Table>
+      {remainingLength > 0 && (
+        <div className={styles['button-container']}>
+          <TextButton kind="clickable" onClick={showMore}>
+            Load {amountThatWillShowNext} more (of {remainingLength})
+          </TextButton>
+        </div>
+      )}
     </Fieldset>
   );
 }
