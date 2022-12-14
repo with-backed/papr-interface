@@ -18,7 +18,7 @@ const developmentAlchemyKey = 'BtHbvji7nhBOC943JJB2XoXMSJAh64g-';
 const prodAlchemyKey = 'aoKdUYwv3VnTO9uURR6JzpZaf-9ssuRz';
 
 const alchemyId =
-  process.env.VERCEL_ENV === 'production'
+  process.env.NEXT_PUBLIC_ENV === 'production'
     ? prodAlchemyKey
     : developmentAlchemyKey;
 
