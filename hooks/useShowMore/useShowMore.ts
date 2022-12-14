@@ -25,5 +25,6 @@ export function useShowMore<T>(allData: T[], increment = 5) {
     amountThatWillShowNext,
     feed,
     showMore,
+    remainingLength: remaining.length,
   };
 }

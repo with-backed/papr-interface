@@ -8,7 +8,11 @@ describe('useShowMore', () => {
     const { result } = renderHook(() => useShowMore(data, 2));
 
     expect(result.current).toEqual(
-      expect.objectContaining({ feed: [1, 2], amountThatWillShowNext: 2 }),
+      expect.objectContaining({
+        feed: [1, 2],
+        amountThatWillShowNext: 2,
+        remainingLength: 3,
+      }),
     );
   });
 
@@ -16,7 +20,11 @@ describe('useShowMore', () => {
     const { result } = renderHook(() => useShowMore(data, 2));
 
     expect(result.current).toEqual(
-      expect.objectContaining({ feed: [1, 2], amountThatWillShowNext: 2 }),
+      expect.objectContaining({
+        feed: [1, 2],
+        amountThatWillShowNext: 2,
+        remainingLength: 3,
+      }),
     );
 
     // feed increases, amount to show decreases
@@ -25,6 +33,7 @@ describe('useShowMore', () => {
       expect.objectContaining({
         feed: [1, 2, 3, 4],
         amountThatWillShowNext: 1,
+        remainingLength: 1,
       }),
     );
 
@@ -34,6 +43,7 @@ describe('useShowMore', () => {
       expect.objectContaining({
         feed: [1, 2, 3, 4, 5],
         amountThatWillShowNext: 0,
+        remainingLength: 0,
       }),
     );
 
@@ -43,6 +53,7 @@ describe('useShowMore', () => {
       expect.objectContaining({
         feed: [1, 2, 3, 4, 5],
         amountThatWillShowNext: 0,
+        remainingLength: 0,
       }),
     );
   });
