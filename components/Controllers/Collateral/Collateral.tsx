@@ -13,6 +13,8 @@ import { CenterAsset } from 'components/CenterAsset';
 import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { computeLTVFromDebts } from 'lib/controllers';
+import { useShowMore } from 'hooks/useShowMore';
+import { TextButton } from 'components/Button';
 
 type CollateralProps = {
   paprController: PaprController;
@@ -20,6 +22,8 @@ type CollateralProps = {
   // instead of the whole controller
   vaultId?: string;
 };
+
+const COLLATERAL_INCREMENT = 30;
 
 export function Collateral({ paprController, vaultId }: CollateralProps) {
   const vaults = useMemo(() => {
@@ -39,6 +43,17 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
       .slice(0, 30);
   }, [vaults]);
 
+  const collateral = useMemo(
+    () =>
+      vaults.flatMap((vault) =>
+        vault.collateral.map((collateral) => ({ vault, collateral })),
+      ),
+    [vaults],
+  );
+
+  const { feed, remainingLength, showMore, amountThatWillShowNext } =
+    useShowMore(collateral, COLLATERAL_INCREMENT);
+
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
   if (!vaults || vaults.length === 0) {
@@ -52,7 +67,7 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
   return (
     <Fieldset legend="🖼 Collateral">
       <div className={styles.wrapper}>
-        {collateralSubset.map(({ vault: v, collateral: c }) => (
+        {feed.map(({ vault: v, collateral: c }) => (
           <Tile
             key={c.id}
             address={c.contractAddress}
@@ -63,6 +78,13 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
           />
         ))}
       </div>
+      {remainingLength > 0 && (
+        <div className={styles['button-container']}>
+          <TextButton kind="clickable" onClick={showMore}>
+            Load {amountThatWillShowNext} more (of {remainingLength})
+          </TextButton>
+        </div>
+      )}
     </Fieldset>
   );
 }
