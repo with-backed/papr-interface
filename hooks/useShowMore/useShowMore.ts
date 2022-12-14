@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 /**
  * Faux pagination for components where we've already downloaded the full
@@ -7,8 +7,8 @@ import { useCallback, useMemo, useState } from 'react';
  * @param increment the amount by which the paginated view should increase
  */
 export function useShowMore<T>(allData: T[], increment = 5) {
-  const [feed, setFeed] = useState<T[]>(allData.slice(0, increment));
-  const [remaining, setRemaining] = useState<T[]>(allData.slice(increment));
+  const [feed, setFeed] = useState<T[]>([]);
+  const [remaining, setRemaining] = useState<T[]>([]);
 
   const showMore = useCallback(() => {
     const nextFive = remaining.slice(0, increment);
@@ -20,6 +20,13 @@ export function useShowMore<T>(allData: T[], increment = 5) {
     () => Math.min(increment, remaining.length),
     [increment, remaining],
   );
+
+  useEffect(() => {
+    if (allData.length > 0) {
+      setFeed(allData.slice(0, increment));
+      setRemaining(allData.slice(increment));
+    }
+  }, [allData, increment]);
 
   return {
     amountThatWillShowNext,
