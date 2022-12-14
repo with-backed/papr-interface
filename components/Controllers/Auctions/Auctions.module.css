@@ -22,3 +22,8 @@
 .center {
   text-align: center;
 }
+
+.button-container {
+  text-align: center;
+  margin-top: 1.5rem;
+}
