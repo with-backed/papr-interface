@@ -14,14 +14,23 @@ export type SupportedNetwork = 'ethereum' | 'goerli';
 // Limited Alchemy API key for use on localdev only. Prod ones can only be used from our prod site's location.
 const developmentAlchemyKey = 'BtHbvji7nhBOC943JJB2XoXMSJAh64g-';
 
+// Paid alchemy key. Safe to include in code because it is scoped to our domain.j
+const prodAlchemyKey = 'aoKdUYwv3VnTO9uURR6JzpZaf-9ssuRz';
+
+const alchemyId =
+  process.env.VERCEL_ENV === 'production'
+    ? prodAlchemyKey
+    : developmentAlchemyKey;
+
+const goerliJsonRpcProvider = `https://eth-goerli.alchemyapi.io/v2/${alchemyId}`;
+
 const paprTrash: Config = {
   ...baseConfig,
   tokenName: 'paprTrash',
   centerNetwork: 'ethereum-goerli',
   chainId: 5,
-  jsonRpcProvider:
-    'https://eth-goerli.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
-  alchemyId: developmentAlchemyKey,
+  jsonRpcProvider: goerliJsonRpcProvider,
+  alchemyId,
   openSeaUrl: 'https://testnets.opensea.io',
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
@@ -49,11 +58,8 @@ const paprHero: Config = {
   tokenName: 'paprHero',
   centerNetwork: 'ethereum-goerli',
   chainId: 5,
-  jsonRpcProvider:
-    process.env.VERCEL_ENV === 'production'
-      ? 'https://eth-goerli.g.alchemy.com/v2/aoKdUYwv3VnTO9uURR6JzpZaf-9ssuRz'
-      : 'https://eth-goerli.alchemyapi.io/v2/BtHbvji7nhBOC943JJB2XoXMSJAh64g-',
-  alchemyId: developmentAlchemyKey,
+  jsonRpcProvider: goerliJsonRpcProvider,
+  alchemyId,
   openSeaUrl: 'https://testnets.opensea.io',
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
@@ -89,9 +95,8 @@ const paprMeme = {
   openSeaUrl: 'https://opensea.io',
   etherscanUrl: 'https://etherscan.io',
   chainId: 1,
-  jsonRpcProvider:
-    'https://eth-mainnet.alchemyapi.io/v2/De3LMv_8CYuN9WzVEgoOI5w7ltnGIhnH',
-  alchemyId: 'De3LMv_8CYuN9WzVEgoOI5w7ltnGIhnH',
+  jsonRpcProvider: `https://eth-mainnet.alchemyapi.io/v2/${alchemyId}`,
+  alchemyId,
   siteUrl: 'https://withbacked.xyz',
   network: 'ethereum',
   controllerAddress: 'TODO update this when we have a papr controller',
