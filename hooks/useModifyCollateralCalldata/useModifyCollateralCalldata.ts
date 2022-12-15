@@ -12,19 +12,19 @@ import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { getAddress } from 'ethers/lib/utils';
 
 const AddCollateralEncoderString =
-  'addCollateral(tuple(address addr, uint256 id) collateral)';
+  'addCollateral(tuple(address addr, uint256 id)[] collateralArr)';
 
 interface AddCollateralArgsStruct {
-  collateral: IPaprController.CollateralStruct;
+  collateralArr: IPaprController.CollateralStruct[];
 }
 
 interface RemoveCollateralArgsStruct {
   sendTo: string;
-  collateral: IPaprController.CollateralStruct;
+  collateralArr: IPaprController.CollateralStruct[];
   oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
 
-const RemoveCollateralEncoderString = `removeCollateral(address sendTo, tuple(address addr, uint256 id) collateral, ${oracleInfoArgEncoded})`;
+const RemoveCollateralEncoderString = `removeCollateral(address sendTo, tuple(address addr, uint256 id)[] collateralArr, ${oracleInfoArgEncoded})`;
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
 
@@ -35,50 +35,45 @@ export function useModifyCollateralCalldata(
   oracleInfo: OracleInfo,
 ) {
   const addCollateralCalldata = useMemo(() => {
-    if (!address) return [];
-
     const contractsAndTokenIds = depositNFTs.map((id) => deconstructFromId(id));
+    if (!address || contractsAndTokenIds.length === 0) return '';
 
-    const addCollateralArgs: AddCollateralArgsStruct[] =
-      contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
-        collateral: {
-          addr: contractAddress,
-          id: ethers.BigNumber.from(tokenId),
-        },
-      }));
+    const addCollateralArgs: AddCollateralArgsStruct = {
+      collateralArr: contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
+        addr: contractAddress,
+        id: ethers.BigNumber.from(tokenId),
+      })),
+    };
 
-    return addCollateralArgs.map((args) =>
-      paprControllerIFace.encodeFunctionData(AddCollateralEncoderString, [
-        args.collateral,
-      ]),
-    );
+    return paprControllerIFace.encodeFunctionData(AddCollateralEncoderString, [
+      addCollateralArgs.collateralArr,
+    ]);
   }, [address, depositNFTs]);
 
   const removeCollateralCalldata = useMemo(() => {
-    if (!address) return [];
-
     const contractsAndTokenIds = withdrawNFTs.map((id) =>
       deconstructFromId(id),
     );
+    if (!address || contractsAndTokenIds.length === 0) return '';
 
-    const removeCollateralArgs: RemoveCollateralArgsStruct[] =
-      contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
-        sendTo: address!,
-        collateral: {
-          addr: contractAddress,
-          id: ethers.BigNumber.from(tokenId),
-        },
-        oracleInfo: getOraclePayloadFromReservoirObject(
-          oracleInfo[getAddress(contractAddress)],
-        ),
-      }));
+    const removeCollateralArgs: RemoveCollateralArgsStruct = {
+      sendTo: address!,
+      collateralArr: contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
+        addr: contractAddress,
+        id: ethers.BigNumber.from(tokenId),
+      })),
+      oracleInfo: getOraclePayloadFromReservoirObject(
+        oracleInfo[getAddress(contractsAndTokenIds[0][0])], // TODO(adamgobes): make sure we check all contract addresses are the same
+      ),
+    };
 
-    return removeCollateralArgs.map((args) =>
-      paprControllerIFace.encodeFunctionData(RemoveCollateralEncoderString, [
-        args.sendTo,
-        args.collateral,
-        args.oracleInfo,
-      ]),
+    return paprControllerIFace.encodeFunctionData(
+      RemoveCollateralEncoderString,
+      [
+        removeCollateralArgs.sendTo,
+        removeCollateralArgs.collateralArr,
+        removeCollateralArgs.oracleInfo,
+      ],
     );
   }, [address, withdrawNFTs, oracleInfo]);
 

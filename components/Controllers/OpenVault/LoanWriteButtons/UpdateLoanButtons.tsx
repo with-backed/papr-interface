@@ -1,6 +1,9 @@
 import { ethers } from 'ethers';
 import { PaprController } from 'lib/PaprController';
-import { ReservoirOracleUnderwriter } from 'types/generated/abis/PaprController';
+import {
+  IPaprController,
+  ReservoirOracleUnderwriter,
+} from 'types/generated/abis/PaprController';
 import PaprControllerABI from 'abis/PaprController.json';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import {
@@ -13,7 +16,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TransactionButton } from 'components/Button';
 import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
-import { oracleInfoArgEncoded } from 'lib/constants';
+import { oracleInfoArgEncoded, swapParamsArgEncoded } from 'lib/constants';
 import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { getAddress } from 'ethers/lib/utils';
 import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
@@ -82,8 +85,8 @@ export function BorrowPerpetualButton({
   const calldata = useMemo(
     () =>
       [
-        ...addCollateralCalldata,
-        ...removeCollateralCalldata,
+        addCollateralCalldata,
+        removeCollateralCalldata,
         borrowPerpetualCalldata,
       ].filter((c) => !!c),
     [addCollateralCalldata, removeCollateralCalldata, borrowPerpetualCalldata],
@@ -151,8 +154,8 @@ export function RepayPerpetualButton({
     () =>
       [
         repayPerpetualCalldata,
-        ...addCollateralCalldata,
-        ...removeCollateralCalldata,
+        addCollateralCalldata,
+        removeCollateralCalldata,
       ].filter((c) => !!c),
     [addCollateralCalldata, removeCollateralCalldata, repayPerpetualCalldata],
   );
@@ -177,16 +180,12 @@ export function RepayPerpetualButton({
   );
 }
 
-export const BuyAndReduceEncoderString =
-  'buyAndReduceDebt(address account, address collateralAsset, uint256 underlyingAmount, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo)';
+export const BuyAndReduceEncoderString = `buyAndReduceDebt(address account, address collateralAsset, ${swapParamsArgEncoded})`;
 
 export interface BuyAndReduceArgsStruct {
   account: string;
   collateralAsset: string;
-  underlyingAmount: ethers.BigNumber;
-  minOut: ethers.BigNumber;
-  sqrtPriceLimitX96: ethers.BigNumber;
-  proceedsTo: string;
+  swapParams: IPaprController.SwapParamsStruct;
 }
 
 type BorrowOrRepayWithSwapButtonProps = {
@@ -224,19 +223,19 @@ export function RepayWithSwapButton({
     const repayWithSwapArgs: BuyAndReduceArgsStruct = {
       account: address!,
       collateralAsset: collateralContractAddress,
-      underlyingAmount: amount,
-      minOut: quote,
-      sqrtPriceLimitX96: ethers.BigNumber.from(0),
-      proceedsTo: address!,
+      swapParams: {
+        amount,
+        minOut: quote,
+        sqrtPriceLimitX96: ethers.BigNumber.from(0),
+        swapFeeTo: ethers.constants.AddressZero,
+        swapFeeBips: ethers.BigNumber.from(0),
+      },
     };
 
     return paprControllerIFace.encodeFunctionData(BuyAndReduceEncoderString, [
       repayWithSwapArgs.account,
       repayWithSwapArgs.collateralAsset,
-      repayWithSwapArgs.underlyingAmount,
-      repayWithSwapArgs.minOut,
-      repayWithSwapArgs.sqrtPriceLimitX96,
-      repayWithSwapArgs.proceedsTo,
+      repayWithSwapArgs.swapParams,
     ]);
   }, [address, collateralContractAddress, amount, quote]);
 
@@ -244,8 +243,8 @@ export function RepayWithSwapButton({
     () =>
       [
         repayWithSwapCalldata,
-        ...addCollateralCalldata,
-        ...removeCollateralCalldata,
+        addCollateralCalldata,
+        removeCollateralCalldata,
       ].filter((c) => !!c),
     [addCollateralCalldata, removeCollateralCalldata, repayWithSwapCalldata],
   );
@@ -270,14 +269,12 @@ export function RepayWithSwapButton({
   );
 }
 
-export const MintAndSwapEncoderString = `mintAndSellDebt(address collateralAsset, uint256 debt, uint256 minOut, uint160 sqrtPriceLimitX96, address proceedsTo, ${oracleInfoArgEncoded})`;
+export const IncreaseAndSwapEncoderString = `increaseDebtAndSell(address proceedsTo, address collateralAsset, ${swapParamsArgEncoded}, ${oracleInfoArgEncoded})`;
 
-export interface MintAndSwapArgsStruct {
-  collateralAsset: string;
-  debt: ethers.BigNumber;
-  minOut: ethers.BigNumber;
-  sqrtPriceLimitX96: ethers.BigNumber;
+export interface IncreaseAndSwapStruct {
   proceedsTo: string;
+  collateralAsset: string;
+  swapParams: IPaprController.SwapParamsStruct;
   oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
 
@@ -300,32 +297,37 @@ export function BorrowWithSwapButton({
 
   const borrowWithSwapCalldata = useMemo(() => {
     if (!amount || !quote || amount.isZero()) return '';
-    const borrowWithSwapArgs: MintAndSwapArgsStruct = {
-      collateralAsset: collateralContractAddress,
-      debt: amount,
-      minOut: quote,
-      sqrtPriceLimitX96: ethers.BigNumber.from(0),
+    const borrowWithSwapArgs: IncreaseAndSwapStruct = {
       proceedsTo: address!,
+      collateralAsset: collateralContractAddress,
+      swapParams: {
+        amount,
+        minOut: quote,
+        sqrtPriceLimitX96: ethers.BigNumber.from(0),
+        swapFeeTo: ethers.constants.AddressZero,
+        swapFeeBips: ethers.BigNumber.from(0),
+      },
       oracleInfo: getOraclePayloadFromReservoirObject(
         oracleInfo[getAddress(collateralContractAddress)],
       ),
     };
 
-    return paprControllerIFace.encodeFunctionData(MintAndSwapEncoderString, [
-      borrowWithSwapArgs.collateralAsset,
-      borrowWithSwapArgs.debt,
-      borrowWithSwapArgs.minOut,
-      borrowWithSwapArgs.sqrtPriceLimitX96,
-      borrowWithSwapArgs.proceedsTo,
-      borrowWithSwapArgs.oracleInfo,
-    ]);
+    return paprControllerIFace.encodeFunctionData(
+      IncreaseAndSwapEncoderString,
+      [
+        borrowWithSwapArgs.proceedsTo,
+        borrowWithSwapArgs.collateralAsset,
+        borrowWithSwapArgs.swapParams,
+        borrowWithSwapArgs.oracleInfo,
+      ],
+    );
   }, [address, collateralContractAddress, amount, quote, oracleInfo]);
 
   const calldata = useMemo(
     () =>
       [
-        ...addCollateralCalldata,
-        ...removeCollateralCalldata,
+        addCollateralCalldata,
+        removeCollateralCalldata,
         borrowWithSwapCalldata,
       ].filter((c) => !!c),
     [addCollateralCalldata, removeCollateralCalldata, borrowWithSwapCalldata],

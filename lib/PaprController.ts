@@ -144,10 +144,6 @@ class PaprControllerInternal {
     return this._contract.lastUpdated();
   }
 
-  multiplier() {
-    return this._contract.multiplier();
-  }
-
   async newTarget() {
     const now = Date.now() / 1000;
     if (now - this._targetLastFetched > 10 || !this._cachedNewTarget) {
@@ -188,46 +184,6 @@ class PaprControllerInternal {
     );
     this._pool = pool;
     return pool;
-  }
-
-  async mintAndSellDebt(
-    collateralAsset: string,
-    debt: ethers.BigNumberish,
-    minOut: ethers.BigNumberish,
-    sqrtPriceLimitX96: ethers.BigNumberish,
-    proceedsTo: string,
-    oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct,
-    overrides?: Overrides & { from?: string | Promise<string> },
-  ) {
-    return this._contract.mintAndSellDebt(
-      collateralAsset,
-      debt,
-      minOut,
-      sqrtPriceLimitX96,
-      proceedsTo,
-      oracleInfo,
-      overrides,
-    );
-  }
-
-  async buyAndReduceDebt(
-    account: string,
-    collateralAsset: string,
-    underlyingAmount: ethers.BigNumberish,
-    minOut: ethers.BigNumberish,
-    sqrtPriceLimitX96: ethers.BigNumberish,
-    proceedsTo: string,
-    overrides?: Overrides & { from?: string | Promise<string> },
-  ) {
-    return this._contract.buyAndReduceDebt(
-      account,
-      collateralAsset,
-      underlyingAmount,
-      minOut,
-      sqrtPriceLimitX96,
-      proceedsTo,
-      overrides,
-    );
   }
 
   async reduceDebt(
