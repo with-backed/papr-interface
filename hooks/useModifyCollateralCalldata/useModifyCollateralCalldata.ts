@@ -34,36 +34,68 @@ export function useModifyCollateralCalldata(
   address: string | undefined,
   oracleInfo: OracleInfo,
 ) {
+  const depositContractsAndTokenIds = useMemo(() => {
+    return depositNFTs.map((id) => deconstructFromId(id));
+  }, [depositNFTs]);
+
+  const withdrawContractsAndTokenIds = useMemo(() => {
+    return withdrawNFTs.map((id) => deconstructFromId(id));
+  }, [withdrawNFTs]);
+
+  const allDepositNFTsEqualContracts = useMemo(() => {
+    return depositContractsAndTokenIds.every(
+      ([contractAddress, _]) =>
+        contractAddress === depositContractsAndTokenIds[0][0],
+    );
+  }, [depositContractsAndTokenIds]);
+
+  const allWithdrawNFTsEqualContracts = useMemo(() => {
+    return withdrawContractsAndTokenIds.every(
+      ([contractAddress, _]) =>
+        contractAddress === withdrawContractsAndTokenIds[0][0],
+    );
+  }, [withdrawContractsAndTokenIds]);
+
   const addCollateralCalldata = useMemo(() => {
-    const contractsAndTokenIds = depositNFTs.map((id) => deconstructFromId(id));
-    if (!address || contractsAndTokenIds.length === 0) return '';
+    if (
+      !address ||
+      depositContractsAndTokenIds.length === 0 ||
+      !allDepositNFTsEqualContracts
+    )
+      return '';
 
     const addCollateralArgs: AddCollateralArgsStruct = {
-      collateralArr: contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
-        addr: contractAddress,
-        id: ethers.BigNumber.from(tokenId),
-      })),
+      collateralArr: depositContractsAndTokenIds.map(
+        ([contractAddress, tokenId]) => ({
+          addr: contractAddress,
+          id: ethers.BigNumber.from(tokenId),
+        }),
+      ),
     };
 
     return paprControllerIFace.encodeFunctionData(AddCollateralEncoderString, [
       addCollateralArgs.collateralArr,
     ]);
-  }, [address, depositNFTs]);
+  }, [address, depositContractsAndTokenIds, allDepositNFTsEqualContracts]);
 
   const removeCollateralCalldata = useMemo(() => {
-    const contractsAndTokenIds = withdrawNFTs.map((id) =>
-      deconstructFromId(id),
-    );
-    if (!address || contractsAndTokenIds.length === 0) return '';
+    if (
+      !address ||
+      withdrawContractsAndTokenIds.length === 0 ||
+      !allWithdrawNFTsEqualContracts
+    )
+      return '';
 
     const removeCollateralArgs: RemoveCollateralArgsStruct = {
       sendTo: address!,
-      collateralArr: contractsAndTokenIds.map(([contractAddress, tokenId]) => ({
-        addr: contractAddress,
-        id: ethers.BigNumber.from(tokenId),
-      })),
+      collateralArr: withdrawContractsAndTokenIds.map(
+        ([contractAddress, tokenId]) => ({
+          addr: contractAddress,
+          id: ethers.BigNumber.from(tokenId),
+        }),
+      ),
       oracleInfo: getOraclePayloadFromReservoirObject(
-        oracleInfo[getAddress(contractsAndTokenIds[0][0])], // TODO(adamgobes): make sure we check all contract addresses are the same
+        oracleInfo[getAddress(withdrawContractsAndTokenIds[0][0])],
       ),
     };
 
@@ -75,7 +107,12 @@ export function useModifyCollateralCalldata(
         removeCollateralArgs.oracleInfo,
       ],
     );
-  }, [address, withdrawNFTs, oracleInfo]);
+  }, [
+    address,
+    withdrawContractsAndTokenIds,
+    allWithdrawNFTsEqualContracts,
+    oracleInfo,
+  ]);
 
   return { addCollateralCalldata, removeCollateralCalldata };
 }
