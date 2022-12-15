@@ -1,12 +1,13 @@
 import { BigNumber } from '@ethersproject/bignumber';
+import { TextButton } from 'components/Button';
 import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useLTVs } from 'hooks/useLTVs/useLTVs';
-import { ControllerPricesData } from 'lib/controllers/charts';
+import { useShowMore } from 'hooks/useShowMore';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { PaprController } from 'lib/PaprController';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import styles from './Loans.module.css';
 import { VaultHealth } from './VaultHealth';
@@ -14,10 +15,9 @@ import { VaultRow } from './VaultRow';
 
 type LoansProps = {
   paprController: PaprController;
-  pricesData: ControllerPricesData | null;
 };
 
-export function Loans({ paprController, pricesData }: LoansProps) {
+export function Loans({ paprController }: LoansProps) {
   const maxLTV = useMemo(() => paprController.maxLTVBigNum, [paprController]);
   const activeVaults = useMemo(
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
@@ -60,6 +60,9 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     return debts;
   }, [activeVaults, paprController.debtToken.decimals]);
 
+  const { feed, remainingLength, showMore, amountThatWillShowNext } =
+    useShowMore(activeVaults);
+
   return (
     <Fieldset legend="💸 Loans">
       <Table className={styles.table} fixed>
@@ -90,7 +93,10 @@ export function Loans({ paprController, pricesData }: LoansProps) {
           </tr>
         </thead>
         <tbody>
-          {activeVaults.map((v, i) => {
+          {feed.map((v, i) => {
+            // TODO: I'm sure there was a reason we calculated all of the LTVs
+            // as a big block, but now that we're only rendering a subset at
+            // a time, we should also defer calculating LTVs for the hidden ones.
             const ltv = ltvs ? ltvs[v.id] : 0;
             const formattedDebt = formattedDebts[i];
             return (
@@ -107,6 +113,13 @@ export function Loans({ paprController, pricesData }: LoansProps) {
           })}
         </tbody>
       </Table>
+      {remainingLength > 0 && (
+        <div className={styles['button-container']}>
+          <TextButton kind="clickable" onClick={showMore}>
+            Load {amountThatWillShowNext} more (of {remainingLength})
+          </TextButton>
+        </div>
+      )}
     </Fieldset>
   );
 }

@@ -7,6 +7,7 @@ import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useShowMore } from 'hooks/useShowMore';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useTimestamp } from 'hooks/useTimestamp';
 import { currentPrice } from 'lib/auctions';
@@ -323,6 +324,8 @@ type PastAuctionsProps = {
 };
 function PastAuctions({ auctions, fetching }: PastAuctionsProps) {
   const legend = '🕰 Past Auctions';
+  const { feed, remainingLength, amountThatWillShowNext, showMore } =
+    useShowMore(auctions);
   if (fetching) {
     return <Fieldset legend={legend}>Loading auctions...</Fieldset>;
   }
@@ -345,11 +348,18 @@ function PastAuctions({ auctions, fetching }: PastAuctionsProps) {
           </tr>
         </thead>
         <tbody>
-          {auctions.map((auction) => (
+          {feed.map((auction) => (
             <PastAuctionRow key={auction.id} auction={auction} />
           ))}
         </tbody>
       </Table>
+      {remainingLength > 0 && (
+        <div className={styles['button-container']}>
+          <TextButton kind="clickable" onClick={showMore}>
+            Load {amountThatWillShowNext} more (of {remainingLength})
+          </TextButton>
+        </div>
+      )}
     </Fieldset>
   );
 }

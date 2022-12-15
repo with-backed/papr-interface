@@ -1,16 +1,18 @@
 import { useCollection } from '@center-inc/react';
 import { BigNumber } from '@ethersproject/bignumber';
+import { TextButton } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
 import { Fieldset } from 'components/Fieldset';
 import { Tooltip } from 'components/Tooltip';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useShowMore } from 'hooks/useShowMore';
 import { computeLTVFromDebts } from 'lib/controllers';
 import { formatPercent } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
 
 import styles from './Collateral.module.css';
@@ -21,6 +23,8 @@ type CollateralProps = {
   // instead of the whole controller
   vaultId?: string;
 };
+
+const COLLATERAL_INCREMENT = 30;
 
 export function Collateral({ paprController, vaultId }: CollateralProps) {
   const vaults = useMemo(() => {
@@ -40,6 +44,17 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
       .slice(0, 30);
   }, [vaults]);
 
+  const collateral = useMemo(
+    () =>
+      vaults.flatMap((vault) =>
+        vault.collateral.map((collateral) => ({ vault, collateral })),
+      ),
+    [vaults],
+  );
+
+  const { feed, remainingLength, showMore, amountThatWillShowNext } =
+    useShowMore(collateral, COLLATERAL_INCREMENT);
+
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
   if (!vaults || vaults.length === 0) {
@@ -53,7 +68,7 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
   return (
     <Fieldset legend="🖼 Collateral">
       <div className={styles.wrapper}>
-        {collateralSubset.map(({ vault: v, collateral: c }) => (
+        {feed.map(({ vault: v, collateral: c }) => (
           <Tile
             key={c.id}
             address={c.contractAddress}
@@ -64,6 +79,13 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
           />
         ))}
       </div>
+      {remainingLength > 0 && (
+        <div className={styles['button-container']}>
+          <TextButton kind="clickable" onClick={showMore}>
+            Load {amountThatWillShowNext} more (of {remainingLength})
+          </TextButton>
+        </div>
+      )}
     </Fieldset>
   );
 }

@@ -8,13 +8,14 @@ import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useActivityByController } from 'hooks/useActivityByController';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useShowMore } from 'hooks/useShowMore';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { erc721Contract } from 'lib/contracts';
 import { humanizedTimestamp } from 'lib/duration';
 import { formatTokenAmount } from 'lib/numberFormat';
 import { PaprController } from 'lib/PaprController';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import { SwapsByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
 
@@ -70,21 +71,8 @@ export function Activity({ paprController, vaultIds }: ActivityProps) {
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
   }, [activityData, paprController.id, swapsData, vaultIds]);
 
-  const [feed, setFeed] = useState<typeof allEvents>([]);
-  const [remaining, setRemaining] = useState<typeof allEvents>([]);
-
-  const handleShowMore = useCallback(() => {
-    const nextFive = remaining.slice(0, EVENT_INCREMENT);
-    setRemaining((prev) => prev.slice(EVENT_INCREMENT));
-    setFeed((prev) => prev.concat(nextFive));
-  }, [remaining]);
-
-  useEffect(() => {
-    if (allEvents.length > 0) {
-      setFeed(allEvents.slice(0, EVENT_INCREMENT));
-      setRemaining(allEvents.slice(EVENT_INCREMENT));
-    }
-  }, [allEvents]);
+  const { feed, amountThatWillShowNext, remainingLength, showMore } =
+    useShowMore(allEvents, EVENT_INCREMENT);
 
   if (swapsFetching || activityFetching) {
     return <Fieldset legend="🐝 Activity">Loading...</Fieldset>;
@@ -149,11 +137,10 @@ export function Activity({ paprController, vaultIds }: ActivityProps) {
           })}
         </tbody>
       </Table>
-      {remaining.length > 0 && (
+      {remainingLength > 0 && (
         <div className={styles['button-container']}>
-          <TextButton kind="clickable" onClick={handleShowMore}>
-            Load {Math.min(EVENT_INCREMENT, remaining.length)} more (of{' '}
-            {remaining.length})
+          <TextButton kind="clickable" onClick={showMore}>
+            Load {amountThatWillShowNext} more (of {remainingLength})
           </TextButton>
         </div>
       )}

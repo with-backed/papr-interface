@@ -12,7 +12,16 @@ import { fetchSubgraphData } from 'lib/PaprController';
 import { calculateNetPhUSDCBalance, HeroPlayerBalance } from 'lib/paprHeroes';
 import { getAllPaprHeroPlayers } from 'lib/pAPRSubgraph';
 import { GetServerSideProps } from 'next';
-import React from 'react';
+import dynamic from 'next/dynamic';
+import { ComponentProps } from 'react';
+
+const Content = dynamic<ComponentProps<typeof HeroesLandingPageContent>>(
+  () =>
+    import(
+      'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent'
+    ).then((mod) => mod.HeroesLandingPageContent),
+  { ssr: false },
+);
 
 const DO_NOT_SHOW_THESE_ADDRESSES_ON_LEADERBOARD: Set<string> = new Set([
   // Claim contract
@@ -125,7 +134,7 @@ export default function HeroesLandingPage({
   return (
     <>
       <OpenGraph title={`paprHero | Competition`} />
-      <HeroesLandingPageContent
+      <Content
         collateral={allowedCollateral}
         oracleInfo={oracleInfo}
         rankedPlayers={rankedPlayers}

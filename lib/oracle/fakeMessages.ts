@@ -24,8 +24,8 @@ export const dummyOracleInfoMap = {
   ],
 };
 
-const UNDERLYING_ADDRESS = '0x3089b47853df1b82877beef6d904a0ce98a12553';
-const UNDERLYING_DECIMALS = 18;
+const UNDERLYING_ADDRESS = '0xf5f4619764b3bcba95aba3b25212365fc6166862';
+const UNDERLYING_DECIMALS = 6;
 
 const EIP712_TYPES = {
   Message: {

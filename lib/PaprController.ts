@@ -2,7 +2,6 @@ import { Provider } from '@ethersproject/abstract-provider';
 import { Signer } from '@ethersproject/abstract-signer';
 import { BigNumber, BigNumberish } from '@ethersproject/bignumber';
 import { hexValue } from '@ethersproject/bytes';
-import { Overrides } from '@ethersproject/contracts';
 import { AlchemyProvider } from '@ethersproject/providers';
 import { parseUnits } from '@ethersproject/units';
 import { Pool } from '@uniswap/v3-sdk';
@@ -150,10 +149,6 @@ class PaprControllerInternal {
     return this._contract.lastUpdated();
   }
 
-  multiplier() {
-    return this._contract.multiplier();
-  }
-
   async newTarget() {
     const now = Date.now() / 1000;
     if (now - this._targetLastFetched > 10 || !this._cachedNewTarget) {
@@ -194,46 +189,6 @@ class PaprControllerInternal {
     );
     this._pool = pool;
     return pool;
-  }
-
-  async mintAndSellDebt(
-    collateralAsset: string,
-    debt: BigNumberish,
-    minOut: BigNumberish,
-    sqrtPriceLimitX96: BigNumberish,
-    proceedsTo: string,
-    oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct,
-    overrides?: Overrides & { from?: string | Promise<string> },
-  ) {
-    return this._contract.mintAndSellDebt(
-      collateralAsset,
-      debt,
-      minOut,
-      sqrtPriceLimitX96,
-      proceedsTo,
-      oracleInfo,
-      overrides,
-    );
-  }
-
-  async buyAndReduceDebt(
-    account: string,
-    collateralAsset: string,
-    underlyingAmount: BigNumberish,
-    minOut: BigNumberish,
-    sqrtPriceLimitX96: BigNumberish,
-    proceedsTo: string,
-    overrides?: Overrides & { from?: string | Promise<string> },
-  ) {
-    return this._contract.buyAndReduceDebt(
-      account,
-      collateralAsset,
-      underlyingAmount,
-      minOut,
-      sqrtPriceLimitX96,
-      proceedsTo,
-      overrides,
-    );
   }
 
   async reduceDebt(
