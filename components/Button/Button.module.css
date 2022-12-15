@@ -18,7 +18,7 @@
 .small {
   padding: var(--padding-button-small);
   font-size: var(--font-large);
-  min-height: 45px;
+  height: 45px;
 }
 
 .xsmall {
@@ -208,7 +208,7 @@
 }
 
 .failure {
-  background-color: #F3D4DF;
+  background-color: #f3d4df;
 }
 
 .failure > svg {
