@@ -16,11 +16,10 @@ export type TestProps = {
 export const getServerSideProps: GetServerSideProps<TestProps> = async (
   context,
 ) => {
-  const address = (context.params?.controller as string).toLowerCase();
   const token = context.params?.token as SupportedToken;
 
   const controllerSubgraphData = await fetchSubgraphData(
-    address,
+    configs[token].controllerAddress,
     configs[token].uniswapSubgraph,
     token,
   );
