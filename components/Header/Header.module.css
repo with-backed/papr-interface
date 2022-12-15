@@ -45,7 +45,7 @@
 
 .nav {
   width: 100%;
-  padding: 20px 0;
+  padding: 21px 0;
   height: 151px;
 }
 
@@ -96,13 +96,13 @@
 
 .mobile-content .links {
   flex-direction: column;
-  margin-top: 7px;
+  margin-top: 5px;
   margin-bottom: 15px;
 }
 
 .entry {
   padding: 5px 15px;
-  height: 45px;
+  height: 44px;
   display: flex;
   flex-direction: row;
   white-space: nowrap;
@@ -113,6 +113,7 @@
 
 .link {
   composes: entry;
+  height: 44px;
 }
 
 .link,

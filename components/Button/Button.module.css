@@ -18,7 +18,7 @@
 .small {
   padding: var(--padding-button-small);
   font-size: var(--font-large);
-  height: 45px;
+  height: 44px;
 }
 
 .xsmall {
