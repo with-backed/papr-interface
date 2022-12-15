@@ -36,7 +36,7 @@ const LINKS: Link[] = [
     href: DISCORD_URL,
   },
   {
-    title: '🥕 Community NFT',
+    title: '🥕 Community NFT 🔨',
     href: 'https://www.withbacked.xyz/community',
   },
 ];
@@ -55,7 +55,6 @@ export function Footer() {
             </li>
           );
         })}
-        <li>🔨</li>
       </ul>
     </footer>
   );
