@@ -1,6 +1,8 @@
 import { DISCORD_URL, GITHUB_URL, TWITTER_URL } from 'lib/constants';
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import Bunny from 'public/logos/backed-bunny.png';
 import styles from './Footer.module.css';
 
 type Link = {
@@ -9,10 +11,10 @@ type Link = {
 };
 
 const LINKS: Link[] = [
-  // {
-  //   title: '🤝 Terms of Service',
-  //   href: '/legal/terms-of-service.pdf',
-  // },
+  {
+    title: '🤝 Terms of Service',
+    href: '/legal/terms-of-service.pdf',
+  },
   {
     title: '🔒 Privacy Policy',
     href: '/legal/privacy-policy.pdf',
@@ -33,11 +35,16 @@ const LINKS: Link[] = [
     title: '📣 Discord',
     href: DISCORD_URL,
   },
+  {
+    title: '🥕 Community NFT',
+    href: 'https://www.withbacked.xyz/community',
+  },
 ];
 
 export function Footer() {
   return (
     <footer className={styles.footer}>
+      <Image src={Bunny} alt="Backed Bunny Logo" height={64} />
       <ul className={styles['footer-links']}>
         {LINKS.map((link) => {
           return (
@@ -48,7 +55,7 @@ export function Footer() {
             </li>
           );
         })}
-        <li>🥕</li>
+        <li>🔨</li>
       </ul>
     </footer>
   );
