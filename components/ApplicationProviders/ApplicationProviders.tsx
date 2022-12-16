@@ -1,23 +1,23 @@
+import { CenterProvider } from '@center-inc/react';
 import {
+  DisclaimerComponent,
   getDefaultWallets,
   lightTheme,
   RainbowKitProvider,
-  DisclaimerComponent,
 } from '@rainbow-me/rainbowkit';
 import { useConfig } from 'hooks/useConfig';
 import { GlobalMessagingProvider } from 'hooks/useGlobalMessages';
+import { PaprBalanceProvider } from 'hooks/usePaprBalance';
 import { TimestampProvider } from 'hooks/useTimestamp/useTimestamp';
-import React, { PropsWithChildren, useMemo } from 'react';
-import { WagmiConfig, chain, createClient, configureChains } from 'wagmi';
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { infuraProvider } from 'wagmi/providers/infura';
-import { publicProvider } from 'wagmi/providers/public';
+import { FunctionComponent, useMemo } from 'react';
 import {
   createClient as createUrqlClient,
   Provider as UrqlProvider,
 } from 'urql';
-import { CenterProvider } from '@center-inc/react';
-import { PaprBalanceProvider } from 'hooks/usePaprBalance';
+import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
+import { infuraProvider } from 'wagmi/providers/infura';
+import { publicProvider } from 'wagmi/providers/public';
 
 const prodChains = [chain.mainnet, chain.goerli];
 const CHAINS =
@@ -37,10 +37,7 @@ const Disclaimer: DisclaimerComponent = ({ Text, Link }) => (
   </Text>
 );
 
-type ApplicationProvidersProps = {};
-export const ApplicationProviders = ({
-  children,
-}: PropsWithChildren<ApplicationProvidersProps>) => {
+export const ApplicationProviders: FunctionComponent = ({ children }) => {
   const { infuraId, alchemyId, network, centerNetwork, paprMemeSubgraph } =
     useConfig();
   const orderedChains = useMemo(() => {
@@ -94,7 +91,7 @@ export const ApplicationProviders = ({
           {/* TODO: make this typesafe? */}
           <CenterProvider
             network={centerNetwork as any}
-            apiKey={process.env.NEXT_PUBLIC_CENTER_KEY!}>
+            apiKey={process.env.NEXT_PUBLIC_CENTER_KEY ?? ''}>
             <PaprBalanceProvider>
               <TimestampProvider>
                 <UrqlProvider value={inKindClient}>{children}</UrqlProvider>

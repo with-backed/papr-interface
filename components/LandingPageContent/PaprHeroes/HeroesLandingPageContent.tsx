@@ -260,7 +260,7 @@ function PHUSDC() {
             <tr>
               <td>
                 <p>
-                  {!!currentBalance
+                  {currentBalance
                     ? parseFloat(
                         ethers.utils.formatUnits(currentBalance, decimals),
                       ).toFixed(2)
@@ -270,9 +270,9 @@ function PHUSDC() {
               <td>
                 <input
                   value={
-                    !!value
+                    value
                       ? value
-                      : !!stakeInfo
+                      : stakeInfo
                       ? ethers.utils.formatUnits(stakeInfo[0], decimals)
                       : 0
                   }

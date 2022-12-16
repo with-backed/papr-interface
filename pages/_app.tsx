@@ -1,30 +1,19 @@
-import 'styles/global.css';
-import 'styles/fonts-maru.css';
-import 'normalize.css';
 import '@rainbow-me/rainbowkit/styles.css';
-import { AppProps } from 'next/app';
-import { AppWrapper } from 'components/layouts/AppWrapper';
-import { Footer } from 'components/Footer';
-import { ConfigProvider } from 'hooks/useConfig';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import {
-  SupportedToken,
-  prodConfigs,
-  devConfigs,
-  isSupportedToken,
-} from 'lib/config';
 import { ApplicationProviders } from 'components/ApplicationProviders';
-import { Header } from 'components/Header';
 import { ErrorBanners } from 'components/ErrorBanners';
+import { Footer } from 'components/Footer';
+import { Header } from 'components/Header';
+import { AppWrapper } from 'components/layouts/AppWrapper';
+import { ConfigProvider } from 'hooks/useConfig';
+import { isSupportedToken, SupportedToken } from 'lib/config';
+import { AppProps } from 'next/app';
+import { useRouter } from 'next/router';
+import 'normalize.css';
+import { useEffect, useState } from 'react';
+import 'styles/fonts-maru.css';
+import 'styles/global.css';
 
-const networks = (
-  process.env.NEXT_PUBLIC_ENV === 'production'
-    ? prodConfigs.map(({ tokenName }) => tokenName)
-    : [...prodConfigs, ...devConfigs].map(({ tokenName }) => tokenName)
-) as SupportedToken[];
-
-const TOKEN_FROM_PATH_REGEXP = /\/tokens\/([^\/]+)/;
+const TOKEN_FROM_PATH_REGEXP = /\/tokens\/([^/]+)/;
 function tokenFromPath(path: string): SupportedToken {
   const match = path.match(TOKEN_FROM_PATH_REGEXP);
   if (match && isSupportedToken(match[1])) {

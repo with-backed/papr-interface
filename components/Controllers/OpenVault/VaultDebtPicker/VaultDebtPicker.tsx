@@ -596,7 +596,7 @@ function AmountToBorrowOrRepayInput({
   const [editingInput, setEditingInput] = useState<boolean>(false);
 
   const inputValue = useMemo(() => {
-    const amountBigNumber = !!amount
+    const amountBigNumber = amount
       ? ethers.utils.parseUnits(amount, decimals)
       : ethers.BigNumber.from(0);
     return formatBigNum(amountBigNumber, decimals);

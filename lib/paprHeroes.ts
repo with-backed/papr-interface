@@ -46,7 +46,7 @@ export async function calculateNetPhUSDCBalance(
   };
   const totalNFTWorth = Object.keys(oracleInfo).reduce(
     (accumulator, current) => {
-      var value =
+      let value =
         oracleInfo[current].price * parseInt(addressToCount(current, user));
       value = Math.floor(value * 1e6) / 1e6;
       return accumulator.add(ethers.utils.parseUnits(value.toString(), 6));
