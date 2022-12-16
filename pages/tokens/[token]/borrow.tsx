@@ -29,7 +29,13 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
   const token = context.params?.token as SupportedToken;
-  const address = getConfig(token).controllerAddress.toLocaleLowerCase();
+  const address: string | undefined =
+    getConfig(token)?.controllerAddress?.toLocaleLowerCase();
+  if (!address) {
+    return {
+      notFound: true,
+    };
+  }
 
   const controllerSubgraphData = await fetchSubgraphData(
     address,

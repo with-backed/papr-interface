@@ -24,7 +24,13 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 ) => {
   const token = context.params?.token as SupportedToken;
   const id = context.params?.id as string;
-  const address = getConfig(token).controllerAddress.toLocaleLowerCase();
+  const address: string | undefined =
+    getConfig(token)?.controllerAddress?.toLocaleLowerCase();
+  if (!address) {
+    return {
+      notFound: true,
+    };
+  }
 
   const controllerSubgraphData = await fetchSubgraphData(
     address,
@@ -33,9 +39,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   );
 
   if (!controllerSubgraphData) {
-    return {
-      notFound: true,
-    };
+    throw new Error('subgraph data not found');
   }
 
   const { pool, paprController } = controllerSubgraphData;

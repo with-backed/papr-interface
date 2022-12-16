@@ -26,7 +26,7 @@ const paprTrash: Config = {
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
-  controllerAddress: '0x6df74b0653ba2b622d911ef5680d1776d850ace9',
+  controllerAddress: '0x6df74b0653ba2b621d911ef5680d1776d850ace9',
   underlyingAddress: '0xf5f4619764b3bcba95aba3b25212365fc6166862',
   paprTokenAddress: '0x103da64f4366dc82ed0393716376a89dfee4b536',
   uniswapSubgraph:
