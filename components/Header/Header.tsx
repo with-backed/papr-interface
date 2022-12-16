@@ -54,13 +54,7 @@ const prodPages = (
   },
 ];
 
-const paprHeroPages: Page[] = [
-  {
-    name: 'Competition',
-    route: `competition`,
-    matcher: 'competition',
-  },
-];
+const paprHeroPages: Page[] = [];
 
 const stagingPages: Page[] = [];
 
