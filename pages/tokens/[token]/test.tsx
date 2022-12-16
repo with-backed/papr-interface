@@ -1,5 +1,5 @@
 import { TestPageContent } from 'components/Controllers/TestPageContent';
-import { configs, SupportedToken } from 'lib/config';
+import { configs, getConfig, SupportedToken } from 'lib/config';
 import {
   fetchSubgraphData,
   SubgraphPool,
@@ -17,17 +17,22 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
   context,
 ) => {
   const token = context.params?.token as SupportedToken;
+  const address: string | undefined =
+    getConfig(token)?.controllerAddress?.toLocaleLowerCase();
+  if (!address) {
+    return {
+      notFound: true,
+    };
+  }
 
   const controllerSubgraphData = await fetchSubgraphData(
-    configs[token].controllerAddress,
+    address,
     configs[token].uniswapSubgraph,
     token,
   );
 
   if (!controllerSubgraphData) {
-    return {
-      notFound: true,
-    };
+    throw new Error('subgraph data not found');
   }
 
   const { pool, paprController } = controllerSubgraphData;
