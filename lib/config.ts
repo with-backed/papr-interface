@@ -36,7 +36,9 @@ const paprTrash: Config = {
   oracleBaseUrl:
     process.env.NEXT_PUBLIC_ENV === 'local'
       ? 'http://localhost:3000'
-      : 'https://v2-interface-rosy.vercel.app',
+      : process.env.NEXT_PUBLIC_ENV === 'preview'
+      ? 'https://v2-interface-rosy.vercel.app'
+      : 'https://www.papr.wtf',
   paprUnderlyingAddress: '0x3089b47853df1b82877beef6d904a0ce98a12553',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
