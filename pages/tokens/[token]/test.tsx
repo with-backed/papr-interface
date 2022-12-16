@@ -7,6 +7,7 @@ import {
 } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 import { usePaprController } from 'hooks/usePaprController';
+import { captureException } from '@sentry/nextjs';
 
 export type TestProps = {
   subgraphController: SubgraphController;
@@ -32,7 +33,9 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
   );
 
   if (!controllerSubgraphData) {
-    throw new Error('subgraph data not found');
+    const e = new Error(`subgraph data for controller ${address} not found`);
+    captureException(e);
+    throw e;
   }
 
   const { pool, paprController } = controllerSubgraphData;

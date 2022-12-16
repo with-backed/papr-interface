@@ -12,6 +12,7 @@ import { VaultPageContent } from 'components/Controllers/VaultPageContent';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { controllerPricesData } from 'lib/controllers/charts';
 import { OpenGraph } from 'components/OpenGraph';
+import { captureException } from '@sentry/nextjs';
 
 type ServerSideProps = {
   vaultId: string;
@@ -39,7 +40,9 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   );
 
   if (!controllerSubgraphData) {
-    throw new Error('subgraph data not found');
+    const e = new Error(`subgraph data for controller ${address} not found`);
+    captureException(e);
+    throw e;
   }
 
   const { pool, paprController } = controllerSubgraphData;

@@ -16,6 +16,7 @@ import { usePaprController } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
 import { OpenGraph } from 'components/OpenGraph';
+import { captureException } from '@sentry/nextjs';
 
 type ServerSideProps = Omit<
   ControllerPageProps,
@@ -44,7 +45,9 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   );
 
   if (!controllerSubgraphData) {
-    throw new Error('subgraph data not found');
+    const e = new Error(`subgraph data for controller ${address} not found`);
+    captureException(e);
+    throw e;
   }
 
   const { pool, paprController } = controllerSubgraphData;
