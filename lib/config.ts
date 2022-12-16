@@ -11,16 +11,7 @@ export type Config = typeof paprMeme;
 export type SupportedToken = keyof typeof configs;
 export type SupportedNetwork = 'ethereum' | 'goerli';
 
-// Limited Alchemy API key for use on localdev only. Prod ones can only be used from our prod site's location.
-const developmentAlchemyKey = 'BtHbvji7nhBOC943JJB2XoXMSJAh64g-';
-
-// Paid alchemy key. Safe to include in code because it is scoped to our domain.j
-const prodAlchemyKey = 'aoKdUYwv3VnTO9uURR6JzpZaf-9ssuRz';
-
-const alchemyId =
-  process.env.NEXT_PUBLIC_ENV === 'production'
-    ? prodAlchemyKey
-    : developmentAlchemyKey;
+const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
 
 const goerliJsonRpcProvider = `https://eth-goerli.alchemyapi.io/v2/${alchemyId}`;
 
@@ -88,10 +79,6 @@ const paprMeme = {
   ...baseConfig,
   tokenName: 'paprMeme',
   centerNetwork: 'ethereum-mainnet',
-  infuraId:
-    process.env.VERCEL_ENV === 'production'
-      ? '54c753f04ec64374aa679e383e7f84d5'
-      : developmentAlchemyKey,
   openSeaUrl: 'https://opensea.io',
   etherscanUrl: 'https://etherscan.io',
   chainId: 1,
