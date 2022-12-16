@@ -53,7 +53,7 @@ export function makePaprController(
   const instance = new PaprControllerInternal(
     subgraphController,
     subgraphPool,
-    !!signerOrProvider
+    signerOrProvider
       ? signerOrProvider
       : new providers.AlchemyProvider(config.network, config.alchemyId),
     config,

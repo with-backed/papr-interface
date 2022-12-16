@@ -22,7 +22,7 @@ export function OpenGraph({
 }: OpenGraphProps) {
   const { siteUrl, tokenName } = useConfig();
   const { pathname } = useRouter();
-  let img = imageUrl || BUNNY_IMG_URL_MAP[tokenName as SupportedToken];
+  const img = imageUrl || BUNNY_IMG_URL_MAP[tokenName as SupportedToken];
   return (
     <Head>
       <meta property="og:title" content={title} />

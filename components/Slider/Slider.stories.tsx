@@ -24,8 +24,6 @@ export const Sliders = () => (
         key={theme}
         min={0}
         max={100}
-        onChange={() => {}}
-        onAfterChange={() => {}}
         renderThumb={(props) => <div {...props}></div>}
         renderTrack={(props) => <div {...props}></div>}
         blackTrackWidth={'50px'}

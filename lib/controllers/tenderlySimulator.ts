@@ -54,7 +54,7 @@ export async function simulateSwap(
 
   const poolContract = IUniswapV3Pool__factory.connect(poolAddress, provider);
 
-  let pool = await getPool(poolContract, token0, token1, 4);
+  const pool = await getPool(poolContract, token0, token1, 4);
 
   const erc20IFace = new ethers.utils.Interface(erc20ABI);
   const approveEncodedData = erc20IFace.encodeFunctionData(
