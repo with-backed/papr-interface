@@ -1,9 +1,9 @@
+import { captureException } from '@sentry/nextjs';
+import { OpenGraph } from 'components/OpenGraph';
+import { SupportedToken, validateToken } from 'lib/config';
+import capitalize from 'lodash/capitalize';
 import { GetServerSideProps } from 'next';
 import React from 'react';
-import { captureException } from '@sentry/nextjs';
-import { SupportedToken, validateToken } from 'lib/config';
-import { OpenGraph } from 'components/OpenGraph';
-import capitalize from 'lodash/capitalize';
 
 export const getServerSideProps: GetServerSideProps<LPProps> = async (
   context,

@@ -1,13 +1,15 @@
 import { Pool } from '@uniswap/v3-sdk';
-import { ethers, Overrides, providers } from 'ethers';
+import { ethers, providers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import {
-  PaprController__factory,
-  PaprController as GenPaprController,
-  IUniswapV3Pool__factory,
-  ERC20__factory,
   ERC20,
+  ERC20__factory,
   ERC721,
   ERC721__factory,
+  IUniswapV3Pool__factory,
+  PaprController as GenPaprController,
+  PaprController__factory,
 } from 'types/generated/abis';
 import {
   INFTEDA,
@@ -15,14 +17,12 @@ import {
 } from 'types/generated/abis/PaprController';
 import { PaprControllerByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+
 import { Config, SupportedToken } from './config';
-import { ReservoirResponseData } from './oracle/reservoir';
-import { subgraphControllerByAddress } from './pAPRSubgraph';
 import { buildToken, convertOneScaledValue } from './controllers';
 import { getPool } from './controllers/uniswap';
+import { subgraphControllerByAddress } from './pAPRSubgraph';
 import { subgraphUniswapPoolById } from './uniswapSubgraph';
-import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { getAddress } from 'ethers/lib/utils';
 
 export type PaprController = SubgraphController & PaprControllerInternal;
 export type SubgraphController = NonNullable<

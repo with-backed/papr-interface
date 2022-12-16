@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
 import { convertOneScaledValue } from 'lib/controllers';
-import styles from './Loans.module.css';
-import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
-import { Tooltip } from 'components/Tooltip';
 import { formatPercent } from 'lib/numberFormat';
+import React, { useMemo } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
+
+import styles from './Loans.module.css';
 
 type VaultHealthProps = {
   ltv: number;

@@ -1,8 +1,9 @@
-import React from 'react';
-import styles from './LandingPageContent.module.css';
 import { Disclosure } from 'components/Disclosure';
-import LoopDiagram from 'public/loop-diagram.png';
 import Image from 'next/legacy/image';
+import LoopDiagram from 'public/loop-diagram.png';
+import React from 'react';
+
+import styles from './LandingPageContent.module.css';
 
 const FAQ_ENTRIES: [string, JSX.Element][] = [
   [

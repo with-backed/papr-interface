@@ -1,18 +1,3 @@
-import { Fieldset } from 'components/Fieldset';
-import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { PaprController } from 'lib/PaprController';
-import {
-  formatThreeFractionDigits,
-  formatTokenAmount,
-  formatPercent,
-  formatPercentChange,
-} from 'lib/numberFormat';
-import { ControllerPricesData } from 'lib/controllers/charts';
-import React, { useMemo } from 'react';
-
-import styles from './TokenPerformance.module.css';
-import { TooltipReference, useTooltipState } from 'reakit';
 import {
   ContractAPRTooltip,
   MarketPriceTooltip,
@@ -20,16 +5,30 @@ import {
   RealizedAPRTooltip,
   TargetMarketTooltip,
 } from 'components/Controllers/TokenPerformance/Tooltips';
+import { Fieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
+import { ethers } from 'ethers';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
+import { ControllerPricesData } from 'lib/controllers/charts';
 import {
-  percentChangeOverDuration,
+  formatPercent,
+  formatPercentChange,
+  formatThreeFractionDigits,
+  formatTokenAmount,
+} from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { PaprController } from 'lib/PaprController';
+import {
   getValueDaysAgo,
   percentChange,
+  percentChangeOverDuration,
 } from 'lib/tokenPerformance';
-import { Table } from 'components/Table';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { OraclePriceType } from 'lib/oracle/reservoir';
-import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
-import { targetValues } from 'lib/controllers/charts/target';
+import React, { useMemo } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit';
+
+import styles from './TokenPerformance.module.css';
 
 export type ControllerSummaryProps = {
   controllers: PaprController[];

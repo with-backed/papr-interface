@@ -1,19 +1,19 @@
-import { GetServerSideProps } from 'next';
-import React, { ComponentProps } from 'react';
 import { captureException } from '@sentry/nextjs';
-import { configs, SupportedToken, validateToken } from 'lib/config';
-import { OpenGraph } from 'components/OpenGraph';
 import { HeroesLandingPageContent } from 'components/LandingPageContent/PaprHeroes/HeroesLandingPageContent';
+import { OpenGraph } from 'components/OpenGraph';
+import { ethers } from 'ethers';
+import { configs, SupportedToken, validateToken } from 'lib/config';
 import {
   getOracleInfoFromAllowedCollateral,
   getQuoteForSwap,
 } from 'lib/controllers';
 import { ReservoirResponseData } from 'lib/oracle/reservoir';
-import { calculateNetPhUSDCBalance, HeroPlayerBalance } from 'lib/paprHeroes';
 import { fetchSubgraphData } from 'lib/PaprController';
+import { calculateNetPhUSDCBalance, HeroPlayerBalance } from 'lib/paprHeroes';
 import { getAllPaprHeroPlayers } from 'lib/pAPRSubgraph';
-import { ethers } from 'ethers';
+import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
+import React, { ComponentProps } from 'react';
 
 const Content = dynamic<ComponentProps<typeof HeroesLandingPageContent>>(
   () =>

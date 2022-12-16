@@ -1,20 +1,21 @@
-import { Fieldset } from 'components/Fieldset';
-import { PaprController } from 'lib/PaprController';
 import { useCollection } from '@center-inc/react';
-import React, { useMemo } from 'react';
-import styles from './Collateral.module.css';
-import { useConfig } from 'hooks/useConfig';
-import { TooltipReference, useTooltipState } from 'reakit';
-import { Tooltip } from 'components/Tooltip';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ethers } from 'ethers';
-import { formatPercent } from 'lib/numberFormat';
-import { CenterAsset } from 'components/CenterAsset';
-import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { OraclePriceType } from 'lib/oracle/reservoir';
-import { computeLTVFromDebts } from 'lib/controllers';
-import { useShowMore } from 'hooks/useShowMore';
 import { TextButton } from 'components/Button';
+import { CenterAsset } from 'components/CenterAsset';
+import { Fieldset } from 'components/Fieldset';
+import { Tooltip } from 'components/Tooltip';
+import { ethers } from 'ethers';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useConfig } from 'hooks/useConfig';
+import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useShowMore } from 'hooks/useShowMore';
+import { computeLTVFromDebts } from 'lib/controllers';
+import { formatPercent } from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { PaprController } from 'lib/PaprController';
+import React, { useMemo } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit';
+
+import styles from './Collateral.module.css';
 
 type CollateralProps = {
   paprController: PaprController;

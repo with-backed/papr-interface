@@ -2,21 +2,22 @@ import 'styles/global.css';
 import 'styles/fonts-maru.css';
 import 'normalize.css';
 import '@rainbow-me/rainbowkit/styles.css';
-import { AppProps } from 'next/app';
-import { AppWrapper } from 'components/layouts/AppWrapper';
+
+import { ApplicationProviders } from 'components/ApplicationProviders';
+import { ErrorBanners } from 'components/ErrorBanners';
 import { Footer } from 'components/Footer';
+import { Header } from 'components/Header';
+import { AppWrapper } from 'components/layouts/AppWrapper';
 import { ConfigProvider } from 'hooks/useConfig';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
 import {
-  SupportedToken,
-  prodConfigs,
   devConfigs,
   isSupportedToken,
+  prodConfigs,
+  SupportedToken,
 } from 'lib/config';
-import { ApplicationProviders } from 'components/ApplicationProviders';
-import { Header } from 'components/Header';
-import { ErrorBanners } from 'components/ErrorBanners';
+import { AppProps } from 'next/app';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 const networks = (
   process.env.NEXT_PUBLIC_ENV === 'production'

@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
-import { Config } from 'lib/config';
 import { PaprController__factory } from 'types/generated/abis';
+
 import { PaprController } from '../../PaprController';
 import { ONE } from '../constants';
 

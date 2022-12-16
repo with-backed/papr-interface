@@ -1,6 +1,7 @@
-import { DISCORD_URL, GITHUB_URL, TWITTER_URL } from 'lib/constants';
+import { DISCORD_URL, TWITTER_URL } from 'lib/constants';
 import Link from 'next/link';
 import React from 'react';
+
 import styles from './Footer.module.css';
 
 type Link = {

@@ -1,16 +1,17 @@
 import { Price, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
 import { Q192, SECONDS_IN_A_DAY } from 'lib/constants';
-import { TimeSeriesValue } from '.';
 import { PaprController, SubgraphController } from 'lib/PaprController';
 import { subgraphUniswapSwapsByPool } from 'lib/uniswapSubgraph';
+import { UTCTimestamp } from 'lightweight-charts';
 import {
   Pool,
   Token as UniSubgraphToken,
 } from 'types/generated/graphql/uniswapSubgraph';
+
 import { RatePeriod } from '..';
-import { UTCTimestamp } from 'lightweight-charts';
-import { getAddress } from 'ethers/lib/utils';
+import { TimeSeriesValue } from '.';
 
 export async function markValues(
   now: number,

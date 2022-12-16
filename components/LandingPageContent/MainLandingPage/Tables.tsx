@@ -1,5 +1,5 @@
-import { ButtonLink } from 'components/Button';
 import React, { FunctionComponent } from 'react';
+
 import styles from './LandingPageContent.module.css';
 
 const BORROWER_ENTRIES = [

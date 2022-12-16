@@ -2,6 +2,7 @@ import { ButtonTheme } from 'components/Button/Button';
 import React from 'react';
 import { Button } from 'reakit/Button';
 import { Checkbox } from 'reakit/Checkbox';
+
 import styles from './Toggle.module.css';
 
 type ToggleProps = {

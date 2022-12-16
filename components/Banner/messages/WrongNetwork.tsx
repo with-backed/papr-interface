@@ -1,9 +1,10 @@
 import { TextButton } from 'components/Button';
 import { ethers } from 'ethers';
 import { useGlobalMessages } from 'hooks/useGlobalMessages';
-import { SupportedNetwork, SupportedToken } from 'lib/config';
+import { SupportedNetwork } from 'lib/config';
 import React, { useCallback, useMemo } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
+
 import { Banner, BannerKind } from '../Banner';
 
 const BANNER_CLASS_MAP: { [network in SupportedNetwork]: BannerKind } = {

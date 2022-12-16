@@ -1,14 +1,11 @@
 import { ethers } from 'ethers';
-import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { PHUSDC__factory } from 'types/generated/abis/factories/PHUSDC__factory';
 import { User } from 'types/generated/graphql/inKindSubgraph';
+
 import { configs } from './config';
 import { ONE } from './constants';
 import { makeProvider } from './contracts';
-import { getQuoteForSwap } from './controllers';
-import { formatBigNum } from './numberFormat';
 import { ReservoirResponseData } from './oracle/reservoir';
-import { getAllVaultsForControllerForUser } from './pAPRSubgraph';
 
 export type HeroPlayerBalance = {
   totalNFTWorth: number;

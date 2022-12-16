@@ -1,6 +1,10 @@
 {
   "extends": "next/core-web-vitals",
+  "plugins": ["simple-import-sort", "unused-imports"],
   "rules": {
+    "unused-imports/no-unused-imports": "error",
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
     "react-hooks/exhaustive-deps": [
       "error",
       {

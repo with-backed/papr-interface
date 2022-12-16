@@ -1,18 +1,18 @@
 import { ethers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
 import { configs, SupportedToken } from 'lib/config';
-import { ONE } from 'lib/constants';
-import { TimeSeriesValue } from '.';
 import { PaprController, SubgraphController } from 'lib/PaprController';
 import { clientFromUrl } from 'lib/urql';
+import { UTCTimestamp } from 'lightweight-charts';
 import { PaprController__factory } from 'types/generated/abis';
 import {
   TargetUpdatesByControllerDocument,
   TargetUpdatesByControllerQuery,
 } from 'types/generated/graphql/inKindSubgraph';
-import { computeRate, RatePeriod } from '..';
-import { UTCTimestamp } from 'lightweight-charts';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
-import { getAddress } from 'ethers/lib/utils';
+
+import { computeRate, RatePeriod } from '..';
+import { TimeSeriesValue } from '.';
 
 interface TargetUpdate {
   newTarget: string;

@@ -1,10 +1,8 @@
-import { ethers } from 'ethers';
-import { Pool } from '@uniswap/v3-sdk';
 import { Token as UniswapToken } from '@uniswap/sdk-core';
-import { abi as IUniswapV3PoolABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
-import { IUniswapV3Pool } from 'types/generated/abis';
-import { Chain } from 'wagmi';
+import { Pool } from '@uniswap/v3-sdk';
+import { ethers } from 'ethers';
 import { ERC20Token } from 'lib/controllers/index';
+import { IUniswapV3Pool } from 'types/generated/abis';
 
 // const provider = new ethers.providers.JsonRpcProvider('https://mainnet.infura.io/v3/<YOUR-ENDPOINT-HERE>')
 

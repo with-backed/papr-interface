@@ -4,21 +4,22 @@ import {
   EtherscanTransactionLink,
 } from 'components/EtherscanLink';
 import { Fieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useActivityByController } from 'hooks/useActivityByController';
-import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
-import { humanizedTimestamp } from 'lib/duration';
-import { PaprController } from 'lib/PaprController';
-import { formatTokenAmount } from 'lib/numberFormat';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
-import { SwapsByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
-import styles from './Activity.module.css';
-import { Table } from 'components/Table';
-import { erc721Contract } from 'lib/contracts';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useShowMore } from 'hooks/useShowMore';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
+import { erc721Contract } from 'lib/contracts';
+import { humanizedTimestamp } from 'lib/duration';
+import { formatTokenAmount } from 'lib/numberFormat';
+import { PaprController } from 'lib/PaprController';
+import React, { useMemo } from 'react';
+import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
+import { SwapsByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
+
+import styles from './Activity.module.css';
 
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;

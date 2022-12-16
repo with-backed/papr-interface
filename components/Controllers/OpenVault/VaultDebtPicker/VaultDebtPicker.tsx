@@ -1,7 +1,5 @@
 import { Button } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
-import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
-import { Fieldset } from 'components/Fieldset';
 import {
   ApproveNFTButton,
   ApproveTokenButton,
@@ -10,15 +8,19 @@ import {
   RepayPerpetualButton,
   RepayWithSwapButton,
 } from 'components/Controllers/OpenVault/LoanWriteButtons/UpdateLoanButtons';
+import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
+import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { Toggle } from 'components/Toggle';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { usePaprBalance } from 'hooks/usePaprBalance';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useTheme } from 'hooks/useTheme';
 import { SupportedToken } from 'lib/config';
 import {
   computeSlippageForSwap,
@@ -38,15 +40,14 @@ import {
 } from 'react';
 import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
-import { useAccount } from 'wagmi';
-import styles from './VaultDebtPicker.module.css';
-import { useTheme } from 'hooks/useTheme';
-import { usePaprBalance } from 'hooks/usePaprBalance';
-import { useQuery } from 'urql';
 import {
-  AuctionsByNftOwnerQuery,
   AuctionsByNftOwnerDocument,
+  AuctionsByNftOwnerQuery,
 } from 'types/generated/graphql/inKindSubgraph';
+import { useQuery } from 'urql';
+import { useAccount } from 'wagmi';
+
+import styles from './VaultDebtPicker.module.css';
 
 type VaultDebtPickerProps = {
   paprController: PaprController;

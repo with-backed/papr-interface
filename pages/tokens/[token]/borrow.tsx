@@ -1,21 +1,21 @@
-import { configs, getConfig, SupportedToken } from 'lib/config';
-import { controllerPricesData } from 'lib/controllers/charts';
-import { GetServerSideProps } from 'next';
 import {
   BorrowPageContent,
   BorrowPageProps,
 } from 'components/Controllers/BorrowPageContent';
+import { OpenGraph } from 'components/OpenGraph';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useConfig } from 'hooks/useConfig';
+import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
+import { usePaprController } from 'hooks/usePaprController';
+import { configs, getConfig, SupportedToken } from 'lib/config';
+import { controllerPricesData } from 'lib/controllers/charts';
 import {
   fetchSubgraphData,
-  SubgraphPool,
   SubgraphController,
+  SubgraphPool,
 } from 'lib/PaprController';
-import { useConfig } from 'hooks/useConfig';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { usePaprController } from 'hooks/usePaprController';
-import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
+import { GetServerSideProps } from 'next';
 import { useMemo } from 'react';
-import { OpenGraph } from 'components/OpenGraph';
 
 type ServerSideProps = Omit<
   BorrowPageProps,

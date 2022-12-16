@@ -1,11 +1,21 @@
+import PaprControllerABI from 'abis/PaprController.json';
+import { TransactionButton } from 'components/Button';
 import { ethers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
+import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { oracleInfoArgEncoded, swapParamsArgEncoded } from 'lib/constants';
+import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { PaprController } from 'lib/PaprController';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ERC20, ERC721__factory } from 'types/generated/abis';
 import {
   IPaprController,
   ReservoirOracleUnderwriter,
 } from 'types/generated/abis/PaprController';
-import PaprControllerABI from 'abis/PaprController.json';
-import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import {
   erc20ABI,
   erc721ABI,
@@ -13,16 +23,6 @@ import {
   useContractWrite,
   usePrepareContractWrite,
 } from 'wagmi';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { TransactionButton } from 'components/Button';
-import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
-import { oracleInfoArgEncoded, swapParamsArgEncoded } from 'lib/constants';
-import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
-import { getAddress } from 'ethers/lib/utils';
-import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ERC20, ERC721__factory } from 'types/generated/abis';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
 

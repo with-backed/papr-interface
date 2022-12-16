@@ -1,23 +1,23 @@
+import { CenterProvider } from '@center-inc/react';
 import {
+  DisclaimerComponent,
   getDefaultWallets,
   lightTheme,
   RainbowKitProvider,
-  DisclaimerComponent,
 } from '@rainbow-me/rainbowkit';
 import { useConfig } from 'hooks/useConfig';
 import { GlobalMessagingProvider } from 'hooks/useGlobalMessages';
+import { PaprBalanceProvider } from 'hooks/usePaprBalance';
 import { TimestampProvider } from 'hooks/useTimestamp/useTimestamp';
 import React, { PropsWithChildren, useMemo } from 'react';
-import { WagmiConfig, chain, createClient, configureChains } from 'wagmi';
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { infuraProvider } from 'wagmi/providers/infura';
-import { publicProvider } from 'wagmi/providers/public';
 import {
   createClient as createUrqlClient,
   Provider as UrqlProvider,
 } from 'urql';
-import { CenterProvider } from '@center-inc/react';
-import { PaprBalanceProvider } from 'hooks/usePaprBalance';
+import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
+import { infuraProvider } from 'wagmi/providers/infura';
+import { publicProvider } from 'wagmi/providers/public';
 
 const prodChains = [chain.mainnet, chain.goerli];
 const CHAINS =

@@ -1,6 +1,7 @@
-import Link from 'next/link';
-import styles from './Custom404.module.css';
 import { DISCORD_ERROR_CHANNEL, DISCORD_URL } from 'lib/constants';
+import Link from 'next/link';
+
+import styles from './Custom404.module.css';
 
 export function Custom404() {
   return (

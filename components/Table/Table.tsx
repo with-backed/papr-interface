@@ -1,5 +1,6 @@
 import { useTheme } from 'hooks/useTheme';
 import React, { TableHTMLAttributes, useMemo } from 'react';
+
 import styles from './Table.module.css';
 
 interface TableProps extends TableHTMLAttributes<HTMLTableElement> {

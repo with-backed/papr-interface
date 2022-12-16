@@ -1,17 +1,17 @@
+import { TextButton } from 'components/Button';
 import { Fieldset } from 'components/Fieldset';
-import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { PaprController } from 'lib/PaprController';
-import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
-import { ControllerPricesData } from 'lib/controllers/charts';
-import React, { useMemo } from 'react';
-import styles from './Loans.module.css';
-import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
-import { VaultHealth } from './VaultHealth';
+import { ethers } from 'ethers';
 import { useLTVs } from 'hooks/useLTVs/useLTVs';
 import { useShowMore } from 'hooks/useShowMore';
-import { TextButton } from 'components/Button';
+import { ControllerPricesData } from 'lib/controllers/charts';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
+import { PaprController } from 'lib/PaprController';
+import React, { useMemo } from 'react';
+
+import styles from './Loans.module.css';
+import { VaultHealth } from './VaultHealth';
+import { VaultRow } from './VaultRow';
 
 type LoansProps = {
   paprController: PaprController;

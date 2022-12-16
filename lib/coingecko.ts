@@ -1,4 +1,5 @@
 import { captureException } from '@sentry/nextjs';
+
 import { configs, SupportedToken } from './config';
 
 // based on output from https://api.coingecko.com/api/v3/asset_platforms

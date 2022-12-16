@@ -1,9 +1,9 @@
-import { useConfig } from 'hooks/useConfig';
-import React from 'react';
-import { ethers } from 'ethers';
-import { formatPercent } from 'lib/numberFormat';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
+import { ethers } from 'ethers';
+import { useConfig } from 'hooks/useConfig';
+import { formatPercent } from 'lib/numberFormat';
 import Link from 'next/link';
+import React from 'react';
 
 type VaultRowProps = {
   id: string;

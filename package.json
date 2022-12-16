@@ -77,6 +77,8 @@
     "babel-jest": "27.5.1",
     "eslint": "8.11.0",
     "eslint-config-next": "^13.0.6",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "husky": "7",
     "jest": "27.5.1",
     "jest-fetch-mock": "3.0.3",
