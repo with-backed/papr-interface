@@ -1,5 +1,0 @@
-query userById($id: ID!) {
-  user(id: $id) {
-    ...allUserProperties
-  }
-}

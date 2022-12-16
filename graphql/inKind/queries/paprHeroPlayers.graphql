@@ -1,5 +1,0 @@
-query paprHeroPlayers {
-  users(first: 1000) {
-    ...allUserProperties
-  }
-}
