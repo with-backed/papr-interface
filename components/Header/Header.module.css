@@ -45,7 +45,7 @@
 
 .nav {
   width: 100%;
-  padding: 20px 0;
+  padding: 21px 0;
   height: 151px;
 }
 
@@ -75,6 +75,13 @@
   flex-direction: column;
 }
 
+.controls {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
 .links {
   display: flex;
   list-style-type: none;
@@ -87,9 +94,15 @@
   gap: 2px;
 }
 
+.mobile-content .links {
+  flex-direction: column;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
 .entry {
   padding: 5px 15px;
-  height: 45px;
+  height: 44px;
   display: flex;
   flex-direction: row;
   white-space: nowrap;
@@ -100,6 +113,7 @@
 
 .link {
   composes: entry;
+  height: 44px;
 }
 
 .link,
@@ -169,6 +183,9 @@
 @media screen and (max-width: 750px) {
   .mobile-content {
     display: flex;
+  }
+  .nav {
+    height: auto;
   }
   .desktop-content {
     display: none;

@@ -1,7 +1,7 @@
 import { useConfig } from 'hooks/useConfig';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { ComponentProps, useMemo } from 'react';
+import React, { ComponentProps, useCallback, useMemo, useState } from 'react';
 import styles from './Header.module.css';
 import paprTitle from 'public/logos/papr-title.png';
 import paprMemeTitle from 'public/logos/paprMEME-title.png';
@@ -12,6 +12,12 @@ import Image, { StaticImageData } from 'next/legacy/image';
 import { SupportedToken } from 'lib/config';
 import dynamic from 'next/dynamic';
 import { ConnectWallet as ConnectWalletComponent } from 'components/ConnectWallet';
+import { Button } from 'components/Button';
+import {
+  useDisclosureState,
+  Disclosure,
+  DisclosureContent,
+} from 'reakit/Disclosure';
 
 const ConnectWallet = dynamic<ComponentProps<typeof ConnectWalletComponent>>(
   () => import('components/ConnectWallet').then((mod) => mod.ConnectWallet),
@@ -162,6 +168,11 @@ const SHOW_HEADER_ON_LANDING_PAGE =
 export function Header() {
   const theme = useTheme();
   const { pathname } = useRouter();
+  const mobileLinks = useDisclosureState({ visible: false });
+
+  const handleMenuClick = useCallback(() => {
+    mobileLinks.toggle();
+  }, [mobileLinks]);
 
   const activeRoute = useMemo(() => {
     // Handling these since they aren't network-namespaced
@@ -202,9 +213,20 @@ export function Header() {
         <ConnectWallet />
       </div>
       <div className={styles['mobile-content']}>
-        <LogoLink isHomePage={isHomePage} />
-        <NavLinks activeRoute={activeRoute} isHomePage={isHomePage} />
-        <ConnectWallet />
+        <div className={styles.controls}>
+          <LogoLink isHomePage={isHomePage} />
+          <Disclosure
+            as={Button}
+            kind="white"
+            size="small"
+            onClick={handleMenuClick}>
+            🧻 Menu
+          </Disclosure>
+        </div>
+        <DisclosureContent {...mobileLinks}>
+          <NavLinks activeRoute={activeRoute} isHomePage={isHomePage} />
+          <ConnectWallet />
+        </DisclosureContent>
       </div>
     </nav>
   );
