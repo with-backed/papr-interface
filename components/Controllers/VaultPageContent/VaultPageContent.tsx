@@ -19,11 +19,12 @@ export function VaultPageContent({
   pricesData,
 }: VaultPageContentProps) {
   const vaultIds = useMemo(() => new Set([vaultId]), [vaultId]);
+  const vaultOwner = useMemo(() => vaultId.split('-')[1], [vaultId]);
   return (
     <div className={controllerStyles.wrapper}>
       <LoanDetails vaultId={vaultId} paprController={paprController} />
       <Collateral paprController={paprController} vaultId={vaultId} />
-      <Activity paprController={paprController} vaultIds={vaultIds} />
+      <Activity paprController={paprController} account={vaultOwner} />
       <TokenPerformance
         pricesData={{ [paprController.id]: pricesData }}
         controllers={[paprController]}
