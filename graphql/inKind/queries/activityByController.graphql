@@ -1,5 +1,5 @@
-query activityByController($controllerId: String) {
-  addCollateralEvents(where: { controller: $controllerId }) {
+query activityByController($controllerId: String, $vaultId: Bytes) {
+  addCollateralEvents(where: { controller: $controllerId, vault: $vaultId }) {
     id
     timestamp
     vault {
@@ -12,7 +12,9 @@ query activityByController($controllerId: String) {
       symbol
     }
   }
-  removeCollateralEvents(where: { controller: $controllerId }) {
+  removeCollateralEvents(
+    where: { controller: $controllerId, vault: $vaultId }
+  ) {
     id
     timestamp
     vault {
@@ -25,7 +27,7 @@ query activityByController($controllerId: String) {
       symbol
     }
   }
-  debtDecreasedEvents(where: { controller: $controllerId }) {
+  debtDecreasedEvents(where: { controller: $controllerId, vault: $vaultId }) {
     id
     timestamp
     vault {
@@ -33,7 +35,7 @@ query activityByController($controllerId: String) {
     }
     amount
   }
-  debtIncreasedEvents(where: { controller: $controllerId }) {
+  debtIncreasedEvents(where: { controller: $controllerId, vault: $vaultId }) {
     id
     timestamp
     vault {
@@ -41,7 +43,9 @@ query activityByController($controllerId: String) {
     }
     amount
   }
-  auctionStartEvents {
+  auctionStartEvents(
+    where: { controller: $controllerId, auction: { vault: $vaultId } }
+  ) {
     id
     timestamp
     auction {
@@ -57,7 +61,9 @@ query activityByController($controllerId: String) {
       }
     }
   }
-  auctionEndEvents {
+  auctionEndEvents(
+    where: { controller: $controllerId, auction: { vault: $vaultId } }
+  ) {
     id
     timestamp
     auction {
