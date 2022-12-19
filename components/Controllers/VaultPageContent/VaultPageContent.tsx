@@ -18,7 +18,6 @@ export function VaultPageContent({
   vaultId,
   pricesData,
 }: VaultPageContentProps) {
-  const vaultIds = useMemo(() => new Set([vaultId]), [vaultId]);
   const vaultOwner = useMemo(() => vaultId.split('-')[1], [vaultId]);
   return (
     <div className={controllerStyles.wrapper}>
