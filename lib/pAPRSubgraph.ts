@@ -10,7 +10,7 @@ import {
   User,
 } from 'types/generated/graphql/inKindSubgraph';
 import { configs, SupportedToken } from './config';
-import { PaprController, SubgraphController } from './PaprController';
+import { SubgraphController } from './PaprController';
 import { clientFromUrl } from './urql';
 
 export async function subgraphControllerByAddress(

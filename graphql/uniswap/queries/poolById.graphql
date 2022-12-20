@@ -12,5 +12,6 @@ query poolById($id: ID!) {
       symbol
       name
     }
+    tick
   }
 }

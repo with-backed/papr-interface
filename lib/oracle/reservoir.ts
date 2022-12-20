@@ -34,7 +34,7 @@ export async function getSignedOracleFloorPriceMessage(
       `${config.reservoirAPI}/oracle/collections/${collection}/floor-ask/v3?kind=${kind}&currency=${config.paprUnderlyingAddress}&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,
       {
         headers: {
-          'x-api-key': process.env.RESERVOIR_KEY!,
+          'x-api-key': process.env.RESERVOIR_KEY || '',
         },
       },
     );

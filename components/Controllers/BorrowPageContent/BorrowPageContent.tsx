@@ -13,6 +13,7 @@ import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { Activity } from '../Activity';
 import { usePaprBalance } from 'hooks/usePaprBalance';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 
 export type BorrowPageProps = {
   controllerAddress: string;
@@ -74,12 +75,19 @@ export function BorrowPageContent({
     [currentVaults],
   );
 
+  const latestMarketPrice = useAsyncValue(async () => {
+    if (!paprController) return 1.0;
+    const price = await paprController.uniswapPaprPrice();
+    console.log(`uniswap price! ${price}`);
+    return parseInt(price.toFixed());
+  }, [paprController]);
+
   if (!paprController || !pricesData || !oracleInfo) {
     return <></>;
   }
 
-  const latestMarketPrice =
-    pricesData?.markValues[pricesData?.markValues.length - 1]?.value || 1.0;
+  // const latestMarketPrice =
+  //   pricesData?.markValues[pricesData?.markValues.length - 1]?.value || 1.0;
 
   return (
     <div className={controllerStyles.wrapper}>
@@ -88,7 +96,7 @@ export function BorrowPageContent({
         paprController={paprController}
         currentVaults={currentVaults}
         oracleInfo={oracleInfo}
-        latestMarketPrice={latestMarketPrice}
+        latestMarketPrice={latestMarketPrice!}
         balance={balance}
       />
       {!!address &&

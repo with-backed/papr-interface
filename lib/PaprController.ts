@@ -1,4 +1,4 @@
-import { Pool } from '@uniswap/v3-sdk';
+import { Pool, tickToPrice } from '@uniswap/v3-sdk';
 import { ethers, Overrides, providers } from 'ethers';
 import {
   PaprController__factory,
@@ -23,6 +23,7 @@ import { getPool } from './controllers/uniswap';
 import { subgraphUniswapPoolById } from './uniswapSubgraph';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { getAddress } from 'ethers/lib/utils';
+import { Token } from '@uniswap/sdk-core';
 
 export type PaprController = SubgraphController & PaprControllerInternal;
 export type SubgraphController = NonNullable<
@@ -251,6 +252,47 @@ class PaprControllerInternal {
       oracleInfo,
       { gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)) },
     );
+  }
+
+  async uniswapPaprPrice() {
+    /// TODO what is tick value if no trades yet?
+    const tick = parseInt(this.subgraphPool.tick);
+
+    /// if we want to ensure up to date, use
+    // const poolContract = IUniswapV3Pool__factory.connect(
+    //   this._subgraphController.poolAddress,
+    //   this._signerOrProvider,
+    // );
+    // const tick = (await poolContract.slot0()).tick
+
+    /// TODO we should probably just make these accessible in the class itself?
+    let baseToken: Token;
+    let quoteToken: Token;
+    if (this.token0IsUnderlying) {
+      baseToken = new Token(
+        1,
+        this.subgraphPool.token1.id,
+        this.subgraphPool.token0.decimals,
+      );
+      quoteToken = new Token(
+        1,
+        this.subgraphPool.token0.id,
+        this.subgraphPool.token0.decimals,
+      );
+    } else {
+      baseToken = new Token(
+        1,
+        this.subgraphPool.token0.id,
+        this.subgraphPool.token1.decimals,
+      );
+      quoteToken = new Token(
+        1,
+        this.subgraphPool.token1.id,
+        this.subgraphPool.token0.decimals,
+      );
+    }
+    /// TODO we should probably cache this?
+    return tickToPrice(baseToken, quoteToken, tick);
   }
 }
 
