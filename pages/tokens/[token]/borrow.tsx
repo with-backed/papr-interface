@@ -16,6 +16,7 @@ import { usePaprController } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
 import { OpenGraph } from 'components/OpenGraph';
+import { captureException } from '@sentry/nextjs';
 
 type ServerSideProps = Omit<
   BorrowPageProps,
@@ -29,7 +30,13 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
   const token = context.params?.token as SupportedToken;
-  const address = getConfig(token).controllerAddress.toLocaleLowerCase();
+  const address: string | undefined =
+    getConfig(token)?.controllerAddress?.toLocaleLowerCase();
+  if (!address) {
+    return {
+      notFound: true,
+    };
+  }
 
   const controllerSubgraphData = await fetchSubgraphData(
     address,
@@ -38,9 +45,9 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   );
 
   if (!controllerSubgraphData) {
-    return {
-      notFound: true,
-    };
+    const e = new Error(`subgraph data for controller ${address} not found`);
+    captureException(e);
+    throw e;
   }
 
   const { pool, paprController } = controllerSubgraphData;
