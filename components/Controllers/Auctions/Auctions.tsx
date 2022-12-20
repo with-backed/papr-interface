@@ -278,7 +278,10 @@ function BuyButton({
     }
 
     if (!paprApproved) {
-      const approvalTx = await tokenContract.approve(controller.id, maxPrice);
+      const approvalTx = await tokenContract.approve(
+        controller.id,
+        ethers.constants.MaxUint256,
+      );
       setBuyingState('approving');
       await approvalTx.wait();
     }
