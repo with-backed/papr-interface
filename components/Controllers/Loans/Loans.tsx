@@ -18,9 +18,10 @@ import { captureException } from '@sentry/nextjs';
 
 type LoansProps = {
   paprController: PaprController;
+  pricesData: ControllerPricesData | null;
 };
 
-export function Loans({ paprController }: LoansProps) {
+export function Loans({ paprController, pricesData }: LoansProps) {
   const maxLTV = useMemo(() => paprController.maxLTVBigNum, [paprController]);
   const activeVaults = useMemo(
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
@@ -34,13 +35,11 @@ export function Loans({ paprController }: LoansProps) {
       !paprController.vaults ||
       paprController.vaults.length === 0 ||
       !oracleInfo
-    ) {
+    )
       return 0;
-    }
     return paprController.vaults
-      .map((v) => v.collateral)
+      .map((v) => v.token.id)
       .flat()
-      .map((collateral) => collateral.contractAddress)
       .map((collection) => oracleInfo[collection].price)
       .reduce((a, b) => a + b, 0);
   }, [paprController, oracleInfo]);
@@ -54,7 +53,7 @@ export function Loans({ paprController }: LoansProps) {
   });
 
   const computedAvg = useMemo(() => {
-    if (!totalSupply || !controllerNFTValue) {
+    if (!totalSupply || !controllerNFTValue || !pricesData) {
       return 0;
     }
     if (!ethers.BigNumber.isBigNumber(totalSupply)) {
@@ -65,11 +64,14 @@ export function Loans({ paprController }: LoansProps) {
       );
       return 0;
     }
+    const { targetValues } = pricesData;
+    const target = targetValues[targetValues.length - 1].value;
+    const nftValueInPapr = controllerNFTValue / target;
     const totalSupplyNum = parseFloat(
       ethers.utils.formatUnits(totalSupply, paprController.underlying.decimals),
     );
-    return controllerNFTValue / totalSupplyNum;
-  }, [controllerNFTValue, paprController.underlying, totalSupply]);
+    return totalSupplyNum / nftValueInPapr;
+  }, [controllerNFTValue, paprController.underlying, pricesData, totalSupply]);
 
   const avgLtv = useMemo(() => {
     const ltvValues = Object.values(ltvs);
