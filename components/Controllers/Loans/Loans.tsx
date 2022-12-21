@@ -35,7 +35,6 @@ export function Loans({ paprController }: LoansProps) {
       paprController.vaults.length === 0 ||
       !oracleInfo
     ) {
-      console.log('fails');
       return 0;
     }
     return paprController.vaults
@@ -46,11 +45,7 @@ export function Loans({ paprController }: LoansProps) {
       .reduce((a, b) => a + b, 0);
   }, [paprController, oracleInfo]);
 
-  const {
-    data: totalSupply,
-    isLoading,
-    error,
-  } = useContractRead({
+  const { data: totalSupply } = useContractRead({
     abi: erc20ABI,
     address:
       paprController[paprController.token0IsUnderlying ? 'token0' : 'token1']
