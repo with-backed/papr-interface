@@ -19,7 +19,7 @@ export function useLTVs(
       if (!oracleInfo || !activeVaults) return {};
       return await activeVaults.reduce(async (prev, v) => {
         const maxDebtForVault: ethers.BigNumber = (
-          await paprController.maxDebt([v.collateralContract], oracleInfo)
+          await paprController.maxDebt([v.token.id], oracleInfo)
         ).mul(v.collateral.length);
 
         return {

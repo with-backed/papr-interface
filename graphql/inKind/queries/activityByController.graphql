@@ -4,12 +4,13 @@ query activityByController($controllerId: String, $account: Bytes) {
     timestamp
     vault {
       id
+      token {
+        ...allERC721Properties
+      }
     }
     collateral {
       id
-      contractAddress
       tokenId
-      symbol
     }
   }
   removeCollateralEvents(
@@ -19,12 +20,13 @@ query activityByController($controllerId: String, $account: Bytes) {
     timestamp
     vault {
       id
+      token {
+        ...allERC721Properties
+      }
     }
     collateral {
       id
-      contractAddress
       tokenId
-      symbol
     }
   }
   debtDecreasedEvents(where: { controller: $controllerId, account: $account }) {
@@ -49,7 +51,9 @@ query activityByController($controllerId: String, $account: Bytes) {
     auction {
       id
       auctionAssetID
-      auctionAssetContract
+      auctionAssetContract {
+        ...allERC721Properties
+      }
       startPrice
       vault {
         id
@@ -64,7 +68,9 @@ query activityByController($controllerId: String, $account: Bytes) {
     timestamp
     auction {
       auctionAssetID
-      auctionAssetContract
+      auctionAssetContract {
+        ...allERC721Properties
+      }
       endPrice
       vault {
         id

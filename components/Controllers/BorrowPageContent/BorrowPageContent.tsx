@@ -29,7 +29,7 @@ export function BorrowPageContent({
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
 
   const collateralContractAddresses = useMemo(() => {
-    return paprController.allowedCollateral.map((ac) => ac.contractAddress);
+    return paprController.allowedCollateral.map((ac) => ac.token.id);
   }, [paprController.allowedCollateral]);
 
   const { userCollectionNFTs, reexecuteQuery: refreshAccountNFTs } =
@@ -56,7 +56,7 @@ export function BorrowPageContent({
     if (!currentVaults) return Array.from(new Set(userCollectionCollateral));
 
     const userAndVaultCollateral = currentVaults
-      .map((v) => getAddress(v.collateralContract))
+      .map((v) => getAddress(v.token.id))
       .concat(userCollectionCollateral);
 
     return Array.from(new Set(userAndVaultCollateral));
@@ -87,8 +87,7 @@ export function BorrowPageContent({
             oracleInfo={oracleInfo}
             paprController={paprController}
             vault={currentVaults?.find(
-              (v) =>
-                getAddress(v.collateralContract) === getAddress(collection),
+              (v) => getAddress(v.token.id) === getAddress(collection),
             )}
             userNFTsForVault={userCollectionNFTs.filter(
               (nft) => getAddress(collection) === getAddress(nft.address),

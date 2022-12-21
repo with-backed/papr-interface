@@ -2,12 +2,12 @@ fragment allVaultProperties on Vault {
   id
   account
   debt
-  collateralContract
+  token {
+    ...allERC721Properties
+  }
   collateral {
     id
-    contractAddress
     tokenId
-    symbol
   }
   collateralCount
 }

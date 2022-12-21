@@ -1,0 +1,6 @@
+fragment allERC20Properties on ERC20Token {
+    id,
+    name,
+    symbol,
+    decimals
+}

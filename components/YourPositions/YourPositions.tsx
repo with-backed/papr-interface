@@ -42,12 +42,7 @@ export function YourPositions({
   const uniqueCollections = useMemo(() => {
     const vaultAndUserAddresses = userNFTs
       .map((nft) => getAddress(nft.address))
-      .concat(
-        (currentVaults || [])
-          .map((v) => v.collateral)
-          .flat()
-          .map((c) => getAddress(c.contractAddress)),
-      );
+      .concat((currentVaults || []).map((v) => getAddress(v.token.id)));
     return Array.from(new Set(vaultAndUserAddresses));
   }, [userNFTs, currentVaults]);
 
@@ -55,12 +50,7 @@ export function YourPositions({
     const maxLoanInDebtTokens = await paprController.maxDebt(
       userNFTs
         .map((nft) => nft.address)
-        .concat(
-          (currentVaults || [])
-            .map((v) => v.collateral)
-            .flat()
-            .map((c) => c.contractAddress),
-        ),
+        .concat((currentVaults || []).map((v) => getAddress(v.token.id))),
       oracleInfo,
     );
     const maxLoanMinusCurrentDebt = maxLoanInDebtTokens.sub(
@@ -212,12 +202,9 @@ export function VaultOverview({
     maxLTV,
   );
   const connectedNFT = useMemo(() => {
-    return ERC721__factory.connect(
-      vaultInfo.collateralContract,
-      signerOrProvider,
-    );
-  }, [vaultInfo.collateralContract, signerOrProvider]);
-  const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
+    return ERC721__factory.connect(vaultInfo.token.id, signerOrProvider);
+  }, [vaultInfo.token.id, signerOrProvider]);
+  const nftSymbol = vaultInfo.token.symbol;
   const costToClose = useAsyncValue(async () => {
     if (ethers.BigNumber.from(vaultInfo.debt).isZero())
       return ethers.BigNumber.from(0);

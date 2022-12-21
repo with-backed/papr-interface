@@ -1,14 +1,21 @@
 fragment allPaprControllerProperties on PaprController {
   id
   createdAt
+  token0IsUnderlying
   poolAddress
-  underlying
-  paprToken
+  underlying {
+    ...allERC20Properties
+  }
+  paprToken {
+    ...allERC20Properties
+  }
   maxLTV
   target
   allowedCollateral(where: { allowed: true }) {
     id
-    contractAddress
+    token {
+      ...allERC721Properties
+    }
     allowed
   }
   vaults {

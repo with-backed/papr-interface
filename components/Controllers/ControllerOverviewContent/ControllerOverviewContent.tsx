@@ -61,7 +61,7 @@ export function ControllerOverviewContent({
   );
 
   const collateralContractAddresses = useMemo(() => {
-    return paprController.allowedCollateral.map((ac) => ac.contractAddress);
+    return paprController.allowedCollateral.map((ac) => ac.token.id);
   }, [paprController.allowedCollateral]);
 
   const { userCollectionNFTs, nftsLoading } = useAccountNFTs(

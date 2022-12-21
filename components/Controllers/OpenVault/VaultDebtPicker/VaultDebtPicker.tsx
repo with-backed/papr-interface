@@ -92,7 +92,7 @@ export function VaultDebtPicker({
   const userAndVaultNFTs = useMemo(() => {
     return (vault?.collateral || [])
       .map((c) => ({
-        address: c.contractAddress,
+        address: vault?.token.id,
         tokenId: c.tokenId,
         inVault: true,
         isLiquidating: false,
@@ -100,7 +100,7 @@ export function VaultDebtPicker({
       }))
       .concat(
         (auctionsByNftOwner?.auctions || []).map((a) => ({
-          address: a.auctionAssetContract,
+          address: a.auctionAssetContract.id,
           tokenId: a.auctionAssetID,
           inVault: false,
           isLiquidating: !a.endPrice,
@@ -114,7 +114,7 @@ export function VaultDebtPicker({
             (nft) =>
               vault?.collateral.find(
                 (c) =>
-                  getAddress(c.contractAddress) === getAddress(nft.address) &&
+                  getAddress(vault.token.id) === getAddress(nft.address) &&
                   c.tokenId === nft.tokenId,
               ) === undefined,
           )
@@ -126,7 +126,7 @@ export function VaultDebtPicker({
             isLiquidated: false,
           })),
       );
-  }, [userNFTsForVault, vault?.collateral, auctionsByNftOwner?.auctions]);
+  }, [userNFTsForVault, vault, auctionsByNftOwner?.auctions]);
 
   // debt variables
   const maxDebtPerNFTInPerpetual = useAsyncValue(async () => {
@@ -303,6 +303,9 @@ export function VaultDebtPicker({
   const connectedNFT = useMemo(() => {
     return ERC721__factory.connect(collateralContractAddress, signerOrProvider);
   }, [collateralContractAddress, signerOrProvider]);
+  // TODO we should vault.token.symbol here but vault is possibly undefined
+  // need a rework of these components, ideally we pass ERC721 token to this
+  // component as a prop
   const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
 
   const maxLTV = useMemo(() => paprController.maxLTVPercent, [paprController]);
@@ -388,9 +391,11 @@ export function VaultDebtPicker({
             userAndVaultNFTs.map((nft) => (
               <CollateralRow
                 key={`${nft.address}-${nft.tokenId}`}
-                contractAddress={nft.address}
+                contractAddress={collateralContractAddress}
                 tokenId={nft.tokenId}
-                floorPrice={oracleInfo[getAddress(nft.address)].price}
+                floorPrice={
+                  oracleInfo[getAddress(collateralContractAddress)].price
+                }
                 inVault={nft.inVault}
                 isLiquidating={nft.isLiquidating}
                 isLiquidated={nft.isLiquidated}

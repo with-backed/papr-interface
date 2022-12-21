@@ -16,7 +16,7 @@ export function TestPageContent({ paprController }: TestPageContentProps) {
   const collateral = useMemo(
     () =>
       paprController.allowedCollateral.map((ac) =>
-        erc721Contract(ac.contractAddress, signerOrProvider),
+        erc721Contract(ac.token.id, signerOrProvider),
       ),
     [paprController.allowedCollateral, signerOrProvider],
   );

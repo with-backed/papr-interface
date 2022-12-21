@@ -174,7 +174,7 @@ function CollateralAdded({
           <EtherscanAddressLink address={vaultOwner}>
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
-          deposited {event.collateral.symbol} #{event.collateral.tokenId} and
+          deposited {event.vault.token.symbol} #{event.collateral.tokenId} and
           minted {borrowedAmount || 'nothing'}
         </span>
       </td>
@@ -226,7 +226,8 @@ function CollateralRemoved({
         </td>
         <td>
           <span>
-            {event.collateral.symbol} #{event.collateral.tokenId} transferred to{' '}
+            {event.vault.token.symbol} #{event.collateral.tokenId} transferred
+            to{' '}
             <EtherscanAddressLink address={vaultOwner}>
               {vaultOwner.substring(0, 8)}
             </EtherscanAddressLink>{' '}
@@ -248,7 +249,7 @@ function CollateralRemoved({
           <EtherscanAddressLink address={vaultOwner}>
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
-          repaid {returnedAmount} and withdrew {event.collateral.symbol} #
+          repaid {returnedAmount} and withdrew {event.vault.token.symbol} #
           {event.collateral.tokenId}
         </span>
       </td>
@@ -293,12 +294,7 @@ function AuctionStart({
 }: {
   event: ArrayElement<ActivityByControllerQuery['auctionStartEvents']>;
 }) {
-  const signerOrProvider = useSignerOrProvider();
-  const assetContract = useMemo(
-    () => erc721Contract(event.auction.auctionAssetContract, signerOrProvider),
-    [event, signerOrProvider],
-  );
-  const symbol = useAsyncValue(() => assetContract.symbol(), [assetContract]);
+  const symbol = event.auction.auctionAssetContract.symbol;
 
   return (
     <tr>
@@ -321,12 +317,7 @@ function AuctionEnd({
   event: ArrayElement<ActivityByControllerQuery['auctionEndEvents']>;
   paprController: PaprController;
 }) {
-  const signerOrProvider = useSignerOrProvider();
-  const assetContract = useMemo(
-    () => erc721Contract(event.auction.auctionAssetContract, signerOrProvider),
-    [event, signerOrProvider],
-  );
-  const symbol = useAsyncValue(() => assetContract.symbol(), [assetContract]);
+  const symbol = event.auction.auctionAssetContract.symbol;
   const formattedEndPrice = useMemo(() => {
     const endPrice = ethers.utils.formatUnits(
       event.auction.endPrice,

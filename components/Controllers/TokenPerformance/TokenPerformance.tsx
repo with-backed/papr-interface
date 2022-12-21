@@ -105,9 +105,8 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
     if (!controller.vaults || controller.vaults.length === 0 || !oracleInfo)
       return 0;
     return controller.vaults
-      .map((v) => v.collateral)
+      .map((v) => v.token.id)
       .flat()
-      .map((collateral) => collateral.contractAddress)
       .map((collection) => oracleInfo[collection].price)
       .reduce((a, b) => a + b, 0);
   }, [controller, oracleInfo]);

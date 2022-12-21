@@ -70,7 +70,7 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
         {feed.map(({ vault: v, collateral: c }) => (
           <Tile
             key={c.id}
-            address={c.contractAddress}
+            address={v.token.id}
             tokenId={c.tokenId}
             paprController={paprController}
             vault={v}
