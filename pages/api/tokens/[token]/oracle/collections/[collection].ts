@@ -22,9 +22,7 @@ async function handler(
     if (token === 'paprTrash') {
       return res
         .status(200)
-        .json(
-          await generateDummyOracleMessage(collection, kind, configs[token]),
-        );
+        .json(await generateDummyOracleMessage(collection, kind));
     } else {
       return res
         .status(200)
