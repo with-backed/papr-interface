@@ -57,13 +57,13 @@ const paprHero: Config = {
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
-  controllerAddress: '0x3777b4b21489d2f0114e178c0cb2bb7332c8c3bd',
+  controllerAddress: '0x9b74e0be4220317dc2f796d3ed865ccb72698020',
   underlyingAddress: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
-  paprTokenAddress: '0xe93eb054835b73abd7425e01f13b13b539b8b773',
+  paprTokenAddress: '0x1c15aee63c64d4e8fa5e62b45f21106f51916105',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph:
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.6/gn',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.7/gn',
   oracleBaseUrl:
     process.env.NEXT_PUBLIC_ENV === 'local'
       ? 'http://localhost:3000'
