@@ -29,6 +29,8 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     [paprController],
   );
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
+
+  // Next up: don't do this for all collateral all at once
   const { ltvs } = useLTVs(paprController, activeVaults, maxLTV);
 
   const controllerNFTValue = useMemo(() => {
@@ -70,25 +72,13 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     const nftValueInPapr = controllerNFTValue / target;
 
     const totalSupplyNum = parseFloat(ethers.utils.formatEther(totalSupply));
-    console.log({ totalSupplyNum, nftValueInPapr });
     return totalSupplyNum / nftValueInPapr;
   }, [controllerNFTValue, pricesData, totalSupply]);
 
-  const avgLtv = useMemo(() => {
-    const ltvValues = Object.values(ltvs);
-
-    if (ltvValues.length === 0) {
-      return 0;
-    }
-    return ltvValues.reduce((a, b) => a + b) / ltvValues.length;
-  }, [ltvs]);
-
-  console.log({
-    computedAvg,
-    avgLtv,
-  });
-
-  const formattedAvgLtv = useMemo(() => formatPercent(avgLtv), [avgLtv]);
+  const formattedAvgLtv = useMemo(
+    () => formatPercent(computedAvg),
+    [computedAvg],
+  );
 
   const formattedTotalDebt = useMemo(() => {
     const debtBigNum = activeVaults.reduce(
@@ -132,7 +122,9 @@ export function Loans({ paprController, pricesData }: LoansProps) {
             <td>{activeVaults.length} Loans</td>
             <td>{formattedTotalDebt}</td>
             <td>{formattedAvgLtv}</td>
-            <td>{!!maxLTV && <VaultHealth ltv={avgLtv} maxLtv={maxLTV} />}</td>
+            <td>
+              {!!maxLTV && <VaultHealth ltv={computedAvg} maxLtv={maxLTV} />}
+            </td>
           </tr>
         </tbody>
       </Table>
