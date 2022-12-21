@@ -15,6 +15,7 @@ import { erc20ABI, useContractRead } from 'wagmi';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { captureException } from '@sentry/nextjs';
+import { convertOneScaledValue } from 'lib/controllers';
 
 type LoansProps = {
   paprController: PaprController;
@@ -47,7 +48,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
   const { data: totalSupply } = useContractRead({
     abi: erc20ABI,
     address:
-      paprController[paprController.token0IsUnderlying ? 'token0' : 'token1']
+      paprController[paprController.token0IsUnderlying ? 'token1' : 'token0']
         .address,
     functionName: 'totalSupply',
   });
@@ -67,11 +68,11 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     const { targetValues } = pricesData;
     const target = targetValues[targetValues.length - 1].value;
     const nftValueInPapr = controllerNFTValue / target;
-    const totalSupplyNum = parseFloat(
-      ethers.utils.formatUnits(totalSupply, paprController.underlying.decimals),
-    );
+
+    const totalSupplyNum = parseFloat(ethers.utils.formatEther(totalSupply));
+    console.log({ totalSupplyNum, nftValueInPapr });
     return totalSupplyNum / nftValueInPapr;
-  }, [controllerNFTValue, paprController.underlying, pricesData, totalSupply]);
+  }, [controllerNFTValue, pricesData, totalSupply]);
 
   const avgLtv = useMemo(() => {
     const ltvValues = Object.values(ltvs);
@@ -82,7 +83,10 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     return ltvValues.reduce((a, b) => a + b) / ltvValues.length;
   }, [ltvs]);
 
-  console.log({ computedAvg, avgLtv });
+  console.log({
+    computedAvg,
+    avgLtv,
+  });
 
   const formattedAvgLtv = useMemo(() => formatPercent(avgLtv), [avgLtv]);
 
