@@ -29,13 +29,17 @@ const addCollateralEvent = {
   timestamp: '1665517104',
   vault: {
     id: '0xd2ccc7970501f2802783acd750ee350fcf758349-0x6b2770a75a928989c1d7356366d4665a6487e1b4-0x6ef2c9cb23f03014d18d7e4ceeaec497db00247c',
+    token: {
+      id: '0xb7d7fe7995d1e347916faae8e16cfd6dd21a9bae',
+      contractAddress: '0xb7d7fe7995d1e347916faae8e16cfd6dd21a9bae',
+      symbol: 'fAPE',
+      name: 'fake APE',
+    },
     __typename: 'Vault',
   },
   collateral: {
     id: '0xb7d7fe7995d1e347916faae8e16cfd6dd21a9bae-28',
-    contractAddress: '0xb7d7fe7995d1e347916faae8e16cfd6dd21a9bae',
     tokenId: '28',
-    symbol: 'fAPE',
     __typename: 'VaultCollateral',
   },
   txHash: '0xdf5bc3c8b2c7769fadc88b573318b46c156cc00b9b119544503903b60bd8fb9c',

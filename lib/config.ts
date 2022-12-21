@@ -14,6 +14,8 @@ export type SupportedNetwork = 'ethereum' | 'goerli';
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
 
 const goerliJsonRpcProvider = `https://eth-goerli.alchemyapi.io/v2/${alchemyId}`;
+const goerliSubgraph =
+  'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.8/gn';
 
 const paprTrash: Config = {
   ...baseConfig,
@@ -31,8 +33,7 @@ const paprTrash: Config = {
   paprTokenAddress: '0x103da64f4366dc82ed0393716376a89dfee4b536',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
-  paprMemeSubgraph:
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.7/gn',
+  paprMemeSubgraph: goerliSubgraph,
   oracleBaseUrl:
     process.env.NEXT_PUBLIC_ENV === 'local'
       ? 'http://localhost:3000'
@@ -62,8 +63,7 @@ const paprHero: Config = {
   paprTokenAddress: '0x1c15aee63c64d4e8fa5e62b45f21106f51916105',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
-  paprMemeSubgraph:
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.7/gn',
+  paprMemeSubgraph: goerliSubgraph,
   oracleBaseUrl:
     process.env.NEXT_PUBLIC_ENV === 'local'
       ? 'http://localhost:3000'

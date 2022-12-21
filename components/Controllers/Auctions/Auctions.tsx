@@ -153,15 +153,8 @@ function ActiveAuctionRow({
 }) {
   const timestamp = useTimestamp();
   const signerOrProvider = useSignerOrProvider();
-  const assetContract = useMemo(
-    () => erc20Contract(auction.paymentAsset, signerOrProvider),
-    [auction.paymentAsset, signerOrProvider],
-  );
-  const decimals = useAsyncValue(
-    () => assetContract.decimals(),
-    [assetContract],
-  );
-  const symbol = useAsyncValue(() => assetContract.symbol(), [assetContract]);
+  const decimals = auction.paymentAsset.decimals;
+  const symbol = auction.paymentAsset.symbol;
   const priceBigNum = useMemo(() => {
     if (!timestamp) {
       return ethers.BigNumber.from(0);
@@ -210,7 +203,7 @@ function ActiveAuctionRow({
     <tr>
       <td className={styles.asset}>
         <CenterAsset
-          address={auction.auctionAssetContract}
+          address={auction.auctionAssetContract.id}
           tokenId={auction.auctionAssetID}
           preset="small"
         />
@@ -286,10 +279,15 @@ function BuyButton({
       await approvalTx.wait();
     }
 
-    const oracleDetails = oracleInfo[auction.auctionAssetContract];
+    const oracleDetails = oracleInfo[auction.auctionAssetContract.id];
     const oracleInfoStruct = getOraclePayloadFromReservoirObject(oracleDetails);
     const tx = await controller.purchaseLiquidationAuctionNFT(
-      { ...auction, nftOwner: auction.vault.account } as INFTEDA.AuctionStruct,
+      {
+        ...auction,
+        nftOwner: auction.vault.account,
+        paymentAsset: auction.paymentAsset.id,
+        auctionAssetContract: auction.auctionAssetContract.id,
+      } as INFTEDA.AuctionStruct,
       maxPrice,
       address!,
       oracleInfoStruct,
@@ -367,15 +365,8 @@ function PastAuctions({ auctions, fetching }: PastAuctionsProps) {
 
 function PastAuctionRow({ auction }: { auction: PastAuction }) {
   const signerOrProvider = useSignerOrProvider();
-  const assetContract = useMemo(
-    () => erc20Contract(auction.paymentAsset, signerOrProvider),
-    [auction.paymentAsset, signerOrProvider],
-  );
-  const decimals = useAsyncValue(
-    () => assetContract.decimals(),
-    [assetContract],
-  );
-  const symbol = useAsyncValue(() => assetContract.symbol(), [assetContract]);
+  const decimals = auction.paymentAsset.decimals;
+  const symbol = auction.paymentAsset.symbol;
   const endPrice = useMemo(
     () =>
       decimals && symbol
@@ -408,7 +399,7 @@ function PastAuctionRow({ auction }: { auction: PastAuction }) {
     <tr>
       <td className={styles.asset}>
         <CenterAsset
-          address={auction.auctionAssetContract}
+          address={auction.auctionAssetContract.id}
           tokenId={auction.auctionAssetID}
           preset="small"
         />

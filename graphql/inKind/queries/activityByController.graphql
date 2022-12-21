@@ -1,31 +1,35 @@
-query activityByController($controllerId: String) {
-  addCollateralEvents(where: { controller: $controllerId }) {
+query activityByController($controllerId: String, $account: Bytes) {
+  addCollateralEvents(where: { controller: $controllerId, account: $account }) {
     id
     timestamp
     vault {
       id
+      token {
+        ...allERC721Properties
+      }
     }
     collateral {
       id
-      contractAddress
       tokenId
-      symbol
     }
   }
-  removeCollateralEvents(where: { controller: $controllerId }) {
+  removeCollateralEvents(
+    where: { controller: $controllerId, account: $account }
+  ) {
     id
     timestamp
     vault {
       id
+      token {
+        ...allERC721Properties
+      }
     }
     collateral {
       id
-      contractAddress
       tokenId
-      symbol
     }
   }
-  debtDecreasedEvents(where: { controller: $controllerId }) {
+  debtDecreasedEvents(where: { controller: $controllerId, account: $account }) {
     id
     timestamp
     vault {
@@ -33,7 +37,7 @@ query activityByController($controllerId: String) {
     }
     amount
   }
-  debtIncreasedEvents(where: { controller: $controllerId }) {
+  debtIncreasedEvents(where: { controller: $controllerId, account: $account }) {
     id
     timestamp
     vault {
@@ -41,13 +45,15 @@ query activityByController($controllerId: String) {
     }
     amount
   }
-  auctionStartEvents {
+  auctionStartEvents(where: { controller: $controllerId, account: $account }) {
     id
     timestamp
     auction {
       id
       auctionAssetID
-      auctionAssetContract
+      auctionAssetContract {
+        ...allERC721Properties
+      }
       startPrice
       vault {
         id
@@ -57,12 +63,14 @@ query activityByController($controllerId: String) {
       }
     }
   }
-  auctionEndEvents {
+  auctionEndEvents(where: { controller: $controllerId, account: $account }) {
     id
     timestamp
     auction {
       auctionAssetID
-      auctionAssetContract
+      auctionAssetContract {
+        ...allERC721Properties
+      }
       endPrice
       vault {
         id

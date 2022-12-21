@@ -6,11 +6,14 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
-export function useActivityByController(controllerId: string) {
+export function useActivityByController(
+  controllerId: string,
+  account?: string,
+) {
   const { paprMemeSubgraph } = useConfig();
   const [{ data, fetching }] = useQuery<ActivityByControllerQuery>({
     query: ActivityByControllerDocument,
-    variables: { controllerId },
+    variables: { controllerId, account },
     context: useMemo(
       () => ({
         url: paprMemeSubgraph,

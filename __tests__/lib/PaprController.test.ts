@@ -11,15 +11,30 @@ const subgraphController: SubgraphController = {
   id: '0x41739c3547992ca3f2a40d110ad33afeb582eb7c',
   createdAt: '1663869096',
   poolAddress: '0xcf93a7655d76b43313a69f15f01a39ea6ada5aea',
-  underlying: '0x3089b47853df1b82877beef6d904a0ce98a12553',
+  underlying: {
+    id: '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
+    name: 'test',
+    symbol: 'TEST',
+    decimals: 6,
+  },
+  token0IsUnderlying: false,
   target: '1000000000000000000',
-  paprToken: '0xb5e5f51e3e112634975fb44e6351380413f653ac',
+  paprToken: {
+    id: '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
+    name: 'test',
+    symbol: 'TEST',
+    decimals: 18,
+  },
   maxLTV: '500000000000000000',
   vaults: [],
   allowedCollateral: [
     {
       id: '0x41739c3547992ca3f2a40d110ad33afeb582eb7c-0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
-      contractAddress: '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
+      token: {
+        id: '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
+        name: 'test',
+        symbol: 'TEST',
+      },
       allowed: true,
     },
   ],

@@ -21,7 +21,6 @@ export type BorrowPageProps = {
 };
 
 export function BorrowPageContent({
-  controllerAddress,
   paprController,
   pricesData,
 }: BorrowPageProps) {
@@ -30,20 +29,14 @@ export function BorrowPageContent({
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
 
   const collateralContractAddresses = useMemo(() => {
-    return paprController.allowedCollateral.map((ac) => ac.contractAddress);
+    return paprController.allowedCollateral.map((ac) => ac.token.id);
   }, [paprController.allowedCollateral]);
 
-  const {
-    userCollectionNFTs,
-    nftsLoading,
-    reexecuteQuery: refreshAccountNFTs,
-  } = useAccountNFTs(address, collateralContractAddresses, config);
+  const { userCollectionNFTs, reexecuteQuery: refreshAccountNFTs } =
+    useAccountNFTs(address, collateralContractAddresses, config);
 
-  const {
-    currentVaults,
-    vaultsFetching,
-    reexecuteQuery: refreshCurrentVaults,
-  } = useCurrentVaults(paprController, address);
+  const { currentVaults, reexecuteQuery: refreshCurrentVaults } =
+    useCurrentVaults(paprController, address);
 
   const { balance, refresh: refreshBalance } = usePaprBalance(
     paprController.debtToken.id,
@@ -63,16 +56,11 @@ export function BorrowPageContent({
     if (!currentVaults) return Array.from(new Set(userCollectionCollateral));
 
     const userAndVaultCollateral = currentVaults
-      .map((v) => getAddress(v.collateralContract))
+      .map((v) => getAddress(v.token.id))
       .concat(userCollectionCollateral);
 
     return Array.from(new Set(userAndVaultCollateral));
   }, [userCollectionNFTs, currentVaults]);
-
-  const vaultIds = useMemo(
-    () => new Set(currentVaults?.map((v) => v.id)),
-    [currentVaults],
-  );
 
   if (!paprController || !pricesData || !oracleInfo) {
     return <></>;
@@ -99,8 +87,7 @@ export function BorrowPageContent({
             oracleInfo={oracleInfo}
             paprController={paprController}
             vault={currentVaults?.find(
-              (v) =>
-                getAddress(v.collateralContract) === getAddress(collection),
+              (v) => getAddress(v.token.id) === getAddress(collection),
             )}
             userNFTsForVault={userCollectionNFTs.filter(
               (nft) => getAddress(collection) === getAddress(nft.address),
@@ -108,8 +95,8 @@ export function BorrowPageContent({
             refresh={refresh}
           />
         ))}
-      {!!currentVaults && (
-        <Activity paprController={paprController} vaultIds={vaultIds} />
+      {!!address && (
+        <Activity paprController={paprController} account={address} />
       )}
     </div>
   );

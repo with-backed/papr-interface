@@ -124,7 +124,7 @@ class PaprControllerInternal {
     this.multicall = this._contract.multicall;
     this.collateralContracts = this._subgraphController.allowedCollateral.map(
       (c) => {
-        return ERC721__factory.connect(c.contractAddress, signerOrProvider);
+        return ERC721__factory.connect(c.token.id, signerOrProvider);
       },
     );
     this.maxLTVBigNum = ethers.BigNumber.from(this._subgraphController.maxLTV);
@@ -195,17 +195,17 @@ class PaprControllerInternal {
   }
 
   get token0IsUnderlying() {
-    return this._subgraphController.underlying === this.subgraphPool.token0.id;
+    return this._subgraphController.token0IsUnderlying;
   }
 
   get underlying() {
-    return this._subgraphController.underlying === this.subgraphPool.token0.id
+    return this._subgraphController.token0IsUnderlying
       ? this.subgraphPool.token0
       : this.subgraphPool.token1;
   }
 
   get debtToken() {
-    return this._subgraphController.underlying === this.subgraphPool.token0.id
+    return this._subgraphController.token0IsUnderlying
       ? this.subgraphPool.token1
       : this.subgraphPool.token0;
   }

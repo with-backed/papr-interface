@@ -8,11 +8,15 @@ fragment allAuctionProperties on Auction {
     }
   }
   auctionAssetID
-  auctionAssetContract
+  auctionAssetContract {
+    ...allERC721Properties
+  }
   startedBy
   startPrice
   endPrice
-  paymentAsset
+  paymentAsset {
+    ...allERC20Properties
+  }
   secondsInPeriod
   perPeriodDecayPercentWad
   start {

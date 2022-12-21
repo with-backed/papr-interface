@@ -81,7 +81,7 @@ export default function ControllerPage({
   );
 
   const collections = useMemo(
-    () => subgraphController.allowedCollateral.map((c) => c.contractAddress),
+    () => subgraphController.allowedCollateral.map((c) => c.token.id),
     [subgraphController.allowedCollateral],
   );
 
