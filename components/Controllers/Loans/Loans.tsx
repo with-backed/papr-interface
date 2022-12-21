@@ -1,6 +1,5 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { PaprController } from 'lib/PaprController';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { ControllerPricesData } from 'lib/controllers/charts';
@@ -12,20 +11,70 @@ import { VaultHealth } from './VaultHealth';
 import { useLTVs } from 'hooks/useLTVs/useLTVs';
 import { useShowMore } from 'hooks/useShowMore';
 import { TextButton } from 'components/Button';
+import { erc20ABI, useContractRead } from 'wagmi';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { captureException } from '@sentry/nextjs';
 
 type LoansProps = {
   paprController: PaprController;
-  pricesData: ControllerPricesData | null;
 };
 
-export function Loans({ paprController, pricesData }: LoansProps) {
+export function Loans({ paprController }: LoansProps) {
   const maxLTV = useMemo(() => paprController.maxLTVBigNum, [paprController]);
   const activeVaults = useMemo(
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
     [paprController],
   );
-
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const { ltvs } = useLTVs(paprController, activeVaults, maxLTV);
+
+  const controllerNFTValue = useMemo(() => {
+    if (
+      !paprController.vaults ||
+      paprController.vaults.length === 0 ||
+      !oracleInfo
+    ) {
+      console.log('fails');
+      return 0;
+    }
+    return paprController.vaults
+      .map((v) => v.collateral)
+      .flat()
+      .map((collateral) => collateral.contractAddress)
+      .map((collection) => oracleInfo[collection].price)
+      .reduce((a, b) => a + b, 0);
+  }, [paprController, oracleInfo]);
+
+  const {
+    data: totalSupply,
+    isLoading,
+    error,
+  } = useContractRead({
+    abi: erc20ABI,
+    address:
+      paprController[paprController.token0IsUnderlying ? 'token0' : 'token1']
+        .address,
+    functionName: 'totalSupply',
+  });
+
+  const computedAvg = useMemo(() => {
+    if (!totalSupply || !controllerNFTValue) {
+      return 0;
+    }
+    if (!ethers.BigNumber.isBigNumber(totalSupply)) {
+      captureException(
+        new Error(
+          `did not receive BigNumber value for totalSupply: ${totalSupply}`,
+        ),
+      );
+      return 0;
+    }
+    const totalSupplyNum = parseFloat(
+      ethers.utils.formatUnits(totalSupply, paprController.underlying.decimals),
+    );
+    return controllerNFTValue / totalSupplyNum;
+  }, [controllerNFTValue, paprController.underlying, totalSupply]);
 
   const avgLtv = useMemo(() => {
     const ltvValues = Object.values(ltvs);
@@ -35,6 +84,8 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     }
     return ltvValues.reduce((a, b) => a + b) / ltvValues.length;
   }, [ltvs]);
+
+  console.log({ computedAvg, avgLtv });
 
   const formattedAvgLtv = useMemo(() => formatPercent(avgLtv), [avgLtv]);
 
