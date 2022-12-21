@@ -5,7 +5,6 @@ import {
   getAddress,
   _TypedDataEncoder,
 } from 'ethers/lib/utils';
-import { Config } from 'lib/config';
 import { OraclePriceType, ReservoirResponseData } from './reservoir';
 
 export const dummyOracleInfoMap = {
@@ -55,13 +54,8 @@ const EIP712_TYPES = {
 export async function generateDummyOracleMessage(
   collection: string,
   kind: OraclePriceType,
-  config: Config,
 ) {
-  const rpcProvider = new ethers.providers.JsonRpcProvider(
-    config.jsonRpcProvider,
-    config.chainId,
-  );
-  const signer = new ethers.Wallet(process.env.SIGNER_KEY!, rpcProvider);
+  const signer = new ethers.Wallet(process.env.SIGNER_KEY!);
 
   const min = dummyOracleInfoMap[getAddress(collection)][0];
   const max = dummyOracleInfoMap[getAddress(collection)][1];
@@ -88,8 +82,8 @@ export async function generateDummyOracleMessage(
     ['address', 'uint256'],
     [UNDERLYING_ADDRESS, price],
   );
-  const blockNumber = await rpcProvider.getBlockNumber();
-  const timestamp = (await rpcProvider.getBlock(blockNumber)).timestamp;
+
+  const timestamp = Math.floor(new Date().getTime() / 1000 - 120);
 
   const signature = await signer.signMessage(
     arrayify(
