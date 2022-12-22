@@ -14,6 +14,7 @@ import { erc20ABI, useContractRead } from 'wagmi';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { captureException } from '@sentry/nextjs';
+import { controllerNFTValue } from 'lib/controllers';
 
 type LoansProps = {
   paprController: PaprController;
@@ -28,19 +29,10 @@ export function Loans({ paprController, pricesData }: LoansProps) {
   );
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
-  const controllerNFTValue = useMemo(() => {
-    if (
-      !paprController.vaults ||
-      paprController.vaults.length === 0 ||
-      !oracleInfo
-    )
-      return 0;
-    return paprController.vaults
-      .map((v) => v.token.id)
-      .flat()
-      .map((collection) => oracleInfo[collection].price)
-      .reduce((a, b) => a + b, 0);
-  }, [paprController, oracleInfo]);
+  const NFTValue = useMemo(
+    () => controllerNFTValue(paprController, oracleInfo),
+    [paprController, oracleInfo],
+  );
 
   const { data: totalSupply } = useContractRead({
     abi: erc20ABI,
@@ -51,7 +43,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
   });
 
   const computedAvg = useMemo(() => {
-    if (!totalSupply || !controllerNFTValue || !pricesData) {
+    if (!totalSupply || !NFTValue || !pricesData) {
       return 0;
     }
     if (!ethers.BigNumber.isBigNumber(totalSupply)) {
@@ -64,11 +56,11 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     }
     const { targetValues } = pricesData;
     const target = targetValues[targetValues.length - 1].value;
-    const nftValueInPapr = controllerNFTValue / target;
+    const nftValueInPapr = NFTValue / target;
 
     const totalSupplyNum = parseFloat(ethers.utils.formatEther(totalSupply));
     return totalSupplyNum / nftValueInPapr;
-  }, [controllerNFTValue, pricesData, totalSupply]);
+  }, [NFTValue, pricesData, totalSupply]);
 
   const formattedAvgLtv = useMemo(
     () => formatPercent(computedAvg),
