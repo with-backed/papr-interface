@@ -11,16 +11,8 @@ type VaultRowProps = {
   debt: string;
   ltv?: number;
   maxLTV: ethers.BigNumber | null;
-  controllerId: string;
 };
-export function VaultRow({
-  id,
-  account,
-  debt,
-  ltv,
-  maxLTV,
-  controllerId,
-}: VaultRowProps) {
+export function VaultRow({ id, account, debt, ltv, maxLTV }: VaultRowProps) {
   const { tokenName } = useConfig();
 
   return (

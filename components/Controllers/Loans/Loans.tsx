@@ -8,14 +8,13 @@ import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
 import { VaultHealth } from './VaultHealth';
-import { useLTVs } from 'hooks/useLTVs/useLTVs';
+import { useLTVs } from 'hooks/useLTVs';
 import { useShowMore } from 'hooks/useShowMore';
 import { TextButton } from 'components/Button';
 import { erc20ABI, useContractRead } from 'wagmi';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { captureException } from '@sentry/nextjs';
-import { convertOneScaledValue } from 'lib/controllers';
 
 type LoansProps = {
   paprController: PaprController;
@@ -150,7 +149,6 @@ export function Loans({ paprController, pricesData }: LoansProps) {
                 id={v.id}
                 account={v.account}
                 debt={formattedDebt}
-                controllerId={paprController.id}
                 ltv={ltv}
                 maxLTV={maxLTV}
               />
