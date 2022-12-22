@@ -17,7 +17,7 @@ import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { getAddress } from 'ethers/lib/utils';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
-import { useLTVs } from 'hooks/useLTVs/useLTVs';
+import { useLTVs } from 'hooks/useLTVs';
 
 export type YourPositionsProps = {
   paprController: PaprController;

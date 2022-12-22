@@ -1,6 +1,5 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { PaprController } from 'lib/PaprController';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { ControllerPricesData } from 'lib/controllers/charts';
@@ -9,9 +8,13 @@ import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
 import { VaultHealth } from './VaultHealth';
-import { useLTVs } from 'hooks/useLTVs/useLTVs';
 import { useShowMore } from 'hooks/useShowMore';
 import { TextButton } from 'components/Button';
+import { erc20ABI, useContractRead } from 'wagmi';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { captureException } from '@sentry/nextjs';
+import { controllerNFTValue } from 'lib/controllers';
 
 type LoansProps = {
   paprController: PaprController;
@@ -24,19 +27,45 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
     [paprController],
   );
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
-  const { ltvs } = useLTVs(paprController, activeVaults, maxLTV);
+  const NFTValue = useMemo(
+    () => controllerNFTValue(paprController, oracleInfo),
+    [paprController, oracleInfo],
+  );
 
-  const avgLtv = useMemo(() => {
-    const ltvValues = Object.values(ltvs);
+  const { data: totalSupply } = useContractRead({
+    abi: erc20ABI,
+    address:
+      paprController[paprController.token0IsUnderlying ? 'token1' : 'token0']
+        .address,
+    functionName: 'totalSupply',
+  });
 
-    if (ltvValues.length === 0) {
+  const computedAvg = useMemo(() => {
+    if (!totalSupply || !NFTValue || !pricesData) {
       return 0;
     }
-    return ltvValues.reduce((a, b) => a + b) / ltvValues.length;
-  }, [ltvs]);
+    if (!ethers.BigNumber.isBigNumber(totalSupply)) {
+      captureException(
+        new Error(
+          `did not receive BigNumber value for totalSupply: ${totalSupply}`,
+        ),
+      );
+      return 0;
+    }
+    const { targetValues } = pricesData;
+    const target = targetValues[targetValues.length - 1].value;
+    const nftValueInPapr = NFTValue / target;
 
-  const formattedAvgLtv = useMemo(() => formatPercent(avgLtv), [avgLtv]);
+    const totalSupplyNum = parseFloat(ethers.utils.formatEther(totalSupply));
+    return totalSupplyNum / nftValueInPapr;
+  }, [NFTValue, pricesData, totalSupply]);
+
+  const formattedAvgLtv = useMemo(
+    () => formatPercent(computedAvg),
+    [computedAvg],
+  );
 
   const formattedTotalDebt = useMemo(() => {
     const debtBigNum = activeVaults.reduce(
@@ -48,18 +77,6 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     );
     return '$' + formatTokenAmount(debtNum);
   }, [activeVaults, paprController.debtToken]);
-
-  const formattedDebts = useMemo(() => {
-    const decimals = paprController.debtToken.decimals;
-    const debts = activeVaults.map(
-      (v) =>
-        '$' +
-        formatTokenAmount(
-          parseFloat(ethers.utils.formatUnits(v.debt, decimals)),
-        ),
-    );
-    return debts;
-  }, [activeVaults, paprController.debtToken.decimals]);
 
   const { feed, remainingLength, showMore, amountThatWillShowNext } =
     useShowMore(activeVaults);
@@ -80,7 +97,9 @@ export function Loans({ paprController, pricesData }: LoansProps) {
             <td>{activeVaults.length} Loans</td>
             <td>{formattedTotalDebt}</td>
             <td>{formattedAvgLtv}</td>
-            <td>{!!maxLTV && <VaultHealth ltv={avgLtv} maxLtv={maxLTV} />}</td>
+            <td>
+              {!!maxLTV && <VaultHealth ltv={computedAvg} maxLtv={maxLTV} />}
+            </td>
           </tr>
         </tbody>
       </Table>
@@ -95,19 +114,12 @@ export function Loans({ paprController, pricesData }: LoansProps) {
         </thead>
         <tbody>
           {feed.map((v, i) => {
-            // TODO: I'm sure there was a reason we calculated all of the LTVs
-            // as a big block, but now that we're only rendering a subset at
-            // a time, we should also defer calculating LTVs for the hidden ones.
-            const ltv = ltvs ? ltvs[v.id] : 0;
-            const formattedDebt = formattedDebts[i];
             return (
               <VaultRow
+                paprController={paprController}
                 key={v.id}
                 id={v.id}
                 account={v.account}
-                debt={formattedDebt}
-                controllerId={paprController.id}
-                ltv={ltv}
                 maxLTV={maxLTV}
               />
             );

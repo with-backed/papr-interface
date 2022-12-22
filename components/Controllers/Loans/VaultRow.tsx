@@ -1,27 +1,56 @@
 import { useConfig } from 'hooks/useConfig';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ethers } from 'ethers';
-import { formatPercent } from 'lib/numberFormat';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import Link from 'next/link';
+import { useLTV } from 'hooks/useLTVs';
+import { PaprController } from 'lib/PaprController';
 
 type VaultRowProps = {
+  paprController: PaprController;
   id: string;
   account: string;
-  debt: string;
-  ltv?: number;
   maxLTV: ethers.BigNumber | null;
-  controllerId: string;
 };
 export function VaultRow({
   id,
   account,
-  debt,
-  ltv,
+  paprController,
   maxLTV,
-  controllerId,
 }: VaultRowProps) {
+  const thisVault = useMemo(
+    () => paprController.vaults?.find((v) => v.id === id),
+    [id, paprController],
+  );
+  const debt = useMemo(() => {
+    if (!thisVault) {
+      return ethers.BigNumber.from(0);
+    }
+    return ethers.BigNumber.from(thisVault.debt);
+  }, [thisVault]);
+  const formattedDebt = useMemo(() => {
+    const debt = parseFloat(
+      ethers.utils.formatUnits(
+        thisVault?.debt,
+        paprController.debtToken.decimals,
+      ),
+    );
+    return `$ ${formatTokenAmount(debt)}`;
+  }, [paprController.debtToken.decimals, thisVault]);
+
+  const { ltv } = useLTV(
+    paprController,
+    thisVault?.token.id,
+    thisVault?.collateralCount,
+    ethers.BigNumber.from(debt),
+    maxLTV,
+  );
   const { tokenName } = useConfig();
+  const formattedLTV = useMemo(
+    () => (ltv === null ? '...' : formatPercent(ltv)),
+    [ltv],
+  );
 
   return (
     <tr>
@@ -30,10 +59,10 @@ export function VaultRow({
           {account.substring(0, 7)}
         </Link>
       </td>
-      <td>{debt}</td>
-      <td>{ltv !== undefined ? formatPercent(ltv) : '...'}</td>
+      <td>{formattedDebt}</td>
+      <td>{formattedLTV}</td>
       <td>
-        {ltv !== undefined && !!maxLTV ? (
+        {ltv !== null && !!maxLTV ? (
           <VaultHealth ltv={ltv} maxLtv={maxLTV} />
         ) : (
           '...'

@@ -334,3 +334,21 @@ export function computeLTVFromDebts(
     (debtNumber / maxNumber) * parseFloat(ethers.utils.formatEther(maxLTV))
   );
 }
+
+export function controllerNFTValue(
+  controller: PaprController,
+  oracleInfo: OracleInfo | undefined,
+) {
+  if (!controller.vaults || controller.vaults.length === 0 || !oracleInfo) {
+    return 0;
+  }
+  const collateral = controller.vaults.map((v) => ({
+    id: v.token.id,
+    count: v.collateralCount,
+  }));
+  const value = collateral.reduce(
+    (acc, { id, count }) => acc + oracleInfo[id].price * count,
+    0,
+  );
+  return value;
+}

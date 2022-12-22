@@ -39,7 +39,6 @@ export function getValueDaysAgo(values: TimeSeriesValue[], daysAgo: number) {
   const timestamps = values.map((v) => v.time);
   const pastTimestamp = getTimestampNDaysAgo(daysAgo);
   const indexOfClosest = findIndexOfClosest(timestamps, pastTimestamp);
-
   return values[indexOfClosest];
 }
 
@@ -47,6 +46,10 @@ export function percentChangeOverDuration(
   timeSeriesValues: TimeSeriesValue[],
   durationDays: number,
 ) {
+  // This occurs on a brand new controller with no data yet.
+  if (timeSeriesValues.length < 1) {
+    return 0;
+  }
   const v1 = getValueDaysAgo(timeSeriesValues, durationDays);
   const v2 = timeSeriesValues[timeSeriesValues.length - 1];
   return percentChange(v1.value, v2.value);
