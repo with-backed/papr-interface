@@ -54,5 +54,5 @@ export function useLTV(
     vaultDebt,
   ]);
 
-  return { ltv, ltvsLoading: ltvLoading };
+  return { ltv, ltvLoading };
 }

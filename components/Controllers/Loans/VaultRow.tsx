@@ -38,7 +38,7 @@ export function VaultRow({
     );
     return `$ ${formatTokenAmount(debt)}`;
   }, [paprController.debtToken.decimals, thisVault]);
-  console.log({ debt });
+
   const { ltv } = useLTV(
     paprController,
     thisVault?.token.id,
