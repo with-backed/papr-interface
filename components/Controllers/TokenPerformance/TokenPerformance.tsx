@@ -29,7 +29,6 @@ import { Table } from 'components/Table';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
-import { targetValues } from 'lib/controllers/charts/target';
 
 export type ControllerSummaryProps = {
   controllers: PaprController[];
@@ -134,6 +133,14 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
       return null;
     }
     const { markValues, targetValues } = pricesData;
+    // This happens on a brand new controller that doesn't have data yet.
+    if (markValues.length === 0 || targetValues.length === 0) {
+      return {
+        mark: 0,
+        target: 0,
+        change: 0,
+      };
+    }
     const mark = markValues[markValues.length - 1].value;
     const target = targetValues[targetValues.length - 1].value;
     const valueADayAgo = getValueDaysAgo(markValues, 1).value;
@@ -145,6 +152,13 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
       return null;
     }
     const { markValues, targetValues } = pricesData;
+    // This happens on a brand new controller that doesn't have data yet.
+    if (markValues.length === 0 || targetValues.length === 0) {
+      return {
+        targetOverMark: 0,
+        change: 0,
+      };
+    }
     const { mark } = markAndChange;
     const norm = targetValues[targetValues.length - 1].value;
     const normADayAgo = getValueDaysAgo(targetValues, 1).value;
