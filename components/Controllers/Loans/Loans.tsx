@@ -8,7 +8,6 @@ import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
 import { Table } from 'components/Table';
 import { VaultHealth } from './VaultHealth';
-import { useLTVs } from 'hooks/useLTVs';
 import { useShowMore } from 'hooks/useShowMore';
 import { TextButton } from 'components/Button';
 import { erc20ABI, useContractRead } from 'wagmi';
@@ -28,9 +27,6 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     [paprController],
   );
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
-
-  // Next up: don't do this for all collateral all at once
-  const { ltvs } = useLTVs(paprController, activeVaults, maxLTV);
 
   const controllerNFTValue = useMemo(() => {
     if (
@@ -90,18 +86,6 @@ export function Loans({ paprController, pricesData }: LoansProps) {
     return '$' + formatTokenAmount(debtNum);
   }, [activeVaults, paprController.debtToken]);
 
-  const formattedDebts = useMemo(() => {
-    const decimals = paprController.debtToken.decimals;
-    const debts = activeVaults.map(
-      (v) =>
-        '$' +
-        formatTokenAmount(
-          parseFloat(ethers.utils.formatUnits(v.debt, decimals)),
-        ),
-    );
-    return debts;
-  }, [activeVaults, paprController.debtToken.decimals]);
-
   const { feed, remainingLength, showMore, amountThatWillShowNext } =
     useShowMore(activeVaults);
 
@@ -138,18 +122,12 @@ export function Loans({ paprController, pricesData }: LoansProps) {
         </thead>
         <tbody>
           {feed.map((v, i) => {
-            // TODO: I'm sure there was a reason we calculated all of the LTVs
-            // as a big block, but now that we're only rendering a subset at
-            // a time, we should also defer calculating LTVs for the hidden ones.
-            const ltv = ltvs ? ltvs[v.id] : 0;
-            const formattedDebt = formattedDebts[i];
             return (
               <VaultRow
+                paprController={paprController}
                 key={v.id}
                 id={v.id}
                 account={v.account}
-                debt={formattedDebt}
-                ltv={ltv}
                 maxLTV={maxLTV}
               />
             );
