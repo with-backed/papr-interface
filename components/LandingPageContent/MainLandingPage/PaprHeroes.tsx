@@ -53,9 +53,9 @@ export function PaprHeroes() {
       <ButtonLink
         kind="outline"
         theme="hero"
-        href="/tokens/paprHero/competition"
+        href="https://backed.mirror.xyz/e2SHAQZFVvNnTPboo1upc1s55rX646_O9caqRgW2IdA"
         newTab>
-        See the Leaderboard
+        Read the Recap
       </ButtonLink>
       <div className={styles.heroes}>
         <Image src={Hero1} alt="" quality={100} />
