@@ -53,7 +53,7 @@ export function PaprHeroes() {
       <ButtonLink
         kind="outline"
         theme="hero"
-        href="https://backed.mirror.xyz/vo5BnBJFKVho4nreXlPRLYYRfuMYGrWpXSwzDdDcork"
+        href="https://backed.mirror.xyz/e2SHAQZFVvNnTPboo1upc1s55rX646_O9caqRgW2IdA"
         newTab>
         Read the Recap
       </ButtonLink>
