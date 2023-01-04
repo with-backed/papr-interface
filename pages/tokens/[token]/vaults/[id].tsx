@@ -7,7 +7,7 @@ import {
 } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 import styles from '../controller.module.css';
-import { usePaprController } from 'hooks/usePaprController';
+import { usePaprController_deprecated } from 'hooks/usePaprController';
 import { VaultPageContent } from 'components/Controllers/VaultPageContent';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { controllerPricesData } from 'lib/controllers/charts';
@@ -61,7 +61,7 @@ export default function VaultPage({
   subgraphPool,
   subgraphController,
 }: ServerSideProps) {
-  const paprController = usePaprController({
+  const paprController = usePaprController_deprecated({
     subgraphController,
     subgraphPool,
   });

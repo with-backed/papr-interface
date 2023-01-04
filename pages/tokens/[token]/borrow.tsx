@@ -12,7 +12,7 @@ import {
 } from 'lib/PaprController';
 import { useConfig } from 'hooks/useConfig';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { usePaprController } from 'hooks/usePaprController';
+import { usePaprController_deprecated } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
 import { OpenGraph } from 'components/OpenGraph';
@@ -68,7 +68,7 @@ export default function Borrow({
 }: ServerSideProps) {
   const config = useConfig();
 
-  const paprController = usePaprController({
+  const paprController = usePaprController_deprecated({
     subgraphController,
     subgraphPool,
   });
