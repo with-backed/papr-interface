@@ -302,7 +302,7 @@ export async function getOracleInfoFromAllowedCollateral(
   const oracleInfoFromAPI: ReservoirResponseData[] = await Promise.all(
     collections.map(async (collectionAddress) => {
       const req = await fetch(
-        `${configs[token].oracleBaseUrl}/api/tokens/${token}/oracle/collections/${collectionAddress}?kind=${kind}`,
+        `/api/tokens/${token}/oracle/collections/${collectionAddress}?kind=${kind}`,
         {
           method: 'POST',
         },
