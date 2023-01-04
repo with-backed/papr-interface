@@ -9,7 +9,7 @@ interface ERC20Token {
 
 interface AllowedCollateral {
   id: string;
-  token: { name: string; symbol: string };
+  token: { id: string; name: string; symbol: string };
   allowed: boolean;
 }
 
