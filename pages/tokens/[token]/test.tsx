@@ -1,17 +1,12 @@
-import { TestPageContent } from 'components/Controllers/TestPageContent';
-import { configs, getConfig, SupportedToken } from 'lib/config';
-import {
-  fetchSubgraphData,
-  SubgraphPool,
-  SubgraphController,
-} from 'lib/PaprController';
-import { GetServerSideProps } from 'next';
-import { usePaprController } from 'hooks/usePaprController';
 import { captureException } from '@sentry/nextjs';
+import { TestPageContent } from 'components/Controllers/TestPageContent';
+import { PaprController, ControllerContextProvider } from 'hooks/useController';
+import { configs, getConfig, SupportedToken } from 'lib/config';
+import { fetchSubgraphData } from 'lib/PaprController';
+import { GetServerSideProps } from 'next';
 
 export type TestProps = {
-  subgraphController: SubgraphController;
-  subgraphPool: SubgraphPool;
+  subgraphController: PaprController;
 };
 
 export const getServerSideProps: GetServerSideProps<TestProps> = async (
@@ -38,24 +33,19 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
     throw e;
   }
 
-  const { pool, paprController } = controllerSubgraphData;
+  const { paprController } = controllerSubgraphData;
 
   return {
     props: {
       subgraphController: paprController,
-      subgraphPool: pool,
     },
   };
 };
 
-export default function InKindTest({
-  subgraphPool,
-  subgraphController,
-}: TestProps) {
-  const paprController = usePaprController({
-    subgraphController,
-    subgraphPool,
-  });
-
-  return <TestPageContent paprController={paprController} />;
+export default function InKindTest({ subgraphController }: TestProps) {
+  return (
+    <ControllerContextProvider value={subgraphController}>
+      <TestPageContent />
+    </ControllerContextProvider>
+  );
 }
