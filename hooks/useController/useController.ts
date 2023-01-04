@@ -1,12 +1,4 @@
-import { captureException } from '@sentry/nextjs';
-import { useConfig } from 'hooks/useConfig';
 import { createGenericContext } from 'lib/createGenericContext';
-import { useEffect } from 'react';
-import {
-  UseControllerDocument,
-  UseControllerQuery,
-} from 'types/generated/graphql/inKindSubgraph';
-import { useQuery } from 'urql';
 
 interface ERC20Token {
   id: string;
