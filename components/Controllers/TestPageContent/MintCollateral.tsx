@@ -22,9 +22,7 @@ export default function MintCollateral({ token }: MintCollateralProps) {
 
   const getSymbol = useCallback(async () => {
     if (token) {
-      const symbol = await token.symbol();
-      console.log({ symbol });
-      setSymbol(symbol);
+      setSymbol(await token.symbol());
     }
   }, [token]);
 
