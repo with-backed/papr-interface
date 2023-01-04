@@ -1,5 +1,6 @@
 import { captureException } from '@sentry/nextjs';
 import { useConfig } from 'hooks/useConfig';
+import { createGenericContext } from 'lib/createGenericContext';
 import { useEffect } from 'react';
 import {
   UseControllerDocument,
@@ -20,7 +21,7 @@ interface AllowedCollateral {
   allowed: boolean;
 }
 
-interface PaprController {
+export interface PaprController {
   paprToken: ERC20Token;
   underlying: ERC20Token;
   allowedCollateral: AllowedCollateral[];
@@ -29,29 +30,12 @@ interface PaprController {
   poolAddress: string;
 }
 
-type UseControllerResult = {
-  controller: PaprController | null;
-  fetching: boolean;
-};
+const [useControllerContext, ControllerContextProvider] =
+  createGenericContext<PaprController>();
 
-export function useController(): UseControllerResult {
-  const { controllerAddress } = useConfig();
-
-  const [{ data, fetching, error }] = useQuery<UseControllerQuery>({
-    query: UseControllerDocument,
-    variables: {
-      id: controllerAddress,
-    },
-  });
-
-  useEffect(() => {
-    if (error) {
-      captureException(error);
-    }
-  }, [error]);
-
-  return {
-    fetching,
-    controller: data?.paprController ?? null,
-  };
+function useController(): PaprController {
+  const controller = useControllerContext();
+  return controller;
 }
+
+export { useController, ControllerContextProvider };
