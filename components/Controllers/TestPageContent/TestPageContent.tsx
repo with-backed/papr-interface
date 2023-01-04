@@ -9,11 +9,11 @@ import { useController } from 'hooks/useController';
 
 export function TestPageContent() {
   const signerOrProvider = useSignerOrProvider();
-  const { controller } = useController();
+  const controller = useController();
 
   const collateral = useMemo(
     () =>
-      controller?.allowedCollateral.map((ac) =>
+      controller.allowedCollateral.map((ac) =>
         erc721Contract(ac.id, signerOrProvider),
       ) || [],
     [controller, signerOrProvider],
