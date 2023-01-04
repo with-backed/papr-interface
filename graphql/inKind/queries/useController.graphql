@@ -1,0 +1,5 @@
+query useController($id: ID!) {
+  paprController(id: $id) {
+    ...allPaprControllerProperties
+  }
+}
