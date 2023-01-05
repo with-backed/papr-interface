@@ -8,22 +8,25 @@ import {
 import { useConfig } from 'hooks/useConfig';
 import { GlobalMessagingProvider } from 'hooks/useGlobalMessages';
 import { PaprBalanceProvider } from 'hooks/usePaprBalance';
+import { TargetProvider } from 'hooks/useTarget';
 import { TimestampProvider } from 'hooks/useTimestamp/useTimestamp';
 import { FunctionComponent, useMemo } from 'react';
 import {
   createClient as createUrqlClient,
   Provider as UrqlProvider,
 } from 'urql';
-import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
+import { configureChains, createClient, WagmiConfig } from 'wagmi';
+import { mainnet, goerli } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { infuraProvider } from 'wagmi/providers/infura';
 import { publicProvider } from 'wagmi/providers/public';
 
-const prodChains = [chain.mainnet, chain.goerli];
+// TODO: since paprHero will always be around, do we need this distinction?
+const prodChains = [mainnet, goerli];
 const CHAINS =
   process.env.NEXT_PUBLIC_ENV === 'production'
     ? prodChains
-    : [...prodChains, chain.goerli];
+    : [...prodChains, goerli];
 
 const Disclaimer: DisclaimerComponent = ({ Text, Link }) => (
   <Text>
@@ -92,11 +95,13 @@ export const ApplicationProviders: FunctionComponent = ({ children }) => {
           <CenterProvider
             network={centerNetwork as any}
             apiKey={process.env.NEXT_PUBLIC_CENTER_KEY ?? ''}>
-            <PaprBalanceProvider>
-              <TimestampProvider>
-                <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-              </TimestampProvider>
-            </PaprBalanceProvider>
+            <TargetProvider>
+              <PaprBalanceProvider>
+                <TimestampProvider>
+                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
+                </TimestampProvider>
+              </PaprBalanceProvider>
+            </TargetProvider>
           </CenterProvider>
         </RainbowKitProvider>
       </WagmiConfig>

@@ -392,7 +392,7 @@ export function ApproveTokenButton({
 
   const symbol = useAsyncValue(() => token.symbol(), [token]);
   const { config } = usePrepareContractWrite({
-    address: token.address,
+    address: token.address as `0x${string}`,
     abi: erc20ABI,
     functionName: 'approve',
     args: [controller.id as `0x${string}`, ethers.constants.MaxInt256],
@@ -461,7 +461,7 @@ export function ApproveNFTButton({
     [collateralContract],
   );
   const { config } = usePrepareContractWrite({
-    address: collateralContract.address,
+    address: collateralContract.address as `0x${string}`,
     abi: erc721ABI,
     functionName: 'setApprovalForAll',
     args: [paprController.id as `0x${string}`, true],

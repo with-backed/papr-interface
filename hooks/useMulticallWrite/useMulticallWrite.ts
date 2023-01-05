@@ -13,7 +13,7 @@ export function useMulticallWrite(
   refresh: () => void,
 ) {
   const { config: multicallConfig } = usePrepareContractWrite({
-    address: paprController.id,
+    address: paprController.id as `0x${string}`,
     abi: PaprControllerABI.abi,
     functionName: 'multicall',
     args: [calldata as `0x${string}`[]],

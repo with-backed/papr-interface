@@ -29,7 +29,7 @@ export function PaprBalanceProvider({ children }: PropsWithChildren<{}>) {
   const { data: rawPaprBalance, refetch: refresh } = useContractRead({
     // If address is undefined, hook will not run. Take advantage of this
     // to not run the hook if there is no connected user.
-    address: connectedAddress ? debtTokenAddress : undefined,
+    address: connectedAddress ? (debtTokenAddress as `0x${string}`) : undefined,
     abi: erc20ABI,
     functionName: 'balanceOf',
     args: [connectedAddress as `0x${string}`],

@@ -11,7 +11,7 @@ export type Config = typeof paprMeme;
 export type SupportedToken = keyof typeof configs;
 export type SupportedNetwork = 'ethereum' | 'goerli';
 
-const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
+const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_KEY as string;
 
 const goerliJsonRpcProvider = `https://eth-goerli.alchemyapi.io/v2/${alchemyId}`;
 const goerliSubgraph =
