@@ -17,9 +17,9 @@ const customJestConfig = {
   coverageThreshold: {
     global: {
       branches: 12,
-      functions: 111,
-      lines: 14,
-      statements: 14,
+      functions: 12.63,
+      lines: 17,
+      statements: 16.5,
     },
   },
   moduleDirectories: ['node_modules', '<rootDir>'],
@@ -29,4 +29,13 @@ const customJestConfig = {
   globalSetup: '<rootDir>/global-setup.js',
 };
 
-module.exports = createJestConfig(customJestConfig);
+const asyncConfig = createJestConfig(customJestConfig);
+
+module.exports = async () => {
+  const config = await asyncConfig();
+  config.transformIgnorePatterns = [
+    // ...your ignore patterns
+    'node_modules/@tanstack/query-sync-storage-persister',
+  ];
+  return config;
+};
