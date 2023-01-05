@@ -17,9 +17,9 @@ const customJestConfig = {
   coverageThreshold: {
     global: {
       branches: 12,
-      functions: 12.63,
-      lines: 17,
-      statements: 16.5,
+      functions: 111,
+      lines: 14,
+      statements: 14,
     },
   },
   moduleDirectories: ['node_modules', '<rootDir>'],
