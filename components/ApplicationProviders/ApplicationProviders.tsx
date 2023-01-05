@@ -14,16 +14,18 @@ import {
   createClient as createUrqlClient,
   Provider as UrqlProvider,
 } from 'urql';
-import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
+import { configureChains, createClient, WagmiConfig } from 'wagmi';
+import { mainnet, goerli } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { infuraProvider } from 'wagmi/providers/infura';
 import { publicProvider } from 'wagmi/providers/public';
 
-const prodChains = [chain.mainnet, chain.goerli];
+// TODO: since paprHero will always be around, do we need this distinction?
+const prodChains = [mainnet, goerli];
 const CHAINS =
   process.env.NEXT_PUBLIC_ENV === 'production'
     ? prodChains
-    : [...prodChains, chain.goerli];
+    : [...prodChains, goerli];
 
 const Disclaimer: DisclaimerComponent = ({ Text, Link }) => (
   <Text>

@@ -36,9 +36,9 @@ export function Loans({ paprController, pricesData }: LoansProps) {
 
   const { data: totalSupply } = useContractRead({
     abi: erc20ABI,
-    address:
-      paprController[paprController.token0IsUnderlying ? 'token1' : 'token0']
-        .address,
+    address: paprController[
+      paprController.token0IsUnderlying ? 'token1' : 'token0'
+    ].address as `0x${string}`,
     functionName: 'totalSupply',
   });
 
