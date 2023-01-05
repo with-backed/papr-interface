@@ -17,7 +17,6 @@ export interface PaprController {
   paprToken: ERC20Token;
   underlying: ERC20Token;
   allowedCollateral: AllowedCollateral[];
-  target: number;
   token0IsUnderlying: boolean;
   poolAddress: string;
 }
