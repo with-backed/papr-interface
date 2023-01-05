@@ -30,7 +30,7 @@ export const TargetProvider: FunctionComponent = ({ children }) => {
   } as const);
 
   return (
-    <TargetContext.Provider value={newTarget as BigNumber | undefined}>
+    <TargetContext.Provider value={newTarget}>
       {children}
     </TargetContext.Provider>
   );
