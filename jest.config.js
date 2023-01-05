@@ -34,7 +34,8 @@ const asyncConfig = createJestConfig(customJestConfig);
 module.exports = async () => {
   const config = await asyncConfig();
   config.transformIgnorePatterns = [
-    // ...your ignore patterns
+    // this is one of wagmi's deps. It's a native ES module, and jest doesn't
+    // currently support those. Adding it here transpiles it before running tests.
     'node_modules/@tanstack/query-sync-storage-persister',
   ];
   return config;
