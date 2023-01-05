@@ -38,7 +38,7 @@
     "datebook": "7.0.8",
     "dayjs": "1.11.0",
     "ethereumjs-util": "^7.1.5",
-    "ethers": "5.6.2",
+    "ethers": "5.7.2",
     "graphql": "16.3.0",
     "lambert-w-function": "^3.0.0",
     "lightweight-charts": "^3.8.0",
