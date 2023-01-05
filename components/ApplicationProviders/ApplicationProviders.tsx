@@ -8,6 +8,7 @@ import {
 import { useConfig } from 'hooks/useConfig';
 import { GlobalMessagingProvider } from 'hooks/useGlobalMessages';
 import { PaprBalanceProvider } from 'hooks/usePaprBalance';
+import { TargetProvider } from 'hooks/useTarget';
 import { TimestampProvider } from 'hooks/useTimestamp/useTimestamp';
 import { FunctionComponent, useMemo } from 'react';
 import {
@@ -94,11 +95,13 @@ export const ApplicationProviders: FunctionComponent = ({ children }) => {
           <CenterProvider
             network={centerNetwork as any}
             apiKey={process.env.NEXT_PUBLIC_CENTER_KEY ?? ''}>
-            <PaprBalanceProvider>
-              <TimestampProvider>
-                <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-              </TimestampProvider>
-            </PaprBalanceProvider>
+            <TargetProvider>
+              <PaprBalanceProvider>
+                <TimestampProvider>
+                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
+                </TimestampProvider>
+              </PaprBalanceProvider>
+            </TargetProvider>
           </CenterProvider>
         </RainbowKitProvider>
       </WagmiConfig>
