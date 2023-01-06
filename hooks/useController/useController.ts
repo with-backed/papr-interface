@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers';
 import { createGenericContext } from 'lib/createGenericContext';
 
 interface ERC20Token {
@@ -19,6 +20,7 @@ export interface PaprController {
   allowedCollateral: AllowedCollateral[];
   token0IsUnderlying: boolean;
   poolAddress: string;
+  maxLTV: BigNumber;
 }
 
 const [useControllerContext, ControllerContextProvider] =
