@@ -1,1 +1,1 @@
-export { useMaxDebt } from './useMaxDebt';
+export { useMaxDebt, maxDebt } from './useMaxDebt';

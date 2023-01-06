@@ -6,12 +6,18 @@ import { useTarget } from 'hooks/useTarget';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useMemo } from 'react';
 
-function maxDebt(value: BigNumber, maxLTV: BigNumberish, target: BigNumber) {
+export function maxDebt(
+  value: BigNumber,
+  maxLTV: BigNumberish,
+  target: BigNumber,
+) {
   const maxLoanUnderlying = value.mul(maxLTV);
   return maxLoanUnderlying.div(target);
 }
 
-export function useMaxDebt(...collateralAssets: string[]) {
+export function useMaxDebt(collateralAsset: string): BigNumber | null;
+export function useMaxDebt(collateralAssets: string[]): BigNumber | null;
+export function useMaxDebt(collateral: string | string[]): BigNumber | null {
   const target = useTarget();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const {
@@ -24,7 +30,15 @@ export function useMaxDebt(...collateralAssets: string[]) {
       return null;
     }
 
-    const totalDebtPerCollateral = collateralAssets.map((asset) =>
+    if (typeof collateral === 'string') {
+      return maxDebt(
+        parseUnits(oracleInfo[collateral].price.toString(), decimals),
+        maxLTV,
+        target,
+      );
+    }
+
+    const totalDebtPerCollateral = collateral.map((asset) =>
       maxDebt(
         parseUnits(oracleInfo[asset].price.toString(), decimals),
         maxLTV,
@@ -33,7 +47,7 @@ export function useMaxDebt(...collateralAssets: string[]) {
     );
 
     return totalDebtPerCollateral.reduce((a, b) => a.add(b), BigNumber.from(0));
-  }, [collateralAssets, decimals, maxLTV, oracleInfo, target]);
+  }, [collateral, decimals, maxLTV, oracleInfo, target]);
 
   return result;
 }

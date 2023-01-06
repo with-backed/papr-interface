@@ -98,7 +98,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
             <td>{formattedTotalDebt}</td>
             <td>{formattedAvgLtv}</td>
             <td>
-              {!!maxLTV && <VaultHealth ltv={computedAvg} maxLtv={maxLTV} />}
+              <VaultHealth ltv={computedAvg} />
             </td>
           </tr>
         </tbody>
@@ -113,16 +113,8 @@ export function Loans({ paprController, pricesData }: LoansProps) {
           </tr>
         </thead>
         <tbody>
-          {feed.map((v, i) => {
-            return (
-              <VaultRow
-                paprController={paprController}
-                key={v.id}
-                id={v.id}
-                account={v.account}
-                maxLTV={maxLTV}
-              />
-            );
+          {feed.map((v) => {
+            return <VaultRow key={v.id} vault={v} account={v.account} />;
           })}
         </tbody>
       </Table>

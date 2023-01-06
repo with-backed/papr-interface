@@ -79,7 +79,6 @@ export function ControllerOverviewContent({
           currentVaults={currentVaults}
           latestMarketPrice={latestMarketPrice}
           oracleInfo={oracleInfo}
-          paprController={paprController}
           userNFTs={userCollectionNFTs}
           balance={balance}
         />

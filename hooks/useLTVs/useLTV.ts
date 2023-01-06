@@ -1,58 +1,32 @@
 import { ethers } from 'ethers';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useController } from 'hooks/useController';
+import { useMaxDebt } from 'hooks/useMaxDebt';
 import { computeLTVFromDebts } from 'lib/controllers';
-import { OraclePriceType } from 'lib/oracle/reservoir';
-import { PaprController } from 'lib/PaprController';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 export function useLTV(
-  paprController: PaprController,
-  collateralContractAddress: string | undefined,
-  numberOfCollateralTokens: number | undefined,
+  collateralContractAddress: string,
+  numberOfCollateralTokens: number,
   vaultDebt: ethers.BigNumber,
-  maxLTV: ethers.BigNumber | null,
 ) {
-  const oracleInfo = useOracleInfo(OraclePriceType.twap);
-  const [ltv, setLTV] = useState<number | null>(null);
-  const [ltvLoading, setLTVLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const fetchLTV = async () => {
-      if (
-        !oracleInfo ||
-        // These checks are required because the types for the graphql result indicate
-        // that the fields may not be present; in practice they should be defined.
-        !collateralContractAddress ||
-        !numberOfCollateralTokens ||
-        !maxLTV
-      ) {
-        return null;
-      }
-      const maxDebtForToken = await paprController.maxDebt_deprecated(
-        [collateralContractAddress],
-        oracleInfo,
-      );
-      const maxDebtForVault = maxDebtForToken.mul(numberOfCollateralTokens);
-      return computeLTVFromDebts(
-        vaultDebt,
-        maxDebtForVault,
-        maxLTV,
-        paprController.debtToken.decimals,
-      );
-    };
-
-    fetchLTV().then((ltv) => {
-      setLTV(ltv);
-      setLTVLoading(false);
-    });
-  }, [
-    collateralContractAddress,
+  const {
     maxLTV,
-    numberOfCollateralTokens,
-    oracleInfo,
-    paprController,
-    vaultDebt,
-  ]);
+    paprToken: { decimals },
+  } = useController();
+  const maxDebtForToken = useMaxDebt(collateralContractAddress);
 
-  return { ltv, ltvLoading };
+  const ltv = useMemo(() => {
+    if (!maxDebtForToken) {
+      return null;
+    }
+    const maxDebtForVault = maxDebtForToken.mul(numberOfCollateralTokens);
+    return computeLTVFromDebts(
+      vaultDebt,
+      maxDebtForVault,
+      ethers.BigNumber.from(maxLTV),
+      decimals,
+    );
+  }, [decimals, maxDebtForToken, maxLTV, numberOfCollateralTokens, vaultDebt]);
+
+  return ltv;
 }

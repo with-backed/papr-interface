@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { PaprController } from 'lib/PaprController';
-import { LoanDetails } from 'components/Controllers/Loans/LoanDetails';
 import controllerStyles from '../Controller.module.css';
 import { Collateral } from 'components/Controllers/Collateral';
 import { Activity } from 'components/Controllers/Activity';
@@ -21,7 +20,6 @@ export function VaultPageContent({
   const vaultOwner = useMemo(() => vaultId.split('-')[1], [vaultId]);
   return (
     <div className={controllerStyles.wrapper}>
-      <LoanDetails vaultId={vaultId} paprController={paprController} />
       <Collateral paprController={paprController} vaultId={vaultId} />
       <Activity paprController={paprController} account={vaultOwner} />
       <TokenPerformance

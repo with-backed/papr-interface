@@ -1,20 +1,15 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Fieldset } from 'components/Fieldset';
 import { VaultRow } from 'components/Controllers/Loans/VaultRow';
-import { PaprController } from 'lib/PaprController';
 import styles from './Loans.module.css';
 import { Table } from 'components/Table';
 
 type LoanDetailsProps = {
-  vaultId: string;
-  paprController: PaprController;
+  // TODO: type
+  vault: any;
 };
 
-export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
-  const vault = useMemo(() => {
-    return paprController.vaults?.find((v) => v.id === vaultId);
-  }, [paprController, vaultId]);
-  const maxLTV = useMemo(() => paprController.maxLTVBigNum, [paprController]);
+export function LoanDetails({ vault }: LoanDetailsProps) {
   return (
     <Fieldset legend={'💸 Loan Details'}>
       <Table className={styles.table}>
@@ -27,12 +22,7 @@ export function LoanDetails({ paprController, vaultId }: LoanDetailsProps) {
           </tr>
         </thead>
         <tbody>
-          <VaultRow
-            id={vaultId}
-            account={vault?.account}
-            maxLTV={maxLTV}
-            paprController={paprController}
-          />
+          <VaultRow vault={vault} account={vault?.account} />
         </tbody>
       </Table>
     </Fieldset>
