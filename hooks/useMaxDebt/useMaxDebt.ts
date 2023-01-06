@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
 import { useController } from 'hooks/useController';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
@@ -6,7 +6,7 @@ import { useTarget } from 'hooks/useTarget';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useMemo } from 'react';
 
-function maxDebt(value: BigNumber, maxLTV: BigNumber, target: BigNumber) {
+function maxDebt(value: BigNumber, maxLTV: BigNumberish, target: BigNumber) {
   const maxLoanUnderlying = value.mul(maxLTV);
   return maxLoanUnderlying.div(target);
 }
