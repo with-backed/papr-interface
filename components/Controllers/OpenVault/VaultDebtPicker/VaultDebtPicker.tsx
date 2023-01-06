@@ -130,7 +130,10 @@ export function VaultDebtPicker({
 
   // debt variables
   const maxDebtPerNFTInPerpetual = useAsyncValue(async () => {
-    return paprController.maxDebt([collateralContractAddress], oracleInfo);
+    return paprController.maxDebt_deprecated(
+      [collateralContractAddress],
+      oracleInfo,
+    );
   }, [paprController, collateralContractAddress, oracleInfo]);
 
   const maxDebtPerNFTInUnderlying = useAsyncValue(async () => {

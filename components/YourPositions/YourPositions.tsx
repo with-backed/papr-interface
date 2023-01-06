@@ -47,7 +47,7 @@ export function YourPositions({
   }, [userNFTs, currentVaults]);
 
   const maxLoanAmountInUnderlying = useAsyncValue(async () => {
-    const maxLoanInDebtTokens = await paprController.maxDebt(
+    const maxLoanInDebtTokens = await paprController.maxDebt_deprecated(
       userNFTs
         .map((nft) => nft.address)
         .concat((currentVaults || []).map((v) => getAddress(v.token.id))),

@@ -210,20 +210,20 @@ class PaprControllerInternal {
       : this.subgraphPool.token0;
   }
 
-  async _maxDebt(totalCollateraValue: ethers.BigNumber) {
+  async _maxDebt_deprecated(totalCollateraValue: ethers.BigNumber) {
     const maxLoanUnderlying = totalCollateraValue.mul(
       ethers.BigNumber.from(this._subgraphController.maxLTV),
     );
     return maxLoanUnderlying.div(await this.newTarget());
   }
 
-  async maxDebt(
+  async maxDebt_deprecated(
     collateralAssets: string[],
     oracleInfo: OracleInfo,
   ): Promise<ethers.BigNumber> {
     const totalDebtPerCollateral = await Promise.all(
       collateralAssets.map(async (asset) =>
-        this._maxDebt(
+        this._maxDebt_deprecated(
           ethers.utils.parseUnits(
             oracleInfo[getAddress(asset)].price.toString(),
             this.underlying.decimals,

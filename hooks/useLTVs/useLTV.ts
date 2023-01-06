@@ -28,7 +28,7 @@ export function useLTV(
       ) {
         return null;
       }
-      const maxDebtForToken = await paprController.maxDebt(
+      const maxDebtForToken = await paprController.maxDebt_deprecated(
         [collateralContractAddress],
         oracleInfo,
       );
