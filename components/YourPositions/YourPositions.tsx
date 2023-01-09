@@ -200,7 +200,8 @@ type VaultOverviewProps = {
 export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
   const { tokenName } = useConfig();
   const ltv = useLTV(
-    vaultInfo.collateral[0].id,
+    // This id is an address/tokenId pair joined by '-'
+    vaultInfo.collateral[0].id.split('-')[0],
     vaultInfo.collateralCount,
     vaultInfo.debt,
   );
