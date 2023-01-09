@@ -13,11 +13,11 @@ type VaultHealthProps = {
 export function VaultHealth({ ltv }: VaultHealthProps) {
   const healthTooltip = useTooltipState();
   const { maxLTV } = useController();
-  const formattedMmaxLTV = convertOneScaledValue(
+  const formattedMaxLTV = convertOneScaledValue(
     ethers.BigNumber.from(maxLTV),
     4,
   );
-  const ratio = ltv / formattedMmaxLTV;
+  const ratio = ltv / formattedMaxLTV;
 
   const indicator = useMemo(() => {
     // Ratio, but as a number out of 10 rather than a decimal out of 1
@@ -45,7 +45,7 @@ export function VaultHealth({ ltv }: VaultHealthProps) {
           </div>
           <div>
             <span>Max LTV</span>
-            <span>{formatPercent(formattedMmaxLTV)}</span>
+            <span>{formatPercent(formattedMaxLTV)}</span>
           </div>
           <div>
             <span>Current/Max LTV</span>
