@@ -47,6 +47,7 @@ import {
   AuctionsByNftOwnerQuery,
   AuctionsByNftOwnerDocument,
 } from 'types/generated/graphql/inKindSubgraph';
+import { useMaxDebt } from 'hooks/useMaxDebt';
 
 type VaultDebtPickerProps = {
   paprController: PaprController;
@@ -129,12 +130,7 @@ export function VaultDebtPicker({
   }, [userNFTsForVault, vault, auctionsByNftOwner?.auctions]);
 
   // debt variables
-  const maxDebtPerNFTInPerpetual = useAsyncValue(async () => {
-    return paprController.maxDebt_deprecated(
-      [collateralContractAddress],
-      oracleInfo,
-    );
-  }, [paprController, collateralContractAddress, oracleInfo]);
+  const maxDebtPerNFTInPerpetual = useMaxDebt(collateralContractAddress);
 
   const maxDebtPerNFTInUnderlying = useAsyncValue(async () => {
     if (!oracleInfo || !maxDebtPerNFTInPerpetual) return null;
