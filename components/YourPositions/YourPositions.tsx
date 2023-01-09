@@ -14,7 +14,7 @@ import { Table } from 'components/Table';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { getAddress } from 'ethers/lib/utils';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
-import { useLTV } from 'hooks/useLTVs';
+import { useLTV } from 'hooks/useLTV';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { useController } from 'hooks/useController';
 

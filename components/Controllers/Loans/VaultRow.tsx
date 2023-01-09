@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import Link from 'next/link';
-import { useLTV } from 'hooks/useLTVs';
+import { useLTV } from 'hooks/useLTV';
 import { useController } from 'hooks/useController';
 
 type VaultRowProps = {
