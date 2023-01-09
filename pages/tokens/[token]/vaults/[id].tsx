@@ -13,6 +13,7 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { controllerPricesData } from 'lib/controllers/charts';
 import { OpenGraph } from 'components/OpenGraph';
 import { captureException } from '@sentry/nextjs';
+import { ControllerContextProvider } from 'hooks/useController';
 
 type ServerSideProps = {
   vaultId: string;
@@ -85,11 +86,13 @@ export default function VaultPage({
       />
       <div className={styles.column}>
         <a href={`/tokens/${tokenName}`}>⬅ controller</a>
-        <VaultPageContent
-          paprController={paprController}
-          vaultId={vaultId}
-          pricesData={pricesData}
-        />
+        <ControllerContextProvider value={subgraphController}>
+          <VaultPageContent
+            paprController={paprController}
+            vaultId={vaultId}
+            pricesData={pricesData}
+          />
+        </ControllerContextProvider>
       </div>
     </>
   );
