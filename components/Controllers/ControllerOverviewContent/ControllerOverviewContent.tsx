@@ -52,8 +52,6 @@ export function ControllerOverviewContent({
   const config = useConfig();
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
-  const latestMarketPrice =
-    pricesData?.markValues[pricesData?.markValues.length - 1]?.value || 1.0;
 
   const { currentVaults, vaultsFetching } = useCurrentVaults(
     paprController,
@@ -77,7 +75,6 @@ export function ControllerOverviewContent({
       {oracleInfo && !vaultsFetching && !nftsLoading && (
         <YourPositions
           currentVaults={currentVaults}
-          latestMarketPrice={latestMarketPrice}
           oracleInfo={oracleInfo}
           userNFTs={userCollectionNFTs}
           balance={balance}
