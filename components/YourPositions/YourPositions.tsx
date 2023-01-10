@@ -17,12 +17,12 @@ import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
 import { useLTV } from 'hooks/useLTV';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { useController } from 'hooks/useController';
+import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 
 export type YourPositionsProps = {
   userNFTs: AccountNFTsResponse[];
   currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
   oracleInfo: OracleInfo;
-  latestMarketPrice: number;
   balance: ethers.BigNumber | null;
 };
 
@@ -30,12 +30,13 @@ export function YourPositions({
   userNFTs,
   currentVaults,
   oracleInfo,
-  latestMarketPrice,
   balance,
 }: YourPositionsProps) {
   const { address } = useAccount();
   const { tokenName } = useConfig();
   const paprController = useController();
+
+  const latestMarketPrice = useLatestMarketPrice();
 
   const uniqueCollections = useMemo(() => {
     const vaultAndUserAddresses = userNFTs
@@ -66,7 +67,7 @@ export function YourPositions({
   }, [currentVaults, maxLoanInDebtTokens]);
 
   const maxLoanAmountInUnderlying = useMemo(() => {
-    if (!maxLoanMinusCurrentDebt) {
+    if (!maxLoanMinusCurrentDebt || !latestMarketPrice) {
       return null;
     }
 
@@ -126,7 +127,7 @@ export function YourPositions({
 
   return (
     <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>
-      <BalanceInfo latestMarketPrice={latestMarketPrice} balance={balance} />
+      <BalanceInfo balance={balance} />
       <div>
         Based on the NFTs in your wallet, you&apos;re eligible for loans from{' '}
         {uniqueCollections.length} collection(s), with a max loan amount of{' '}
@@ -248,10 +249,10 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
 
 type BalanceInfoProps = {
   balance: ethers.BigNumber | null;
-  latestMarketPrice?: number;
 };
-function BalanceInfo({ balance, latestMarketPrice }: BalanceInfoProps) {
+function BalanceInfo({ balance }: BalanceInfoProps) {
   const { paprToken } = useController();
+  const latestMarketPrice = useLatestMarketPrice();
   const paprMemeBalance = useMemo(
     () => ethers.BigNumber.from(balance || 0),
     [balance],

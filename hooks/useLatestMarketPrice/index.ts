@@ -1,0 +1,1 @@
+export { useLatestMarketPrice } from './useLatestMarketPrice';
