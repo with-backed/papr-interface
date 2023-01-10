@@ -62,7 +62,7 @@ export function BorrowPageContent({
     return Array.from(new Set(userAndVaultCollateral));
   }, [userCollectionNFTs, currentVaults]);
 
-  if (!paprController || !pricesData || !oracleInfo) {
+  if (!paprController || !oracleInfo) {
     return <></>;
   }
 
