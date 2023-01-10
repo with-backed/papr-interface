@@ -73,7 +73,6 @@ export function BorrowPageContent({
     <div className={controllerStyles.wrapper}>
       <YourPositions
         userNFTs={userCollectionNFTs}
-        paprController={paprController}
         currentVaults={currentVaults}
         oracleInfo={oracleInfo}
         latestMarketPrice={latestMarketPrice}

@@ -17,6 +17,7 @@ import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
 import { OpenGraph } from 'components/OpenGraph';
 import { captureException } from '@sentry/nextjs';
+import { ControllerContextProvider } from 'hooks/useController';
 
 type ServerSideProps = Omit<
   ControllerPageProps,
@@ -87,11 +88,13 @@ export default function ControllerPage({
 
   return (
     <OracleInfoProvider collections={collections}>
-      <OpenGraph title={`${config.tokenName} | Performance`} />
-      <ControllerOverviewContent
-        paprController={paprController}
-        pricesData={pricesData}
-      />
+      <ControllerContextProvider value={subgraphController}>
+        <OpenGraph title={`${config.tokenName} | Performance`} />
+        <ControllerOverviewContent
+          paprController={paprController}
+          pricesData={pricesData}
+        />
+      </ControllerContextProvider>
     </OracleInfoProvider>
   );
 }

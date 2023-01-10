@@ -1,6 +1,5 @@
-import { getAddress } from 'ethers/lib/utils';
 import { useConfig } from 'hooks/useConfig';
-import { Config, SupportedToken } from 'lib/config';
+import { SupportedToken } from 'lib/config';
 import { getOracleInfoFromAllowedCollateral } from 'lib/controllers';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import {

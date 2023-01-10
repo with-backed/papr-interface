@@ -1,7 +1,6 @@
 import styles from './YourPositions.module.css';
 import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
 import { Fieldset } from 'components/Fieldset';
-import { PaprController } from 'lib/PaprController';
 import { useAccount } from 'wagmi';
 import { useMemo } from 'react';
 import { ethers } from 'ethers';
@@ -12,15 +11,14 @@ import { useConfig } from 'hooks/useConfig';
 import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import { Table } from 'components/Table';
-import { ERC721__factory } from 'types/generated/abis';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { getAddress } from 'ethers/lib/utils';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
-import { useLTVs } from 'hooks/useLTVs';
+import { useLTV } from 'hooks/useLTV';
+import { useMaxDebt } from 'hooks/useMaxDebt';
+import { useController } from 'hooks/useController';
 
 export type YourPositionsProps = {
-  paprController: PaprController;
   userNFTs: AccountNFTsResponse[];
   currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
   oracleInfo: OracleInfo;
@@ -29,7 +27,6 @@ export type YourPositionsProps = {
 };
 
 export function YourPositions({
-  paprController,
   userNFTs,
   currentVaults,
   oracleInfo,
@@ -38,6 +35,7 @@ export function YourPositions({
 }: YourPositionsProps) {
   const { address } = useAccount();
   const { tokenName } = useConfig();
+  const paprController = useController();
 
   const uniqueCollections = useMemo(() => {
     const vaultAndUserAddresses = userNFTs
@@ -46,28 +44,45 @@ export function YourPositions({
     return Array.from(new Set(vaultAndUserAddresses));
   }, [userNFTs, currentVaults]);
 
-  const maxLoanAmountInUnderlying = useAsyncValue(async () => {
-    const maxLoanInDebtTokens = await paprController.maxDebt(
+  const collateralAssets = useMemo(
+    () =>
       userNFTs
         .map((nft) => nft.address)
         .concat((currentVaults || []).map((v) => getAddress(v.token.id))),
-      oracleInfo,
-    );
-    const maxLoanMinusCurrentDebt = maxLoanInDebtTokens.sub(
+    [currentVaults, userNFTs],
+  );
+
+  const maxLoanInDebtTokens = useMaxDebt(collateralAssets);
+
+  const maxLoanMinusCurrentDebt = useMemo(() => {
+    if (!maxLoanInDebtTokens) {
+      return null;
+    }
+    return maxLoanInDebtTokens.sub(
       (currentVaults || [])
         .map((v) => ethers.BigNumber.from(v.debt))
         .reduce((a, b) => a.add(b), ethers.BigNumber.from(0)),
     );
+  }, [currentVaults, maxLoanInDebtTokens]);
+
+  const maxLoanAmountInUnderlying = useMemo(() => {
+    if (!maxLoanMinusCurrentDebt) {
+      return null;
+    }
 
     return (
       parseFloat(
         ethers.utils.formatUnits(
           maxLoanMinusCurrentDebt,
-          paprController.debtToken.decimals,
+          paprController.paprToken.decimals,
         ),
       ) * latestMarketPrice
     );
-  }, [paprController, oracleInfo, userNFTs, currentVaults, latestMarketPrice]);
+  }, [
+    latestMarketPrice,
+    maxLoanMinusCurrentDebt,
+    paprController.paprToken.decimals,
+  ]);
 
   const totalPaprMemeDebt = useMemo(() => {
     if (!currentVaults) return ethers.BigNumber.from(0);
@@ -83,13 +98,13 @@ export function YourPositions({
     if (totalPaprMemeDebt.isZero()) return null;
     return getQuoteForSwap(
       totalPaprMemeDebt,
-      paprController.debtToken.id,
+      paprController.paprToken.id,
       paprController.underlying.id,
       tokenName as SupportedToken,
     );
   }, [
     tokenName,
-    paprController.debtToken.id,
+    paprController.paprToken.id,
     paprController.underlying.id,
     totalPaprMemeDebt,
   ]);
@@ -111,11 +126,7 @@ export function YourPositions({
 
   return (
     <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>
-      <BalanceInfo
-        paprController={paprController}
-        latestMarketPrice={latestMarketPrice}
-        balance={balance}
-      />
+      <BalanceInfo latestMarketPrice={latestMarketPrice} balance={balance} />
       <div>
         Based on the NFTs in your wallet, you&apos;re eligible for loans from{' '}
         {uniqueCollections.length} collection(s), with a max loan amount of{' '}
@@ -130,7 +141,7 @@ export function YourPositions({
             <b>
               {formatBigNum(
                 totalPaprMemeDebt,
-                paprController.debtToken.decimals,
+                paprController.paprToken.decimals,
               )}{' '}
               {tokenName}
             </b>{' '}
@@ -171,7 +182,6 @@ export function YourPositions({
               <VaultOverview
                 vaultInfo={vault}
                 oracleInfo={oracleInfo}
-                paprController={paprController}
                 key={vault.id}
               />
             ))}
@@ -183,43 +193,29 @@ export function YourPositions({
 }
 
 type VaultOverviewProps = {
-  paprController: PaprController;
   oracleInfo: OracleInfo;
   vaultInfo: VaultsByOwnerForControllerQuery['vaults']['0'];
 };
 
-export function VaultOverview({
-  paprController,
-  oracleInfo,
-  vaultInfo,
-}: VaultOverviewProps) {
+export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
   const { tokenName } = useConfig();
-  const signerOrProvider = useSignerOrProvider();
-  const maxLTV = useMemo(() => paprController.maxLTVBigNum, [paprController]);
-  const { ltvs } = useLTVs(
-    paprController,
-    useMemo(() => [vaultInfo], [vaultInfo]),
-    maxLTV,
+  const ltv = useLTV(
+    vaultInfo.token.id,
+    vaultInfo.collateralCount,
+    vaultInfo.debt,
   );
-  const connectedNFT = useMemo(() => {
-    return ERC721__factory.connect(vaultInfo.token.id, signerOrProvider);
-  }, [vaultInfo.token.id, signerOrProvider]);
+  const { paprToken, underlying } = useController();
   const nftSymbol = vaultInfo.token.symbol;
   const costToClose = useAsyncValue(async () => {
     if (ethers.BigNumber.from(vaultInfo.debt).isZero())
       return ethers.BigNumber.from(0);
     return getQuoteForSwapOutput(
       ethers.BigNumber.from(vaultInfo.debt),
-      paprController.underlying.id,
-      paprController.debtToken.id,
+      underlying.id,
+      paprToken.id,
       tokenName as SupportedToken,
     );
-  }, [
-    vaultInfo.debt,
-    tokenName,
-    paprController.debtToken.id,
-    paprController.underlying.id,
-  ]);
+  }, [vaultInfo.debt, tokenName, paprToken.id, underlying.id]);
 
   if (
     ethers.BigNumber.from(vaultInfo.debt).isZero() &&
@@ -237,21 +233,14 @@ export function VaultOverview({
       </td>
       <td>
         <p>
-          {formatBigNum(vaultInfo.debt, paprController.debtToken.decimals)}{' '}
-          {tokenName}
+          {formatBigNum(vaultInfo.debt, paprToken.decimals)} {tokenName}
         </p>
       </td>
       <td>
-        <p>
-          $
-          {costToClose &&
-            formatBigNum(costToClose, paprController.underlying.decimals)}{' '}
-        </p>
+        <p>${costToClose && formatBigNum(costToClose, underlying.decimals)} </p>
       </td>
       <td>
-        {maxLTV && (
-          <VaultHealth ltv={ltvs[vaultInfo.id] || 0} maxLtv={maxLTV} />
-        )}
+        <VaultHealth ltv={ltv || 0} />
       </td>
     </tr>
   );
@@ -259,14 +248,10 @@ export function VaultOverview({
 
 type BalanceInfoProps = {
   balance: ethers.BigNumber | null;
-  paprController: PaprController;
   latestMarketPrice?: number;
 };
-function BalanceInfo({
-  balance,
-  paprController,
-  latestMarketPrice,
-}: BalanceInfoProps) {
+function BalanceInfo({ balance, latestMarketPrice }: BalanceInfoProps) {
+  const { paprToken } = useController();
   const paprMemeBalance = useMemo(
     () => ethers.BigNumber.from(balance || 0),
     [balance],
@@ -274,29 +259,20 @@ function BalanceInfo({
 
   const formattedBalance = useMemo(() => {
     const convertedBalance = parseFloat(
-      ethers.utils.formatUnits(
-        paprMemeBalance,
-        paprController.debtToken.decimals,
-      ),
+      ethers.utils.formatUnits(paprMemeBalance, paprToken.decimals),
     );
-    return (
-      formatTokenAmount(convertedBalance) +
-      ` ${paprController.debtToken.symbol}`
-    );
-  }, [paprMemeBalance, paprController.debtToken]);
+    return formatTokenAmount(convertedBalance) + ` ${paprToken.symbol}`;
+  }, [paprMemeBalance, paprToken]);
   const formattedValue = useMemo(() => {
     if (!latestMarketPrice) {
       return 'an unknown amount of USDC (no market data available)';
     }
 
     const convertedBalance = parseFloat(
-      ethers.utils.formatUnits(
-        paprMemeBalance,
-        paprController.debtToken.decimals,
-      ),
+      ethers.utils.formatUnits(paprMemeBalance, paprToken.decimals),
     );
     return formatTokenAmount(convertedBalance * latestMarketPrice) + ' USDC';
-  }, [paprController.debtToken, paprMemeBalance, latestMarketPrice]);
+  }, [paprToken, paprMemeBalance, latestMarketPrice]);
   return (
     <p>
       You hold <b>{formattedBalance}</b> worth <b>{formattedValue}</b>.

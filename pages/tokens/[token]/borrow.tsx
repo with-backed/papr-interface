@@ -17,6 +17,7 @@ import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
 import { OpenGraph } from 'components/OpenGraph';
 import { captureException } from '@sentry/nextjs';
+import { ControllerContextProvider } from 'hooks/useController';
 
 type ServerSideProps = Omit<
   BorrowPageProps,
@@ -90,12 +91,14 @@ export default function Borrow({
 
   return (
     <OracleInfoProvider collections={collections}>
-      <OpenGraph title={`${config.tokenName} | Borrow`} />
-      <BorrowPageContent
-        paprController={paprController}
-        controllerAddress={controllerAddress}
-        pricesData={pricesData}
-      />
+      <ControllerContextProvider value={subgraphController}>
+        <OpenGraph title={`${config.tokenName} | Borrow`} />
+        <BorrowPageContent
+          paprController={paprController}
+          controllerAddress={controllerAddress}
+          pricesData={pricesData}
+        />
+      </ControllerContextProvider>
     </OracleInfoProvider>
   );
 }
