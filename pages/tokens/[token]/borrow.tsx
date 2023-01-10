@@ -1,5 +1,4 @@
 import { configs, getConfig, SupportedToken } from 'lib/config';
-import { controllerPricesData } from 'lib/controllers/charts';
 import { GetServerSideProps } from 'next';
 import {
   BorrowPageContent,
@@ -11,7 +10,6 @@ import {
   SubgraphController,
 } from 'lib/PaprController';
 import { useConfig } from 'hooks/useConfig';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { usePaprController_deprecated } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
@@ -74,16 +72,6 @@ export default function Borrow({
     subgraphPool,
   });
 
-  const pricesData = useAsyncValue(
-    () =>
-      controllerPricesData(
-        paprController,
-        config.tokenName as SupportedToken,
-        config.uniswapSubgraph,
-      ),
-    [config, paprController],
-  );
-
   const collections = useMemo(
     () => subgraphController.allowedCollateral.map((c) => c.token.id),
     [subgraphController.allowedCollateral],
@@ -96,7 +84,6 @@ export default function Borrow({
         <BorrowPageContent
           paprController={paprController}
           controllerAddress={controllerAddress}
-          pricesData={pricesData}
         />
       </ControllerContextProvider>
     </OracleInfoProvider>

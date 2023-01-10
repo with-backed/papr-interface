@@ -1,4 +1,3 @@
-import { ControllerPricesData } from 'lib/controllers/charts';
 import React, { useCallback, useMemo } from 'react';
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { useConfig } from 'hooks/useConfig';
@@ -16,14 +15,10 @@ import { usePaprBalance } from 'hooks/usePaprBalance';
 
 export type BorrowPageProps = {
   controllerAddress: string;
-  pricesData: ControllerPricesData | null;
   paprController: PaprController;
 };
 
-export function BorrowPageContent({
-  paprController,
-  pricesData,
-}: BorrowPageProps) {
+export function BorrowPageContent({ paprController }: BorrowPageProps) {
   const config = useConfig();
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
@@ -66,16 +61,12 @@ export function BorrowPageContent({
     return <></>;
   }
 
-  const latestMarketPrice =
-    pricesData?.markValues[pricesData?.markValues.length - 1]?.value || 1.0;
-
   return (
     <div className={controllerStyles.wrapper}>
       <YourPositions
         userNFTs={userCollectionNFTs}
         currentVaults={currentVaults}
         oracleInfo={oracleInfo}
-        latestMarketPrice={latestMarketPrice}
         balance={balance}
       />
       {!!address &&
