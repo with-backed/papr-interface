@@ -32,28 +32,26 @@ export async function controllerPricesData(
     controller.poolAddress,
     uniswapSubgraphUrl,
   );
+
+  if (!subgraphUniswapPool) {
+    throw new Error(
+      `could not find uniswap pool ${controller.poolAddress} in subgraph.`,
+    );
+  }
+
   const createdAt = parseInt(controller.createdAt);
 
   const index = 1;
 
-  let markDPRs: TimeSeriesValue[] = [];
-  let marks: TimeSeriesValue[] = [];
-  let targets: TimeSeriesValue[] = [];
-  let targetDPRs: TimeSeriesValue[] = [];
-  if (subgraphUniswapPool) {
-    [marks, markDPRs] = await markValues(
+  const [[marks, markDPRs], [targets, targetDPRs]] = await Promise.all([
+    markValues(
       now,
       controller,
       subgraphUniswapPool.pool as Pool,
       uniswapSubgraphUrl,
-    );
-    [targets, targetDPRs] = await targetValues(
-      now,
-      controller,
-      subgraphUniswapPool.pool as Pool,
-      token,
-    );
-  }
+    ),
+    targetValues(now, controller, subgraphUniswapPool.pool as Pool, token),
+  ]);
 
   // add a starting data point all on target
   markDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });
