@@ -22,7 +22,6 @@ type LoansProps = {
 };
 
 export function Loans({ paprController, pricesData }: LoansProps) {
-  const maxLTV = useMemo(() => paprController.maxLTVBigNum, [paprController]);
   const activeVaults = useMemo(
     () => paprController.vaults?.filter((v) => v.debt > 0) || [],
     [paprController],

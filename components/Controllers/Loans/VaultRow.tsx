@@ -6,11 +6,11 @@ import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import Link from 'next/link';
 import { useLTV } from 'hooks/useLTV';
 import { useController } from 'hooks/useController';
+import { Vault } from 'types/generated/graphql/inKindSubgraph';
 
 type VaultRowProps = {
   account: string;
-  // TODO: type
-  vault: any;
+  vault: Pick<Vault, 'debt' | 'token' | 'collateralCount' | 'id'>;
 };
 export function VaultRow({ account, vault }: VaultRowProps) {
   const { paprToken } = useController();
