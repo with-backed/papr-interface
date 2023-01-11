@@ -1,5 +1,5 @@
 import { captureException } from '@sentry/nextjs';
-import { configs, SupportedToken } from './config';
+import { configs, SupportedNetwork, SupportedToken } from './config';
 
 // based on output from https://api.coingecko.com/api/v3/asset_platforms
 const networkMap: { [key: string]: string } = {
@@ -9,7 +9,15 @@ const networkMap: { [key: string]: string } = {
   polygon: 'polygon-pos',
 };
 
-export async function getUnitPriceForEth(toCurrency: string) {
+// given a toCurrency, returns how much 1 ETH is worth in that currency
+export async function getUnitPriceForEth(
+  toCurrency: string,
+  network: SupportedNetwork,
+) {
+  if (network == 'goerli') {
+    return 1.0;
+  }
+
   try {
     const res = await fetch(
       `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=${toCurrency}`,
@@ -22,6 +30,16 @@ export async function getUnitPriceForEth(toCurrency: string) {
   } catch (e) {
     captureException(e);
   }
+  return undefined;
+}
+
+// given a currency, returns how much 1 unit of that currency is worth in ETH
+export async function getUnitPriceForCoinInEth(
+  currency: string,
+  network: SupportedNetwork,
+) {
+  const unitPriceForEth = await getUnitPriceForEth(currency, network);
+  if (unitPriceForEth) return 1 / unitPriceForEth;
   return undefined;
 }
 

@@ -1,109 +1,132 @@
 .d1 {
-    animation: colorChange1 10s steps(5) infinite;
+  animation: colorChange1 10s steps(5) infinite;
+}
+
+.d2 {
+  animation: colorChange2 10s steps(5) infinite;
+}
+
+.d3 {
+  animation: colorChange3 10s steps(5) infinite;
+}
+
+.d4 {
+  animation: colorChange4 10s steps(5) infinite;
+}
+
+.d5 {
+  animation: colorChange5 10s steps(5) infinite;
+}
+
+.d6 {
+  animation: colorChange6 10s steps(5) infinite;
+}
+
+.d7 {
+  animation: colorChange7 10s steps(5) infinite;
+}
+
+.d8 {
+  animation: colorChange8 10s steps(5) infinite;
+}
+
+@keyframes colorChange1 {
+  0%,
+  12%,
+  100% {
+    fill: #eeeeee;
   }
-  
-  .d2 {
-    animation: colorChange2 10s steps(5) infinite;
+  12.5%,
+  97% {
+    fill: #0000ee;
   }
-  
-  .d3 {
-    animation: colorChange3 10s steps(5) infinite;
+}
+
+@keyframes colorChange2 {
+  0%,
+  24%,
+  100% {
+    fill: #eeeeee;
   }
-  
-  .d4 {
-    animation: colorChange4 10s steps(5) infinite;
+  25%,
+  97% {
+    fill: #0000ee;
   }
-  
-  .d5 {
-    animation: colorChange5 10s steps(5) infinite;
+}
+
+@keyframes colorChange3 {
+  0%,
+  37%,
+  100% {
+    fill: #eeeeee;
   }
-  
-  .d6 {
-    animation: colorChange6 10s steps(5) infinite;
+  37.5%,
+  97% {
+    fill: #0000ee;
   }
-  
-  .d7 {
-    animation: colorChange7 10s steps(5) infinite;
+}
+
+@keyframes colorChange4 {
+  0%,
+  49%,
+  100% {
+    fill: #eeeeee;
   }
-  
-  .d8 {
-    animation: colorChange8 10s steps(5) infinite;
+  50%,
+  97% {
+    fill: #0000ee;
   }
-  
-  
-  @keyframes colorChange1 {
-    0%, 12%, 100% {
-      fill: #EEEEEE;
-    }
-    12.5%, 97% {
-      fill: #0000EE;
-    }
+}
+
+@keyframes colorChange5 {
+  0%,
+  61%,
+  100% {
+    fill: #eeeeee;
   }
-  
-  @keyframes colorChange2 {
-    0%, 24%, 100% {
-      fill: #EEEEEE;
-    }
-    25%, 97% {
-      fill: #0000EE;
-    }
+  62.5%,
+  97% {
+    fill: #0000ee;
   }
-  
-  @keyframes colorChange3 {
-    0%, 37%, 100% {
-      fill: #EEEEEE;
-    }
-    37.5%, 97% {
-      fill: #0000EE;
-    }  
+}
+
+@keyframes colorChange6 {
+  0%,
+  74%,
+  100% {
+    fill: #eeeeee;
   }
-  
-  @keyframes colorChange4 {
-    0%, 49%, 100% {
-      fill: #EEEEEE;
-    }
-    50%, 97% {
-      fill: #0000EE;
-    }
+  75%,
+  97% {
+    fill: #0000ee;
   }
-  
-  @keyframes colorChange5 {
-    0%, 61%, 100% {
-      fill: #EEEEEE;
-    }
-    62.5%, 97% {
-      fill: #0000EE;
-    }
+}
+
+@keyframes colorChange7 {
+  0%,
+  87%,
+  100% {
+    fill: #eeeeee;
   }
-  
-  @keyframes colorChange6 {
-    0%, 74%, 100% {
-      fill: #EEEEEE;
-    }
-    75%, 97% {
-      fill: #0000EE;
-    }
+  87.5%,
+  97% {
+    fill: #0000ee;
   }
-  
-  @keyframes colorChange7 {
-    0%, 87%, 100% {
-      fill: #EEEEEE;
-    }
-    87.5%, 97% {
-      fill: #0000EE;
-    }
+}
+
+@keyframes colorChange8 {
+  0%,
+  97%,
+  100% {
+    fill: #eeeeee;
   }
-  
-  @keyframes colorChange8 {
-    0%, 97%, 100% {
-      fill: #EEEEEE;
-    }
-    98%, 99% {
-      fill: #0000EE;
-    }
+  98%,
+  99% {
+    fill: #0000ee;
   }
-  
-  .mainSvg {
-    margin: 30px auto;
-    display: block;
-  }
+}
+
+.mainSvg {
+  margin: 30px auto;
+  display: block;
+}

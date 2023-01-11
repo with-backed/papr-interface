@@ -5,9 +5,8 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
-import { useTimestamp } from 'hooks/useTimestamp';
 import { currentPrice } from 'lib/auctions';
-import { SupportedToken } from 'lib/config';
+import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
 import { convertOneScaledValue, getQuoteForSwapOutput } from 'lib/controllers';
 import { formatBigNum } from 'lib/numberFormat';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -20,6 +19,7 @@ import dayjs from 'dayjs';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { getTimestamp } from 'hooks/useTimestamp/useTimestamp';
+import { getUnitPriceForCoinInEth } from 'lib/coingecko';
 
 export type AuctionPageContentProps = {
   auction: NonNullable<AuctionQuery['auction']>;
@@ -29,7 +29,6 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   const signerOrProvider = useSignerOrProvider();
   const { tokenName } = useConfig();
   const controller = useController();
-  const ethPrice = 1.0;
 
   const calculateAuctionPrice = useCallback(() => {
     const timestamp = getTimestamp();
@@ -69,8 +68,16 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
       tokenName as SupportedToken,
     );
   }, [auction, currentAuctionPrice, controller.underlying.id, tokenName]);
+
+  const ethPrice = useAsyncValue(() => {
+    return getUnitPriceForCoinInEth(
+      controller.underlying.id,
+      configs[tokenName as SupportedToken].network as SupportedNetwork,
+    );
+  }, [controller.underlying.id, tokenName]);
+
   const auctionEthPrice = useMemo(() => {
-    if (!auctionUnderlyingPrice) return null;
+    if (!auctionUnderlyingPrice || !ethPrice) return null;
     return auctionUnderlyingPrice.mul(ethers.BigNumber.from(ethPrice));
   }, [auctionUnderlyingPrice, ethPrice]);
 

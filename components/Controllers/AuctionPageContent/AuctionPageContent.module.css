@@ -1,72 +1,72 @@
 .headerWrapper {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 .nft {
-    width: 30%;
-    margin-right: 40px;
+  width: 30%;
+  margin-right: 40px;
 }
 
 .nft img {
-    max-width: 100%;
+  max-width: 100%;
 }
 
 .headerInfo {
-    width: 70%;
+  width: 70%;
 }
 
 .livePrice {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .countdown {
-    margin-right: 26px;
+  margin-right: 26px;
 }
 
 .prices {
-    margin-top: -2px;
+  margin-top: -2px;
 }
 
 .prices p {
-    margin: -6px 0;
+  margin: -6px 0;
 }
 
 .prices p:first-child {
-    font-size: var(--font-huge);
+  font-size: var(--font-huge);
 }
 
 .summaryTable tbody tr {
-    background-color: #f9f9f9 !important;
+  background-color: #f9f9f9 !important;
 }
 
 .summaryTable td {
-    text-align: center;
+  text-align: center;
 }
 
 .updatable {
-    background-color: inherit;
-    color: inherit;
-    -webkit-transition: background-color 100ms linear;
-    -ms-transition: background-color 100ms linear;
-    transition: background-color 100ms linear;
+  background-color: inherit;
+  color: inherit;
+  -webkit-transition: background-color 100ms linear;
+  -ms-transition: background-color 100ms linear;
+  transition: background-color 100ms linear;
 
-    -webkit-transition: color 100ms linear;
-    -ms-transition: color 100ms linear;
-    transition: color 100ms linear;
+  -webkit-transition: color 100ms linear;
+  -ms-transition: color 100ms linear;
+  transition: color 100ms linear;
 }
 
 .updating {
-    background-color: var(--highlight-clickable-5);
-    color: var(--highlight-clickable-100);
-    
-    -webkit-transition: background-color 100ms linear;
-    -ms-transition: background-color 100ms linear;
-    transition: background-color 100ms linear;
+  background-color: var(--highlight-clickable-5);
+  color: var(--highlight-clickable-100);
 
-    -webkit-transition: color 100ms linear;
-    -ms-transition: color 100ms linear;
-    transition: color 100ms linear;
+  -webkit-transition: background-color 100ms linear;
+  -ms-transition: background-color 100ms linear;
+  transition: background-color 100ms linear;
+
+  -webkit-transition: color 100ms linear;
+  -ms-transition: color 100ms linear;
+  transition: color 100ms linear;
 }
