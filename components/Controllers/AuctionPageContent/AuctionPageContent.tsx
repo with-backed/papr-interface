@@ -4,13 +4,11 @@ import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { currentPrice } from 'lib/auctions';
 import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
 import { convertOneScaledValue, getQuoteForSwapOutput } from 'lib/controllers';
 import { formatBigNum } from 'lib/numberFormat';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ERC721__factory } from 'types/generated/abis';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 import { AuctionCountdown } from 'components/Controllers/AuctionPageContent/AuctionCountdown';
 import styles from './AuctionPageContent.module.css';
@@ -18,20 +16,20 @@ import { Table } from 'components/Table';
 import dayjs from 'dayjs';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
-import { getTimestamp } from 'hooks/useTimestamp/useTimestamp';
 import { getUnitPriceForCoinInEth } from 'lib/coingecko';
 
 export type AuctionPageContentProps = {
   auction: NonNullable<AuctionQuery['auction']>;
 };
 
+const currentTimeInSeconds = () => Math.floor(new Date().getTime() / 1000);
+
 export function AuctionPageContent({ auction }: AuctionPageContentProps) {
-  const signerOrProvider = useSignerOrProvider();
   const { tokenName } = useConfig();
   const controller = useController();
 
   const calculateAuctionPrice = useCallback(() => {
-    const timestamp = getTimestamp();
+    const timestamp = currentTimeInSeconds();
     const secondsElapsed = timestamp - auction.start.timestamp;
     return currentPrice(
       ethers.BigNumber.from(auction.startPrice),
@@ -149,7 +147,6 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
 }
 
 const ONE_HOUR_IN_SECONDS = 60 * 60;
-const currentTimeInSeconds = () => Math.floor(new Date().getTime() / 1000);
 
 type SummaryTableProps = {
   auction: NonNullable<AuctionQuery['auction']>;
@@ -171,7 +168,7 @@ function SummaryTable({
   );
 
   const hourlyPriceChange = useMemo(() => {
-    const timestamp = getTimestamp();
+    const timestamp = currentTimeInSeconds();
     const secondsElapsedAnHourAgo =
       timestamp - ONE_HOUR_IN_SECONDS - auction.start.timestamp;
     const priceAnHourAgo = currentPrice(
