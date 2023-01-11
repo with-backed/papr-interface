@@ -1,11 +1,6 @@
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import {
-  AuctionDocument,
-  AuctionQuery,
-} from 'types/generated/graphql/inKindSubgraph';
-import { useQuery } from 'urql';
 import { AuctionPageContent } from 'components/Controllers/AuctionPageContent/AuctionPageContent';
 import { ControllerContextProvider, PaprController } from 'hooks/useController';
 import { GetServerSideProps } from 'next';
@@ -13,6 +8,7 @@ import { configs, getConfig, SupportedToken } from 'lib/config';
 import { fetchSubgraphData } from 'lib/PaprController';
 import { captureException } from '@sentry/nextjs';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
+import { Custom404 } from 'components/Custom404';
 
 type AuctionProps = {
   subgraphController: PaprController;
@@ -54,28 +50,20 @@ export const getServerSideProps: GetServerSideProps<AuctionProps> = async (
 export default function Auction({ subgraphController }: AuctionProps) {
   const id = useRouter().query.id;
 
-  const [{ data: auctionQueryResult }] = useQuery<AuctionQuery>({
-    query: AuctionDocument,
-    variables: { id },
-  });
-
-  const auction = useMemo(() => {
-    if (!auctionQueryResult?.auction) return undefined;
-    return auctionQueryResult.auction;
-  }, [auctionQueryResult]);
-
   const collections = useMemo(
     () => subgraphController.allowedCollateral.map((c) => c.token.id),
     [subgraphController.allowedCollateral],
   );
 
-  if (!auction) return <div></div>;
+  if (!id) {
+    return <Custom404 />;
+  }
 
   return (
     <OracleInfoProvider collections={collections}>
       <ControllerContextProvider value={subgraphController}>
         <div className={controllerStyles.wrapper}>
-          <AuctionPageContent auction={auction} />
+          <AuctionPageContent auctionId={id as string} />
         </div>
       </ControllerContextProvider>
     </OracleInfoProvider>
