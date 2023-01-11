@@ -9,7 +9,7 @@ export const getServerSideProps: GetServerSideProps<SwapProps> = async (
   context,
 ) => {
   try {
-    validateToken(context.params!);
+    validateToken(context.params || {});
     const token = context.params?.token as SupportedToken;
 
     return {
