@@ -1,33 +1,33 @@
 .d1 {
-  animation: colorChange1 10s steps(5) infinite;
+  animation: colorChange1 8s steps(5) infinite;
 }
 
 .d2 {
-  animation: colorChange2 10s steps(5) infinite;
+  animation: colorChange2 8s steps(5) infinite;
 }
 
 .d3 {
-  animation: colorChange3 10s steps(5) infinite;
+  animation: colorChange3 8s steps(5) infinite;
 }
 
 .d4 {
-  animation: colorChange4 10s steps(5) infinite;
+  animation: colorChange4 8s steps(5) infinite;
 }
 
 .d5 {
-  animation: colorChange5 10s steps(5) infinite;
+  animation: colorChange5 8s steps(5) infinite;
 }
 
 .d6 {
-  animation: colorChange6 10s steps(5) infinite;
+  animation: colorChange6 8s steps(5) infinite;
 }
 
 .d7 {
-  animation: colorChange7 10s steps(5) infinite;
+  animation: colorChange7 8s steps(5) infinite;
 }
 
 .d8 {
-  animation: colorChange8 10s steps(5) infinite;
+  animation: colorChange8 8s steps(5) infinite;
 }
 
 @keyframes colorChange1 {

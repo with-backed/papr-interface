@@ -152,7 +152,6 @@ function ActiveAuctionRow({
   paprApproved: boolean | null;
 }) {
   const timestamp = useTimestamp();
-  const signerOrProvider = useSignerOrProvider();
   const decimals = auction.paymentAsset.decimals;
   const symbol = auction.paymentAsset.symbol;
   const priceBigNum = useMemo(() => {
