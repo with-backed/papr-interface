@@ -12,7 +12,7 @@ const TIMESTAMP_POLL_INTERVAL = 14000;
  * Get an approximation of the current block timestamp.
  * @returns timestamp 15 seconds ago
  */
-function getTimestamp() {
+export function getTimestamp() {
   const nowSeconds = Math.floor(Date.now() / 1000);
   return nowSeconds - 15;
 }

@@ -1,0 +1,5 @@
+query auction($id: ID!) {
+  auction(id: $id) {
+    ...allAuctionProperties
+  }
+}
