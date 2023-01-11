@@ -48,18 +48,6 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
     useState<ethers.BigNumber>(calculateAuctionPrice());
   const [updating, setUpdating] = useState<boolean>(false);
 
-  const connectedNFT = useMemo(() => {
-    if (!auction) return undefined;
-    return ERC721__factory.connect(
-      auction.auctionAssetContract.id,
-      signerOrProvider,
-    );
-  }, [auction, signerOrProvider]);
-  const nftSymbol = useAsyncValue(
-    async () => (!connectedNFT ? '' : connectedNFT.symbol()),
-    [connectedNFT],
-  );
-
   const auctionUnderlyingPrice = useAsyncValue(() => {
     return getQuoteForSwapOutput(
       currentAuctionPrice,
@@ -95,7 +83,8 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   }, [calculateAuctionPrice]);
 
   return (
-    <Fieldset legend={`${nftSymbol} #${auction.auctionAssetID}`}>
+    <Fieldset
+      legend={`${auction.auctionAssetContract.symbol} #${auction.auctionAssetID}`}>
       <div className={styles.headerWrapper}>
         <div className={styles.nft}>
           <CenterAsset
@@ -198,7 +187,7 @@ function SummaryTable({
   }, [auctionPrice, auction]);
 
   const percentFloor = useMemo(() => {
-    if (!oracleInfo || !auctionUnderlyingPrice) return null;
+    if (!oracleInfo || !auctionUnderlyingPrice) return '0.000';
     const floor = oracleInfo[auction.auctionAssetContract.id].price;
     const percent =
       (parseFloat(

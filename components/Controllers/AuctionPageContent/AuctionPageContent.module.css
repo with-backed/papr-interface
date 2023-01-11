@@ -1,9 +1,12 @@
 .headerWrapper {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .nft {
+  min-width: 180px;
   width: 30%;
   margin-right: 40px;
 }
