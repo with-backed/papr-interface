@@ -215,7 +215,7 @@ function SummaryTable({
   ]);
 
   const formattedTimeElapsed = useMemo(() => {
-    return dayjs.duration(timeElapsed, 'seconds').format('HH:mm:ss');
+    return dayjs.duration(timeElapsed, 'seconds').format('D[d] HH:mm:ss');
   }, [timeElapsed]);
 
   useEffect(() => {
