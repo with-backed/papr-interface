@@ -1,0 +1,75 @@
+.headerWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.nft {
+  min-width: 180px;
+  width: 30%;
+  margin-right: 40px;
+}
+
+.nft img {
+  max-width: 100%;
+}
+
+.headerInfo {
+  width: 70%;
+}
+
+.livePrice {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.countdown {
+  margin-right: 26px;
+}
+
+.prices {
+  margin-top: -2px;
+}
+
+.prices p {
+  margin: -6px 0;
+}
+
+.prices p:first-child {
+  font-size: var(--font-huge);
+}
+
+.summaryTable tbody tr {
+  background-color: #f9f9f9 !important;
+}
+
+.summaryTable td {
+  text-align: center;
+}
+
+.updatable {
+  background-color: inherit;
+  color: inherit;
+  -webkit-transition: background-color 100ms linear;
+  -ms-transition: background-color 100ms linear;
+  transition: background-color 100ms linear;
+
+  -webkit-transition: color 100ms linear;
+  -ms-transition: color 100ms linear;
+  transition: color 100ms linear;
+}
+
+.updating {
+  background-color: var(--highlight-clickable-5);
+  color: var(--highlight-clickable-100);
+
+  -webkit-transition: background-color 100ms linear;
+  -ms-transition: background-color 100ms linear;
+  transition: background-color 100ms linear;
+
+  -webkit-transition: color 100ms linear;
+  -ms-transition: color 100ms linear;
+  transition: color 100ms linear;
+}
