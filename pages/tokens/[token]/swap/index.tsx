@@ -4,6 +4,7 @@ import { captureException } from '@sentry/nextjs';
 import { SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import capitalize from 'lodash/capitalize';
+import { SwapPageContent } from 'components/SwapPageContent';
 
 export const getServerSideProps: GetServerSideProps<SwapProps> = async (
   context,
@@ -32,7 +33,7 @@ export default function Swap({ token }: SwapProps) {
   return (
     <>
       <OpenGraph title={`Backed | ${capitalize(token)} | Swap`} />
-      <h1>under construction</h1>
+      <SwapPageContent />
     </>
   );
 }
