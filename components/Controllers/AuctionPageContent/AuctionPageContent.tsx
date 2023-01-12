@@ -22,8 +22,6 @@ export type AuctionPageContentProps = {
   auction: NonNullable<AuctionQuery['auction']>;
 };
 
-const currentTimeInSeconds = () => Math.floor(new Date().getTime() / 1000);
-
 export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   const { tokenName } = useConfig();
   const controller = useController();
@@ -52,8 +50,6 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
     if (!auctionUnderlyingPrice || !ethPrice) return null;
     return auctionUnderlyingPrice.mul(ethers.BigNumber.from(ethPrice));
   }, [auctionUnderlyingPrice, ethPrice]);
-
-  if (!auction || !liveAuctionPrice) return <div></div>;
 
   return (
     <Fieldset
@@ -117,6 +113,8 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
     </Fieldset>
   );
 }
+
+const currentTimeInSeconds = () => Math.floor(new Date().getTime() / 1000);
 
 type SummaryTableProps = {
   auction: NonNullable<AuctionQuery['auction']>;
