@@ -1,5 +1,4 @@
 import controllerStyles from 'components/Controllers/Controller.module.css';
-import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import { AuctionPageContent } from 'components/Controllers/AuctionPageContent/AuctionPageContent';
 import { ControllerContextProvider, PaprController } from 'hooks/useController';
@@ -8,7 +7,6 @@ import { configs, getConfig, SupportedToken } from 'lib/config';
 import { fetchSubgraphData } from 'lib/PaprController';
 import { captureException } from '@sentry/nextjs';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
-import { Custom404 } from 'components/Custom404';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 import { auctionById } from 'lib/pAPRSubgraph';
 
