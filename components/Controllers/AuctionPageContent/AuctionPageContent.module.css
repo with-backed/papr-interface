@@ -61,7 +61,7 @@
   transition: color 100ms linear;
 }
 
-.updating {
+.updated {
   background-color: var(--highlight-clickable-5);
   color: var(--highlight-clickable-100);
 

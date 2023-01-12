@@ -5,6 +5,8 @@ import {
   PaprControllerByIdQuery,
   VaultsByOwnerForControllerDocument,
   VaultsByOwnerForControllerQuery,
+  AuctionQuery,
+  AuctionDocument,
 } from 'types/generated/graphql/inKindSubgraph';
 import { configs, SupportedToken } from './config';
 import { SubgraphController } from './PaprController';
@@ -66,4 +68,20 @@ export async function getAllVaultsForControllerForUser(
   }
 
   return data?.vaults || [];
+}
+
+export async function auctionById(auctionId: string, token: SupportedToken) {
+  const client = clientFromUrl(configs[token].paprMemeSubgraph);
+  const { data, error } = await client
+    .query<AuctionQuery>(AuctionDocument, {
+      id: auctionId,
+    })
+    .toPromise();
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  return data?.auction || null;
 }
