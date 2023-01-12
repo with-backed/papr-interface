@@ -17,6 +17,7 @@ import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { getUnitPriceForCoinInEth } from 'lib/coingecko';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
+import { AuctionGraph } from './AuctionGraph';
 
 export type AuctionPageContentProps = {
   auction: NonNullable<AuctionQuery['auction']>;
@@ -109,6 +110,9 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
             />
           </div>
         </div>
+      </div>
+      <div className={styles.graphWrapper}>
+        <AuctionGraph />
       </div>
     </Fieldset>
   );
