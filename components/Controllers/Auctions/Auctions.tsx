@@ -5,13 +5,11 @@ import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { useShowMore } from 'hooks/useShowMore';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
-import { useTimestamp } from 'hooks/useTimestamp';
-import { currentPrice } from 'lib/auctions';
 import { erc20Contract } from 'lib/contracts';
-import { convertOneScaledValue } from 'lib/controllers';
 import { getDaysHoursMinutesSeconds } from 'lib/duration';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import {
@@ -34,16 +32,13 @@ type Auction = AuctionsQuery['auctions'][number];
 type ActiveAuction = Auction & { startPrice: string };
 type PastAuction = ActiveAuction & { end: { timestamp: number; id: string } };
 
-const ONE_HOUR_IN_SECONDS = 60 * 60;
-
 type AuctionsProps = {
   paprController: PaprController;
 };
 export function Auctions({ paprController }: AuctionsProps) {
-  const [{ data: auctionsQueryResult, fetching, error }] =
-    useQuery<AuctionsQuery>({
-      query: AuctionsDocument,
-    });
+  const [{ data: auctionsQueryResult, fetching }] = useQuery<AuctionsQuery>({
+    query: AuctionsDocument,
+  });
 
   const { activeAuctions, pastAuctions } = useMemo(() => {
     const result: {
@@ -151,46 +146,10 @@ function ActiveAuctionRow({
   tokenContract: ERC20;
   paprApproved: boolean | null;
 }) {
-  const timestamp = useTimestamp();
   const decimals = auction.paymentAsset.decimals;
   const symbol = auction.paymentAsset.symbol;
-  const priceBigNum = useMemo(() => {
-    if (!timestamp) {
-      return ethers.BigNumber.from(0);
-    }
-    const secondsElapsed = timestamp - auction.start.timestamp;
-    return currentPrice(
-      ethers.BigNumber.from(auction.startPrice),
-      secondsElapsed,
-      parseInt(auction.secondsInPeriod),
-      convertOneScaledValue(
-        ethers.BigNumber.from(auction.perPeriodDecayPercentWad),
-        4,
-      ),
-    );
-  }, [auction, timestamp]);
 
-  const priceBigNumAnHourAgo = useMemo(() => {
-    if (!timestamp) {
-      return ethers.BigNumber.from(0);
-    }
-    const secondsElapsed =
-      timestamp - ONE_HOUR_IN_SECONDS - auction.start.timestamp;
-    return currentPrice(
-      ethers.BigNumber.from(auction.startPrice),
-      secondsElapsed,
-      parseInt(auction.secondsInPeriod),
-      convertOneScaledValue(
-        ethers.BigNumber.from(auction.perPeriodDecayPercentWad),
-        4,
-      ),
-    );
-  }, [auction, timestamp]);
-
-  const hourlyPriceChange = useMemo(
-    () => priceBigNum.sub(priceBigNumAnHourAgo),
-    [priceBigNum, priceBigNumAnHourAgo],
-  );
+  const { liveAuctionPrice, hourlyPriceChange } = useLiveAuctionPrice(auction);
 
   const floorValue = useMemo(
     // Auctions start at 3x the floor value, so we can derive floor by dividing
@@ -211,7 +170,7 @@ function ActiveAuctionRow({
       <td className={styles.right}>
         {decimals
           ? formatTokenAmount(
-              parseFloat(ethers.utils.formatUnits(priceBigNum, decimals)),
+              parseFloat(ethers.utils.formatUnits(liveAuctionPrice, decimals)),
             )
           : '...'}{' '}
         {symbol}
@@ -235,7 +194,7 @@ function ActiveAuctionRow({
         <BuyButton
           auction={auction}
           controller={controller}
-          maxPrice={priceBigNum}
+          maxPrice={liveAuctionPrice}
           tokenContract={tokenContract}
           paprApproved={paprApproved}
         />
@@ -363,7 +322,6 @@ function PastAuctions({ auctions, fetching }: PastAuctionsProps) {
 }
 
 function PastAuctionRow({ auction }: { auction: PastAuction }) {
-  const signerOrProvider = useSignerOrProvider();
   const decimals = auction.paymentAsset.decimals;
   const symbol = auction.paymentAsset.symbol;
   const endPrice = useMemo(

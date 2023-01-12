@@ -2,27 +2,16 @@ import { ethers } from 'ethers';
 import { currentPrice } from 'lib/auctions';
 import { convertOneScaledValue } from 'lib/controllers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  AuctionDocument,
-  AuctionQuery,
-} from 'types/generated/graphql/inKindSubgraph';
-import { useQuery } from 'urql';
+import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 
 const currentTimeInSeconds = () => Math.floor(new Date().getTime() / 1000);
+const ONE_HOUR_IN_SECONDS = 60 * 60;
 
-export function useAuction(id: string, priceRefreshTime = 14000) {
-  const [{ data: auctionQueryResult, fetching }] = useQuery<AuctionQuery>({
-    query: AuctionDocument,
-    variables: { id },
-  });
-
-  const auction = useMemo(() => {
-    if (!auctionQueryResult?.auction) return undefined;
-    return auctionQueryResult.auction;
-  }, [auctionQueryResult]);
-
+export function useLiveAuctionPrice(
+  auction: NonNullable<AuctionQuery['auction']>,
+  priceRefreshTime = 14000,
+) {
   const calculateAuctionPrice = useCallback(() => {
-    if (!auction) return null;
     const timestamp = currentTimeInSeconds();
     const secondsElapsed = timestamp - auction.start.timestamp;
     return currentPrice(
@@ -36,9 +25,26 @@ export function useAuction(id: string, priceRefreshTime = 14000) {
     );
   }, [auction]);
 
-  const [liveAuctionPrice, setLiveAuctionPrice] =
-    useState<ethers.BigNumber | null>(null);
+  const [liveAuctionPrice, setLiveAuctionPrice] = useState<ethers.BigNumber>(
+    calculateAuctionPrice(),
+  );
   const [priceUpdated, setPriceUpdated] = useState<boolean>(false);
+
+  const hourlyPriceChange = useMemo(() => {
+    const timestamp = currentTimeInSeconds();
+    const secondsElapsedAnHourAgo =
+      timestamp - ONE_HOUR_IN_SECONDS - auction.start.timestamp;
+    const priceAnHourAgo = currentPrice(
+      ethers.BigNumber.from(auction.startPrice),
+      secondsElapsedAnHourAgo,
+      parseInt(auction.secondsInPeriod),
+      convertOneScaledValue(
+        ethers.BigNumber.from(auction.perPeriodDecayPercentWad),
+        4,
+      ),
+    );
+    return liveAuctionPrice.sub(priceAnHourAgo);
+  }, [liveAuctionPrice, auction]);
 
   useEffect(() => {
     if (!auction) return;
@@ -53,5 +59,5 @@ export function useAuction(id: string, priceRefreshTime = 14000) {
     return () => clearInterval(interval);
   }, [auction, calculateAuctionPrice, priceRefreshTime]);
 
-  return { auction, liveAuctionPrice, priceUpdated, auctionLoading: fetching };
+  return { liveAuctionPrice, hourlyPriceChange, priceUpdated };
 }

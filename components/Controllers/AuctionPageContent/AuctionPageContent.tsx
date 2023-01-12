@@ -4,11 +4,10 @@ import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { currentPrice } from 'lib/auctions';
 import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
-import { convertOneScaledValue, getQuoteForSwapOutput } from 'lib/controllers';
+import { getQuoteForSwapOutput } from 'lib/controllers';
 import { formatBigNum } from 'lib/numberFormat';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 import { AuctionCountdown } from 'components/Controllers/AuctionPageContent/AuctionCountdown';
 import styles from './AuctionPageContent.module.css';
@@ -17,22 +16,20 @@ import dayjs from 'dayjs';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { getUnitPriceForCoinInEth } from 'lib/coingecko';
-import { useAuction } from 'hooks/useAuction';
+import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 
 export type AuctionPageContentProps = {
-  auctionId: string;
+  auction: NonNullable<AuctionQuery['auction']>;
 };
 
 const currentTimeInSeconds = () => Math.floor(new Date().getTime() / 1000);
 
-export function AuctionPageContent({ auctionId }: AuctionPageContentProps) {
+export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   const { tokenName } = useConfig();
   const controller = useController();
 
-  const { auction, liveAuctionPrice, priceUpdated } = useAuction(
-    auctionId,
-    7900,
-  );
+  const { liveAuctionPrice, hourlyPriceChange, priceUpdated } =
+    useLiveAuctionPrice(auction, 7900);
 
   const auctionUnderlyingPrice = useAsyncValue(async () => {
     if (!liveAuctionPrice || !auction) return null;
@@ -110,7 +107,7 @@ export function AuctionPageContent({ auctionId }: AuctionPageContentProps) {
           <div className={styles.summary}>
             <SummaryTable
               auction={auction}
-              auctionPrice={liveAuctionPrice}
+              hourlyPriceChange={hourlyPriceChange}
               auctionUnderlyingPrice={auctionUnderlyingPrice}
               priceUpdated={priceUpdated}
             />
@@ -121,18 +118,16 @@ export function AuctionPageContent({ auctionId }: AuctionPageContentProps) {
   );
 }
 
-const ONE_HOUR_IN_SECONDS = 60 * 60;
-
 type SummaryTableProps = {
   auction: NonNullable<AuctionQuery['auction']>;
-  auctionPrice: ethers.BigNumber;
+  hourlyPriceChange: ethers.BigNumber;
   auctionUnderlyingPrice: ethers.BigNumber | null;
   priceUpdated: boolean;
 };
 
 function SummaryTable({
   auction,
-  auctionPrice,
+  hourlyPriceChange,
   auctionUnderlyingPrice,
   priceUpdated,
 }: SummaryTableProps) {
@@ -141,22 +136,6 @@ function SummaryTable({
   const [timeElapsed, setTimeElapsed] = useState<number>(
     currentTimeInSeconds() - auction.start.timestamp,
   );
-
-  const hourlyPriceChange = useMemo(() => {
-    const timestamp = currentTimeInSeconds();
-    const secondsElapsedAnHourAgo =
-      timestamp - ONE_HOUR_IN_SECONDS - auction.start.timestamp;
-    const priceAnHourAgo = currentPrice(
-      ethers.BigNumber.from(auction.startPrice),
-      secondsElapsedAnHourAgo,
-      parseInt(auction.secondsInPeriod),
-      convertOneScaledValue(
-        ethers.BigNumber.from(auction.perPeriodDecayPercentWad),
-        4,
-      ),
-    );
-    return auctionPrice.sub(priceAnHourAgo);
-  }, [auctionPrice, auction]);
 
   const percentFloor = useMemo(() => {
     if (!oracleInfo || !auctionUnderlyingPrice) return '0.000';
