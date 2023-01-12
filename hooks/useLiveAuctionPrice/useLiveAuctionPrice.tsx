@@ -47,8 +47,6 @@ export function useLiveAuctionPrice(
   }, [liveAuctionPrice, auction]);
 
   useEffect(() => {
-    if (!auction) return;
-    setLiveAuctionPrice(calculateAuctionPrice());
     const interval = setInterval(() => {
       setLiveAuctionPrice(calculateAuctionPrice());
       setPriceUpdated(true);
