@@ -27,7 +27,7 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   const { tokenName } = useConfig();
   const controller = useController();
 
-  const { liveAuctionPrice, hourlyPriceChange, priceUpdated } =
+  const { liveAuctionPrice, liveTimestamp, hourlyPriceChange, priceUpdated } =
     useLiveAuctionPrice(auction, 7900);
 
   const auctionUnderlyingPrice = useAsyncValue(async () => {
@@ -115,7 +115,7 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
         <AuctionGraph
           auction={auction}
           liveAuctionPrice={liveAuctionPrice}
-          liveTimestamp={0}
+          liveTimestamp={liveTimestamp}
         />
       </div>
     </Fieldset>

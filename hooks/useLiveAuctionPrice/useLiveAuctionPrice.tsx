@@ -56,5 +56,5 @@ export function useLiveAuctionPrice(
     return () => clearInterval(interval);
   }, [auction, priceRefreshTime]);
 
-  return { liveAuctionPrice, hourlyPriceChange, priceUpdated };
+  return { liveAuctionPrice, liveTimestamp, hourlyPriceChange, priceUpdated };
 }

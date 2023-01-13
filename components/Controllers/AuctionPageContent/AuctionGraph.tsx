@@ -46,7 +46,7 @@ export function generateTimestampsAndPrices(
   for (
     let t = startTime;
     t < startTime + 86400 * 3 || startTime < currentTimestamp;
-    t += 10
+    t += 10000
   ) {
     chartX.push(t);
     chartY.push(
@@ -101,11 +101,11 @@ export function AuctionGraph({
           borderColor: '#e4e4e4',
           ...baseChartProperties,
         },
-        {
-          data: timestampAndPricesCurrent[1],
-          borderColor: '#0000c2',
-          ...baseChartProperties,
-        },
+        // {
+        //   data: timestampAndPricesCurrent[1],
+        //   borderColor: '#0000c2',
+        //   ...baseChartProperties,
+        // },
       ],
     };
   }, [timestampAndPricesAllTime, timestampAndPricesCurrent]);
