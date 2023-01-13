@@ -92,7 +92,7 @@ export function AuctionGraph({
     return generateTimestampsAndPrices(auction, liveTimestamp);
   }, [auction, liveTimestamp]);
 
-  const allTimeChartData = useMemo(() => {
+  const chartData = useMemo(() => {
     return {
       labels: timestampAndPricesAllTime[0],
       datasets: [
@@ -101,14 +101,6 @@ export function AuctionGraph({
           borderColor: '#e4e4e4',
           ...baseChartProperties,
         },
-      ],
-    };
-  }, [timestampAndPricesAllTime]);
-
-  const currentChartData = useMemo(() => {
-    return {
-      labels: timestampAndPricesCurrent[0],
-      datasets: [
         {
           data: timestampAndPricesCurrent[1],
           borderColor: '#0000c2',
@@ -116,12 +108,11 @@ export function AuctionGraph({
         },
       ],
     };
-  }, [timestampAndPricesCurrent]);
+  }, [timestampAndPricesAllTime, timestampAndPricesCurrent]);
 
   return (
     <>
-      <Line options={chartOptions} data={allTimeChartData} />
-      <Line options={chartOptions} data={currentChartData} />
+      <Line options={chartOptions} data={chartData} />
     </>
   );
 }

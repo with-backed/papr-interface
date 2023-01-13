@@ -11,9 +11,11 @@ export function useLiveAuctionPrice(
   auction: NonNullable<AuctionQuery['auction']>,
   priceRefreshTime = 14000,
 ) {
-  const calculateAuctionPrice = useCallback(() => {
-    const timestamp = currentTimeInSeconds();
-    const secondsElapsed = timestamp - auction.start.timestamp;
+  const [liveTimestamp, setLiveTimestamp] = useState<number>(
+    currentTimeInSeconds(),
+  );
+  const liveAuctionPrice = useMemo(() => {
+    const secondsElapsed = liveTimestamp - auction.start.timestamp;
     return currentPrice(
       ethers.BigNumber.from(auction.startPrice),
       secondsElapsed,
@@ -23,11 +25,8 @@ export function useLiveAuctionPrice(
         4,
       ),
     );
-  }, [auction]);
+  }, [auction, liveTimestamp]);
 
-  const [liveAuctionPrice, setLiveAuctionPrice] = useState<ethers.BigNumber>(
-    calculateAuctionPrice(),
-  );
   const [priceUpdated, setPriceUpdated] = useState<boolean>(false);
 
   const hourlyPriceChange = useMemo(() => {
@@ -48,14 +47,14 @@ export function useLiveAuctionPrice(
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setLiveAuctionPrice(calculateAuctionPrice());
+      setLiveTimestamp(currentTimeInSeconds());
       setPriceUpdated(true);
       setTimeout(() => {
         setPriceUpdated(false);
       }, 1000);
     }, priceRefreshTime);
     return () => clearInterval(interval);
-  }, [auction, calculateAuctionPrice, priceRefreshTime]);
+  }, [auction, priceRefreshTime]);
 
   return { liveAuctionPrice, hourlyPriceChange, priceUpdated };
 }
