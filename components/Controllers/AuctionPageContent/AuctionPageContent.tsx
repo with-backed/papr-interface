@@ -112,7 +112,11 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
         </div>
       </div>
       <div className={styles.graphWrapper}>
-        <AuctionGraph />
+        <AuctionGraph
+          auction={auction}
+          liveAuctionPrice={liveAuctionPrice}
+          liveTimestamp={0}
+        />
       </div>
     </Fieldset>
   );
