@@ -108,7 +108,7 @@ export function AuctionGraph({
         // },
       ],
     };
-  }, [timestampAndPricesAllTime, timestampAndPricesCurrent]);
+  }, [timestampAndPricesAllTime]);
 
   return (
     <>
