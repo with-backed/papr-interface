@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,9 +7,8 @@ import {
   LineElement,
   ChartOptions,
   Tooltip,
-  Chart,
 } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import { Line } from 'react-chartjs-2';
 import styles from './AuctionGraph.module.css';
 import { formatBigNum } from 'lib/numberFormat';
@@ -17,7 +16,7 @@ import { ethers } from 'ethers';
 import { currentPrice } from 'lib/auctions';
 import { convertOneScaledValue } from 'lib/controllers';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
-import { PaprController, useController } from 'hooks/useController';
+import { useController } from 'hooks/useController';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 
 ChartJS.register(
@@ -31,6 +30,7 @@ ChartJS.register(
 
 export function generateTimestampsAndPrices(
   auction: NonNullable<AuctionQuery['auction']>,
+  latestUniswapPrice: number,
   currentTimestamp = 0,
 ) {
   const chartX: number[] = [];
@@ -59,7 +59,7 @@ export function generateTimestampsAndPrices(
           ),
           18,
         ),
-      ),
+      ) * latestUniswapPrice,
     );
   }
   return [chartX, chartY];
@@ -70,31 +70,85 @@ const baseChartProperties = {
   borderCapStyle: 'square' as const,
 };
 
+function generateLabelSpecificStyles(
+  context: Context,
+  floorDataPoint: number,
+  startStyle: any,
+  buyNowStyle: any,
+  topBidStyle: any,
+  dottedLineStyle: any,
+  floorInfoStyle: any,
+  zeroSignStyle: any,
+  defaultStyle: any,
+) {
+  if (context.datasetIndex === 1 && context.dataIndex === 0) {
+    return startStyle;
+  } else if (
+    context.datasetIndex === 0 &&
+    context.dataIndex === context.chart.data.datasets[0].data.length - 1
+  ) {
+    return buyNowStyle;
+  } else if (
+    context.datasetIndex === 1 &&
+    context.dataIndex === floorDataPoint
+  ) {
+    return topBidStyle;
+  } else if (
+    context.datasetIndex === 1 &&
+    context.dataIndex === floorDataPoint - 1
+  ) {
+    return dottedLineStyle;
+  } else if (
+    context.datasetIndex === 1 &&
+    context.dataIndex === floorDataPoint - 2
+  ) {
+    return floorInfoStyle;
+  } else if (
+    context.datasetIndex === 1 &&
+    context.dataIndex === context.chart.data.datasets[1].data.length - 1
+  ) {
+    return zeroSignStyle;
+  } else {
+    return defaultStyle;
+  }
+}
+
 type AuctionGraphProps = {
   auction: NonNullable<AuctionQuery['auction']>;
   auctionUnderlyingPrice: ethers.BigNumber | null;
   liveTimestamp: number;
+  timeElapsed: number;
   oracleInfo: OracleInfo;
   latestUniswapPrice: number;
   floorEthPrice: number;
-  timeAgo: string;
 };
 
 export function AuctionGraph({
   auction,
   auctionUnderlyingPrice,
   liveTimestamp,
+  timeElapsed,
   oracleInfo,
+  latestUniswapPrice,
   floorEthPrice,
-  timeAgo,
 }: AuctionGraphProps) {
   const controller = useController();
   const timestampAndPricesAllTime = useMemo(() => {
-    return generateTimestampsAndPrices(auction);
-  }, [auction]);
+    return generateTimestampsAndPrices(auction, latestUniswapPrice);
+  }, [auction, latestUniswapPrice]);
   const timestampAndPricesCurrent = useMemo(() => {
-    return generateTimestampsAndPrices(auction, liveTimestamp);
-  }, [auction, liveTimestamp]);
+    return generateTimestampsAndPrices(
+      auction,
+      latestUniswapPrice,
+      liveTimestamp,
+    );
+  }, [auction, latestUniswapPrice, liveTimestamp]);
+
+  const timeAgo = useMemo(() => {
+    return Math.floor(timeElapsed / 60 / 60) > 24
+      ? [Math.floor(timeElapsed / (60 * 60 * 24)), 'days', 'ago'].join(' ')
+      : [Math.floor(timeElapsed / 60 / 60), 'hours', 'ago'].join(' ');
+  }, [timeElapsed]);
 
   const floorDataPoint = useMemo(() => {
     const prices = timestampAndPricesAllTime[1];
@@ -113,7 +167,21 @@ export function AuctionGraph({
   const startLabel = useMemo(() => {
     const floorPrice =
       oracleInfo[auction.auctionAssetContract.id].price.toFixed(2);
-    return `\n\n\nStart @ 3x Floor\n\t\t\t\t${timeAgo}\n\t\t\t\t\t\t\t${floorEthPrice} ETH\n\t\t\t\t\t\t\t\t\t$${floorPrice}`;
+    const startingString = 'Start @ 3x Floor';
+    const paddingForTimeAgo = Array(startingString.length - timeAgo.length)
+      .fill('\t')
+      .join('');
+    const paddingForEthPrice = Array(
+      startingString.length - (floorEthPrice.toString().length + 4),
+    )
+      .fill('\t')
+      .join('');
+    const paddingForFloorPrice = Array(
+      startingString.length - (floorPrice.toString().length + 1),
+    )
+      .fill('\t')
+      .join('');
+    return `\n\n\n${startingString}\n${paddingForTimeAgo}${timeAgo}\n${paddingForEthPrice}${floorEthPrice} ETH\n${paddingForFloorPrice}$${floorPrice}`;
   }, [timeAgo, oracleInfo, floorEthPrice, auction.auctionAssetContract.id]);
 
   const buyNowLabel = useMemo(
@@ -130,10 +198,15 @@ export function AuctionGraph({
   const floorLabel = useMemo(() => {
     const floorPrice =
       oracleInfo[auction.auctionAssetContract.id].price.toFixed(2);
-    return `\t\tTop Bid   - - - - - - - - - - - - - - - - - - - - - - - - - - -\n${floorEthPrice} ETH\n\t\t$${floorPrice}`;
+    const floorPricePadding = Array(
+      floorEthPrice.toString().length + 4 - (floorPrice.toString().length + 1),
+    )
+      .fill('\t')
+      .join('');
+    return `\n\n\n\n${floorEthPrice} ETH\n${floorPricePadding}$${floorPrice}`;
   }, [oracleInfo, floorEthPrice, auction.auctionAssetContract.id]);
 
-  const chartOptions = useMemo(
+  const chartOptions: ChartOptions = useMemo(
     () => ({
       responsive: true,
       events: [],
@@ -155,73 +228,46 @@ export function AuctionGraph({
             family: 'Courier Prime, Courier New, monospace',
           },
           align: 'right',
-          color: function (context: any) {
-            if (context.datasetIndex === 1 && context.dataIndex === 0) {
-              return 'black';
-            } else if (
-              context.datasetIndex === 0 &&
-              context.dataIndex ===
-                context.chart.data.datasets[0].data.length - 1
-            ) {
-              return 'white';
-            } else if (
-              context.datasetIndex === 1 &&
-              context.dataIndex === floorDataPoint
-            ) {
-              return 'black';
-            } else if (
-              context.datasetIndex === 1 &&
-              context.dataIndex ===
-                context.chart.data.datasets[1].data.length - 1
-            ) {
-              return 'black';
-            }
+          color: function (context) {
+            return generateLabelSpecificStyles(
+              context,
+              floorDataPoint,
+              'black',
+              'white',
+              '#0000c2',
+              '#b1aeae',
+              'black',
+              'black',
+              '',
+            );
           },
-          backgroundColor: function (context: any) {
-            if (context.datasetIndex === 1 && context.dataIndex === 0) {
-              return 'white';
-            } else if (
-              context.datasetIndex === 0 &&
-              context.dataIndex ===
-                context.chart.data.datasets[0].data.length - 1
-            ) {
-              return '#0000c2';
-            } else if (
-              context.datasetIndex === 1 &&
-              context.dataIndex === floorDataPoint
-            ) {
-              return '';
-            } else if (
-              context.datasetIndex === 1 &&
-              context.dataIndex ===
-                context.chart.data.datasets[1].data.length - 1
-            ) {
-              return 'white';
-            }
+          backgroundColor: function (context) {
+            return generateLabelSpecificStyles(
+              context,
+              floorDataPoint,
+              'white',
+              '#0000c2',
+              '',
+              '',
+              '',
+              'white',
+              '',
+            );
           },
-          offset: function (context: any) {
-            if (context.datasetIndex === 1 && context.dataIndex === 0) {
-              return -160;
-            } else if (
-              context.datasetIndex === 0 &&
-              context.dataIndex ===
-                context.chart.data.datasets[0].data.length - 1
-            ) {
-              return 20;
-            } else if (
-              context.datasetIndex === 1 &&
-              context.dataIndex === floorDataPoint
-            ) {
-              return -220;
-            } else if (
-              context.datasetIndex === 1 &&
-              context.dataIndex ===
-                context.chart.data.datasets[1].data.length - 1
-            ) {
-              return 10;
-            }
+          offset: function (context) {
+            return generateLabelSpecificStyles(
+              context,
+              floorDataPoint,
+              -160,
+              20,
+              -190,
+              -100,
+              -200,
+              10,
+              0,
+            );
           },
-          formatter: function (_value: any, context: any) {
+          formatter: function (_value, context) {
             if (context.datasetIndex === 1 && context.dataIndex === 0) {
               return startLabel;
             } else if (
@@ -234,6 +280,16 @@ export function AuctionGraph({
               context.datasetIndex === 1 &&
               context.dataIndex === floorDataPoint
             ) {
+              return 'Top Bid';
+            } else if (
+              context.datasetIndex === 1 &&
+              context.dataIndex === floorDataPoint - 1
+            ) {
+              return '- - - - - - - - - - - - - - - - - - - - - - - - - -';
+            } else if (
+              context.datasetIndex === 1 &&
+              context.dataIndex === floorDataPoint - 2
+            ) {
               return floorLabel;
             } else if (
               context.datasetIndex === 1 &&
@@ -241,15 +297,21 @@ export function AuctionGraph({
                 context.chart.data.datasets[1].data.length - 1
             ) {
               return '$0';
+            } else {
+              return '';
             }
           },
-          display: function (context: any) {
+          display: function (context) {
             return (
               (context.datasetIndex === 0 &&
                 context.dataIndex ===
                   context.chart.data.datasets[0].data.length - 1) ||
               (context.datasetIndex === 1 &&
                 context.dataIndex === floorDataPoint) ||
+              (context.datasetIndex === 1 &&
+                context.dataIndex === floorDataPoint - 1) ||
+              (context.datasetIndex === 1 &&
+                context.dataIndex === floorDataPoint - 2) ||
               (context.datasetIndex === 1 && context.dataIndex === 0) ||
               (context.datasetIndex === 1 &&
                 context.dataIndex ===

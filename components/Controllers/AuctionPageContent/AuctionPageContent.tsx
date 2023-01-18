@@ -31,7 +31,7 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   const latestUniswapPrice = useLatestMarketPrice();
 
   const { liveAuctionPrice, liveTimestamp, hourlyPriceChange, priceUpdated } =
-    useLiveAuctionPrice(auction, 7900);
+    useLiveAuctionPrice(auction, 8000);
 
   const [timeElapsed, setTimeElapsed] = useState<number>(
     currentTimeInSeconds() - auction.start.timestamp,
@@ -63,12 +63,6 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
     if (!oracleInfo || !ethPrice) return 0;
     return oracleInfo[auction.auctionAssetContract.id].price / ethPrice;
   }, [oracleInfo, ethPrice, auction.auctionAssetContract.id]);
-
-  const timeAgo = useMemo(() => {
-    return Math.floor(timeElapsed / 60 / 60) > 24
-      ? [Math.floor(timeElapsed / (60 * 60 * 24)), 'days', 'ago'].join(' ')
-      : [Math.floor(timeElapsed / 60 / 60), 'hours', 'ago'].join(' ');
-  }, [timeElapsed]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -143,10 +137,10 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
         auction={auction}
         auctionUnderlyingPrice={auctionUnderlyingPrice}
         liveTimestamp={liveTimestamp}
+        timeElapsed={timeElapsed}
         oracleInfo={oracleInfo}
         latestUniswapPrice={latestUniswapPrice}
         floorEthPrice={floorEthPrice}
-        timeAgo={timeAgo}
       />
     </Fieldset>
   );

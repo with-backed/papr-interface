@@ -52,26 +52,19 @@
 .updatable {
   background-color: inherit;
   color: inherit;
-  -webkit-transition: background-color 100ms linear;
-  -ms-transition: background-color 100ms linear;
-  transition: background-color 100ms linear;
 
-  -webkit-transition: color 100ms linear;
-  -ms-transition: color 100ms linear;
-  transition: color 100ms linear;
+  -webkit-transition: background-color 0.3s linear, color 0.3s linear;
+  -ms-transition: background-color 0.3s linear, color 0.3s linear;
+  transition: background-color 0.3s linear, color 0.3s linear;
 }
 
 .updated {
   background-color: var(--highlight-clickable-5);
   color: var(--highlight-clickable-100);
 
-  -webkit-transition: background-color 100ms linear;
-  -ms-transition: background-color 100ms linear;
-  transition: background-color 100ms linear;
-
-  -webkit-transition: color 100ms linear;
-  -ms-transition: color 100ms linear;
-  transition: color 100ms linear;
+  -webkit-transition: background-color 0.3s linear, color 0.3s linear;
+  -ms-transition: background-color 0.3s linear, color 0.3s linear;
+  transition: background-color 0.3s linear, color 0.3s linear;
 }
 
 .graphWrapper {
