@@ -6,6 +6,14 @@ const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
+
+const USD_FORMATTER = new Intl.NumberFormat(LOCALE, {
+  notation: 'compact',
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
 /**
  * Formats a number representing a quantity of tokens consistent with our design.
  * @param amount e.g., the result of `parseFloat(ethers.utils.formatUnits(...))`
@@ -21,6 +29,10 @@ export function formatBigNum(
 
 export function formatTokenAmount(amount: number) {
   return USDC_FORMATTER.format(amount);
+}
+
+export function formatDollars(amount: number) {
+  return USD_FORMATTER.format(amount);
 }
 
 const PERCENT_FORMATTER = new Intl.NumberFormat(LOCALE, {

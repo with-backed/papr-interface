@@ -1,5 +1,9 @@
 query poolById($id: ID!) {
   pool(id: $id) {
+    feeTier
+    liquidity
+    volumeUSD
+    totalValueLockedUSD
     tick
     token0 {
       id
