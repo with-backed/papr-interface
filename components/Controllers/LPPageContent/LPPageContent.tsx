@@ -1,5 +1,6 @@
-import styles from 'components/Controllers/Controller.module.css';
+import controllerStyles from 'components/Controllers/Controller.module.css';
 import { Fieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { formatDollars } from 'lib/numberFormat';
@@ -10,6 +11,7 @@ import {
   PoolByIdQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
 import { useQuery } from 'urql';
+import styles from './LPPageContent.module.css';
 
 export function LPPageContent() {
   const {
@@ -73,7 +75,7 @@ export function LPPageContent() {
   }, [data, error, fetching]);
 
   return (
-    <div className={styles.wrapper}>
+    <div className={controllerStyles.wrapper}>
       <Fieldset legend="🦄 How to LP">
         <p>
           Liquidity providers earn a 0.3% fee from facilitating swaps in the
@@ -91,9 +93,22 @@ export function LPPageContent() {
         </ol>
       </Fieldset>
       <Fieldset legend="🛟 Pool Stats">
-        <div>Volume 24h: {volume24h}</div>
-        <div>Total Value: {totalValueLocked}</div>
-        <div>Fees 24h: {fees24h}</div>
+        <Table>
+          <thead>
+            <tr>
+              <th className={styles.left}>Total Value</th>
+              <th className={styles.left}>24H Volume</th>
+              <th className={styles.left}>24H Fees</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{totalValueLocked}</td>
+              <td>{volume24h}</td>
+              <td>{fees24h}</td>
+            </tr>
+          </tbody>
+        </Table>
       </Fieldset>
     </div>
   );
