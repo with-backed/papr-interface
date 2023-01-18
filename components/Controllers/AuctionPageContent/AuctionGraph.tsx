@@ -133,7 +133,7 @@ export function AuctionGraph({
     return `\t\tTop Bid   - - - - - - - - - - - - - - - - - - - - - - - - - - -\n${floorEthPrice} ETH\n\t\t$${floorPrice}`;
   }, [oracleInfo, floorEthPrice, auction.auctionAssetContract.id]);
 
-  const chartOptions: ChartOptions = useMemo(
+  const chartOptions = useMemo(
     () => ({
       responsive: true,
       events: [],
@@ -155,7 +155,7 @@ export function AuctionGraph({
             family: 'Courier Prime, Courier New, monospace',
           },
           align: 'right',
-          color: function (context) {
+          color: function (context: any) {
             if (context.datasetIndex === 1 && context.dataIndex === 0) {
               return 'black';
             } else if (
@@ -177,7 +177,7 @@ export function AuctionGraph({
               return 'black';
             }
           },
-          backgroundColor: function (context) {
+          backgroundColor: function (context: any) {
             if (context.datasetIndex === 1 && context.dataIndex === 0) {
               return 'white';
             } else if (
@@ -199,7 +199,7 @@ export function AuctionGraph({
               return 'white';
             }
           },
-          offset: function (context) {
+          offset: function (context: any) {
             if (context.datasetIndex === 1 && context.dataIndex === 0) {
               return -160;
             } else if (
@@ -221,7 +221,7 @@ export function AuctionGraph({
               return 10;
             }
           },
-          formatter: function (_value, context) {
+          formatter: function (_value: any, context: any) {
             if (context.datasetIndex === 1 && context.dataIndex === 0) {
               return startLabel;
             } else if (
@@ -243,7 +243,7 @@ export function AuctionGraph({
               return '$0';
             }
           },
-          display: function (context) {
+          display: function (context: any) {
             return (
               (context.datasetIndex === 0 &&
                 context.dataIndex ===
@@ -296,7 +296,12 @@ export function AuctionGraph({
 
   return (
     <div className={styles.curve}>
-      <Line options={chartOptions} data={chartData} height={300} width={560} />
+      <Line
+        options={chartOptions as any}
+        data={chartData}
+        height={300}
+        width={560}
+      />
     </div>
   );
 }
