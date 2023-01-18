@@ -7,6 +7,10 @@
   border-radius: var(--border-radius);
 }
 
+.standard-fieldset > p {
+  margin: 0;
+}
+
 .legend {
   line-height: 0;
   font-size: var(--font-large);

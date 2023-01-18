@@ -4,12 +4,13 @@ import { captureException } from '@sentry/nextjs';
 import { SupportedToken, validateToken } from 'lib/config';
 import { OpenGraph } from 'components/OpenGraph';
 import capitalize from 'lodash/capitalize';
+import { LPPageContent } from 'components/Controllers/LPPageContent';
 
 export const getServerSideProps: GetServerSideProps<LPProps> = async (
   context,
 ) => {
   try {
-    validateToken(context.params!);
+    validateToken(context.params || {});
     const network = context.params?.token as SupportedToken;
 
     return {
@@ -32,7 +33,7 @@ export default function LP({ network }: LPProps) {
   return (
     <>
       <OpenGraph title={`Backed | ${capitalize(network)} | LP`} />
-      <h1>under construction</h1>
+      <LPPageContent />
     </>
   );
 }
