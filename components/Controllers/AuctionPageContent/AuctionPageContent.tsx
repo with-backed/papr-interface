@@ -15,9 +15,10 @@ import { Table } from 'components/Table';
 import dayjs from 'dayjs';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
-import { getUnitPriceForCoinInEth } from 'lib/coingecko';
+import { getUnitPriceForEth } from 'lib/coingecko';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 import { AuctionGraph } from './AuctionGraph';
+import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 
 export type AuctionPageContentProps = {
   auction: NonNullable<AuctionQuery['auction']>;
@@ -26,9 +27,15 @@ export type AuctionPageContentProps = {
 export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   const { tokenName } = useConfig();
   const controller = useController();
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const latestUniswapPrice = useLatestMarketPrice();
 
   const { liveAuctionPrice, liveTimestamp, hourlyPriceChange, priceUpdated } =
     useLiveAuctionPrice(auction, 7900);
+
+  const [timeElapsed, setTimeElapsed] = useState<number>(
+    currentTimeInSeconds() - auction.start.timestamp,
+  );
 
   const auctionUnderlyingPrice = useAsyncValue(async () => {
     if (!liveAuctionPrice || !auction) return null;
@@ -41,7 +48,7 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   }, [auction, liveAuctionPrice, controller.underlying.id, tokenName]);
 
   const ethPrice = useAsyncValue(() => {
-    return getUnitPriceForCoinInEth(
+    return getUnitPriceForEth(
       controller.underlying.id,
       configs[tokenName as SupportedToken].network as SupportedNetwork,
     );
@@ -49,8 +56,28 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
 
   const auctionEthPrice = useMemo(() => {
     if (!auctionUnderlyingPrice || !ethPrice) return null;
-    return auctionUnderlyingPrice.mul(ethers.BigNumber.from(ethPrice));
+    return auctionUnderlyingPrice.div(ethers.BigNumber.from(ethPrice));
   }, [auctionUnderlyingPrice, ethPrice]);
+
+  const floorEthPrice = useMemo(() => {
+    if (!oracleInfo || !ethPrice) return 0;
+    return oracleInfo[auction.auctionAssetContract.id].price / ethPrice;
+  }, [oracleInfo, ethPrice, auction.auctionAssetContract.id]);
+
+  const timeAgo = useMemo(() => {
+    return Math.floor(timeElapsed / 60 / 60) > 24
+      ? [Math.floor(timeElapsed / (60 * 60 * 24)), 'days', 'ago'].join(' ')
+      : [Math.floor(timeElapsed / 60 / 60), 'hours', 'ago'].join(' ');
+  }, [timeElapsed]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeElapsed(currentTimeInSeconds() - auction.start.timestamp);
+    }, 1000);
+    return () => clearInterval(interval);
+  });
+
+  if (!oracleInfo || !latestUniswapPrice) return <></>;
 
   return (
     <Fieldset
@@ -107,17 +134,20 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
               hourlyPriceChange={hourlyPriceChange}
               auctionUnderlyingPrice={auctionUnderlyingPrice}
               priceUpdated={priceUpdated}
+              timeElapsed={timeElapsed}
             />
           </div>
         </div>
       </div>
-      <div className={styles.graphWrapper}>
-        <AuctionGraph
-          auction={auction}
-          liveAuctionPrice={liveAuctionPrice}
-          liveTimestamp={liveTimestamp}
-        />
-      </div>
+      <AuctionGraph
+        auction={auction}
+        auctionUnderlyingPrice={auctionUnderlyingPrice}
+        liveTimestamp={liveTimestamp}
+        oracleInfo={oracleInfo}
+        latestUniswapPrice={latestUniswapPrice}
+        floorEthPrice={floorEthPrice}
+        timeAgo={timeAgo}
+      />
     </Fieldset>
   );
 }
@@ -129,6 +159,7 @@ type SummaryTableProps = {
   hourlyPriceChange: ethers.BigNumber;
   auctionUnderlyingPrice: ethers.BigNumber | null;
   priceUpdated: boolean;
+  timeElapsed: number;
 };
 
 function SummaryTable({
@@ -136,12 +167,10 @@ function SummaryTable({
   hourlyPriceChange,
   auctionUnderlyingPrice,
   priceUpdated,
+  timeElapsed,
 }: SummaryTableProps) {
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const controller = useController();
-  const [timeElapsed, setTimeElapsed] = useState<number>(
-    currentTimeInSeconds() - auction.start.timestamp,
-  );
 
   const percentFloor = useMemo(() => {
     if (!oracleInfo || !auctionUnderlyingPrice) return '0.000';
@@ -163,13 +192,6 @@ function SummaryTable({
   const formattedTimeElapsed = useMemo(() => {
     return dayjs.duration(timeElapsed, 'seconds').format('D[d] HH:mm:ss');
   }, [timeElapsed]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeElapsed(currentTimeInSeconds() - auction.start.timestamp);
-    }, 1000);
-    return () => clearInterval(interval);
-  });
 
   return (
     <Table className={styles.summaryTable}>

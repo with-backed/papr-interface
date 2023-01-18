@@ -1,0 +1,9 @@
+.curve {
+  position: relative;
+  margin: auto;
+}
+
+.curve canvas {
+  margin: 0px;
+  padding: 0px;
+}

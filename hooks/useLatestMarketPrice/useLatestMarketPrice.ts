@@ -23,13 +23,10 @@ export function useLatestMarketPrice() {
     ),
   });
 
-  console.log({ error });
-
   const token0 = useMemo(() => {
     if (!data || !data.pool) {
       return null;
     }
-    console.log({ data });
     return new Token(
       chainId,
       data.pool.token0.id,
@@ -50,7 +47,6 @@ export function useLatestMarketPrice() {
 
   const price = useMemo(() => {
     if (!data || !data.pool || !token0 || !token1) {
-      console.log({ data, token0, token1 });
       return null;
     }
 

@@ -15,7 +15,7 @@ export async function getUnitPriceForEth(
   network: SupportedNetwork,
 ) {
   if (network == 'goerli') {
-    return 1.0;
+    return 1000.0;
   }
 
   try {
