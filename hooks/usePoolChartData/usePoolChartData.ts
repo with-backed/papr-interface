@@ -68,13 +68,16 @@ export function usePoolChartData() {
 }
 
 export type PoolChartEntry = {
-  date: number;
+  time: number;
   volumeUSD: number;
-  totalValueLockedUSD: number;
+  liquidityUSD: number;
   feesUSD: number;
 };
 
 function formatChartData(chartData: ChartData) {
+  if (chartData.length === 0) {
+    return [];
+  }
   const formatted = chartData.reduce(
     (acc: { [date: number]: PoolChartEntry }, dayData) => {
       const roundedDate = parseInt(
@@ -86,9 +89,9 @@ function formatChartData(chartData: ChartData) {
         : 0;
 
       acc[roundedDate] = {
-        date: dayData.date,
+        time: dayData.date,
         volumeUSD: parseFloat(dayData.volumeUSD),
-        totalValueLockedUSD: parseFloat(dayData.tvlUSD) - tvlAdjust,
+        liquidityUSD: parseFloat(dayData.tvlUSD) - tvlAdjust,
         feesUSD: parseFloat(dayData.feesUSD),
       };
       return acc;
@@ -99,20 +102,20 @@ function formatChartData(chartData: ChartData) {
   const firstEntry = formatted[parseInt(Object.keys(formatted)[0])];
 
   // fill in empty days ( there will be no day datas if no trades made that day )
-  let timestamp = firstEntry?.date ?? START_TIME;
-  let latestTvl = firstEntry?.totalValueLockedUSD ?? 0;
+  let timestamp = firstEntry?.time ?? START_TIME;
+  let latestTvl = firstEntry?.liquidityUSD ?? 0;
   while (timestamp < END_TIME - SECONDS_IN_A_DAY) {
     const nextDay = timestamp + SECONDS_IN_A_DAY;
     const currentDayIndex = parseInt((nextDay / SECONDS_IN_A_DAY).toFixed(0));
     if (!Object.keys(formatted).includes(currentDayIndex.toString())) {
       formatted[currentDayIndex] = {
-        date: nextDay,
+        time: nextDay,
         volumeUSD: 0,
-        totalValueLockedUSD: latestTvl,
+        liquidityUSD: latestTvl,
         feesUSD: 0,
       };
     } else {
-      latestTvl = formatted[currentDayIndex].totalValueLockedUSD;
+      latestTvl = formatted[currentDayIndex].liquidityUSD;
     }
     timestamp = nextDay;
   }
