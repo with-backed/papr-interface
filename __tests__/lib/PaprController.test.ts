@@ -7,7 +7,7 @@ import {
   SubgraphPool,
 } from 'lib/PaprController';
 
-const subgraphController: SubgraphController = {
+export const subgraphController: SubgraphController = {
   id: '0x41739c3547992ca3f2a40d110ad33afeb582eb7c',
   createdAt: '1663869096',
   poolAddress: '0xcf93a7655d76b43313a69f15f01a39ea6ada5aea',
