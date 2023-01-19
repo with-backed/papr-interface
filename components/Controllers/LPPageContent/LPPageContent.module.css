@@ -1,3 +1,27 @@
 .left {
   text-align: left;
 }
+
+.chart-wrapper {
+  margin-top: 1em;
+}
+
+.chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.chart-controls {
+  padding-left: 12px;
+}
+
+.chart-button {
+  text-transform: uppercase;
+}
+
+.chart-button-active {
+  composes: chart-button;
+  text-decoration: underline;
+}
