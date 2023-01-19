@@ -30,22 +30,17 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const latestUniswapPrice = useLatestMarketPrice();
 
-  const { liveAuctionPrice, liveTimestamp, hourlyPriceChange, priceUpdated } =
-    useLiveAuctionPrice(auction, 8000);
+  const {
+    liveAuctionPrice,
+    liveAuctionPriceUnderlying,
+    liveTimestamp,
+    hourlyPriceChange,
+    priceUpdated,
+  } = useLiveAuctionPrice(auction, 8000);
 
   const [timeElapsed, setTimeElapsed] = useState<number>(
     currentTimeInSeconds() - auction.start.timestamp,
   );
-
-  const auctionUnderlyingPrice = useAsyncValue(async () => {
-    if (!liveAuctionPrice || !auction) return null;
-    return getQuoteForSwapOutput(
-      liveAuctionPrice,
-      controller.underlying.id,
-      auction.paymentAsset.id,
-      tokenName as SupportedToken,
-    );
-  }, [auction, liveAuctionPrice, controller.underlying.id, tokenName]);
 
   const ethPrice = useAsyncValue(() => {
     return getUnitPriceForEth(
@@ -54,10 +49,10 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
     );
   }, [controller.underlying.id, tokenName]);
 
-  const auctionEthPrice = useMemo(() => {
-    if (!auctionUnderlyingPrice || !ethPrice) return null;
-    return auctionUnderlyingPrice.div(ethers.BigNumber.from(ethPrice));
-  }, [auctionUnderlyingPrice, ethPrice]);
+  const liveAuctionPriceEth = useMemo(() => {
+    if (!liveAuctionPriceUnderlying || !ethPrice) return null;
+    return liveAuctionPriceUnderlying.div(ethers.BigNumber.from(ethPrice));
+  }, [liveAuctionPriceUnderlying, ethPrice]);
 
   const floorEthPrice = useMemo(() => {
     if (!oracleInfo || !ethPrice) return 0;
@@ -93,32 +88,32 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
                 priceUpdated ? styles.updated : ''
               }`}>
               <p>
-                {auctionUnderlyingPrice && (
+                {liveAuctionPriceUnderlying && (
                   <>
                     $
                     {formatBigNum(
-                      auctionUnderlyingPrice,
+                      liveAuctionPriceUnderlying,
                       controller.underlying.decimals,
                     )}
                   </>
                 )}
               </p>
-              {!auctionUnderlyingPrice && <>...</>}
+              {!liveAuctionPriceUnderlying && <>...</>}
               <p>
                 {formatBigNum(liveAuctionPrice, auction.paymentAsset.decimals)}{' '}
                 {tokenName}
               </p>
               <p>
-                {auctionEthPrice && (
+                {liveAuctionPriceEth && (
                   <>
                     {formatBigNum(
-                      auctionEthPrice,
+                      liveAuctionPriceEth,
                       controller.underlying.decimals,
                     )}{' '}
                     ETH
                   </>
                 )}
-                {!auctionEthPrice && <>...</>}
+                {!liveAuctionPriceEth && <>...</>}
               </p>
             </div>
           </div>
@@ -126,7 +121,7 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
             <SummaryTable
               auction={auction}
               hourlyPriceChange={hourlyPriceChange}
-              auctionUnderlyingPrice={auctionUnderlyingPrice}
+              auctionUnderlyingPrice={liveAuctionPriceUnderlying}
               priceUpdated={priceUpdated}
               timeElapsed={timeElapsed}
             />
@@ -135,7 +130,7 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
       </div>
       <AuctionGraph
         auction={auction}
-        auctionUnderlyingPrice={auctionUnderlyingPrice}
+        auctionUnderlyingPrice={liveAuctionPriceUnderlying}
         liveTimestamp={liveTimestamp}
         timeElapsed={timeElapsed}
         oracleInfo={oracleInfo}

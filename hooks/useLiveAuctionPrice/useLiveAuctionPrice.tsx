@@ -1,6 +1,9 @@
 import { ethers } from 'ethers';
+import { useConfig } from 'hooks/useConfig';
+import { useController } from 'hooks/useController';
 import { currentPrice } from 'lib/auctions';
-import { convertOneScaledValue } from 'lib/controllers';
+import { SupportedToken } from 'lib/config';
+import { convertOneScaledValue, getQuoteForSwapOutput } from 'lib/controllers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 
@@ -11,9 +14,12 @@ export function useLiveAuctionPrice(
   auction: NonNullable<AuctionQuery['auction']>,
   priceRefreshTime = 14000,
 ) {
+  const { tokenName } = useConfig();
+  const controller = useController();
   const [liveTimestamp, setLiveTimestamp] = useState<number>(
     currentTimeInSeconds(),
   );
+
   const liveAuctionPrice = useMemo(() => {
     const secondsElapsed = liveTimestamp - auction.start.timestamp;
     return currentPrice(
@@ -26,6 +32,18 @@ export function useLiveAuctionPrice(
       ),
     );
   }, [auction, liveTimestamp]);
+
+  const calculateLiveAuctionPriceUnderlying = useCallback(() => {
+    return getQuoteForSwapOutput(
+      liveAuctionPrice,
+      controller.underlying.id,
+      auction.paymentAsset.id,
+      tokenName as SupportedToken,
+    );
+  }, [auction, liveAuctionPrice, controller.underlying.id, tokenName]);
+
+  const [liveAuctionPriceUnderlying, setLiveAuctionPriceUnderlying] =
+    useState<ethers.BigNumber | null>(null);
 
   const [priceUpdated, setPriceUpdated] = useState<boolean>(false);
 
@@ -56,5 +74,17 @@ export function useLiveAuctionPrice(
     return () => clearInterval(interval);
   }, [auction, priceRefreshTime]);
 
-  return { liveAuctionPrice, liveTimestamp, hourlyPriceChange, priceUpdated };
+  useEffect(() => {
+    calculateLiveAuctionPriceUnderlying().then((price) => {
+      setLiveAuctionPriceUnderlying(price);
+    });
+  }, [calculateLiveAuctionPriceUnderlying]);
+
+  return {
+    liveAuctionPrice,
+    liveAuctionPriceUnderlying,
+    liveTimestamp,
+    hourlyPriceChange,
+    priceUpdated,
+  };
 }
