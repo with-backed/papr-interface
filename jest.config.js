@@ -12,6 +12,7 @@ const customJestConfig = {
     '!**/index.ts',
     '!**/*.d.ts',
     '!**/node_modules/**',
+    '!**/*.stories.tsx',
   ],
   coverageReporters: ['json-summary', 'text'],
   coverageThreshold: {
