@@ -2,6 +2,7 @@ import controllerStyles from 'components/Controllers/Controller.module.css';
 import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { useConfig } from 'hooks/useConfig';
+import { usePoolChartData } from 'hooks/usePoolChartData';
 import { usePoolStats } from 'hooks/usePoolStats';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -17,6 +18,9 @@ export function LPPageContent() {
   );
 
   const { fees24h, totalValueLocked, volume24h } = usePoolStats();
+  const { chartData, allFound } = usePoolChartData();
+
+  console.log({ chartData, allFound });
 
   return (
     <div className={controllerStyles.wrapper}>

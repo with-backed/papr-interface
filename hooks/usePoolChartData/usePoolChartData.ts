@@ -1,11 +1,12 @@
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
+import { SECONDS_IN_A_DAY } from 'lib/constants';
 import { useEffect, useMemo, useState } from 'react';
 import {
   PoolDayDatasDocument,
   PoolDayDatasQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
-import { CombinedError, useQuery } from 'urql';
+import { useQuery } from 'urql';
 
 type ChartData = {
   date: number;
@@ -55,8 +56,70 @@ export function usePoolChartData() {
     }
   }, [data, fetching]);
 
+  const chartData = useMemo(
+    () => formatChartData(rawChartData),
+    [rawChartData],
+  );
+
   return {
-    chartData: rawChartData,
+    chartData,
     allFound,
   };
+}
+
+export type PoolChartEntry = {
+  date: number;
+  volumeUSD: number;
+  totalValueLockedUSD: number;
+  feesUSD: number;
+};
+
+function formatChartData(chartData: ChartData) {
+  const formatted = chartData.reduce(
+    (acc: { [date: number]: PoolChartEntry }, dayData) => {
+      const roundedDate = parseInt(
+        (dayData.date / SECONDS_IN_A_DAY).toFixed(0),
+      );
+      const feePercent = parseFloat(dayData.pool.feeTier) / 10000;
+      const tvlAdjust = dayData?.volumeUSD
+        ? parseFloat(dayData.volumeUSD) * feePercent
+        : 0;
+
+      acc[roundedDate] = {
+        date: dayData.date,
+        volumeUSD: parseFloat(dayData.volumeUSD),
+        totalValueLockedUSD: parseFloat(dayData.tvlUSD) - tvlAdjust,
+        feesUSD: parseFloat(dayData.feesUSD),
+      };
+      return acc;
+    },
+    {},
+  );
+
+  const firstEntry = formatted[parseInt(Object.keys(formatted)[0])];
+
+  // fill in empty days ( there will be no day datas if no trades made that day )
+  let timestamp = firstEntry?.date ?? START_TIME;
+  let latestTvl = firstEntry?.totalValueLockedUSD ?? 0;
+  while (timestamp < END_TIME - SECONDS_IN_A_DAY) {
+    const nextDay = timestamp + SECONDS_IN_A_DAY;
+    const currentDayIndex = parseInt((nextDay / SECONDS_IN_A_DAY).toFixed(0));
+    if (!Object.keys(formatted).includes(currentDayIndex.toString())) {
+      formatted[currentDayIndex] = {
+        date: nextDay,
+        volumeUSD: 0,
+        totalValueLockedUSD: latestTvl,
+        feesUSD: 0,
+      };
+    } else {
+      latestTvl = formatted[currentDayIndex].totalValueLockedUSD;
+    }
+    timestamp = nextDay;
+  }
+
+  const dateMap = Object.keys(formatted).map((key) => {
+    return formatted[parseInt(key)];
+  });
+
+  return dateMap;
 }
