@@ -22,7 +22,7 @@ const BASE_CHART_OPTIONS: DeepPartial<ChartOptions> = {
 export function Chart() {
   const [view, setView] = useState<ChartView>('volumeUSD');
   const chartRef = useRef<HTMLDivElement>(null);
-  const { chartData, allFound } = usePoolChartData();
+  const { chartData } = usePoolChartData();
   const theme = useTheme();
 
   const primaryColor = useMemo(() => {
@@ -38,9 +38,9 @@ export function Chart() {
     () =>
       chartData.map(({ time, ...props }) => ({
         time,
-        value: /*props[view]*/ (Math.random() * 1000) | 0,
+        value: props[view],
       })),
-    [chartData],
+    [chartData, view],
   );
 
   useEffect(() => {
