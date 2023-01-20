@@ -21,6 +21,12 @@ jest.mock('hooks/usePoolStats', () => ({
   }),
 }));
 
+// Mocking to avoid difficulties with canvas in Jest
+jest.mock('components/Controllers/LPPageContent/Chart', () => ({
+  ...jest.requireActual('components/Controllers/LPPageContent/Chart'),
+  Chart: () => <div />,
+}));
+
 jest.mock('hooks/useTheme', () => ({
   ...jest.requireActual('hooks/useTheme'),
   useTheme: () => 'paprTrash',
