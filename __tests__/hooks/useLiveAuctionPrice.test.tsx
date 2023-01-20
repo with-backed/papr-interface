@@ -66,8 +66,7 @@ const mockedGetQuoteForSwapOutput =
 describe('useLiveAuctionPrice', () => {
   const startTime = 1674086400;
   const startPrice = ethers.BigNumber.from('585578162375090237174');
-  beforeEach(() => {
-    jest.clearAllMocks();
+  beforeAll(() => {
     mockedGetQuoteForSwapOutput.mockResolvedValue(startPrice); // mock quote as 1:1
   });
   it('starts at the current auction price and updates at the given interval', async () => {

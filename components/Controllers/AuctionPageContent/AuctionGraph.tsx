@@ -36,12 +36,12 @@ export function generateTimestampsAndPrices(
   const chartX: number[] = [];
   const chartY: number[] = [];
   const startTime = auction.start.timestamp;
+  const endTime = startTime + 86400 * 3;
   const startPrice = ethers.BigNumber.from(auction.startPrice);
 
   for (
     let t = startTime;
-    t < startTime + 86400 * 3 &&
-    (currentTimestamp ? t < currentTimestamp : true);
+    t < endTime && (currentTimestamp ? t < currentTimestamp : true);
     t += 900
   ) {
     chartX.push(t);
@@ -73,13 +73,13 @@ const baseChartProperties = {
 function generateLabelSpecificStyles(
   context: Context,
   floorDataPoint: number,
-  startStyle: any,
-  buyNowStyle: any,
-  topBidStyle: any,
-  dottedLineStyle: any,
+  startStyle: string | number,
+  buyNowStyle: string | number,
+  topBidStyle: string | number,
+  dottedLineStyle: string | number,
   floorInfoStyle: any,
-  zeroSignStyle: any,
-  defaultStyle: any,
+  zeroSignStyle: string | number,
+  defaultStyle: string | number,
 ) {
   if (context.datasetIndex === 1 && context.dataIndex === 0) {
     return startStyle;
