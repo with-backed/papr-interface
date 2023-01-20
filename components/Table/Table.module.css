@@ -29,10 +29,11 @@
 .table th {
   font-size: var(--font-medium);
   font-family: var(--mono);
-  letter-spacing: 0.08rem;
+  letter-spacing: 0.05rem;
   line-height: 1.5em;
   padding-bottom: 0.5em;
   font-weight: inherit;
+  text-transform: uppercase;
 }
 
 .table.papr tbody tr:nth-child(odd) {
