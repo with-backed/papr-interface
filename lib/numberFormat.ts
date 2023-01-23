@@ -15,8 +15,9 @@ const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
 export function formatBigNum(
   num: ethers.BigNumber,
   decimals: ethers.BigNumberish,
+  precision = 3,
 ): string {
-  return parseFloat(ethers.utils.formatUnits(num, decimals)).toFixed(3);
+  return parseFloat(ethers.utils.formatUnits(num, decimals)).toFixed(precision);
 }
 
 export function formatTokenAmount(amount: number) {

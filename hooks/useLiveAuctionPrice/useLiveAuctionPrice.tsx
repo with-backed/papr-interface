@@ -1,6 +1,9 @@
 import { ethers } from 'ethers';
+import { useConfig } from 'hooks/useConfig';
+import { useController } from 'hooks/useController';
 import { currentPrice } from 'lib/auctions';
-import { convertOneScaledValue } from 'lib/controllers';
+import { SupportedToken } from 'lib/config';
+import { convertOneScaledValue, getQuoteForSwapOutput } from 'lib/controllers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 
@@ -11,9 +14,14 @@ export function useLiveAuctionPrice(
   auction: NonNullable<AuctionQuery['auction']>,
   priceRefreshTime = 14000,
 ) {
-  const calculateAuctionPrice = useCallback(() => {
-    const timestamp = currentTimeInSeconds();
-    const secondsElapsed = timestamp - auction.start.timestamp;
+  const { tokenName } = useConfig();
+  const controller = useController();
+  const [liveTimestamp, setLiveTimestamp] = useState<number>(
+    currentTimeInSeconds(),
+  );
+
+  const liveAuctionPrice = useMemo(() => {
+    const secondsElapsed = liveTimestamp - auction.start.timestamp;
     return currentPrice(
       ethers.BigNumber.from(auction.startPrice),
       secondsElapsed,
@@ -23,11 +31,20 @@ export function useLiveAuctionPrice(
         4,
       ),
     );
-  }, [auction]);
+  }, [auction, liveTimestamp]);
 
-  const [liveAuctionPrice, setLiveAuctionPrice] = useState<ethers.BigNumber>(
-    calculateAuctionPrice(),
-  );
+  const calculateLiveAuctionPriceUnderlying = useCallback(() => {
+    return getQuoteForSwapOutput(
+      liveAuctionPrice,
+      controller.underlying.id,
+      auction.paymentAsset.id,
+      tokenName as SupportedToken,
+    );
+  }, [auction, liveAuctionPrice, controller.underlying.id, tokenName]);
+
+  const [liveAuctionPriceUnderlying, setLiveAuctionPriceUnderlying] =
+    useState<ethers.BigNumber | null>(null);
+
   const [priceUpdated, setPriceUpdated] = useState<boolean>(false);
 
   const hourlyPriceChange = useMemo(() => {
@@ -48,14 +65,26 @@ export function useLiveAuctionPrice(
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setLiveAuctionPrice(calculateAuctionPrice());
+      setLiveTimestamp(currentTimeInSeconds());
       setPriceUpdated(true);
       setTimeout(() => {
         setPriceUpdated(false);
       }, 1000);
     }, priceRefreshTime);
     return () => clearInterval(interval);
-  }, [auction, calculateAuctionPrice, priceRefreshTime]);
+  }, [auction, priceRefreshTime]);
 
-  return { liveAuctionPrice, hourlyPriceChange, priceUpdated };
+  useEffect(() => {
+    calculateLiveAuctionPriceUnderlying().then((price) => {
+      setLiveAuctionPriceUnderlying(price);
+    });
+  }, [calculateLiveAuctionPriceUnderlying]);
+
+  return {
+    liveAuctionPrice,
+    liveAuctionPriceUnderlying,
+    liveTimestamp,
+    hourlyPriceChange,
+    priceUpdated,
+  };
 }
