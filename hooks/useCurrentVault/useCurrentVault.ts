@@ -1,4 +1,4 @@
-import { PaprController } from 'hooks/useController';
+import { useController } from 'hooks/useController';
 import { useEffect, useMemo, useState } from 'react';
 import {
   VaultsByOwnerForControllerDocument,
@@ -8,10 +8,8 @@ import { useQuery } from 'urql';
 
 // TODO(adamgobes): remove useCurrentVault and utilize useCurrentVaults everywhere
 // the below hook should be considered deprecated, DO NOT USE
-export function useCurrentVault(
-  controller: PaprController,
-  user: string | undefined,
-) {
+export function useCurrentVault(user: string | undefined) {
+  const controller = useController();
   const [{ data: vaultsData, fetching: vaultFetching }] = useQuery({
     query: VaultsByOwnerForControllerDocument,
     variables: {
@@ -34,10 +32,8 @@ export function useCurrentVault(
   };
 }
 
-export function useCurrentVaults(
-  controller: PaprController,
-  user: string | undefined,
-) {
+export function useCurrentVaults(user: string | undefined) {
+  const controller = useController();
   const [prevData, setPrevData] = useState<
     VaultsByOwnerForControllerQuery | undefined
   >(undefined);
