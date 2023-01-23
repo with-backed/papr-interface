@@ -8,31 +8,32 @@ import { ethers } from 'ethers';
 import { useActivityByController } from 'hooks/useActivityByController';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { humanizedTimestamp } from 'lib/duration';
-import { PaprController } from 'lib/PaprController';
 import { formatTokenAmount } from 'lib/numberFormat';
 import React, { useMemo } from 'react';
 import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
-import { SwapsByPoolQuery } from 'types/generated/graphql/uniswapSubgraph';
+import {
+  PoolByIdQuery,
+  SwapsByPoolQuery,
+} from 'types/generated/graphql/uniswapSubgraph';
 import styles from './Activity.module.css';
 import { Table } from 'components/Table';
-import { erc721Contract } from 'lib/contracts';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useShowMore } from 'hooks/useShowMore';
+import { PaprController, useController } from 'hooks/useController';
 
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 type ActivityProps = {
-  paprController: PaprController;
   // If scoping activity view to just a specific vault
   // instead of the whole controller
   account?: string;
+  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
 
 const EVENT_INCREMENT = 5;
 
-export function Activity({ paprController, account }: ActivityProps) {
+export function Activity({ account, subgraphPool }: ActivityProps) {
+  const paprController = useController();
   const { data: swapsData, fetching: swapsFetching } = useUniswapSwapsByPool(
     paprController.poolAddress,
   );
@@ -86,6 +87,7 @@ export function Activity({ paprController, account }: ActivityProps) {
               case 'RemoveCollateralEvent':
                 return (
                   <CollateralRemoved
+                    subgraphPool={subgraphPool}
                     event={event}
                     debtDecreasedEvents={
                       activityData?.debtDecreasedEvents || []
@@ -97,9 +99,9 @@ export function Activity({ paprController, account }: ActivityProps) {
               case 'Swap':
                 return (
                   <Swap
-                    event={event}
                     key={event.id + event.__typename}
-                    paprController={paprController}
+                    event={event}
+                    subgraphPool={subgraphPool}
                   />
                 );
               case 'AuctionStartEvent':
@@ -154,11 +156,11 @@ function CollateralAdded({
     if (!debtIncreasedEvent) return null;
     const bigNumAmount = ethers.utils.formatUnits(
       debtIncreasedEvent?.amount,
-      paprController.debtToken.decimals,
+      paprController.paprToken.decimals,
     );
     return (
       formatTokenAmount(parseFloat(bigNumAmount)) +
-      ` ${paprController.debtToken.symbol}`
+      ` ${paprController.paprToken.symbol}`
     );
   }, [debtIncreasedEvent, paprController]);
 
@@ -186,10 +188,12 @@ function CollateralRemoved({
   event,
   paprController,
   debtDecreasedEvents,
+  subgraphPool,
 }: {
   event: ArrayElement<ActivityByControllerQuery['removeCollateralEvents']>;
   debtDecreasedEvents: ActivityByControllerQuery['debtDecreasedEvents'];
   paprController: PaprController;
+  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 }) {
   const vaultOwner = useMemo(() => {
     const vaultId = event.vault.id;
@@ -207,14 +211,14 @@ function CollateralRemoved({
     const bigNumAmount = ethers.utils.formatUnits(
       debtDecreasedEvent?.amount,
       paprController.token0IsUnderlying
-        ? paprController.subgraphPool.token0.decimals
-        : paprController.subgraphPool.token1.decimals,
+        ? subgraphPool.token0.decimals
+        : subgraphPool.token1.decimals,
     );
     return (
       formatTokenAmount(parseFloat(bigNumAmount)) +
-      ` ${paprController.debtToken.symbol}`
+      ` ${paprController.paprToken.symbol}`
     );
-  }, [debtDecreasedEvent, paprController]);
+  }, [debtDecreasedEvent, paprController, subgraphPool]);
 
   if (!debtDecreasedEvent) {
     return (
@@ -259,22 +263,22 @@ function CollateralRemoved({
 
 function Swap({
   event,
-  paprController,
+  subgraphPool,
 }: {
   event: ArrayElement<SwapsByPoolQuery['swaps']>;
-  paprController: PaprController;
+  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 }) {
   const description = useMemo(() => {
     const amount0 = formatTokenAmount(Math.abs(event.amount0));
     const amount1 = formatTokenAmount(Math.abs(event.amount1));
-    const token0Symbol = paprController.subgraphPool.token0.symbol;
-    const token1Symbol = paprController.subgraphPool.token1.symbol;
+    const token0Symbol = subgraphPool.token0.symbol;
+    const token1Symbol = subgraphPool.token1.symbol;
 
     if (event.amount0 < 0) {
       return `${amount1} ${token1Symbol} traded for ${amount0} ${token0Symbol}`;
     }
     return `${amount0} ${token0Symbol} traded for ${amount1} ${token1Symbol}`;
-  }, [event, paprController]);
+  }, [event, subgraphPool]);
   return (
     <tr>
       <td>
@@ -321,7 +325,7 @@ function AuctionEnd({
   const formattedEndPrice = useMemo(() => {
     const endPrice = ethers.utils.formatUnits(
       event.auction.endPrice,
-      paprController.debtToken.decimals,
+      paprController.paprToken.decimals,
     );
     return formatTokenAmount(parseFloat(endPrice));
   }, [event, paprController]);

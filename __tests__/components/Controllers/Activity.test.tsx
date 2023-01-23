@@ -1,12 +1,19 @@
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { Activity } from 'components/Controllers/Activity';
-import { mockPaprController } from 'lib/mockData/mockPaprController';
+import {
+  mockPaprController,
+  mockUniswapPool,
+} from 'lib/mockData/mockPaprController';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { useActivityByController } from 'hooks/useActivityByController';
 import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import userEvent from '@testing-library/user-event';
+import { useController } from 'hooks/useController';
 
+jest.mock('hooks/useController', () => ({
+  useController: jest.fn(),
+}));
 jest.mock('hooks/useUniswapSwapsByPool', () => ({
   useUniswapSwapsByPool: jest.fn(),
 }));
@@ -17,6 +24,9 @@ jest.mock('hooks/useTheme', () => ({
   useTheme: jest.fn(() => 'papr'),
 }));
 
+const mockedUseController = useController as jest.MockedFunction<
+  typeof useController
+>;
 const mockedUseUniswapSwapsByPool =
   useUniswapSwapsByPool as jest.MockedFunction<typeof useUniswapSwapsByPool>;
 const mockedUseActivityByController =
@@ -47,6 +57,9 @@ const addCollateralEvent = {
 };
 
 describe('Activity', () => {
+  beforeAll(() => {
+    mockedUseController.mockReturnValue(mockPaprController);
+  });
   it('renders a loading state when swaps are loading', () => {
     mockedUseUniswapSwapsByPool.mockReturnValue({
       fetching: true,
@@ -56,9 +69,7 @@ describe('Activity', () => {
       fetching: false,
       data: undefined,
     });
-    const { getByText } = render(
-      <Activity paprController={mockPaprController} />,
-    );
+    const { getByText } = render(<Activity subgraphPool={mockUniswapPool} />);
     getByText('Loading...');
   });
 
@@ -71,9 +82,7 @@ describe('Activity', () => {
       fetching: true,
       data: undefined,
     });
-    const { getByText } = render(
-      <Activity paprController={mockPaprController} />,
-    );
+    const { getByText } = render(<Activity subgraphPool={mockUniswapPool} />);
     getByText('Loading...');
   });
 
@@ -86,9 +95,7 @@ describe('Activity', () => {
       fetching: false,
       data: undefined,
     });
-    const { getByText } = render(
-      <Activity paprController={mockPaprController} />,
-    );
+    const { getByText } = render(<Activity subgraphPool={mockUniswapPool} />);
     getByText('No activity yet');
   });
 
@@ -110,9 +117,7 @@ describe('Activity', () => {
         auctionStartEvents: [],
       },
     });
-    const { container } = render(
-      <Activity paprController={mockPaprController} />,
-    );
+    const { container } = render(<Activity subgraphPool={mockUniswapPool} />);
     expect(container.querySelectorAll('tr')).toHaveLength(1);
     expect(container.querySelector('button')).toBeNull();
   });
@@ -136,7 +141,7 @@ describe('Activity', () => {
       },
     });
     const { container, getByText } = render(
-      <Activity paprController={mockPaprController} />,
+      <Activity subgraphPool={mockUniswapPool} />,
     );
     expect(container.querySelectorAll('tr')).toHaveLength(5);
 

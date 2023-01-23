@@ -1,12 +1,10 @@
 import { Slider } from 'components/Slider';
-import { PaprController } from 'lib/PaprController';
 import { formatPercent } from 'lib/numberFormat';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styles from '../VaultDebtPicker/VaultDebtPicker.module.css';
 import { useTheme } from 'hooks/useTheme';
 
 type VaultDebtSliderProps = {
-  controller: PaprController;
   maxDebtNumber: number;
   currentVaultDebtNumber: number;
   maxLTV: number | null;
@@ -18,7 +16,6 @@ type VaultDebtSliderProps = {
 };
 
 export function VaultDebtSlider({
-  controller,
   maxDebtNumber,
   currentVaultDebtNumber,
   maxLTV,

@@ -56,12 +56,16 @@ const subgraphPool: SubgraphPool = {
     name: 'APE Loans debt token',
     __typename: 'Token',
   },
+  feeTier: '0',
+  liquidity: '0',
+  totalValueLockedUSD: '0',
+  volumeUSD: '0',
   __typename: 'Pool',
 };
 
 const provider = makeProvider(configs.paprHero.jsonRpcProvider, 'paprHero');
 
-let controllerInstance = makePaprController(
+const controllerInstance = makePaprController(
   subgraphController,
   subgraphPool,
   provider,

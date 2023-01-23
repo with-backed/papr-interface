@@ -16,6 +16,7 @@ import { useAccountNFTs } from 'hooks/useAccountNFTs';
 import { useConfig } from 'hooks/useConfig';
 import { usePaprBalance } from 'hooks/usePaprBalance';
 import { YourPositions as YourPositionsComponent } from 'components/YourPositions';
+import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 
 /* lightweight-charts uses canvas and cannot be SSRed */
 const Charts = dynamic(() => import('components/Controllers/Charts/Charts'), {
@@ -43,20 +44,19 @@ const Collateral = dynamic<ComponentProps<typeof CollateralComponent>>(
 export type ControllerPageProps = {
   paprController: PaprController;
   pricesData: ControllerPricesData | null;
+  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
 
 export function ControllerOverviewContent({
   paprController,
   pricesData,
+  subgraphPool,
 }: ControllerPageProps) {
   const config = useConfig();
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
 
-  const { currentVaults, vaultsFetching } = useCurrentVaults(
-    paprController,
-    address,
-  );
+  const { currentVaults, vaultsFetching } = useCurrentVaults(address);
 
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.token.id);
@@ -85,7 +85,7 @@ export function ControllerOverviewContent({
         controllers={[paprController]}
       />
       <Collateral paprController={paprController} />
-      <Activity paprController={paprController} />
+      <Activity subgraphPool={subgraphPool} />
       <Charts pricesData={pricesData} />
       <Loans paprController={paprController} pricesData={pricesData} />
       <Auctions paprController={paprController} />

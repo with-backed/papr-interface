@@ -91,6 +91,7 @@ export default function VaultPage({
             paprController={paprController}
             vaultId={vaultId}
             pricesData={pricesData}
+            subgraphPool={subgraphPool}
           />
         </ControllerContextProvider>
       </div>

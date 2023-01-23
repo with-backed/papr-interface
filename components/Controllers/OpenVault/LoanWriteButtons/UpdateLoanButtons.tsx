@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { PaprController } from 'lib/PaprController';
 import {
   IPaprController,
   ReservoirOracleUnderwriter,
@@ -21,8 +20,10 @@ import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { getAddress } from 'ethers/lib/utils';
 import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ERC20, ERC721__factory } from 'types/generated/abis';
+import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useController } from 'hooks/useController';
+import { ERC20Token } from 'lib/controllers';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
 
@@ -36,7 +37,6 @@ interface IncreaseDebtArgsStruct {
 }
 
 type BorrowOrRepayPerpetualButtonProps = {
-  paprController: PaprController;
   collateralContractAddress: string;
   depositNFTs: string[];
   withdrawNFTs: string[];
@@ -48,7 +48,6 @@ type BorrowOrRepayPerpetualButtonProps = {
 };
 
 export function BorrowPerpetualButton({
-  paprController,
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
@@ -92,11 +91,7 @@ export function BorrowPerpetualButton({
     [addCollateralCalldata, removeCollateralCalldata, borrowPerpetualCalldata],
   );
 
-  const { data, write, error } = useMulticallWrite(
-    paprController,
-    calldata,
-    refresh,
-  );
+  const { data, write, error } = useMulticallWrite(calldata, refresh);
 
   return (
     <TransactionButton
@@ -121,7 +116,6 @@ interface ReduceDebtArgsStruct {
 }
 
 export function RepayPerpetualButton({
-  paprController,
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
@@ -160,11 +154,7 @@ export function RepayPerpetualButton({
     [addCollateralCalldata, removeCollateralCalldata, repayPerpetualCalldata],
   );
 
-  const { data, write, error } = useMulticallWrite(
-    paprController,
-    calldata,
-    refresh,
-  );
+  const { data, write, error } = useMulticallWrite(calldata, refresh);
 
   return (
     <TransactionButton
@@ -189,7 +179,6 @@ export interface BuyAndReduceArgsStruct {
 }
 
 type BorrowOrRepayWithSwapButtonProps = {
-  paprController: PaprController;
   collateralContractAddress: string;
   depositNFTs: string[];
   withdrawNFTs: string[];
@@ -202,7 +191,6 @@ type BorrowOrRepayWithSwapButtonProps = {
 };
 
 export function RepayWithSwapButton({
-  paprController,
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
@@ -249,11 +237,7 @@ export function RepayWithSwapButton({
     [addCollateralCalldata, removeCollateralCalldata, repayWithSwapCalldata],
   );
 
-  const { data, write, error } = useMulticallWrite(
-    paprController,
-    calldata,
-    refresh,
-  );
+  const { data, write, error } = useMulticallWrite(calldata, refresh);
 
   return (
     <TransactionButton
@@ -279,7 +263,6 @@ export interface IncreaseAndSwapStruct {
 }
 
 export function BorrowWithSwapButton({
-  paprController,
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
@@ -333,11 +316,7 @@ export function BorrowWithSwapButton({
     [addCollateralCalldata, removeCollateralCalldata, borrowWithSwapCalldata],
   );
 
-  const { data, write, error } = useMulticallWrite(
-    paprController,
-    calldata,
-    refresh,
-  );
+  const { data, write, error } = useMulticallWrite(calldata, refresh);
 
   return (
     <TransactionButton
@@ -354,19 +333,19 @@ export function BorrowWithSwapButton({
 }
 
 type ApproveTokenButtonProps = {
-  controller: PaprController;
-  token: ERC20;
+  token: ERC20Token;
   tokenApproved: boolean;
   setTokenApproved: (val: boolean) => void;
 };
 
 export function ApproveTokenButton({
-  controller,
   token,
   tokenApproved,
   setTokenApproved,
 }: ApproveTokenButtonProps) {
+  const controller = useController();
   const { address } = useAccount();
+  const signerOrProvider = useSignerOrProvider();
 
   const [approvedLoading, setApprovedLoading] = useState<boolean>(true);
 
@@ -374,9 +353,10 @@ export function ApproveTokenButton({
     if (!address) {
       return;
     }
-    const connectedToken = controller.token0IsUnderlying
-      ? controller.token0
-      : controller.token1;
+    const connectedToken = await ERC20__factory.connect(
+      token.id,
+      signerOrProvider,
+    );
     if (
       (await connectedToken.allowance(address, controller.id)) >
       ethers.BigNumber.from(0)
@@ -384,15 +364,14 @@ export function ApproveTokenButton({
       setTokenApproved(true);
     }
     setApprovedLoading(false);
-  }, [controller, address, setTokenApproved]);
+  }, [controller, address, setTokenApproved, signerOrProvider, token]);
 
   useEffect(() => {
     initializeUnderlyingApproved();
   });
 
-  const symbol = useAsyncValue(() => token.symbol(), [token]);
   const { config } = usePrepareContractWrite({
-    address: token.address as `0x${string}`,
+    address: token.id as `0x${string}`,
     abi: erc20ABI,
     functionName: 'approve',
     args: [controller.id as `0x${string}`, ethers.constants.MaxInt256],
@@ -404,7 +383,7 @@ export function ApproveTokenButton({
     },
   });
 
-  if (tokenApproved || approvedLoading || !symbol) return <></>;
+  if (tokenApproved || approvedLoading) return <></>;
 
   return (
     <TransactionButton
@@ -414,25 +393,24 @@ export function ApproveTokenButton({
       onClick={write!}
       transactionData={data}
       error={error?.message}
-      text={`Approve ${symbol}`}
+      text={`Approve ${token.symbol}`}
       completed={tokenApproved}
     />
   );
 }
 
 type ApproveNFTButtonProps = {
-  paprController: PaprController;
   collateralContractAddress: string;
   approved: boolean;
   setApproved: (val: boolean) => void;
 };
 
 export function ApproveNFTButton({
-  paprController,
   collateralContractAddress,
   approved,
   setApproved,
 }: ApproveNFTButtonProps) {
+  const paprController = useController();
   const { address } = useAccount();
   const signerOrProvider = useSignerOrProvider();
   const [approvedLoading, setApprovedLoading] = useState<boolean>(true);

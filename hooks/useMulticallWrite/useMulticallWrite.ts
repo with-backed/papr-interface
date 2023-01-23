@@ -1,19 +1,16 @@
-import { PaprController } from 'lib/PaprController';
 import PaprControllerABI from 'abis/PaprController.json';
 import { useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { ethers } from 'ethers';
+import { useController } from 'hooks/useController';
 
 const overrides = {
   gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
 };
 
-export function useMulticallWrite(
-  paprController: PaprController,
-  calldata: string[],
-  refresh: () => void,
-) {
+export function useMulticallWrite(calldata: string[], refresh: () => void) {
+  const controller = useController();
   const { config: multicallConfig } = usePrepareContractWrite({
-    address: paprController.id as `0x${string}`,
+    address: controller.id as `0x${string}`,
     abi: PaprControllerABI.abi,
     functionName: 'multicall',
     args: [calldata as `0x${string}`[]],
