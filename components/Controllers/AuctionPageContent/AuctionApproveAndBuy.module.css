@@ -1,0 +1,21 @@
+.currentPriceRowWrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.currentPriceRowWrapper > div:first-child {
+  width: 30%;
+}
+
+.currentPriceRow {
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 70%;
+}
+
+.currentPriceRow p {
+  margin: 0 12px;
+}
