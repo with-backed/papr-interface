@@ -1,0 +1,18 @@
+query poolDayDatas($startTime: Int!, $skip: Int!, $address: String) {
+    poolDayDatas(
+      first: 1000
+      skip: $skip
+      where: { pool: $address, date_gt: $startTime }
+      orderBy: date
+      orderDirection: asc
+      subgraphError: allow
+    ) {
+      date
+      volumeUSD
+      tvlUSD
+      feesUSD
+      pool {
+        feeTier
+      }
+    }
+  }

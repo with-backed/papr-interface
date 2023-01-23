@@ -17,11 +17,12 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export function TextButton({
   children,
   kind = 'neutral',
+  className,
   ...props
 }: ButtonProps) {
-  const className = `text-button-${kind}`;
+  const appliedClassname = `${styles[`text-button-${kind}`]} ${className}`;
   return (
-    <button className={styles[className]} {...props}>
+    <button className={appliedClassname} {...props}>
       {children}
     </button>
   );

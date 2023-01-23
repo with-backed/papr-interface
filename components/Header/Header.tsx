@@ -54,9 +54,8 @@ const prodPages = (
   },
 
   {
-    name: 'LP ↗',
-    route: `https://app.uniswap.org/#/add/${underlyingAddress}/${paprTokenAddress}/10000?chain=goerli`,
-    externalRedirect: true,
+    name: 'LP',
+    route: `lp`,
   },
 ];
 

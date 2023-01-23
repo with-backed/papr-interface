@@ -1,0 +1,1 @@
+export { LPPageContent } from './LPPageContent';
