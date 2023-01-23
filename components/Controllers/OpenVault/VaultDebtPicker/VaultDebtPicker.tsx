@@ -484,14 +484,12 @@ export function VaultDebtPicker({
             />
 
             <ApproveNFTButton
-              paprController={paprController}
               collateralContractAddress={collateralContractAddress}
               approved={collateralApproved}
               setApproved={setCollateralApproved}
             />
             {usingPerpetual && !isBorrowing && (
               <ApproveTokenButton
-                controller={paprController}
                 token={paprController.paprToken}
                 tokenApproved={debtTokenApproved}
                 setTokenApproved={setDebtTokenApproved}
@@ -499,7 +497,6 @@ export function VaultDebtPicker({
             )}
             {!usingPerpetual && !isBorrowing && (
               <ApproveTokenButton
-                controller={paprController}
                 token={paprController.underlying}
                 tokenApproved={underlyingApproved}
                 setTokenApproved={setUnderlyingApproved}
@@ -512,7 +509,6 @@ export function VaultDebtPicker({
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                paprController={paprController}
                 oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!collateralApproved}
@@ -525,7 +521,6 @@ export function VaultDebtPicker({
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                paprController={paprController}
                 oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!!balanceErrorMessage || !debtTokenApproved}
@@ -539,7 +534,6 @@ export function VaultDebtPicker({
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                paprController={paprController}
                 oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!!balanceErrorMessage || !underlyingApproved}
@@ -553,7 +547,6 @@ export function VaultDebtPicker({
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                paprController={paprController}
                 oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!collateralApproved}

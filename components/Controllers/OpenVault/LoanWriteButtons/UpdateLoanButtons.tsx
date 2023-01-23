@@ -20,9 +20,9 @@ import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { getAddress } from 'ethers/lib/utils';
 import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ERC20, ERC20__factory, ERC721__factory } from 'types/generated/abis';
+import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
-import { PaprController } from 'hooks/useController';
+import { useController } from 'hooks/useController';
 import { ERC20Token } from 'lib/controllers';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
@@ -37,7 +37,6 @@ interface IncreaseDebtArgsStruct {
 }
 
 type BorrowOrRepayPerpetualButtonProps = {
-  paprController: PaprController;
   collateralContractAddress: string;
   depositNFTs: string[];
   withdrawNFTs: string[];
@@ -49,7 +48,6 @@ type BorrowOrRepayPerpetualButtonProps = {
 };
 
 export function BorrowPerpetualButton({
-  paprController,
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
@@ -93,11 +91,7 @@ export function BorrowPerpetualButton({
     [addCollateralCalldata, removeCollateralCalldata, borrowPerpetualCalldata],
   );
 
-  const { data, write, error } = useMulticallWrite(
-    paprController,
-    calldata,
-    refresh,
-  );
+  const { data, write, error } = useMulticallWrite(calldata, refresh);
 
   return (
     <TransactionButton
@@ -122,7 +116,6 @@ interface ReduceDebtArgsStruct {
 }
 
 export function RepayPerpetualButton({
-  paprController,
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
@@ -161,11 +154,7 @@ export function RepayPerpetualButton({
     [addCollateralCalldata, removeCollateralCalldata, repayPerpetualCalldata],
   );
 
-  const { data, write, error } = useMulticallWrite(
-    paprController,
-    calldata,
-    refresh,
-  );
+  const { data, write, error } = useMulticallWrite(calldata, refresh);
 
   return (
     <TransactionButton
@@ -190,7 +179,6 @@ export interface BuyAndReduceArgsStruct {
 }
 
 type BorrowOrRepayWithSwapButtonProps = {
-  paprController: PaprController;
   collateralContractAddress: string;
   depositNFTs: string[];
   withdrawNFTs: string[];
@@ -203,7 +191,6 @@ type BorrowOrRepayWithSwapButtonProps = {
 };
 
 export function RepayWithSwapButton({
-  paprController,
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
@@ -250,11 +237,7 @@ export function RepayWithSwapButton({
     [addCollateralCalldata, removeCollateralCalldata, repayWithSwapCalldata],
   );
 
-  const { data, write, error } = useMulticallWrite(
-    paprController,
-    calldata,
-    refresh,
-  );
+  const { data, write, error } = useMulticallWrite(calldata, refresh);
 
   return (
     <TransactionButton
@@ -280,7 +263,6 @@ export interface IncreaseAndSwapStruct {
 }
 
 export function BorrowWithSwapButton({
-  paprController,
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
@@ -334,11 +316,7 @@ export function BorrowWithSwapButton({
     [addCollateralCalldata, removeCollateralCalldata, borrowWithSwapCalldata],
   );
 
-  const { data, write, error } = useMulticallWrite(
-    paprController,
-    calldata,
-    refresh,
-  );
+  const { data, write, error } = useMulticallWrite(calldata, refresh);
 
   return (
     <TransactionButton
@@ -355,18 +333,17 @@ export function BorrowWithSwapButton({
 }
 
 type ApproveTokenButtonProps = {
-  controller: PaprController;
   token: ERC20Token;
   tokenApproved: boolean;
   setTokenApproved: (val: boolean) => void;
 };
 
 export function ApproveTokenButton({
-  controller,
   token,
   tokenApproved,
   setTokenApproved,
 }: ApproveTokenButtonProps) {
+  const controller = useController();
   const { address } = useAccount();
   const signerOrProvider = useSignerOrProvider();
 
@@ -423,18 +400,17 @@ export function ApproveTokenButton({
 }
 
 type ApproveNFTButtonProps = {
-  paprController: PaprController;
   collateralContractAddress: string;
   approved: boolean;
   setApproved: (val: boolean) => void;
 };
 
 export function ApproveNFTButton({
-  paprController,
   collateralContractAddress,
   approved,
   setApproved,
 }: ApproveNFTButtonProps) {
+  const paprController = useController();
   const { address } = useAccount();
   const signerOrProvider = useSignerOrProvider();
   const [approvedLoading, setApprovedLoading] = useState<boolean>(true);

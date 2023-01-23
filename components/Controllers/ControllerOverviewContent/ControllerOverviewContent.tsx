@@ -56,10 +56,7 @@ export function ControllerOverviewContent({
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
 
-  const { currentVaults, vaultsFetching } = useCurrentVaults(
-    paprController,
-    address,
-  );
+  const { currentVaults, vaultsFetching } = useCurrentVaults(address);
 
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.token.id);

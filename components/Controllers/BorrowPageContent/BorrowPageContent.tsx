@@ -32,7 +32,7 @@ export function BorrowPageContent({ subgraphPool }: BorrowPageProps) {
     useAccountNFTs(address, collateralContractAddresses, config);
 
   const { currentVaults, reexecuteQuery: refreshCurrentVaults } =
-    useCurrentVaults(paprController, address);
+    useCurrentVaults(address);
 
   const { balance, refresh: refreshBalance } = usePaprBalance(
     paprController.paprToken.id,
