@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { PaprController } from 'lib/PaprController';
 import {
   IPaprController,
   ReservoirOracleUnderwriter,
@@ -21,8 +20,10 @@ import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
 import { getAddress } from 'ethers/lib/utils';
 import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ERC20, ERC721__factory } from 'types/generated/abis';
+import { ERC20, ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { PaprController } from 'hooks/useController';
+import { ERC20Token } from 'lib/controllers';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
 
@@ -355,7 +356,7 @@ export function BorrowWithSwapButton({
 
 type ApproveTokenButtonProps = {
   controller: PaprController;
-  token: ERC20;
+  token: ERC20Token;
   tokenApproved: boolean;
   setTokenApproved: (val: boolean) => void;
 };
@@ -367,6 +368,7 @@ export function ApproveTokenButton({
   setTokenApproved,
 }: ApproveTokenButtonProps) {
   const { address } = useAccount();
+  const signerOrProvider = useSignerOrProvider();
 
   const [approvedLoading, setApprovedLoading] = useState<boolean>(true);
 
@@ -374,9 +376,10 @@ export function ApproveTokenButton({
     if (!address) {
       return;
     }
-    const connectedToken = controller.token0IsUnderlying
-      ? controller.token0
-      : controller.token1;
+    const connectedToken = await ERC20__factory.connect(
+      token.id,
+      signerOrProvider,
+    );
     if (
       (await connectedToken.allowance(address, controller.id)) >
       ethers.BigNumber.from(0)
@@ -384,15 +387,14 @@ export function ApproveTokenButton({
       setTokenApproved(true);
     }
     setApprovedLoading(false);
-  }, [controller, address, setTokenApproved]);
+  }, [controller, address, setTokenApproved, signerOrProvider, token]);
 
   useEffect(() => {
     initializeUnderlyingApproved();
   });
 
-  const symbol = useAsyncValue(() => token.symbol(), [token]);
   const { config } = usePrepareContractWrite({
-    address: token.address as `0x${string}`,
+    address: token.id as `0x${string}`,
     abi: erc20ABI,
     functionName: 'approve',
     args: [controller.id as `0x${string}`, ethers.constants.MaxInt256],
@@ -404,7 +406,7 @@ export function ApproveTokenButton({
     },
   });
 
-  if (tokenApproved || approvedLoading || !symbol) return <></>;
+  if (tokenApproved || approvedLoading) return <></>;
 
   return (
     <TransactionButton
@@ -414,7 +416,7 @@ export function ApproveTokenButton({
       onClick={write!}
       transactionData={data}
       error={error?.message}
-      text={`Approve ${symbol}`}
+      text={`Approve ${token.symbol}`}
       completed={tokenApproved}
     />
   );

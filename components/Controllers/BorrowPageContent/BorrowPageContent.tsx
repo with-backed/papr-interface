@@ -3,7 +3,6 @@ import controllerStyles from 'components/Controllers/Controller.module.css';
 import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
 import { useAccountNFTs } from 'hooks/useAccountNFTs';
-import { PaprController } from 'lib/PaprController';
 import { YourPositions } from 'components/YourPositions/YourPositions';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { VaultDebtPicker } from 'components/Controllers/OpenVault/VaultDebtPicker/VaultDebtPicker';
@@ -12,13 +11,15 @@ import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { Activity } from '../Activity';
 import { usePaprBalance } from 'hooks/usePaprBalance';
+import { useController } from 'hooks/useController';
+import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 
 export type BorrowPageProps = {
-  controllerAddress: string;
-  paprController: PaprController;
+  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
 
-export function BorrowPageContent({ paprController }: BorrowPageProps) {
+export function BorrowPageContent({ subgraphPool }: BorrowPageProps) {
+  const paprController = useController();
   const config = useConfig();
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
@@ -34,7 +35,7 @@ export function BorrowPageContent({ paprController }: BorrowPageProps) {
     useCurrentVaults(paprController, address);
 
   const { balance, refresh: refreshBalance } = usePaprBalance(
-    paprController.debtToken.id,
+    paprController.paprToken.id,
   );
 
   const refresh = useCallback(() => {
@@ -75,7 +76,6 @@ export function BorrowPageContent({ paprController }: BorrowPageProps) {
             key={collection}
             collateralContractAddress={collection}
             oracleInfo={oracleInfo}
-            paprController={paprController}
             vault={currentVaults?.find(
               (v) => getAddress(v.token.id) === getAddress(collection),
             )}
@@ -85,9 +85,7 @@ export function BorrowPageContent({ paprController }: BorrowPageProps) {
             refresh={refresh}
           />
         ))}
-      {!!address && (
-        <Activity paprController={paprController} account={address} />
-      )}
+      {!!address && <Activity account={address} subgraphPool={subgraphPool} />}
     </div>
   );
 }

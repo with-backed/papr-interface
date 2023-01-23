@@ -22,12 +22,12 @@ import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { SupportedToken } from 'lib/config';
 import {
   computeSlippageForSwap,
+  convertOneScaledValue,
   getQuoteForSwap,
   getQuoteForSwapOutput,
   getUniqueNFTId,
 } from 'lib/controllers';
 import { formatBigNum } from 'lib/numberFormat';
-import { PaprController } from 'lib/PaprController';
 import {
   Dispatch,
   SetStateAction,
@@ -48,9 +48,9 @@ import {
   AuctionsByNftOwnerDocument,
 } from 'types/generated/graphql/inKindSubgraph';
 import { useMaxDebt } from 'hooks/useMaxDebt';
+import { useController, PaprController } from 'hooks/useController';
 
 type VaultDebtPickerProps = {
-  paprController: PaprController;
   oracleInfo: OracleInfo;
   vault: VaultsByOwnerForControllerQuery['vaults']['0'] | undefined;
   collateralContractAddress: string;
@@ -59,7 +59,6 @@ type VaultDebtPickerProps = {
 };
 
 export function VaultDebtPicker({
-  paprController,
   oracleInfo,
   vault,
   collateralContractAddress,
@@ -67,6 +66,7 @@ export function VaultDebtPicker({
   refresh,
 }: VaultDebtPickerProps) {
   // init hooks
+  const paprController = useController();
   const { address } = useAccount();
   const { tokenName } = useConfig();
   const signerOrProvider = useSignerOrProvider();
@@ -136,7 +136,7 @@ export function VaultDebtPicker({
     if (!oracleInfo || !maxDebtPerNFTInPerpetual) return null;
     return getQuoteForSwap(
       maxDebtPerNFTInPerpetual,
-      paprController.debtToken.id,
+      paprController.paprToken.id,
       paprController.underlying.id,
       tokenName as SupportedToken,
     );
@@ -149,9 +149,9 @@ export function VaultDebtPicker({
   const maxDebtNumber = useMemo(() => {
     if (!maxDebt) return null;
     return parseFloat(
-      ethers.utils.formatUnits(maxDebt, paprController.debtToken.decimals),
+      ethers.utils.formatUnits(maxDebt, paprController.paprToken.decimals),
     );
-  }, [maxDebt, paprController.debtToken.decimals]);
+  }, [maxDebt, paprController.paprToken.decimals]);
 
   const vaultHasDebt = useMemo(() => {
     if (!vault) return false;
@@ -176,10 +176,10 @@ export function VaultDebtPicker({
     return parseFloat(
       ethers.utils.formatUnits(
         currentVaultDebt,
-        paprController.debtToken.decimals,
+        paprController.paprToken.decimals,
       ),
     );
-  }, [currentVaultDebt, paprController.debtToken.decimals]);
+  }, [currentVaultDebt, paprController.paprToken.decimals]);
 
   const [controlledSliderValue, setControlledSliderValue] = useState<number>(
     currentVaultDebtNumber,
@@ -210,13 +210,13 @@ export function VaultDebtPicker({
         return [ethers.BigNumber.from(0), 0];
       const quote = await getQuoteForSwap(
         debtToBorrowOrRepay,
-        paprController.debtToken.id,
+        paprController.paprToken.id,
         paprController.underlying.id,
         tokenName as SupportedToken,
       );
       const slippage = await computeSlippageForSwap(
         quote,
-        paprController.debtToken,
+        paprController.paprToken,
         paprController.underlying,
         debtToBorrowOrRepay,
         true,
@@ -226,7 +226,7 @@ export function VaultDebtPicker({
     }, [
       isBorrowing,
       debtToBorrowOrRepay,
-      paprController.debtToken,
+      paprController.paprToken,
       paprController.underlying,
       tokenName,
     ]);
@@ -246,13 +246,13 @@ export function VaultDebtPicker({
       const quote = await getQuoteForSwapOutput(
         debtToBorrowOrRepay,
         paprController.underlying.id,
-        paprController.debtToken.id,
+        paprController.paprToken.id,
         tokenName as SupportedToken,
       );
       const slippage = await computeSlippageForSwap(
         quote,
         paprController.underlying,
-        paprController.debtToken,
+        paprController.paprToken,
         debtToBorrowOrRepay,
         false,
         tokenName as SupportedToken,
@@ -261,7 +261,7 @@ export function VaultDebtPicker({
     }, [
       isBorrowing,
       debtToBorrowOrRepay,
-      paprController.debtToken,
+      paprController.paprToken,
       paprController.underlying,
       tokenName,
     ]);
@@ -307,18 +307,22 @@ export function VaultDebtPicker({
   // component as a prop
   const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
 
-  const maxLTV = useMemo(() => paprController.maxLTVPercent, [paprController]);
+  const maxLTV = useMemo(
+    () =>
+      convertOneScaledValue(ethers.BigNumber.from(paprController.maxLTV), 2),
+    [paprController],
+  );
 
   const handleChosenDebtChanged = useCallback(
     (value: string) => {
       if (!value) return;
       const debtBigNumber = ethers.utils.parseUnits(
         value,
-        paprController.debtToken.decimals,
+        paprController.paprToken.decimals,
       );
       setChosenDebt(debtBigNumber);
     },
-    [paprController.debtToken.decimals],
+    [paprController.paprToken.decimals],
   );
 
   const [collateralApproved, setCollateralApproved] = useState<boolean>(false);
@@ -333,7 +337,7 @@ export function VaultDebtPicker({
     ).balanceOf(address);
   }, [paprController.underlying.id, signerOrProvider, address]);
   const { balance: debtTokenBalance } = usePaprBalance(
-    paprController.debtToken.id,
+    paprController.paprToken.id,
   );
 
   const balanceErrorMessage = useMemo(() => {
@@ -341,7 +345,7 @@ export function VaultDebtPicker({
     if (isBorrowing) return '';
     if (usingPerpetual)
       return debtTokenBalance.lt(debtToBorrowOrRepay)
-        ? `Insufficient ${paprController.debtToken.symbol} balance`
+        ? `Insufficient ${paprController.paprToken.symbol} balance`
         : '';
     if (!usingPerpetual && !!underlyingRepayQuote)
       return underlyingBalance.lt(underlyingRepayQuote[0])
@@ -350,7 +354,7 @@ export function VaultDebtPicker({
 
     return '';
   }, [
-    paprController.debtToken.symbol,
+    paprController.paprToken.symbol,
     paprController.underlying.symbol,
     underlyingBalance,
     debtTokenBalance,
@@ -414,7 +418,6 @@ export function VaultDebtPicker({
       <div className={styles.slider}>
         {!!maxDebtPerNFTInPerpetual && maxDebt && (
           <VaultDebtSlider
-            controller={paprController}
             currentVaultDebtNumber={currentVaultDebtNumber}
             maxDebtNumber={maxDebtNumber!}
             controlledSliderValue={controlledSliderValue}
@@ -489,11 +492,7 @@ export function VaultDebtPicker({
             {usingPerpetual && !isBorrowing && (
               <ApproveTokenButton
                 controller={paprController}
-                token={
-                  paprController.token0IsUnderlying
-                    ? paprController.token1
-                    : paprController.token0
-                }
+                token={paprController.paprToken}
                 tokenApproved={debtTokenApproved}
                 setTokenApproved={setDebtTokenApproved}
               />
@@ -501,11 +500,7 @@ export function VaultDebtPicker({
             {!usingPerpetual && !isBorrowing && (
               <ApproveTokenButton
                 controller={paprController}
-                token={
-                  paprController.token0IsUnderlying
-                    ? paprController.token0
-                    : paprController.token1
-                }
+                token={paprController.underlying}
                 tokenApproved={underlyingApproved}
                 setTokenApproved={setUnderlyingApproved}
               />
@@ -590,8 +585,8 @@ function AmountToBorrowOrRepayInput({
   setChosenDebt,
 }: AmountToBorrowOrRepayInputProps) {
   const decimals = useMemo(
-    () => paprController.debtToken.decimals,
-    [paprController.debtToken.decimals],
+    () => paprController.paprToken.decimals,
+    [paprController.paprToken.decimals],
   );
 
   const [amount, setAmount] = useState<string>(
@@ -789,12 +784,12 @@ function LoanActionSummary({
         <div>
           <div>
             <p>
-              {isBorrowing ? 'Borrow' : 'Repay'} {controller.debtToken.symbol}
+              {isBorrowing ? 'Borrow' : 'Repay'} {controller.paprToken.symbol}
             </p>
           </div>
           <div>
             <p>
-              {formatBigNum(debtToBorrowOrRepay, controller.debtToken.decimals)}
+              {formatBigNum(debtToBorrowOrRepay, controller.paprToken.decimals)}
             </p>
           </div>
         </div>
@@ -836,13 +831,13 @@ function LoanActionSummary({
             <p>
               {isBorrowing ? 'Receive' : 'Pay'}{' '}
               {usingPerpetual
-                ? controller.debtToken.symbol
+                ? controller.paprToken.symbol
                 : controller.underlying.symbol}
             </p>
           </div>
           <div>
             {usingPerpetual
-              ? formatBigNum(debtToBorrowOrRepay, controller.debtToken.decimals)
+              ? formatBigNum(debtToBorrowOrRepay, controller.paprToken.decimals)
               : quote && formatBigNum(quote, controller.underlying.decimals)}
           </div>
         </div>

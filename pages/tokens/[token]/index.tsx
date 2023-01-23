@@ -93,6 +93,7 @@ export default function ControllerPage({
         <ControllerOverviewContent
           paprController={paprController}
           pricesData={pricesData}
+          subgraphPool={subgraphPool}
         />
       </ControllerContextProvider>
     </OracleInfoProvider>

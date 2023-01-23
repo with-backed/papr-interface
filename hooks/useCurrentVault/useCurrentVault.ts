@@ -1,4 +1,4 @@
-import { PaprController } from 'lib/PaprController';
+import { PaprController } from 'hooks/useController';
 import { useEffect, useMemo, useState } from 'react';
 import {
   VaultsByOwnerForControllerDocument,

@@ -10,7 +10,6 @@ import {
   SubgraphController,
 } from 'lib/PaprController';
 import { useConfig } from 'hooks/useConfig';
-import { usePaprController_deprecated } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
 import { OpenGraph } from 'components/OpenGraph';
@@ -61,16 +60,10 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 };
 
 export default function Borrow({
-  controllerAddress,
   subgraphController,
   subgraphPool,
 }: ServerSideProps) {
   const config = useConfig();
-
-  const paprController = usePaprController_deprecated({
-    subgraphController,
-    subgraphPool,
-  });
 
   const collections = useMemo(
     () => subgraphController.allowedCollateral.map((c) => c.token.id),
@@ -81,10 +74,7 @@ export default function Borrow({
     <OracleInfoProvider collections={collections}>
       <ControllerContextProvider value={subgraphController}>
         <OpenGraph title={`${config.tokenName} | Borrow`} />
-        <BorrowPageContent
-          paprController={paprController}
-          controllerAddress={controllerAddress}
-        />
+        <BorrowPageContent subgraphPool={subgraphPool} />
       </ControllerContextProvider>
     </OracleInfoProvider>
   );

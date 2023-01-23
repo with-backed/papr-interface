@@ -15,6 +15,7 @@ interface AllowedCollateral {
 }
 
 export interface PaprController {
+  id: string;
   paprToken: ERC20Token;
   underlying: ERC20Token;
   allowedCollateral: AllowedCollateral[];
