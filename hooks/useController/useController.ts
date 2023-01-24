@@ -22,6 +22,12 @@ export interface PaprController {
   token0IsUnderlying: boolean;
   poolAddress: string;
   maxLTV: BigNumberish;
+  vaults: {
+    token: {
+      id: string;
+    };
+    collateralCount: number;
+  }[];
 }
 
 const [useControllerContext, ControllerContextProvider] =

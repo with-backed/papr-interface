@@ -12,6 +12,7 @@ import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { Quoter } from 'lib/contracts';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { formatBigNum } from 'lib/numberFormat';
+import { PaprController } from 'hooks/useController';
 
 dayjs.extend(duration);
 
@@ -340,7 +341,7 @@ export function computeLTVFromDebts(
 }
 
 export function controllerNFTValue(
-  controller: PaprController_deprecated,
+  controller: PaprController,
   oracleInfo: OracleInfo | undefined,
 ) {
   if (!controller.vaults || controller.vaults.length === 0 || !oracleInfo) {

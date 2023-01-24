@@ -48,7 +48,6 @@ export function ControllerOverviewContent({
   return (
     <div className={styles.wrapper}>
       <YourPositions />
-
       <TokenPerformance
         pricesData={{ [paprController.id]: pricesData }}
         controllers={[paprController]}
@@ -56,7 +55,7 @@ export function ControllerOverviewContent({
       <Collateral paprController={paprController} />
       <Activity subgraphPool={subgraphPool} />
       <Charts pricesData={pricesData} />
-      <Loans paprController={paprController} pricesData={pricesData} />
+      <Loans pricesData={pricesData} />
       <Auctions paprController={paprController} />
     </div>
   );
