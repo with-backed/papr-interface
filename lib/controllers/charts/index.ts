@@ -1,9 +1,6 @@
 import { ethers } from 'ethers';
 import { SupportedToken } from 'lib/config';
-import {
-  PaprController_deprecated,
-  SubgraphController,
-} from 'lib/PaprController';
+import { SubgraphController } from 'lib/PaprController';
 import { subgraphUniswapPoolById } from 'lib/uniswapSubgraph';
 import { UTCTimestamp } from 'lightweight-charts';
 import { Pool } from 'types/generated/graphql/uniswapSubgraph';
@@ -26,7 +23,7 @@ export interface ControllerPricesData {
 }
 
 export async function controllerPricesData(
-  controller: PaprController_deprecated | SubgraphController,
+  controller: SubgraphController,
   token: SupportedToken,
   uniswapSubgraphUrl: string,
 ): Promise<ControllerPricesData> {
