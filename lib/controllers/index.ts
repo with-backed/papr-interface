@@ -329,7 +329,7 @@ export async function getOracleInfoFromAllowedCollateral(
 export function computeLTVFromDebts(
   debt: ethers.BigNumber,
   maxDebt: ethers.BigNumber,
-  maxLTV: ethers.BigNumber,
+  maxLTV: ethers.BigNumberish,
   debtTokenDecimals: number,
 ): number {
   if (maxDebt.isZero()) return 0;

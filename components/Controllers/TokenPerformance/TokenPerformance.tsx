@@ -1,7 +1,6 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { PaprController_deprecated } from 'lib/PaprController';
 import {
   formatThreeFractionDigits,
   formatTokenAmount,
@@ -30,16 +29,13 @@ import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
 import { controllerNFTValue } from 'lib/controllers';
+import { useController } from 'hooks/useController';
 
 export type ControllerSummaryProps = {
-  controllers: PaprController_deprecated[];
-  pricesData: { [key: string]: ControllerPricesData | null };
+  pricesData: ControllerPricesData | null;
 };
 
-export function TokenPerformance({
-  controllers,
-  pricesData,
-}: ControllerSummaryProps) {
+export function TokenPerformance({ pricesData }: ControllerSummaryProps) {
   return (
     <Fieldset legend="📈 Token Performance">
       <div className={styles.controllers}>
@@ -74,13 +70,7 @@ export function TokenPerformance({
             </tr>
           </thead>
           <tbody>
-            {controllers.map((controller, i) => (
-              <SummaryEntry
-                key={controller.id}
-                pricesData={pricesData[controller.id]}
-                controller={controller}
-              />
-            ))}
+            <SummaryEntry pricesData={pricesData} />
           </tbody>
         </Table>
       </div>
@@ -90,17 +80,10 @@ export function TokenPerformance({
 
 type SummaryEntryProps = {
   pricesData: ControllerPricesData | null;
-  controller: PaprController_deprecated;
 };
-function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
+function SummaryEntry({ pricesData }: SummaryEntryProps) {
+  const controller = useController();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
-  const debtTokenSupply = useAsyncValue(
-    () =>
-      controller.token0IsUnderlying
-        ? controller.token1.totalSupply()
-        : controller.token0.totalSupply(),
-    [controller],
-  );
   const NFTValue = useMemo(
     () => controllerNFTValue(controller, oracleInfo),
     [controller, oracleInfo],
@@ -174,12 +157,6 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
 
   if (!pricesData) return <></>;
 
-  const debtTokenMarketCap =
-    parseFloat(ethers.utils.formatEther(debtTokenSupply || 0)) *
-    markAndChange!.mark;
-
-  const nftOverCap = NFTValue / debtTokenMarketCap;
-
   return (
     <tr>
       <td>
@@ -244,14 +221,12 @@ function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
         <RealizedAPRTooltip tooltip={realizedAPRTooltip} />
       </td>
       <td>
-        <TooltipReference {...nftOverCapTooltip}>
-          {formatThreeFractionDigits(nftOverCap)}
-        </TooltipReference>
+        <TooltipReference {...nftOverCapTooltip}>???</TooltipReference>
         <NFTCapTooltip
           tooltip={nftOverCapTooltip}
-          debtTokenMarketCap={debtTokenMarketCap}
+          debtTokenMarketCap={0}
           nftMarketCap={NFTValue}
-          paprSymbol={controller.debtToken.symbol}
+          paprSymbol={controller.paprToken.symbol}
         />
       </td>
     </tr>

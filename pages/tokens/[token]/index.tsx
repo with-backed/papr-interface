@@ -91,7 +91,6 @@ export default function ControllerPage({
       <ControllerContextProvider value={subgraphController}>
         <OpenGraph title={`${config.tokenName} | Performance`} />
         <ControllerOverviewContent
-          paprController={paprController}
           pricesData={pricesData}
           subgraphPool={subgraphPool}
         />

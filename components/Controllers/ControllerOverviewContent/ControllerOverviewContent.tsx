@@ -1,7 +1,6 @@
 import React, { ComponentProps } from 'react';
 import styles from 'components/Controllers/Controller.module.css';
 import { ControllerPricesData } from 'lib/controllers/charts';
-import { PaprController_deprecated } from 'lib/PaprController';
 import { Collateral as CollateralComponent } from 'components/Controllers/Collateral';
 import { Activity } from 'components/Controllers/Activity';
 import { Loans as LoansComponent } from 'components/Controllers/Loans';
@@ -35,28 +34,23 @@ const Collateral = dynamic<ComponentProps<typeof CollateralComponent>>(
 );
 
 export type ControllerPageProps = {
-  paprController: PaprController_deprecated;
   pricesData: ControllerPricesData | null;
   subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
 
 export function ControllerOverviewContent({
-  paprController,
   pricesData,
   subgraphPool,
 }: ControllerPageProps) {
   return (
     <div className={styles.wrapper}>
       <YourPositions />
-      <TokenPerformance
-        pricesData={{ [paprController.id]: pricesData }}
-        controllers={[paprController]}
-      />
-      <Collateral paprController={paprController} />
+      <TokenPerformance pricesData={pricesData} />
+      <Collateral />
       <Activity subgraphPool={subgraphPool} />
       <Charts pricesData={pricesData} />
       <Loans pricesData={pricesData} />
-      <Auctions paprController={paprController} />
+      <Auctions />
     </div>
   );
 }
