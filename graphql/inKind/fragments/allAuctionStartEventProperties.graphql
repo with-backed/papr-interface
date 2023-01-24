@@ -1,0 +1,18 @@
+fragment allAuctionStartEventProperties on AuctionStartEvent {
+  id
+  timestamp
+  auction {
+    id
+    auctionAssetID
+    auctionAssetContract {
+      ...allERC721Properties
+    }
+    startPrice
+    vault {
+      id
+      controller {
+        id
+      }
+    }
+  }
+}

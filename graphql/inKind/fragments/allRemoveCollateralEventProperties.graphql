@@ -1,0 +1,14 @@
+fragment allRemoveCollateralEventProperties on RemoveCollateralEvent {
+  id
+  timestamp
+  vault {
+    id
+    token {
+      ...allERC721Properties
+    }
+  }
+  collateral {
+    id
+    tokenId
+  }
+}

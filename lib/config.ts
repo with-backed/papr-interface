@@ -15,7 +15,7 @@ const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_KEY as string;
 
 const goerliJsonRpcProvider = `https://eth-goerli.alchemyapi.io/v2/${alchemyId}`;
 const goerliSubgraph =
-  'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.8/gn';
+  'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.9/gn';
 
 const paprTrash: Config = {
   ...baseConfig,

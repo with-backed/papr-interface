@@ -1,83 +1,20 @@
-query activityByController($controllerId: String, $account: Bytes) {
-  addCollateralEvents(where: { controller: $controllerId, account: $account }) {
-    id
-    timestamp
-    vault {
-      id
-      token {
-        ...allERC721Properties
-      }
-    }
-    collateral {
-      id
-      tokenId
-    }
+query activityByController($controllerId: String) {
+  addCollateralEvents(where: { controller: $controllerId }) {
+    ...allAddCollateralEventProperties
   }
-  removeCollateralEvents(
-    where: { controller: $controllerId, account: $account }
-  ) {
-    id
-    timestamp
-    vault {
-      id
-      token {
-        ...allERC721Properties
-      }
-    }
-    collateral {
-      id
-      tokenId
-    }
+  removeCollateralEvents(where: { controller: $controllerId }) {
+    ...allRemoveCollateralEventProperties
   }
-  debtDecreasedEvents(where: { controller: $controllerId, account: $account }) {
-    id
-    timestamp
-    vault {
-      id
-    }
-    amount
+  debtDecreasedEvents(where: { controller: $controllerId }) {
+    ...allDebtDecreasedEventProperties
   }
-  debtIncreasedEvents(where: { controller: $controllerId, account: $account }) {
-    id
-    timestamp
-    vault {
-      id
-    }
-    amount
+  debtIncreasedEvents(where: { controller: $controllerId }) {
+    ...allDebtIncreasedEventProperties
   }
-  auctionStartEvents(where: { controller: $controllerId, account: $account }) {
-    id
-    timestamp
-    auction {
-      id
-      auctionAssetID
-      auctionAssetContract {
-        ...allERC721Properties
-      }
-      startPrice
-      vault {
-        id
-        controller {
-          id
-        }
-      }
-    }
+  auctionStartEvents(where: { controller: $controllerId }) {
+    ...allAuctionStartEventProperties
   }
-  auctionEndEvents(where: { controller: $controllerId, account: $account }) {
-    id
-    timestamp
-    auction {
-      auctionAssetID
-      auctionAssetContract {
-        ...allERC721Properties
-      }
-      endPrice
-      vault {
-        id
-        controller {
-          id
-        }
-      }
-    }
+  auctionEndEvents(where: { controller: $controllerId }) {
+    ...allAuctionEndEventProperties
   }
 }

@@ -1,0 +1,17 @@
+fragment allAuctionEndEventProperties on AuctionEndEvent {
+  id
+  timestamp
+  auction {
+    auctionAssetID
+    auctionAssetContract {
+      ...allERC721Properties
+    }
+    endPrice
+    vault {
+      id
+      controller {
+        id
+      }
+    }
+  }
+}

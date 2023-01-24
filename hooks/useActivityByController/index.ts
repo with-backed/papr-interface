@@ -1,1 +1,1 @@
-export { useActivityByController } from './useActivityByController';
+export { useActivity as useActivityByController } from './useActivityByController';

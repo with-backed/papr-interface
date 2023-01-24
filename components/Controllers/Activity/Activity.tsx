@@ -27,25 +27,32 @@ type ActivityProps = {
   // If scoping activity view to just a specific vault
   // instead of the whole controller
   account?: string;
+  vault?: string;
+  showSwaps?: boolean;
   subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
 
 const EVENT_INCREMENT = 5;
 
-export function Activity({ account, subgraphPool }: ActivityProps) {
+export function Activity({
+  account,
+  vault,
+  showSwaps = true,
+  subgraphPool,
+}: ActivityProps) {
   const paprController = useController();
   const { data: swapsData, fetching: swapsFetching } = useUniswapSwapsByPool(
     paprController.poolAddress,
   );
 
   const { data: activityData, fetching: activityFetching } =
-    useActivityByController(paprController.id, account);
+    useActivityByController(paprController.id, account, vault);
 
   const allEvents = useMemo(() => {
     const unsortedEvents = [
       ...(activityData?.addCollateralEvents || []),
       ...(activityData?.removeCollateralEvents || []),
-      ...(swapsData?.swaps || []),
+      ...(swapsData?.swaps && showSwaps ? swapsData.swaps : []),
       ...(activityData?.auctionStartEvents.filter(
         (e) => e.auction.vault.controller.id === paprController.id,
       ) || []),
@@ -54,7 +61,7 @@ export function Activity({ account, subgraphPool }: ActivityProps) {
       ) || []),
     ];
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
-  }, [activityData, paprController.id, swapsData]);
+  }, [activityData, paprController.id, showSwaps, swapsData]);
 
   const { feed, amountThatWillShowNext, remainingLength, showMore } =
     useShowMore(allEvents, EVENT_INCREMENT);

@@ -1,0 +1,22 @@
+query activityByControllerAndAccount($controllerId: String, $account: Bytes) {
+  addCollateralEvents(where: { controller: $controllerId, account: $account }) {
+    ...allAddCollateralEventProperties
+  }
+  removeCollateralEvents(
+    where: { controller: $controllerId, account: $account }
+  ) {
+    ...allRemoveCollateralEventProperties
+  }
+  debtDecreasedEvents(where: { controller: $controllerId, account: $account }) {
+    ...allDebtDecreasedEventProperties
+  }
+  debtIncreasedEvents(where: { controller: $controllerId, account: $account }) {
+    ...allDebtIncreasedEventProperties
+  }
+  auctionStartEvents(where: { controller: $controllerId, account: $account }) {
+    ...allAuctionStartEventProperties
+  }
+  auctionEndEvents(where: { controller: $controllerId, account: $account }) {
+    ...allAuctionEndEventProperties
+  }
+}
