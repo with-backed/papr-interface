@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { ethers } from 'ethers';
 import { ControllerContextProvider } from 'hooks/useController';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
-import { subgraphController } from '__tests__/lib/PaprController.test';
+import { subgraphController } from 'lib/mockData/mockPaprController';
 import { getQuoteForSwapOutput } from 'lib/controllers';
 
 const auction = {

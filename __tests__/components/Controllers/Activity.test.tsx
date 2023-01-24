@@ -1,8 +1,8 @@
 import React from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { Activity } from 'components/Controllers/Activity';
 import {
-  mockPaprController,
+  subgraphController,
   mockUniswapPool,
 } from 'lib/mockData/mockPaprController';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
@@ -57,7 +57,7 @@ const addCollateralEvent = {
 
 describe('Activity', () => {
   beforeAll(() => {
-    mockedUseController.mockReturnValue(mockPaprController);
+    mockedUseController.mockReturnValue(subgraphController);
   });
   it('renders a loading state when swaps are loading', () => {
     mockedUseUniswapSwapsByPool.mockReturnValue({
