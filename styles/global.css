@@ -147,6 +147,13 @@ body {
   min-height: 100vh;
 }
 
+@media screen and (max-width: 639px) {
+  html,
+  body {
+    font-size: var(--font-small);
+  }
+}
+
 * {
   box-sizing: border-box;
   font-family: var(--mono);
