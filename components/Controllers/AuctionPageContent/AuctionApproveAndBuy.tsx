@@ -114,7 +114,7 @@ function BuyButton({
   const { data, write, error } = useContractWrite({
     ...config,
     onSuccess: (data: any) => {
-      data.wait().then();
+      data.wait().then(window.location.reload());
     },
   } as any);
 

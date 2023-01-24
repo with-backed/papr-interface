@@ -144,6 +144,11 @@ export function AuctionGraph({
     );
   }, [auction, latestUniswapPrice, liveTimestamp]);
 
+  const auctionCompleted = useMemo(
+    () => !!auction.endPrice,
+    [auction.endPrice],
+  );
+
   const timeAgo = useMemo(() => {
     return Math.floor(timeElapsed / 60 / 60) > 24
       ? [Math.floor(timeElapsed / (60 * 60 * 24)), 'days', 'ago'].join(' ')
@@ -184,16 +189,27 @@ export function AuctionGraph({
     return `\n\n\n${startingString}\n${paddingForTimeAgo}${timeAgo}\n${paddingForEthPrice}${floorEthPrice} ETH\n${paddingForFloorPrice}$${floorPrice}`;
   }, [timeAgo, oracleInfo, floorEthPrice, auction.auctionAssetContract.id]);
 
-  const buyNowLabel = useMemo(
-    () =>
-      auctionUnderlyingPrice
+  const buyNowLabel = useMemo(() => {
+    if (!auctionCompleted)
+      return auctionUnderlyingPrice
         ? `Buy now: $${formatBigNum(
             auctionUnderlyingPrice,
             controller.underlying.decimals,
           )}`
-        : 'Buy now: ......',
-    [auctionUnderlyingPrice, controller.underlying.decimals],
-  );
+        : 'Buy now: ......';
+    else {
+      return auctionUnderlyingPrice
+        ? `SOLD: $${formatBigNum(
+            auctionUnderlyingPrice,
+            controller.underlying.decimals,
+          )}`
+        : 'SOLD: ......';
+    }
+  }, [
+    auctionUnderlyingPrice,
+    controller.underlying.decimals,
+    auctionCompleted,
+  ]);
 
   const floorLabel = useMemo(() => {
     const floorPrice =
@@ -234,7 +250,7 @@ export function AuctionGraph({
               floorDataPoint,
               'black',
               'white',
-              '#0000c2',
+              auctionCompleted ? 'black' : '#0000c2',
               '#b1aeae',
               'black',
               'black',
@@ -246,7 +262,7 @@ export function AuctionGraph({
               context,
               floorDataPoint,
               'white',
-              '#0000c2',
+              auctionCompleted ? 'black' : '#0000c2',
               '',
               '',
               '',
@@ -330,7 +346,7 @@ export function AuctionGraph({
         },
       },
     }),
-    [startLabel, buyNowLabel, floorLabel, floorDataPoint],
+    [startLabel, buyNowLabel, floorLabel, floorDataPoint, auctionCompleted],
   );
 
   const chartData = useMemo(() => {
@@ -339,7 +355,7 @@ export function AuctionGraph({
       datasets: [
         {
           data: timestampAndPricesCurrent[1],
-          borderColor: '#0000c2',
+          borderColor: auctionCompleted ? 'black' : '#0000c2',
           ...baseChartProperties,
           pointRadius: Array(timestampAndPricesCurrent[1].length)
             .fill('')
@@ -354,7 +370,7 @@ export function AuctionGraph({
         },
       ],
     };
-  }, [timestampAndPricesAllTime, timestampAndPricesCurrent]);
+  }, [timestampAndPricesAllTime, timestampAndPricesCurrent, auctionCompleted]);
 
   return (
     <div className={styles.curve}>

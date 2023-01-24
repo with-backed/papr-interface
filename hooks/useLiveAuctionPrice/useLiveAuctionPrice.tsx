@@ -21,6 +21,7 @@ export function useLiveAuctionPrice(
   );
 
   const liveAuctionPrice = useMemo(() => {
+    if (auction.endPrice) return ethers.BigNumber.from(auction.endPrice);
     const secondsElapsed = liveTimestamp - auction.start.timestamp;
     return currentPrice(
       ethers.BigNumber.from(auction.startPrice),
@@ -64,14 +65,16 @@ export function useLiveAuctionPrice(
   }, [liveAuctionPrice, auction]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setLiveTimestamp(currentTimeInSeconds());
-      setPriceUpdated(true);
-      setTimeout(() => {
-        setPriceUpdated(false);
-      }, 1000);
-    }, priceRefreshTime);
-    return () => clearInterval(interval);
+    if (!auction.endPrice) {
+      const interval = setInterval(() => {
+        setLiveTimestamp(currentTimeInSeconds());
+        setPriceUpdated(true);
+        setTimeout(() => {
+          setPriceUpdated(false);
+        }, 1000);
+      }, priceRefreshTime);
+      return () => clearInterval(interval);
+    }
   }, [auction, priceRefreshTime]);
 
   useEffect(() => {
