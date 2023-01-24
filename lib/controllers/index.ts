@@ -6,7 +6,7 @@ import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { getAddress } from 'ethers/lib/utils';
-import { PaprController } from 'lib/PaprController';
+import { PaprController_deprecated } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { Quoter } from 'lib/contracts';
@@ -96,7 +96,7 @@ export function secondsForRatePeriod(period: RatePeriod): number {
 
 // TODO(adamgobes): figure out how to do powWad locally in JS
 export async function multiplier(
-  controller: PaprController,
+  controller: PaprController_deprecated,
   now: ethers.BigNumber,
   mark: ethers.BigNumber,
 ) {
@@ -155,7 +155,7 @@ export async function getQuoteForSwapOutput(
 export async function computeLiquidationEstimation(
   debt: ethers.BigNumber,
   max: ethers.BigNumber,
-  controller: PaprController,
+  controller: PaprController_deprecated,
 ) {
   const debtTaken = parseFloat(
     ethers.utils.formatUnits(debt, controller.debtToken.decimals),
@@ -247,7 +247,9 @@ export async function computeSlippageForSwap(
   return priceImpact * 100;
 }
 
-export async function getDebtTokenMarketPrice(controller: PaprController) {
+export async function getDebtTokenMarketPrice(
+  controller: PaprController_deprecated,
+) {
   if (controller == null) {
     return null;
   }
@@ -255,7 +257,9 @@ export async function getDebtTokenMarketPrice(controller: PaprController) {
   return controller.token0IsUnderlying ? pool.token1Price : pool.token0Price;
 }
 
-export async function getDebtTokenControllerPrice(controller: PaprController) {
+export async function getDebtTokenControllerPrice(
+  controller: PaprController_deprecated,
+) {
   return await controller.newTarget();
 }
 
@@ -336,7 +340,7 @@ export function computeLTVFromDebts(
 }
 
 export function controllerNFTValue(
-  controller: PaprController,
+  controller: PaprController_deprecated,
   oracleInfo: OracleInfo | undefined,
 ) {
   if (!controller.vaults || controller.vaults.length === 0 || !oracleInfo) {

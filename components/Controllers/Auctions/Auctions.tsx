@@ -16,7 +16,7 @@ import {
   getOraclePayloadFromReservoirObject,
   OraclePriceType,
 } from 'lib/oracle/reservoir';
-import { PaprController } from 'lib/PaprController';
+import { PaprController_deprecated } from 'lib/PaprController';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ERC20 } from 'types/generated/abis';
 import { INFTEDA } from 'types/generated/abis/PaprController';
@@ -33,7 +33,7 @@ type ActiveAuction = Auction & { startPrice: string };
 type PastAuction = ActiveAuction & { end: { timestamp: number; id: string } };
 
 type AuctionsProps = {
-  paprController: PaprController;
+  paprController: PaprController_deprecated;
 };
 export function Auctions({ paprController }: AuctionsProps) {
   const [{ data: auctionsQueryResult, fetching }] = useQuery<AuctionsQuery>({
@@ -76,7 +76,7 @@ export function Auctions({ paprController }: AuctionsProps) {
 type ActiveAuctionsProps = {
   auctions: ActiveAuction[];
   fetching: boolean;
-  controller: PaprController;
+  controller: PaprController_deprecated;
 };
 function ActiveAuctions({
   auctions,
@@ -142,7 +142,7 @@ function ActiveAuctionRow({
   paprApproved,
 }: {
   auction: ActiveAuction;
-  controller: PaprController;
+  controller: PaprController_deprecated;
   tokenContract: ERC20;
   paprApproved: boolean | null;
 }) {
@@ -205,7 +205,7 @@ function ActiveAuctionRow({
 
 type BuyButtonProps = {
   auction: ActiveAuction;
-  controller: PaprController;
+  controller: PaprController_deprecated;
   maxPrice: ethers.BigNumber;
   tokenContract: ERC20;
   paprApproved: boolean | null;

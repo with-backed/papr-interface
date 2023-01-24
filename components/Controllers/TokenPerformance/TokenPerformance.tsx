@@ -1,7 +1,7 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { PaprController } from 'lib/PaprController';
+import { PaprController_deprecated } from 'lib/PaprController';
 import {
   formatThreeFractionDigits,
   formatTokenAmount,
@@ -32,7 +32,7 @@ import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
 import { controllerNFTValue } from 'lib/controllers';
 
 export type ControllerSummaryProps = {
-  controllers: PaprController[];
+  controllers: PaprController_deprecated[];
   pricesData: { [key: string]: ControllerPricesData | null };
 };
 
@@ -90,7 +90,7 @@ export function TokenPerformance({
 
 type SummaryEntryProps = {
   pricesData: ControllerPricesData | null;
-  controller: PaprController;
+  controller: PaprController_deprecated;
 };
 function SummaryEntry({ controller, pricesData }: SummaryEntryProps) {
   const oracleInfo = useOracleInfo(OraclePriceType.twap);

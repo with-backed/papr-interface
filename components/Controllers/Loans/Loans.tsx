@@ -1,6 +1,6 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { PaprController } from 'lib/PaprController';
+import { PaprController_deprecated } from 'lib/PaprController';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import React, { useMemo } from 'react';
@@ -17,7 +17,7 @@ import { captureException } from '@sentry/nextjs';
 import { controllerNFTValue } from 'lib/controllers';
 
 type LoansProps = {
-  paprController: PaprController;
+  paprController: PaprController_deprecated;
   pricesData: ControllerPricesData | null;
 };
 

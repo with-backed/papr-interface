@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { PaprController } from 'lib/PaprController';
+import { PaprController_deprecated } from 'lib/PaprController';
 import controllerStyles from '../Controller.module.css';
 import { Collateral } from 'components/Controllers/Collateral';
 import { Activity } from 'components/Controllers/Activity';
@@ -8,7 +8,7 @@ import { ControllerPricesData } from 'lib/controllers/charts';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 
 type VaultPageContentProps = {
-  paprController: PaprController;
+  paprController: PaprController_deprecated;
   vaultId: string;
   pricesData: ControllerPricesData | null;
   subgraphPool: NonNullable<PoolByIdQuery['pool']>;

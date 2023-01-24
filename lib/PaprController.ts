@@ -24,7 +24,8 @@ import { subgraphUniswapPoolById } from './uniswapSubgraph';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { getAddress } from 'ethers/lib/utils';
 
-export type PaprController = SubgraphController & PaprControllerInternal;
+export type PaprController_deprecated = SubgraphController &
+  PaprControllerInternal;
 export type SubgraphController = NonNullable<
   PaprControllerByIdQuery['paprController']
 >;
@@ -49,7 +50,7 @@ export function makePaprController(
   subgraphPool: SubgraphPool,
   signerOrProvider: SignerOrProvider,
   config: Config,
-): PaprController {
+): PaprController_deprecated {
   const instance = new PaprControllerInternal(
     subgraphController,
     subgraphPool,
@@ -71,7 +72,7 @@ export function makePaprController(
     });
   });
 
-  return instance as PaprController;
+  return instance as PaprController_deprecated;
 }
 
 /**

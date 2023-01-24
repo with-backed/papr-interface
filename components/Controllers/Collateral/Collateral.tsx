@@ -1,5 +1,5 @@
 import { Fieldset } from 'components/Fieldset';
-import { PaprController } from 'lib/PaprController';
+import { PaprController_deprecated } from 'lib/PaprController';
 import { useCollection } from '@center-inc/react';
 import React, { useMemo } from 'react';
 import styles from './Collateral.module.css';
@@ -15,7 +15,7 @@ import { TextButton } from 'components/Button';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 
 type CollateralProps = {
-  paprController: PaprController;
+  paprController: PaprController_deprecated;
   // If scoping collateral view to just a specific vault
   // instead of the whole controller
   vaultId?: string;
@@ -78,8 +78,8 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
 type TileProps = {
   address: string;
   tokenId: string;
-  paprController: PaprController;
-  vault: NonNullable<PaprController['vaults']>['0'];
+  paprController: PaprController_deprecated;
+  vault: NonNullable<PaprController_deprecated['vaults']>['0'];
 };
 function Tile({ address, tokenId, paprController, vault }: TileProps) {
   const { centerNetwork } = useConfig();

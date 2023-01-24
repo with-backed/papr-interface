@@ -1,5 +1,5 @@
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { PaprController } from 'lib/PaprController';
+import { PaprController_deprecated } from 'lib/PaprController';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import { useMemo } from 'react';

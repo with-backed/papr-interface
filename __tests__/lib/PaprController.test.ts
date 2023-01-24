@@ -3,7 +3,7 @@ import { makeProvider } from 'lib/contracts';
 import {
   makePaprController,
   SubgraphController,
-  PaprController,
+  PaprController_deprecated,
   SubgraphPool,
 } from 'lib/PaprController';
 
@@ -81,7 +81,7 @@ describe('PaprController', () => {
           controllerInstance[
             (key === 'underlying'
               ? 'underlyingAddress'
-              : key) as keyof PaprController
+              : key) as keyof PaprController_deprecated
           ];
         const inputValue = subgraphController[key as keyof SubgraphController];
 
