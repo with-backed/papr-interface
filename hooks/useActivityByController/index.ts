@@ -1,1 +1,0 @@
-export { useActivityByController } from './useActivityByController';

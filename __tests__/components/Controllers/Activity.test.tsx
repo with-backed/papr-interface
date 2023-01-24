@@ -6,7 +6,7 @@ import {
   mockUniswapPool,
 } from 'lib/mockData/mockPaprController';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
-import { useActivityByController } from 'hooks/useActivityByController';
+import { useActivity } from 'hooks/useActivity';
 import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import userEvent from '@testing-library/user-event';
 import { useController } from 'hooks/useController';
@@ -17,8 +17,8 @@ jest.mock('hooks/useController', () => ({
 jest.mock('hooks/useUniswapSwapsByPool', () => ({
   useUniswapSwapsByPool: jest.fn(),
 }));
-jest.mock('hooks/useActivityByController', () => ({
-  useActivityByController: jest.fn(),
+jest.mock('hooks/useActivity', () => ({
+  useActivity: jest.fn(),
 }));
 jest.mock('hooks/useTheme', () => ({
   useTheme: jest.fn(() => 'papr'),
@@ -29,10 +29,9 @@ const mockedUseController = useController as jest.MockedFunction<
 >;
 const mockedUseUniswapSwapsByPool =
   useUniswapSwapsByPool as jest.MockedFunction<typeof useUniswapSwapsByPool>;
-const mockedUseActivityByController =
-  useActivityByController as jest.MockedFunction<
-    typeof useActivityByController
-  >;
+const mockedUseActivity = useActivity as jest.MockedFunction<
+  typeof useActivity
+>;
 
 const addCollateralEvent = {
   id: '0xdf5bc3c8b2c7769fadc88b573318b46c156cc00b9b119544503903b60bd8fb9c',
@@ -65,7 +64,7 @@ describe('Activity', () => {
       fetching: true,
       data: undefined,
     });
-    mockedUseActivityByController.mockReturnValue({
+    mockedUseActivity.mockReturnValue({
       fetching: false,
       data: undefined,
     });
@@ -78,7 +77,7 @@ describe('Activity', () => {
       fetching: false,
       data: undefined,
     });
-    mockedUseActivityByController.mockReturnValue({
+    mockedUseActivity.mockReturnValue({
       fetching: true,
       data: undefined,
     });
@@ -91,7 +90,7 @@ describe('Activity', () => {
       fetching: false,
       data: undefined,
     });
-    mockedUseActivityByController.mockReturnValue({
+    mockedUseActivity.mockReturnValue({
       fetching: false,
       data: undefined,
     });
@@ -104,7 +103,7 @@ describe('Activity', () => {
       fetching: false,
       data: undefined,
     });
-    mockedUseActivityByController.mockReturnValue({
+    mockedUseActivity.mockReturnValue({
       fetching: false,
       data: {
         addCollateralEvents: [
@@ -127,7 +126,7 @@ describe('Activity', () => {
       fetching: false,
       data: undefined,
     });
-    mockedUseActivityByController.mockReturnValue({
+    mockedUseActivity.mockReturnValue({
       fetching: false,
       data: {
         addCollateralEvents: new Array(6).fill(

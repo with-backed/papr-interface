@@ -9,10 +9,14 @@ import { captureException } from '@sentry/nextjs';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 import { auctionById } from 'lib/pAPRSubgraph';
+import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+import { Activity } from 'components/Controllers/Activity';
+import { generateVaultId } from 'lib/controllers/vaults';
 
 type AuctionProps = {
   subgraphController: PaprController;
   auction: NonNullable<AuctionQuery['auction']>;
+  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
 
 export const getServerSideProps: GetServerSideProps<AuctionProps> = async (
@@ -39,7 +43,7 @@ export const getServerSideProps: GetServerSideProps<AuctionProps> = async (
     throw e;
   }
 
-  const { paprController } = controllerSubgraphData;
+  const { paprController, pool } = controllerSubgraphData;
 
   const auctionId = context.params?.id as string;
   const auction = await auctionById(auctionId, token);
@@ -53,21 +57,43 @@ export const getServerSideProps: GetServerSideProps<AuctionProps> = async (
     props: {
       subgraphController: paprController,
       auction,
+      subgraphPool: pool,
     },
   };
 };
 
-export default function Auction({ subgraphController, auction }: AuctionProps) {
+export default function Auction({
+  subgraphController,
+  subgraphPool,
+  auction,
+}: AuctionProps) {
   const collections = useMemo(
     () => subgraphController.allowedCollateral.map((c) => c.token.id),
     [subgraphController.allowedCollateral],
   );
+
+  const auctionVaultId = useMemo(() => {
+    return generateVaultId(
+      subgraphController.id,
+      auction.vault.account,
+      auction.auctionAssetContract.id,
+    );
+  }, [
+    subgraphController.id,
+    auction.vault.account,
+    auction.auctionAssetContract.id,
+  ]);
 
   return (
     <OracleInfoProvider collections={collections}>
       <ControllerContextProvider value={subgraphController}>
         <div className={controllerStyles.wrapper}>
           <AuctionPageContent auction={auction} />
+          <Activity
+            subgraphPool={subgraphPool}
+            vault={auctionVaultId}
+            showSwaps={false}
+          />
         </div>
       </ControllerContextProvider>
     </OracleInfoProvider>

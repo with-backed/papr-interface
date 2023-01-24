@@ -5,7 +5,7 @@ import {
 } from 'components/EtherscanLink';
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { useActivityByController } from 'hooks/useActivityByController';
+import { useActivity } from 'hooks/useActivity';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { humanizedTimestamp } from 'lib/duration';
 import { formatTokenAmount } from 'lib/numberFormat';
@@ -24,28 +24,38 @@ type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 type ActivityProps = {
-  // If scoping activity view to just a specific vault
-  // instead of the whole controller
+  // If scoping activity view to just a specific account
   account?: string;
+  // If scoping activity view to just a specific vault
+  vault?: string;
+  showSwaps?: boolean;
   subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
 
 const EVENT_INCREMENT = 5;
 
-export function Activity({ account, subgraphPool }: ActivityProps) {
+export function Activity({
+  account,
+  vault,
+  showSwaps = true,
+  subgraphPool,
+}: ActivityProps) {
   const paprController = useController();
   const { data: swapsData, fetching: swapsFetching } = useUniswapSwapsByPool(
     paprController.poolAddress,
   );
 
-  const { data: activityData, fetching: activityFetching } =
-    useActivityByController(paprController.id, account);
+  const { data: activityData, fetching: activityFetching } = useActivity(
+    paprController.id,
+    account,
+    vault,
+  );
 
   const allEvents = useMemo(() => {
     const unsortedEvents = [
       ...(activityData?.addCollateralEvents || []),
       ...(activityData?.removeCollateralEvents || []),
-      ...(swapsData?.swaps || []),
+      ...(swapsData?.swaps && showSwaps ? swapsData.swaps : []),
       ...(activityData?.auctionStartEvents.filter(
         (e) => e.auction.vault.controller.id === paprController.id,
       ) || []),
@@ -54,7 +64,7 @@ export function Activity({ account, subgraphPool }: ActivityProps) {
       ) || []),
     ];
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
-  }, [activityData, paprController.id, swapsData]);
+  }, [activityData, paprController.id, showSwaps, swapsData]);
 
   const { feed, amountThatWillShowNext, remainingLength, showMore } =
     useShowMore(allEvents, EVENT_INCREMENT);

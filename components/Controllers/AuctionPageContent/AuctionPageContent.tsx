@@ -5,7 +5,6 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
-import { getQuoteForSwapOutput } from 'lib/controllers';
 import { formatBigNum } from 'lib/numberFormat';
 import { useEffect, useMemo, useState } from 'react';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
