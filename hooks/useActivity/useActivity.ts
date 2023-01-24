@@ -10,6 +10,8 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
+// hook to fetch activity from subgraph depending on if scoping to account or vault
+// if neither account nor vault are passed, defaults to fetching all activity for controller
 export function useActivity(
   controllerId: string,
   account?: string,

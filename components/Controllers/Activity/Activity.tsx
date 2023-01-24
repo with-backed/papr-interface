@@ -5,7 +5,7 @@ import {
 } from 'components/EtherscanLink';
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { useActivityByController } from 'hooks/useActivityByController';
+import { useActivity } from 'hooks/useActivity';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { humanizedTimestamp } from 'lib/duration';
 import { formatTokenAmount } from 'lib/numberFormat';
@@ -24,9 +24,9 @@ type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 type ActivityProps = {
-  // If scoping activity view to just a specific vault
-  // instead of the whole controller
+  // If scoping activity view to just a specific account
   account?: string;
+  // If scoping activity view to just a specific vault
   vault?: string;
   showSwaps?: boolean;
   subgraphPool: NonNullable<PoolByIdQuery['pool']>;
@@ -45,8 +45,11 @@ export function Activity({
     paprController.poolAddress,
   );
 
-  const { data: activityData, fetching: activityFetching } =
-    useActivityByController(paprController.id, account, vault);
+  const { data: activityData, fetching: activityFetching } = useActivity(
+    paprController.id,
+    account,
+    vault,
+  );
 
   const allEvents = useMemo(() => {
     const unsortedEvents = [
