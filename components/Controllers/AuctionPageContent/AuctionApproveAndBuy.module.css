@@ -1,0 +1,41 @@
+.currentPriceRowWrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.currentPriceRowWrapper > div:first-child {
+  width: 30%;
+}
+
+.currentPriceRow {
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 70%;
+}
+
+.currentPriceRow p {
+  margin: 0 12px;
+}
+
+.approveAndBuy {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.approveAndBuy > div:first-child {
+  width: 30%;
+}
+
+.approveAndBuy > div:nth-child(2) {
+  width: 70%;
+}
+
+.approveAndBuy button {
+  width: 100%;
+}

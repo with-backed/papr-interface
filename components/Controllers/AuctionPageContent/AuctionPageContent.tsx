@@ -19,6 +19,7 @@ import { getUnitPriceForEth } from 'lib/coingecko';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 import { AuctionGraph } from './AuctionGraph';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+import AuctionApproveAndBuy from './AuctionApproveAndBuy';
 
 export type AuctionPageContentProps = {
   auction: NonNullable<AuctionQuery['auction']>;
@@ -136,6 +137,10 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
         oracleInfo={oracleInfo}
         latestUniswapPrice={latestUniswapPrice}
         floorEthPrice={floorEthPrice}
+      />
+      <AuctionApproveAndBuy
+        auction={auction}
+        liveAuctionPrice={liveAuctionPrice}
       />
     </Fieldset>
   );
