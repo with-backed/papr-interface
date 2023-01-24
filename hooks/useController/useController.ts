@@ -8,9 +8,15 @@ interface ERC20Token {
   decimals: number;
 }
 
+interface ERC721Token {
+  id: string;
+  name: string;
+  symbol: string;
+}
+
 interface AllowedCollateral {
   id: string;
-  token: { id: string; name: string; symbol: string };
+  token: ERC721Token;
   allowed: boolean;
 }
 
@@ -25,11 +31,10 @@ export interface PaprController {
   vaults?:
     | {
         id: string;
-        token: {
-          id: string;
-        };
+        token: ERC721Token;
         debt: ethers.BigNumberish;
         collateralCount: number;
+        account: string;
         collateral:
           | {
               id: string;

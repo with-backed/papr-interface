@@ -9,22 +9,23 @@ import { Table } from 'components/Table';
 import { VaultHealth } from './VaultHealth';
 import { useShowMore } from 'hooks/useShowMore';
 import { TextButton } from 'components/Button';
-import { erc20ABI, useAccount, useContractRead } from 'wagmi';
+import { erc20ABI, useContractRead } from 'wagmi';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { captureException } from '@sentry/nextjs';
 import { controllerNFTValue } from 'lib/controllers';
 import { useController } from 'hooks/useController';
-import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 
 type LoansProps = {
   pricesData: ControllerPricesData | null;
 };
 
 export function Loans({ pricesData }: LoansProps) {
-  const { address } = useAccount();
   const paprController = useController();
-  const { currentVaults } = useCurrentVaults(address);
+  const currentVaults = useMemo(
+    () => paprController.vaults?.filter((v) => v.debt > 0),
+    [paprController],
+  );
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
   const NFTValue = useMemo(
@@ -75,6 +76,8 @@ export function Loans({ pricesData }: LoansProps) {
     );
     return '$' + formatTokenAmount(debtNum);
   }, [currentVaults, paprController.paprToken]);
+
+  console.log({ currentVaults });
 
   const { feed, remainingLength, showMore, amountThatWillShowNext } =
     useShowMore(currentVaults || []);
