@@ -49,7 +49,7 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { useController, PaprController } from 'hooks/useController';
-import { calculateFee } from 'lib/controllers/fees';
+import { calculateSwapFee } from 'lib/controllers/fees';
 
 type VaultDebtPickerProps = {
   oracleInfo: OracleInfo;
@@ -237,7 +237,7 @@ export function VaultDebtPicker({
   }, [underlyingBorrowQuote]);
   const underlyingBorrowFee = useMemo(() => {
     if (!underlyingBorrowQuote || usingPerpetual) return null;
-    return calculateFee(underlyingBorrowQuote[0]);
+    return calculateSwapFee(underlyingBorrowQuote[0]);
   }, [underlyingBorrowQuote, usingPerpetual]);
 
   const slippageForBorrow = useMemo(() => {
@@ -277,7 +277,7 @@ export function VaultDebtPicker({
   }, [underlyingRepayQuote]);
   const underlyingRepayFee = useMemo(() => {
     if (!underlyingRepayQuote || usingPerpetual) return null;
-    return calculateFee(underlyingRepayQuote[0]);
+    return calculateSwapFee(underlyingRepayQuote[0]);
   }, [underlyingRepayQuote, usingPerpetual]);
 
   const slippageForRepay = useMemo(() => {
@@ -401,7 +401,7 @@ export function VaultDebtPicker({
           </tr>
         </thead>
         <tbody>
-          {true &&
+          {maxDebtPerNFTInUnderlying &&
             userAndVaultNFTs.map((nft) => (
               <CollateralRow
                 key={`${nft.address}-${nft.tokenId}`}
@@ -415,7 +415,7 @@ export function VaultDebtPicker({
                 isLiquidated={nft.isLiquidated}
                 vaultHasCollateral={vaultHasCollateral}
                 maxBorrow={formatBigNum(
-                  maxDebtPerNFTInUnderlying || ethers.BigNumber.from(0),
+                  maxDebtPerNFTInUnderlying,
                   paprController.underlying.decimals,
                 )}
                 depositNFTs={depositNFTs}
