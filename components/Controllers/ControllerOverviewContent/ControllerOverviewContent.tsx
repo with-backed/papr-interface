@@ -9,6 +9,7 @@ import dynamic from 'next/dynamic';
 import { Auctions } from 'components/Controllers/Auctions';
 import { YourPositions as YourPositionsComponent } from 'components/YourPositions';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+import { ContractStatus } from 'components/ContractStatus';
 
 /* lightweight-charts uses canvas and cannot be SSRed */
 const Charts = dynamic(() => import('components/Controllers/Charts/Charts'), {
@@ -45,6 +46,7 @@ export function ControllerOverviewContent({
   return (
     <div className={styles.wrapper}>
       <YourPositions />
+      <ContractStatus pricesData={pricesData} />
       <TokenPerformance pricesData={pricesData} />
       <Collateral />
       <Activity subgraphPool={subgraphPool} />

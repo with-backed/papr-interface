@@ -1,0 +1,55 @@
+.summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  background-color: var(--paprMEME-5);
+  height: 30px;
+}
+
+.summary > button {
+  color: var(--highlight-clickable-100);
+}
+
+.chart {
+  margin-top: 2.5rem;
+  width: 100%;
+  display: flex;
+}
+
+.chart-prices {
+  position: relative;
+  min-width: 130px;
+}
+
+.price {
+  position: absolute;
+}
+
+.chart-lines {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.chart-lines > span:nth-child(-n + 3),
+.chart-lines > span:nth-last-child(-n + 3) {
+  height: 10px;
+}
+
+.chart-lines > span {
+  display: flex;
+  align-items: center;
+}
+
+.explainer {
+  font-size: var(--font-small);
+  margin: 6px 0 6px 1.7rem;
+  transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
+  opacity: 0;
+}
+
+.explainer[data-enter] {
+  opacity: 1;
+}

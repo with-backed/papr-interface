@@ -1,6 +1,4 @@
 import { Fieldset } from 'components/Fieldset';
-import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import {
   formatThreeFractionDigits,
   formatTokenAmount,
