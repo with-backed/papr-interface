@@ -75,9 +75,8 @@ export default function Auction({
     });
 
   const auction = useMemo(() => {
-    if (fetching) return null;
     return auctionQueryResult?.auction;
-  }, [auctionQueryResult, fetching]);
+  }, [auctionQueryResult]);
 
   const auctionVaultId = useMemo(() => {
     if (!auction) return '';
@@ -96,7 +95,7 @@ export default function Auction({
     return <Custom404 />;
   }
 
-  if (fetching) {
+  if (!auction) {
     return <></>;
   }
 
@@ -104,7 +103,7 @@ export default function Auction({
     <OracleInfoProvider collections={collections}>
       <ControllerContextProvider value={subgraphController}>
         <div className={controllerStyles.wrapper}>
-          <AuctionPageContent auction={auction!} refresh={refresh} />
+          <AuctionPageContent auction={auction} refresh={refresh} />
           <Activity
             subgraphPool={subgraphPool}
             vault={auctionVaultId}
