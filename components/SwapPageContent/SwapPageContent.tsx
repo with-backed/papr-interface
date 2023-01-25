@@ -2,7 +2,7 @@ import { SwapWidget, Theme } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
 import { useConfig } from 'hooks/useConfig';
 import { useMemo } from 'react';
-import { useProvider } from 'wagmi';
+import { useSigner } from 'wagmi';
 import styles from './SwapPageContent.module.css';
 
 const theme: Theme = {
@@ -20,7 +20,7 @@ const theme: Theme = {
 
 export function SwapPageContent() {
   const { chainId, jsonRpcProvider } = useConfig();
-  const provider = useProvider();
+  const { data: signer } = useSigner();
 
   const jsonRpcUrlMap = useMemo(
     () => ({ [chainId]: jsonRpcProvider }),
@@ -31,7 +31,7 @@ export function SwapPageContent() {
       <SwapWidget
         theme={theme}
         jsonRpcUrlMap={jsonRpcUrlMap}
-        provider={provider as any}
+        provider={signer?.provider as any}
       />
     </div>
   );
