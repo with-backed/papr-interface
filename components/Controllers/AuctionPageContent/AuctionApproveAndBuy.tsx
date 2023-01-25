@@ -18,11 +18,13 @@ import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 type AuctionApproveAndBuyProps = {
   auction: NonNullable<AuctionQuery['auction']>;
   liveAuctionPrice: ethers.BigNumber;
+  refresh: () => void;
 };
 
 export default function AuctionApproveAndBuy({
   auction,
   liveAuctionPrice,
+  refresh,
 }: AuctionApproveAndBuyProps) {
   const controller = useController();
   const [paprTokenApproved, setPaprTokenApproved] = useState<boolean>(false);
@@ -55,6 +57,7 @@ export default function AuctionApproveAndBuy({
             auction={auction}
             liveAuctionPrice={liveAuctionPrice}
             tokenApproved={paprTokenApproved}
+            refresh={refresh}
           />
         </div>
       </div>
@@ -70,12 +73,14 @@ type BuyButtonProps = {
   auction: NonNullable<AuctionQuery['auction']>;
   liveAuctionPrice: ethers.BigNumber;
   tokenApproved: boolean;
+  refresh: () => void;
 };
 
 function BuyButton({
   auction,
   liveAuctionPrice,
   tokenApproved,
+  refresh,
 }: BuyButtonProps) {
   const { address } = useAccount();
   const controller = useController();
@@ -114,7 +119,7 @@ function BuyButton({
   const { data, write, error } = useContractWrite({
     ...config,
     onSuccess: (data: any) => {
-      data.wait().then();
+      data.wait().then(refresh);
     },
   } as any);
 

@@ -22,9 +22,13 @@ import AuctionApproveAndBuy from './AuctionApproveAndBuy';
 
 export type AuctionPageContentProps = {
   auction: NonNullable<AuctionQuery['auction']>;
+  refresh: () => void;
 };
 
-export function AuctionPageContent({ auction }: AuctionPageContentProps) {
+export function AuctionPageContent({
+  auction,
+  refresh,
+}: AuctionPageContentProps) {
   const { tokenName } = useConfig();
   const controller = useController();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
@@ -59,12 +63,20 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
     return oracleInfo[auction.auctionAssetContract.id].price / ethPrice;
   }, [oracleInfo, ethPrice, auction.auctionAssetContract.id]);
 
+  const auctionCompleted = useMemo(() => {
+    return !!auction.endPrice;
+  }, [auction.endPrice]);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeElapsed(currentTimeInSeconds() - auction.start.timestamp);
-    }, 1000);
-    return () => clearInterval(interval);
-  });
+    if (!auctionCompleted) {
+      const interval = setInterval(() => {
+        setTimeElapsed(currentTimeInSeconds() - auction.start.timestamp);
+      }, 1000);
+      return () => clearInterval(interval);
+    } else {
+      setTimeElapsed(auction.end!.timestamp - auction.start.timestamp);
+    }
+  }, [auctionCompleted, auction.start.timestamp, auction.end]);
 
   if (!oracleInfo || !latestUniswapPrice) return <></>;
 
@@ -79,10 +91,20 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
           />
         </div>
         <div className={styles.headerInfo}>
-          <div className={styles.livePrice}>
-            <div className={styles.countdown}>
-              <AuctionCountdown />
-            </div>
+          <div
+            className={`${styles.livePrice} ${
+              auctionCompleted ? styles.completed : ''
+            }`}>
+            {auctionCompleted && (
+              <div className={styles.sold}>
+                <p>SOLD:</p>
+              </div>
+            )}
+            {!auctionCompleted && (
+              <div className={styles.countdown}>
+                <AuctionCountdown />
+              </div>
+            )}
             <div
               className={`${styles.prices} ${styles.updatable} ${
                 priceUpdated ? styles.updated : ''
@@ -137,10 +159,13 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
         latestUniswapPrice={latestUniswapPrice}
         floorEthPrice={floorEthPrice}
       />
-      <AuctionApproveAndBuy
-        auction={auction}
-        liveAuctionPrice={liveAuctionPrice}
-      />
+      {!auctionCompleted && (
+        <AuctionApproveAndBuy
+          auction={auction}
+          liveAuctionPrice={liveAuctionPrice}
+          refresh={refresh}
+        />
+      )}
     </Fieldset>
   );
 }
@@ -192,7 +217,7 @@ function SummaryTable({
         <tr>
           <th>Time</th>
           <th>% Top Bid</th>
-          <th>△1hr</th>
+          {!auction.endPrice && <th>△1hr</th>}
         </tr>
       </thead>
       <tbody>
@@ -204,12 +229,14 @@ function SummaryTable({
             }`}>
             {percentFloor}%
           </td>
-          <td
-            className={`${styles.updatable} ${
-              priceUpdated ? styles.updated : ''
-            }`}>
-            {formatBigNum(hourlyPriceChange, auction.paymentAsset.decimals)}
-          </td>
+          {!auction.endPrice && (
+            <td
+              className={`${styles.updatable} ${
+                priceUpdated ? styles.updated : ''
+              }`}>
+              {formatBigNum(hourlyPriceChange, auction.paymentAsset.decimals)}
+            </td>
+          )}
         </tr>
       </tbody>
     </Table>
