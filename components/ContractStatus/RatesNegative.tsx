@@ -41,7 +41,7 @@ export function RatesNegative({
       <Summary disclosureState={disclosureState}>
         🧊 Contract is trying to cool down Market Price
       </Summary>
-      <div className={styles.chart}>
+      <div data-testid="rates-negative" className={styles.chart}>
         <div className={styles['chart-prices']}>
           <Price kind="market" value={marketPrice} />
           <Price kind="target" value={targetPrice} />
