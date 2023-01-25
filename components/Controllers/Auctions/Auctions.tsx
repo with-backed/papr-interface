@@ -5,6 +5,7 @@ import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useController } from 'hooks/useController';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { useShowMore } from 'hooks/useShowMore';
@@ -16,9 +17,8 @@ import {
   getOraclePayloadFromReservoirObject,
   OraclePriceType,
 } from 'lib/oracle/reservoir';
-import { PaprController } from 'lib/PaprController';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ERC20 } from 'types/generated/abis';
+import { ERC20, PaprController__factory } from 'types/generated/abis';
 import { INFTEDA } from 'types/generated/abis/PaprController';
 import {
   AuctionsDocument,
@@ -32,10 +32,8 @@ type Auction = AuctionsQuery['auctions'][number];
 type ActiveAuction = Auction & { startPrice: string };
 type PastAuction = ActiveAuction & { end: { timestamp: number; id: string } };
 
-type AuctionsProps = {
-  paprController: PaprController;
-};
-export function Auctions({ paprController }: AuctionsProps) {
+export function Auctions() {
+  const controller = useController();
   const [{ data: auctionsQueryResult, fetching }] = useQuery<AuctionsQuery>({
     query: AuctionsDocument,
   });
@@ -48,7 +46,7 @@ export function Auctions({ paprController }: AuctionsProps) {
 
     if (!!auctionsQueryResult?.auctions && !fetching) {
       auctionsQueryResult.auctions
-        .filter((a) => a.vault.controller.id === paprController.id)
+        .filter((a) => a.vault.controller.id === controller.id)
         .forEach((auction) => {
           if (typeof auction.end?.timestamp === 'number') {
             result.pastAuctions.push(auction as PastAuction);
@@ -59,15 +57,11 @@ export function Auctions({ paprController }: AuctionsProps) {
     }
 
     return result;
-  }, [auctionsQueryResult, fetching, paprController]);
+  }, [auctionsQueryResult, fetching, controller]);
 
   return (
     <div className={styles.wrapper}>
-      <ActiveAuctions
-        auctions={activeAuctions}
-        fetching={fetching}
-        controller={paprController}
-      />
+      <ActiveAuctions auctions={activeAuctions} fetching={fetching} />
       <PastAuctions auctions={pastAuctions} fetching={fetching} />
     </div>
   );
@@ -76,18 +70,14 @@ export function Auctions({ paprController }: AuctionsProps) {
 type ActiveAuctionsProps = {
   auctions: ActiveAuction[];
   fetching: boolean;
-  controller: PaprController;
 };
-function ActiveAuctions({
-  auctions,
-  controller: controller,
-  fetching,
-}: ActiveAuctionsProps) {
+function ActiveAuctions({ auctions, fetching }: ActiveAuctionsProps) {
+  const controller = useController();
   const { address } = useAccount();
   const signerOrProvider = useSignerOrProvider();
   const tokenContract = useMemo(
-    () => erc20Contract(controller.debtToken.id, signerOrProvider),
-    [controller.debtToken.id, signerOrProvider],
+    () => erc20Contract(controller.paprToken.id, signerOrProvider),
+    [controller.paprToken.id, signerOrProvider],
   );
   const paprApproved = useAsyncValue(async () => {
     if (!address) return null;
@@ -124,7 +114,6 @@ function ActiveAuctions({
             <ActiveAuctionRow
               key={auction.id}
               auction={auction}
-              controller={controller}
               tokenContract={tokenContract}
               paprApproved={paprApproved}
             />
@@ -137,12 +126,10 @@ function ActiveAuctions({
 
 function ActiveAuctionRow({
   auction,
-  controller,
   tokenContract,
   paprApproved,
 }: {
   auction: ActiveAuction;
-  controller: PaprController;
   tokenContract: ERC20;
   paprApproved: boolean | null;
 }) {
@@ -193,7 +180,6 @@ function ActiveAuctionRow({
       <td className={styles.center}>
         <BuyButton
           auction={auction}
-          controller={controller}
           maxPrice={liveAuctionPrice}
           tokenContract={tokenContract}
           paprApproved={paprApproved}
@@ -205,18 +191,18 @@ function ActiveAuctionRow({
 
 type BuyButtonProps = {
   auction: ActiveAuction;
-  controller: PaprController;
   maxPrice: ethers.BigNumber;
   tokenContract: ERC20;
   paprApproved: boolean | null;
 };
 function BuyButton({
   auction,
-  controller,
   maxPrice,
   tokenContract,
   paprApproved,
 }: BuyButtonProps) {
+  const signerOrProvider = useSignerOrProvider();
+  const controller = useController();
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const [buyingState, setBuyingState] = useState<
@@ -239,7 +225,11 @@ function BuyButton({
 
     const oracleDetails = oracleInfo[auction.auctionAssetContract.id];
     const oracleInfoStruct = getOraclePayloadFromReservoirObject(oracleDetails);
-    const tx = await controller.purchaseLiquidationAuctionNFT(
+    const contract = PaprController__factory.connect(
+      controller.id,
+      signerOrProvider,
+    );
+    const tx = await contract.purchaseLiquidationAuctionNFT(
       {
         ...auction,
         nftOwner: auction.vault.account,
@@ -261,6 +251,7 @@ function BuyButton({
     oracleInfo,
     tokenContract,
     paprApproved,
+    signerOrProvider,
   ]);
 
   return (

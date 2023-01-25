@@ -1,8 +1,7 @@
 import { ethers } from 'ethers';
 import { configs, SupportedToken } from 'lib/config';
-import { ONE } from 'lib/constants';
 import { TimeSeriesValue } from '.';
-import { PaprController, SubgraphController } from 'lib/PaprController';
+import { SubgraphController } from 'lib/PaprController';
 import { clientFromUrl } from 'lib/urql';
 import { PaprController__factory } from 'types/generated/abis';
 import {
@@ -21,7 +20,7 @@ interface TargetUpdate {
 
 export async function targetValues(
   now: number,
-  controller: PaprController | SubgraphController,
+  controller: SubgraphController,
   pool: Pool,
   token: SupportedToken,
 ): Promise<[TimeSeriesValue[], TimeSeriesValue[]]> {

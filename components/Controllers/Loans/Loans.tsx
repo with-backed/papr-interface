@@ -1,6 +1,5 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
-import { PaprController } from 'lib/PaprController';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import React, { useMemo } from 'react';
@@ -15,15 +14,16 @@ import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { captureException } from '@sentry/nextjs';
 import { controllerNFTValue } from 'lib/controllers';
+import { useController } from 'hooks/useController';
 
 type LoansProps = {
-  paprController: PaprController;
   pricesData: ControllerPricesData | null;
 };
 
-export function Loans({ paprController, pricesData }: LoansProps) {
-  const activeVaults = useMemo(
-    () => paprController.vaults?.filter((v) => v.debt > 0) || [],
+export function Loans({ pricesData }: LoansProps) {
+  const paprController = useController();
+  const currentVaults = useMemo(
+    () => paprController.vaults?.filter((v) => v.debt > 0),
     [paprController],
   );
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
@@ -36,8 +36,8 @@ export function Loans({ paprController, pricesData }: LoansProps) {
   const { data: totalSupply } = useContractRead({
     abi: erc20ABI,
     address: paprController[
-      paprController.token0IsUnderlying ? 'token1' : 'token0'
-    ].address as `0x${string}`,
+      paprController.token0IsUnderlying ? 'paprToken' : 'underlying'
+    ].id as `0x${string}`,
     functionName: 'totalSupply',
   });
 
@@ -67,18 +67,18 @@ export function Loans({ paprController, pricesData }: LoansProps) {
   );
 
   const formattedTotalDebt = useMemo(() => {
-    const debtBigNum = activeVaults.reduce(
+    const debtBigNum = (currentVaults || []).reduce(
       (prev, v) => prev.add(v.debt),
       ethers.BigNumber.from(0),
     );
     const debtNum = parseFloat(
-      ethers.utils.formatUnits(debtBigNum, paprController.debtToken.decimals),
+      ethers.utils.formatUnits(debtBigNum, paprController.paprToken.decimals),
     );
     return '$' + formatTokenAmount(debtNum);
-  }, [activeVaults, paprController.debtToken]);
+  }, [currentVaults, paprController.paprToken]);
 
   const { feed, remainingLength, showMore, amountThatWillShowNext } =
-    useShowMore(activeVaults);
+    useShowMore(currentVaults || []);
 
   return (
     <Fieldset legend="💸 Loans">
@@ -93,7 +93,7 @@ export function Loans({ paprController, pricesData }: LoansProps) {
         </thead>
         <tbody>
           <tr className={styles.row}>
-            <td>{activeVaults.length} Loans</td>
+            <td>{currentVaults?.length} Loans</td>
             <td>{formattedTotalDebt}</td>
             <td>{formattedAvgLtv}</td>
             <td>

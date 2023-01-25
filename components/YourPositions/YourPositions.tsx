@@ -1,11 +1,11 @@
 import styles from './YourPositions.module.css';
-import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
+import { useAccountNFTs } from 'hooks/useAccountNFTs';
 import { Fieldset } from 'components/Fieldset';
 import { useAccount } from 'wagmi';
 import { useMemo } from 'react';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { SupportedToken } from 'lib/config';
 import { useConfig } from 'hooks/useConfig';
 import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
@@ -18,39 +18,42 @@ import { useLTV } from 'hooks/useLTV';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { useController } from 'hooks/useController';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+import { usePaprBalance } from 'hooks/usePaprBalance';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 
-export type YourPositionsProps = {
-  userNFTs: AccountNFTsResponse[];
-  currentVaults: VaultsByOwnerForControllerQuery['vaults'] | null;
-  oracleInfo: OracleInfo;
-  balance: ethers.BigNumber | null;
-};
-
-export function YourPositions({
-  userNFTs,
-  currentVaults,
-  oracleInfo,
-  balance,
-}: YourPositionsProps) {
+export function YourPositions() {
   const { address } = useAccount();
   const { tokenName } = useConfig();
   const paprController = useController();
 
   const latestMarketPrice = useLatestMarketPrice();
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const { balance } = usePaprBalance(paprController.paprToken.id);
+  const { currentVaults } = useCurrentVaults(address);
+
+  const collateralContractAddresses = useMemo(() => {
+    return paprController.allowedCollateral.map((ac) => ac.token.id);
+  }, [paprController.allowedCollateral]);
+
+  const { userCollectionNFTs } = useAccountNFTs(
+    address,
+    collateralContractAddresses,
+  );
 
   const uniqueCollections = useMemo(() => {
-    const vaultAndUserAddresses = userNFTs
+    const vaultAndUserAddresses = userCollectionNFTs
       .map((nft) => getAddress(nft.address))
       .concat((currentVaults || []).map((v) => getAddress(v.token.id)));
     return Array.from(new Set(vaultAndUserAddresses));
-  }, [userNFTs, currentVaults]);
+  }, [userCollectionNFTs, currentVaults]);
 
   const collateralAssets = useMemo(
     () =>
-      userNFTs
+      userCollectionNFTs
         .map((nft) => nft.address)
         .concat((currentVaults || []).map((v) => getAddress(v.token.id))),
-    [currentVaults, userNFTs],
+    [currentVaults, userCollectionNFTs],
   );
 
   const maxLoanInDebtTokens = useMaxDebt(collateralAssets);
@@ -109,8 +112,6 @@ export function YourPositions({
     paprController.underlying.id,
     totalPaprMemeDebt,
   ]);
-
-  if (!oracleInfo) return <></>;
 
   if (!address) {
     return (
@@ -179,13 +180,14 @@ export function YourPositions({
             </tr>
           </thead>
           <tbody>
-            {currentVaults.map((vault) => (
-              <VaultOverview
-                vaultInfo={vault}
-                oracleInfo={oracleInfo}
-                key={vault.id}
-              />
-            ))}
+            {!!oracleInfo &&
+              currentVaults.map((vault) => (
+                <VaultOverview
+                  vaultInfo={vault}
+                  oracleInfo={oracleInfo}
+                  key={vault.id}
+                />
+              ))}
           </tbody>
         </Table>
       )}

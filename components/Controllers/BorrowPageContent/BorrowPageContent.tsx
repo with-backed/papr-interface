@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
 import controllerStyles from 'components/Controllers/Controller.module.css';
-import { useConfig } from 'hooks/useConfig';
 import { useAccount } from 'wagmi';
 import { useAccountNFTs } from 'hooks/useAccountNFTs';
 import { YourPositions } from 'components/YourPositions/YourPositions';
@@ -20,7 +19,6 @@ export type BorrowPageProps = {
 
 export function BorrowPageContent({ subgraphPool }: BorrowPageProps) {
   const paprController = useController();
-  const config = useConfig();
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
 
@@ -29,12 +27,12 @@ export function BorrowPageContent({ subgraphPool }: BorrowPageProps) {
   }, [paprController.allowedCollateral]);
 
   const { userCollectionNFTs, reexecuteQuery: refreshAccountNFTs } =
-    useAccountNFTs(address, collateralContractAddresses, config);
+    useAccountNFTs(address, collateralContractAddresses);
 
   const { currentVaults, reexecuteQuery: refreshCurrentVaults } =
     useCurrentVaults(address);
 
-  const { balance, refresh: refreshBalance } = usePaprBalance(
+  const { refresh: refreshBalance } = usePaprBalance(
     paprController.paprToken.id,
   );
 
@@ -64,12 +62,7 @@ export function BorrowPageContent({ subgraphPool }: BorrowPageProps) {
 
   return (
     <div className={controllerStyles.wrapper}>
-      <YourPositions
-        userNFTs={userCollectionNFTs}
-        currentVaults={currentVaults}
-        oracleInfo={oracleInfo}
-        balance={balance}
-      />
+      <YourPositions />
       {!!address &&
         uniqueCollections.map((collection) => (
           <VaultDebtPicker

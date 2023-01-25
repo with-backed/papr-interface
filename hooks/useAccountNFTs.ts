@@ -1,10 +1,10 @@
-import { Config } from 'lib/config';
 import { useEffect, useMemo, useState } from 'react';
 import {
   NftsForAccountAndCollectionDocument,
   NftsForAccountAndCollectionQuery,
 } from 'types/generated/graphql/erc721';
 import { useQuery } from 'urql';
+import { useConfig } from './useConfig';
 
 export type AccountNFTsResponse = {
   address: string;
@@ -14,8 +14,8 @@ export type AccountNFTsResponse = {
 export const useAccountNFTs = (
   address: string | undefined,
   collections: string[] | undefined,
-  config: Config,
 ) => {
+  const config = useConfig();
   // Cache last result, so that when refreshing we don't have a flash of
   // blank page while new results are fetching
   const [prevData, setPrevData] = useState<

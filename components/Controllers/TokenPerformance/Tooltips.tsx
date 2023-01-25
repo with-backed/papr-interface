@@ -1,8 +1,4 @@
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { PaprController } from 'lib/PaprController';
-import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
-import { ControllerPricesData } from 'lib/controllers/charts';
-import { useMemo } from 'react';
+import { formatTokenAmount } from 'lib/numberFormat';
 import { TooltipStateReturn } from 'reakit';
 import styles from 'components/Controllers/TokenPerformance/tooltips.module.css';
 import { Tooltip } from 'components/Tooltip';

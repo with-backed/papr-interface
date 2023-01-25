@@ -12,7 +12,6 @@ import {
 } from 'lib/PaprController';
 import { useConfig } from 'hooks/useConfig';
 import { useAsyncValue } from 'hooks/useAsyncValue';
-import { usePaprController_deprecated } from 'hooks/usePaprController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
 import { OpenGraph } from 'components/OpenGraph';
@@ -66,19 +65,15 @@ export default function ControllerPage({
   subgraphPool,
 }: ServerSideProps) {
   const config = useConfig();
-  const paprController = usePaprController_deprecated({
-    subgraphController,
-    subgraphPool,
-  });
 
   const pricesData = useAsyncValue(
     () =>
       controllerPricesData(
-        paprController,
+        subgraphController,
         config.tokenName as SupportedToken,
         config.uniswapSubgraph,
       ),
-    [config, paprController],
+    [config, subgraphController],
   );
 
   const collections = useMemo(
@@ -91,7 +86,6 @@ export default function ControllerPage({
       <ControllerContextProvider value={subgraphController}>
         <OpenGraph title={`${config.tokenName} | Performance`} />
         <ControllerOverviewContent
-          paprController={paprController}
           pricesData={pricesData}
           subgraphPool={subgraphPool}
         />

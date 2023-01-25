@@ -6,12 +6,13 @@ import { lambertW0 } from 'lambert-w-function';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { getAddress } from 'ethers/lib/utils';
-import { PaprController } from 'lib/PaprController';
+import { SubgraphController } from 'lib/PaprController';
 import { configs, SupportedToken } from 'lib/config';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { Quoter } from 'lib/contracts';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { formatBigNum } from 'lib/numberFormat';
+import { PaprController } from 'hooks/useController';
 
 dayjs.extend(duration);
 
@@ -94,30 +95,6 @@ export function secondsForRatePeriod(period: RatePeriod): number {
   }
 }
 
-// TODO(adamgobes): figure out how to do powWad locally in JS
-export async function multiplier(
-  controller: PaprController,
-  now: ethers.BigNumber,
-  mark: ethers.BigNumber,
-) {
-  const lastUpdated = await controller.lastUpdated();
-  const PERIOD = ethers.BigNumber.from(28 * SECONDS_IN_A_DAY);
-  const prevNorm = await controller.target();
-
-  const period = now.sub(lastUpdated);
-  const periodRatio = period.mul(ONE).div(PERIOD);
-  let indexMarkRatio = ONE.div(mark.div(prevNorm));
-
-  /// TODO fetch actual indexMark min and max from contract
-  if (indexMarkRatio.gt(14e17)) {
-    indexMarkRatio = ethers.BigNumber.from(14e17);
-  } else {
-    indexMarkRatio = ethers.BigNumber.from(8e17);
-  }
-
-  return indexMarkRatio.pow(periodRatio);
-}
-
 export async function getQuoteForSwap(
   amount: ethers.BigNumber,
   tokenIn: string,
@@ -155,13 +132,13 @@ export async function getQuoteForSwapOutput(
 export async function computeLiquidationEstimation(
   debt: ethers.BigNumber,
   max: ethers.BigNumber,
-  controller: PaprController,
+  controller: SubgraphController,
 ) {
   const debtTaken = parseFloat(
-    ethers.utils.formatUnits(debt, controller.debtToken.decimals),
+    ethers.utils.formatUnits(debt, controller.paprToken.decimals),
   );
   const maxDebt = parseFloat(
-    ethers.utils.formatUnits(max, controller.debtToken.decimals),
+    ethers.utils.formatUnits(max, controller.paprToken.decimals),
   );
 
   const percentage = (debtTaken / maxDebt) * 100;
@@ -247,18 +224,6 @@ export async function computeSlippageForSwap(
   return priceImpact * 100;
 }
 
-export async function getDebtTokenMarketPrice(controller: PaprController) {
-  if (controller == null) {
-    return null;
-  }
-  const pool = await controller.pool();
-  return controller.token0IsUnderlying ? pool.token1Price : pool.token0Price;
-}
-
-export async function getDebtTokenControllerPrice(controller: PaprController) {
-  return await controller.newTarget();
-}
-
 export const getUniqueNFTId = (address: string, tokenId: string): string =>
   `${getAddress(address)}-${tokenId}`;
 
@@ -324,7 +289,7 @@ export async function getOracleInfoFromAllowedCollateral(
 export function computeLTVFromDebts(
   debt: ethers.BigNumber,
   maxDebt: ethers.BigNumber,
-  maxLTV: ethers.BigNumber,
+  maxLTV: ethers.BigNumberish,
   debtTokenDecimals: number,
 ): number {
   if (maxDebt.isZero()) return 0;

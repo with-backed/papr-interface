@@ -1,5 +1,4 @@
 import { Fieldset } from 'components/Fieldset';
-import { PaprController } from 'lib/PaprController';
 import { useCollection } from '@center-inc/react';
 import React, { useMemo } from 'react';
 import styles from './Collateral.module.css';
@@ -13,9 +12,9 @@ import { computeLTVFromDebts } from 'lib/controllers';
 import { useShowMore } from 'hooks/useShowMore';
 import { TextButton } from 'components/Button';
 import { useMaxDebt } from 'hooks/useMaxDebt';
+import { PaprController, useController } from 'hooks/useController';
 
 type CollateralProps = {
-  paprController: PaprController;
   // If scoping collateral view to just a specific vault
   // instead of the whole controller
   vaultId?: string;
@@ -23,7 +22,8 @@ type CollateralProps = {
 
 const COLLATERAL_INCREMENT = 30;
 
-export function Collateral({ paprController, vaultId }: CollateralProps) {
+export function Collateral({ vaultId }: CollateralProps) {
+  const paprController = useController();
   const vaults = useMemo(() => {
     if (vaultId) {
       const vault = paprController.vaults?.find((v) => v.id === vaultId);
@@ -55,13 +55,7 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
     <Fieldset legend="🖼 Collateral">
       <div className={styles.wrapper}>
         {feed.map(({ vault: v, collateral: c }) => (
-          <Tile
-            key={c.id}
-            address={v.token.id}
-            tokenId={c.tokenId}
-            paprController={paprController}
-            vault={v}
-          />
+          <Tile key={c.id} address={v.token.id} tokenId={c.tokenId} vault={v} />
         ))}
       </div>
       {remainingLength > 0 && (
@@ -78,27 +72,19 @@ export function Collateral({ paprController, vaultId }: CollateralProps) {
 type TileProps = {
   address: string;
   tokenId: string;
-  paprController: PaprController;
   vault: NonNullable<PaprController['vaults']>['0'];
 };
-function Tile({ address, tokenId, paprController, vault }: TileProps) {
+function Tile({ address, tokenId, vault }: TileProps) {
+  const { maxLTV, paprToken } = useController();
   const { centerNetwork } = useConfig();
 
   const result = useCollection({ network: centerNetwork as any, address });
-  const maxLTV = useMemo(() => {
-    return paprController.maxLTVBigNum;
-  }, [paprController]);
   const maxDebt = useMaxDebt(address);
   const debt = useMemo(() => ethers.BigNumber.from(vault.debt), [vault.debt]);
   const ltv = useMemo(() => {
     if (!maxLTV || !maxDebt) return null;
-    return computeLTVFromDebts(
-      debt,
-      maxDebt,
-      maxLTV,
-      paprController.debtToken.decimals,
-    );
-  }, [maxLTV, maxDebt, debt, paprController.debtToken.decimals]);
+    return computeLTVFromDebts(debt, maxDebt, maxLTV, paprToken.decimals);
+  }, [maxLTV, maxDebt, debt, paprToken.decimals]);
 
   const tooltip = useTooltipState();
   return (

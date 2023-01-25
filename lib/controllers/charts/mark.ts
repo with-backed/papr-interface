@@ -2,7 +2,7 @@ import { Price, Token } from '@uniswap/sdk-core';
 import { ethers } from 'ethers';
 import { Q192, SECONDS_IN_A_DAY } from 'lib/constants';
 import { TimeSeriesValue } from '.';
-import { PaprController, SubgraphController } from 'lib/PaprController';
+import { SubgraphController } from 'lib/PaprController';
 import { subgraphUniswapSwapsByPool } from 'lib/uniswapSubgraph';
 import {
   Pool,
@@ -14,7 +14,7 @@ import { getAddress } from 'ethers/lib/utils';
 
 export async function markValues(
   now: number,
-  controller: PaprController | SubgraphController,
+  controller: SubgraphController,
   pool: Pool,
   uniswapSubgraphUrl: string,
 ): Promise<[TimeSeriesValue[], TimeSeriesValue[]]> {

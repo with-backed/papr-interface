@@ -7,7 +7,6 @@ import {
 } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 import styles from '../controller.module.css';
-import { usePaprController_deprecated } from 'hooks/usePaprController';
 import { VaultPageContent } from 'components/Controllers/VaultPageContent';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { controllerPricesData } from 'lib/controllers/charts';
@@ -62,20 +61,16 @@ export default function VaultPage({
   subgraphPool,
   subgraphController,
 }: ServerSideProps) {
-  const paprController = usePaprController_deprecated({
-    subgraphController,
-    subgraphPool,
-  });
   const { tokenName, uniswapSubgraph } = useConfig();
 
   const pricesData = useAsyncValue(
     () =>
       controllerPricesData(
-        paprController,
+        subgraphController,
         tokenName as SupportedToken,
         uniswapSubgraph,
       ),
-    [paprController, tokenName, uniswapSubgraph],
+    [subgraphController, tokenName, uniswapSubgraph],
   );
 
   return (
@@ -88,7 +83,6 @@ export default function VaultPage({
         <a href={`/tokens/${tokenName}`}>⬅ controller</a>
         <ControllerContextProvider value={subgraphController}>
           <VaultPageContent
-            paprController={paprController}
             vaultId={vaultId}
             pricesData={pricesData}
             subgraphPool={subgraphPool}
