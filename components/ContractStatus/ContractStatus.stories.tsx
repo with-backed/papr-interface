@@ -12,8 +12,16 @@ export const Rates = () => {
           flexDirection: 'column',
           gap: 50,
         }}>
-        <RatesNegative />
-        <RatesPositive />
+        <RatesNegative
+          marketPrice="1.39"
+          targetPrice="1.03"
+          contractRate="-231.09%"
+        />
+        <RatesPositive
+          marketPrice="1.03"
+          targetPrice="1.39"
+          contractRate="231.09%"
+        />
       </div>
     </ConfigProvider>
   );
