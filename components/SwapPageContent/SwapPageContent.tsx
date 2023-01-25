@@ -1,3 +1,4 @@
+import { JsonRpcSigner } from '@ethersproject/providers';
 import { SwapWidget, Theme } from '@uniswap/widgets';
 import '@uniswap/widgets/fonts.css';
 import { useConfig } from 'hooks/useConfig';
@@ -20,7 +21,7 @@ const theme: Theme = {
 
 export function SwapPageContent() {
   const { chainId, jsonRpcProvider } = useConfig();
-  const { data: signer } = useSigner();
+  const provider = useSigner<JsonRpcSigner>().data?.provider;
 
   const jsonRpcUrlMap = useMemo(
     () => ({ [chainId]: jsonRpcProvider }),
@@ -31,7 +32,7 @@ export function SwapPageContent() {
       <SwapWidget
         theme={theme}
         jsonRpcUrlMap={jsonRpcUrlMap}
-        provider={signer?.provider as any}
+        provider={provider}
       />
     </div>
   );
