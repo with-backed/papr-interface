@@ -6,7 +6,12 @@ import { useMemo, useState } from 'react';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 import styles from './AuctionApproveAndBuy.module.css';
 import { ApproveTokenButton } from 'components/Controllers/OpenVault/LoanWriteButtons/UpdateLoanButtons';
-import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import {
+  useAccount,
+  useContractEvent,
+  useContractWrite,
+  usePrepareContractWrite,
+} from 'wagmi';
 import PaprControllerABI from 'abis/PaprController.json';
 import { INFTEDA } from 'types/generated/abis/PaprController';
 import {
@@ -14,15 +19,20 @@ import {
   OraclePriceType,
 } from 'lib/oracle/reservoir';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { currentTimeInSeconds } from './AuctionPageContent';
 
 type AuctionApproveAndBuyProps = {
   auction: NonNullable<AuctionQuery['auction']>;
   liveAuctionPrice: ethers.BigNumber;
+  setEndAuctionPrice: (price: ethers.BigNumber) => void;
+  setEndAuctionTimestamp: (timestamp: number) => void;
 };
 
 export default function AuctionApproveAndBuy({
   auction,
   liveAuctionPrice,
+  setEndAuctionPrice,
+  setEndAuctionTimestamp,
 }: AuctionApproveAndBuyProps) {
   const controller = useController();
   const [paprTokenApproved, setPaprTokenApproved] = useState<boolean>(false);
@@ -55,6 +65,8 @@ export default function AuctionApproveAndBuy({
             auction={auction}
             liveAuctionPrice={liveAuctionPrice}
             tokenApproved={paprTokenApproved}
+            setEndAuctionPrice={setEndAuctionPrice}
+            setEndAuctionTimestamp={setEndAuctionTimestamp}
           />
         </div>
       </div>
@@ -70,12 +82,16 @@ type BuyButtonProps = {
   auction: NonNullable<AuctionQuery['auction']>;
   liveAuctionPrice: ethers.BigNumber;
   tokenApproved: boolean;
+  setEndAuctionPrice: (price: ethers.BigNumber) => void;
+  setEndAuctionTimestamp: (timestamp: number) => void;
 };
 
 function BuyButton({
   auction,
   liveAuctionPrice,
   tokenApproved,
+  setEndAuctionPrice,
+  setEndAuctionTimestamp,
 }: BuyButtonProps) {
   const { address } = useAccount();
   const controller = useController();
@@ -113,10 +129,19 @@ function BuyButton({
 
   const { data, write, error } = useContractWrite({
     ...config,
-    onSuccess: (data: any) => {
-      data.wait().then(window.location.reload());
-    },
   } as any);
+
+  useContractEvent({
+    address: controller.id as `0x${string}`,
+    abi: PaprControllerABI.abi,
+    eventName: 'EndAuction',
+    listener(id, price) {
+      console.log(id, price);
+      setEndAuctionPrice(ethers.BigNumber.from(price));
+      setEndAuctionTimestamp(currentTimeInSeconds());
+    },
+    once: true,
+  });
 
   return (
     <TransactionButton

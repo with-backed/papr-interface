@@ -38,6 +38,11 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
     priceUpdated,
   } = useLiveAuctionPrice(auction, 8000);
 
+  const [endAuctionPrice, setEndAuctionPrice] =
+    useState<ethers.BigNumber | null>(auction.endPrice);
+  const [endAuctionTimestamp, setEndAuctionTimestamp] = useState<number>(
+    auction.end?.timestamp || 0,
+  );
   const [timeElapsed, setTimeElapsed] = useState<number>(
     currentTimeInSeconds() - auction.start.timestamp,
   );
@@ -60,8 +65,8 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
   }, [oracleInfo, ethPrice, auction.auctionAssetContract.id]);
 
   const auctionCompleted = useMemo(() => {
-    return !!auction.endPrice;
-  }, [auction.endPrice]);
+    return !!endAuctionPrice;
+  }, [endAuctionPrice]);
 
   useEffect(() => {
     if (!auctionCompleted) {
@@ -70,9 +75,9 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
       }, 1000);
       return () => clearInterval(interval);
     } else {
-      setTimeElapsed(auction.end!.timestamp - auction.start.timestamp);
+      setTimeElapsed(endAuctionTimestamp - auction.start.timestamp);
     }
-  }, [auctionCompleted, auction.start.timestamp, auction.end]);
+  }, [auctionCompleted, auction.start.timestamp, endAuctionTimestamp]);
 
   if (!oracleInfo || !latestUniswapPrice) return <></>;
 
@@ -159,13 +164,16 @@ export function AuctionPageContent({ auction }: AuctionPageContentProps) {
         <AuctionApproveAndBuy
           auction={auction}
           liveAuctionPrice={liveAuctionPrice}
+          setEndAuctionPrice={setEndAuctionPrice}
+          setEndAuctionTimestamp={setEndAuctionTimestamp}
         />
       )}
     </Fieldset>
   );
 }
 
-const currentTimeInSeconds = () => Math.floor(new Date().getTime() / 1000);
+export const currentTimeInSeconds = () =>
+  Math.floor(new Date().getTime() / 1000);
 
 type SummaryTableProps = {
   auction: NonNullable<AuctionQuery['auction']>;
