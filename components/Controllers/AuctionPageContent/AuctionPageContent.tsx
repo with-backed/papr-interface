@@ -170,8 +170,7 @@ export function AuctionPageContent({
   );
 }
 
-export const currentTimeInSeconds = () =>
-  Math.floor(new Date().getTime() / 1000);
+const currentTimeInSeconds = () => Math.floor(new Date().getTime() / 1000);
 
 type SummaryTableProps = {
   auction: NonNullable<AuctionQuery['auction']>;
