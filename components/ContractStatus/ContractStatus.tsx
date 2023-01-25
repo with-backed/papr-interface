@@ -3,6 +3,7 @@ import { ControllerPricesData } from 'lib/controllers/charts';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { percentChange } from 'lib/tokenPerformance';
 import { useMemo } from 'react';
+import { Fieldset } from './Common';
 import { RatesNegative } from './RatesNegative';
 import { RatesPositive } from './RatesPositive';
 
@@ -44,8 +45,7 @@ export function ContractStatus({ pricesData }: ContractStatusProps) {
   }, [pricesData]);
 
   if (!contractAPR) {
-    // TODO: indicate error fetching price data
-    return null;
+    return <Fieldset>Failed to load price data.</Fieldset>;
   }
 
   if (contractAPR < 0) {
