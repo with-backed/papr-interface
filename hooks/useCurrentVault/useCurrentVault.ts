@@ -11,19 +11,15 @@ export function useCurrentVaults(user: string | undefined) {
   const [prevData, setPrevData] = useState<
     VaultsByOwnerForControllerQuery | undefined
   >(undefined);
-  const [
-    { data: vaultsData, fetching: vaultsFetching, error },
-    reexecuteQuery,
-  ] = useQuery({
-    query: VaultsByOwnerForControllerDocument,
-    variables: {
-      owner: user?.toLowerCase(),
-      controller: controller.id.toLowerCase(),
-    },
-    pause: !user,
-  });
-
-  console.log({ vaultsData, vaultsFetching, error });
+  const [{ data: vaultsData, fetching: vaultsFetching }, reexecuteQuery] =
+    useQuery({
+      query: VaultsByOwnerForControllerDocument,
+      variables: {
+        owner: user?.toLowerCase(),
+        controller: controller.id.toLowerCase(),
+      },
+      pause: !user,
+    });
 
   useEffect(() => {
     if (vaultsData) {

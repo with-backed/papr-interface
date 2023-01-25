@@ -77,8 +77,6 @@ export function Loans({ pricesData }: LoansProps) {
     return '$' + formatTokenAmount(debtNum);
   }, [currentVaults, paprController.paprToken]);
 
-  console.log({ currentVaults });
-
   const { feed, remainingLength, showMore, amountThatWillShowNext } =
     useShowMore(currentVaults || []);
 
