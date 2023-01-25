@@ -33,8 +33,8 @@ const EIP712_TYPES = {
       { name: 'timestamp', type: 'uint256' },
     ],
   },
-  ContractWideCollectionPrice: {
-    ContractWideCollectionPrice: [
+  ContractWideCollectionTopBidPrice: {
+    ContractWideCollectionTopBidPrice: [
       {
         name: 'kind',
         type: 'uint8',
@@ -69,11 +69,11 @@ export async function generateDummyOracleMessage(
   );
 
   const id = _TypedDataEncoder.hashStruct(
-    'ContractWideCollectionPrice',
-    EIP712_TYPES.ContractWideCollectionPrice,
+    'ContractWideCollectionTopBidPrice',
+    EIP712_TYPES.ContractWideCollectionTopBidPrice,
     {
       kind: Object.keys(OraclePriceType).indexOf(kind),
-      twapSeconds: 2592000,
+      twapSeconds: 604800,
       contract: collection,
     },
   );

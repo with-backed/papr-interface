@@ -49,6 +49,7 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { useController, PaprController } from 'hooks/useController';
+import { calculateFee } from 'lib/controllers/fees';
 
 type VaultDebtPickerProps = {
   oracleInfo: OracleInfo;
@@ -234,6 +235,11 @@ export function VaultDebtPicker({
     if (!underlyingBorrowQuote) return ethers.BigNumber.from(0);
     return underlyingBorrowQuote[0];
   }, [underlyingBorrowQuote]);
+  const underlyingBorrowFee = useMemo(() => {
+    if (!underlyingBorrowQuote || usingPerpetual) return null;
+    return calculateFee(underlyingBorrowQuote[0]);
+  }, [underlyingBorrowQuote, usingPerpetual]);
+
   const slippageForBorrow = useMemo(() => {
     if (!underlyingBorrowQuote) return 0;
     return underlyingBorrowQuote[1];
@@ -269,6 +275,11 @@ export function VaultDebtPicker({
     if (!underlyingRepayQuote) return ethers.BigNumber.from(0);
     return underlyingRepayQuote[0];
   }, [underlyingRepayQuote]);
+  const underlyingRepayFee = useMemo(() => {
+    if (!underlyingRepayQuote || usingPerpetual) return null;
+    return calculateFee(underlyingRepayQuote[0]);
+  }, [underlyingRepayQuote, usingPerpetual]);
+
   const slippageForRepay = useMemo(() => {
     if (!underlyingRepayQuote) return 0;
     return underlyingRepayQuote[1];
@@ -390,7 +401,7 @@ export function VaultDebtPicker({
           </tr>
         </thead>
         <tbody>
-          {maxDebtPerNFTInUnderlying &&
+          {true &&
             userAndVaultNFTs.map((nft) => (
               <CollateralRow
                 key={`${nft.address}-${nft.tokenId}`}
@@ -404,7 +415,7 @@ export function VaultDebtPicker({
                 isLiquidated={nft.isLiquidated}
                 vaultHasCollateral={vaultHasCollateral}
                 maxBorrow={formatBigNum(
-                  maxDebtPerNFTInUnderlying,
+                  maxDebtPerNFTInUnderlying || ethers.BigNumber.from(0),
                   paprController.underlying.decimals,
                 )}
                 depositNFTs={depositNFTs}
@@ -476,6 +487,7 @@ export function VaultDebtPicker({
               controller={paprController}
               debtToBorrowOrRepay={debtToBorrowOrRepay}
               quote={isBorrowing ? underlyingToBorrow : underlyingToRepay}
+              fee={isBorrowing ? underlyingBorrowFee : underlyingRepayFee}
               isBorrowing={isBorrowing}
               usingPerpetual={usingPerpetual}
               setUsingPerpetual={setUsingPerpetual}
@@ -755,6 +767,7 @@ type LoanActionSummaryProps = {
   usingPerpetual: boolean;
   debtToBorrowOrRepay: ethers.BigNumber;
   quote: ethers.BigNumber | null;
+  fee: ethers.BigNumber | null;
   slippage: number | null;
   setUsingPerpetual: (val: boolean) => void;
   errorMessage: string;
@@ -766,11 +779,19 @@ function LoanActionSummary({
   usingPerpetual,
   debtToBorrowOrRepay,
   quote,
+  fee,
   slippage,
   setUsingPerpetual,
   errorMessage,
 }: LoanActionSummaryProps) {
   const theme = useTheme();
+
+  const quoteWithFee = useMemo(() => {
+    if (!quote || !fee) return null;
+    if (isBorrowing) return quote.sub(fee);
+    else return quote.add(fee);
+  }, [quote, fee, isBorrowing]);
+
   return (
     <div className={styles.loanActionSummaryWrapper}>
       <div className={[styles.loanActionSummary, styles[theme]].join(' ')}>
@@ -812,6 +833,17 @@ function LoanActionSummary({
             usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
           }`}>
           <div>
+            <p>papr.wtf swap fee</p>
+          </div>
+          <div>
+            <p>0.3%</p>
+          </div>
+        </div>
+        <div
+          className={`${
+            usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
+          }`}>
+          <div>
             <p>Slippage</p>
           </div>
           <div>
@@ -831,7 +863,8 @@ function LoanActionSummary({
           <div>
             {usingPerpetual
               ? formatBigNum(debtToBorrowOrRepay, controller.paprToken.decimals)
-              : quote && formatBigNum(quote, controller.underlying.decimals)}
+              : quoteWithFee &&
+                formatBigNum(quoteWithFee, controller.underlying.decimals)}
           </div>
         </div>
         {!!errorMessage && (
