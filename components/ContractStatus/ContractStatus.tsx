@@ -46,7 +46,7 @@ export function ContractStatus() {
   }, [pricesData]);
 
   if (pricesDataFetching) {
-    return <Fieldset>Loading price data ...</Fieldset>;
+    return <Fieldset>Loading price data...</Fieldset>;
   }
 
   if (pricesDataError || !contractAPR) {

@@ -55,7 +55,7 @@ describe('ContractStatus', () => {
       error: null,
     });
     const { getByText } = render(<ContractStatus />);
-    getByText('Failed to load price data.');
+    getByText('Loading price data...');
   });
   it('renders RatesPositive when rates are positive', () => {
     mockedUseControllerPricesData.mockReturnValue({
