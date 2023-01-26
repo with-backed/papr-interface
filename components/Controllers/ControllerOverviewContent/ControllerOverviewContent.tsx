@@ -1,6 +1,5 @@
 import React, { ComponentProps } from 'react';
 import styles from 'components/Controllers/Controller.module.css';
-import { ControllerPricesData } from 'lib/controllers/charts';
 import { Collateral as CollateralComponent } from 'components/Controllers/Collateral';
 import { Activity } from 'components/Controllers/Activity';
 import { Loans as LoansComponent } from 'components/Controllers/Loans';
@@ -9,6 +8,7 @@ import dynamic from 'next/dynamic';
 import { Auctions } from 'components/Controllers/Auctions';
 import { YourPositions as YourPositionsComponent } from 'components/YourPositions';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+import { ContractStatus } from 'components/ContractStatus';
 
 /* lightweight-charts uses canvas and cannot be SSRed */
 const Charts = dynamic(() => import('components/Controllers/Charts/Charts'), {
@@ -34,22 +34,21 @@ const Collateral = dynamic<ComponentProps<typeof CollateralComponent>>(
 );
 
 export type ControllerPageProps = {
-  pricesData: ControllerPricesData | null;
   subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
 
 export function ControllerOverviewContent({
-  pricesData,
   subgraphPool,
 }: ControllerPageProps) {
   return (
     <div className={styles.wrapper}>
       <YourPositions />
-      <TokenPerformance pricesData={pricesData} />
+      <ContractStatus />
+      <TokenPerformance />
       <Collateral />
       <Activity subgraphPool={subgraphPool} />
-      <Charts pricesData={pricesData} />
-      <Loans pricesData={pricesData} />
+      <Charts />
+      <Loans />
       <Auctions />
     </div>
   );

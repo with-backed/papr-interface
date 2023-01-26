@@ -10,17 +10,15 @@ import {
   PriceScaleOptions,
   TimeScaleOptions,
 } from 'lightweight-charts';
-import { percentChangeOverDuration, percentChange } from 'lib/tokenPerformance';
+import { percentChange } from 'lib/tokenPerformance';
 import { SECONDS_IN_A_YEAR } from 'lib/constants';
+import { useControllerPricesData } from 'hooks/useControllerPricesData';
 
 const APR_COLOR = '#0000ee';
 const PRICE_COLOR = '#FF659C';
 
-type ChartsProps = {
-  pricesData: ControllerPricesData | null;
-};
-
-export function Charts({ pricesData }: ChartsProps) {
+export function Charts() {
+  const { pricesData } = useControllerPricesData();
   if (!pricesData) {
     return (
       <Fieldset legend="💸 Performance">No price data available...</Fieldset>
