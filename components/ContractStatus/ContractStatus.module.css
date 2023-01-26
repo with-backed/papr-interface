@@ -15,6 +15,7 @@
   margin-top: 2rem;
   width: 100%;
   display: flex;
+  line-height: 1.9rem;
 }
 
 .chart-prices {
@@ -48,6 +49,7 @@
   margin: 6px 0 6px 1.7rem;
   transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
   opacity: 0;
+  line-height: 1.4rem;
 }
 
 .explainer[data-enter] {
