@@ -28,9 +28,9 @@ const paprTrash: Config = {
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
-  controllerAddress: '0x6df74b0653ba2b622d911ef5680d1776d850ace9',
+  controllerAddress: '0x9de959beb8c84710e929b2182c97007f3c372d73',
   underlyingAddress: '0xf5f4619764b3bcba95aba3b25212365fc6166862',
-  paprTokenAddress: '0x103da64f4366dc82ed0393716376a89dfee4b536',
+  paprTokenAddress: '0x1f1552f82ff0331d223bf9a9c9ae68c5cc8a2026',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: goerliSubgraph,

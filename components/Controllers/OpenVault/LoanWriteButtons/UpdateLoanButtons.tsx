@@ -24,6 +24,8 @@ import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useController } from 'hooks/useController';
 import { ERC20Token } from 'lib/controllers';
+import { getCurrentUnixTime } from 'lib/duration';
+import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
 
@@ -213,10 +215,11 @@ export function RepayWithSwapButton({
       collateralAsset: collateralContractAddress,
       swapParams: {
         amount,
+        deadline: getCurrentUnixTime().add(ethers.BigNumber.from(60)),
         minOut: quote,
         sqrtPriceLimitX96: ethers.BigNumber.from(0),
-        swapFeeTo: ethers.constants.AddressZero,
-        swapFeeBips: ethers.BigNumber.from(0),
+        swapFeeTo: SWAP_FEE_TO,
+        swapFeeBips: SWAP_FEE_BIPS,
       },
     };
 
@@ -286,9 +289,10 @@ export function BorrowWithSwapButton({
       swapParams: {
         amount,
         minOut: quote,
+        deadline: getCurrentUnixTime().add(ethers.BigNumber.from(60)),
         sqrtPriceLimitX96: ethers.BigNumber.from(0),
-        swapFeeTo: ethers.constants.AddressZero,
-        swapFeeBips: ethers.BigNumber.from(0),
+        swapFeeTo: SWAP_FEE_TO,
+        swapFeeBips: SWAP_FEE_BIPS,
       },
       oracleInfo: getOraclePayloadFromReservoirObject(
         oracleInfo[getAddress(collateralContractAddress)],

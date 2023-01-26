@@ -192,7 +192,7 @@ export async function computeSlippageForSwap(
       tokenIn.id,
       tokenOut.id,
       ethers.BigNumber.from(10).pow(4),
-      ethers.utils.parseUnits('1', tokenIn.decimals),
+      ethers.utils.parseUnits('1', tokenOut.decimals),
       0,
     );
   }
@@ -200,13 +200,17 @@ export async function computeSlippageForSwap(
   const quoteWithSlippageFloat = parseFloat(
     ethers.utils.formatUnits(
       quoteWithSlippage,
-      ethers.BigNumber.from(tokenOut.decimals),
+      ethers.BigNumber.from(
+        useExactInput ? tokenOut.decimals : tokenIn.decimals,
+      ),
     ),
   );
   const quoteWithoutSlippageFloat = parseFloat(
     ethers.utils.formatUnits(
       quoteWithoutSlippage,
-      ethers.BigNumber.from(tokenOut.decimals),
+      ethers.BigNumber.from(
+        useExactInput ? tokenOut.decimals : tokenIn.decimals,
+      ),
     ),
   );
 
@@ -214,7 +218,12 @@ export async function computeSlippageForSwap(
   const quoteWithoutSlippageScaled =
     quoteWithoutSlippageFloat *
     parseFloat(
-      ethers.utils.formatUnits(amount, ethers.BigNumber.from(tokenIn.decimals)),
+      ethers.utils.formatUnits(
+        amount,
+        ethers.BigNumber.from(
+          useExactInput ? tokenIn.decimals : tokenOut.decimals,
+        ),
+      ),
     );
 
   const priceImpact =
