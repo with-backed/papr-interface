@@ -833,10 +833,11 @@ function LoanActionSummary({
             usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
           }`}>
           <div>
-            <p>papr.wtf swap fee</p>
+            <p>Slippage</p>
           </div>
           <div>
-            <p>0.3%</p>
+            {slippage !== null && <p>{slippage.toFixed(2)}%</p>}
+            {slippage === null && <p>...</p>}
           </div>
         </div>
         <div
@@ -844,11 +845,11 @@ function LoanActionSummary({
             usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
           }`}>
           <div>
-            <p>Slippage</p>
+            <p>papr.wtf swap fee (0.3%)</p>
           </div>
           <div>
-            {slippage !== null && <p>{slippage.toFixed(2)}%</p>}
-            {slippage === null && <p>...</p>}
+            {fee && <p>{formatBigNum(fee, controller.underlying.decimals)}</p>}
+            {!fee && <p>-</p>}
           </div>
         </div>
         <div>
