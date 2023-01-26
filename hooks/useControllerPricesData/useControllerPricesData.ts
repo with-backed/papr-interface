@@ -145,7 +145,7 @@ function targets(
   underlyingDecimals: ethers.BigNumberish,
 ) {
   const now = Math.floor(Date.now() / 1000);
-  const sortedTargets = targetUpdates.sort(
+  const sortedTargets = [...targetUpdates].sort(
     (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
   );
 
@@ -181,7 +181,7 @@ function marks(
 ) {
   const now = Math.floor(Date.now() / 1000);
 
-  const sortedSwaps = swaps.sort(
+  const sortedSwaps = [...swaps].sort(
     (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
   );
 
