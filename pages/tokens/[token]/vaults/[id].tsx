@@ -8,8 +8,6 @@ import {
 import { GetServerSideProps } from 'next';
 import styles from '../controller.module.css';
 import { VaultPageContent } from 'components/Controllers/VaultPageContent';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { controllerPricesData_deprecated } from 'lib/controllers/charts';
 import { OpenGraph } from 'components/OpenGraph';
 import { captureException } from '@sentry/nextjs';
 import { ControllerContextProvider } from 'hooks/useController';
@@ -61,17 +59,7 @@ export default function VaultPage({
   subgraphPool,
   subgraphController,
 }: ServerSideProps) {
-  const { tokenName, uniswapSubgraph } = useConfig();
-
-  const pricesData = useAsyncValue(
-    () =>
-      controllerPricesData_deprecated(
-        subgraphController,
-        tokenName as SupportedToken,
-        uniswapSubgraph,
-      ),
-    [subgraphController, tokenName, uniswapSubgraph],
-  );
+  const { tokenName } = useConfig();
 
   return (
     <>
@@ -82,11 +70,7 @@ export default function VaultPage({
       <div className={styles.column}>
         <a href={`/tokens/${tokenName}`}>⬅ controller</a>
         <ControllerContextProvider value={subgraphController}>
-          <VaultPageContent
-            vaultId={vaultId}
-            pricesData={pricesData}
-            subgraphPool={subgraphPool}
-          />
+          <VaultPageContent vaultId={vaultId} subgraphPool={subgraphPool} />
         </ControllerContextProvider>
       </div>
     </>
