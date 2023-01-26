@@ -87,7 +87,7 @@ export function computeMarkPercentageRates(
   });
 }
 
-function price(
+export function price(
   sqrtPriceX96: number,
   baseCurrency: UniSubgraphToken,
   quoteCurrency: UniSubgraphToken,

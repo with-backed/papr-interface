@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next';
-import { controllerPricesData } from 'lib/controllers/charts';
+import { controllerPricesData_deprecated } from 'lib/controllers/charts';
 import { configs, getConfig, SupportedToken } from 'lib/config';
 import {
   ControllerOverviewContent,
@@ -68,7 +68,7 @@ export default function ControllerPage({
 
   const pricesData = useAsyncValue(
     () =>
-      controllerPricesData(
+      controllerPricesData_deprecated(
         subgraphController,
         config.tokenName as SupportedToken,
         config.uniswapSubgraph,

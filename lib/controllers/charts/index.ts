@@ -13,16 +13,12 @@ export interface TimeSeriesValue {
 }
 
 export interface ControllerPricesData {
-  targetDPRValues: TimeSeriesValue[];
-  markDPRValues: TimeSeriesValue[];
-  indexDPRValues: TimeSeriesValue[];
   markValues: TimeSeriesValue[];
   targetValues: TimeSeriesValue[];
   index: number;
-  indexDPR: number;
 }
 
-export async function controllerPricesData(
+export async function controllerPricesData_deprecated(
   controller: SubgraphController,
   token: SupportedToken,
   uniswapSubgraphUrl: string,
@@ -39,11 +35,9 @@ export async function controllerPricesData(
     );
   }
 
-  const createdAt = parseInt(controller.createdAt);
-
   const index = 1;
 
-  const [[marks, markDPRs], [targets, targetDPRs]] = await Promise.all([
+  const [[marks], [targets]] = await Promise.all([
     markValues(
       now,
       controller,
@@ -53,35 +47,9 @@ export async function controllerPricesData(
     targetValues(now, controller, subgraphUniswapPool.pool as Pool, token),
   ]);
 
-  // add a starting data point all on target
-  markDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });
-  targetDPRs.unshift({ value: 0, time: createdAt as UTCTimestamp });
-
-  // each unique timestamp from the datasets, sorted ascending. Use this to
-  // make sure we have an index entry for each other value
-  const timestamps = Array.from(
-    new Set([
-      ...markDPRs.map(({ time }) => time),
-      ...targetDPRs.map(({ time }) => time),
-    ]),
-  ).sort((a, b) => a - b);
-
   return {
-    indexDPR: 0,
     index: parseFloat(ethers.utils.formatEther(index)),
-    targetDPRValues: targetDPRs,
     targetValues: targets,
     markValues: marks,
-    markDPRValues: markDPRs,
-    indexDPRValues: indexValues(0, timestamps),
   };
-}
-
-function indexValues(
-  targetDPR: number,
-  timestamps: UTCTimestamp[],
-): TimeSeriesValue[] {
-  return timestamps.map((t) => {
-    return { value: targetDPR, time: t };
-  });
 }

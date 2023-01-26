@@ -1,0 +1,1 @@
+export { useControllerPricesData } from './useControllerPricesData';
