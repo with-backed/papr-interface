@@ -5,7 +5,6 @@ import {
   formatPercent,
   formatPercentChange,
 } from 'lib/numberFormat';
-import { ControllerPricesData } from 'lib/controllers/charts';
 import React, { useMemo } from 'react';
 
 import styles from './TokenPerformance.module.css';
@@ -28,12 +27,9 @@ import { OraclePriceType } from 'lib/oracle/reservoir';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
 import { controllerNFTValue } from 'lib/controllers';
 import { useController } from 'hooks/useController';
+import { useControllerPricesData } from 'hooks/useControllerPricesData';
 
-export type ControllerSummaryProps = {
-  pricesData: ControllerPricesData | null;
-};
-
-export function TokenPerformance({ pricesData }: ControllerSummaryProps) {
+export function TokenPerformance() {
   return (
     <Fieldset legend="📈 Token Performance">
       <div className={styles.controllers}>
@@ -68,7 +64,7 @@ export function TokenPerformance({ pricesData }: ControllerSummaryProps) {
             </tr>
           </thead>
           <tbody>
-            <SummaryEntry pricesData={pricesData} />
+            <SummaryEntry />
           </tbody>
         </Table>
       </div>
@@ -76,10 +72,8 @@ export function TokenPerformance({ pricesData }: ControllerSummaryProps) {
   );
 }
 
-type SummaryEntryProps = {
-  pricesData: ControllerPricesData | null;
-};
-function SummaryEntry({ pricesData }: SummaryEntryProps) {
+function SummaryEntry() {
+  const { pricesData } = useControllerPricesData();
   const controller = useController();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const NFTValue = useMemo(

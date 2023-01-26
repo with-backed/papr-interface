@@ -1,7 +1,6 @@
 import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
-import { ControllerPricesData } from 'lib/controllers/charts';
 import React, { useMemo } from 'react';
 import styles from './Loans.module.css';
 import { VaultRow } from './VaultRow';
@@ -15,12 +14,10 @@ import { OraclePriceType } from 'lib/oracle/reservoir';
 import { captureException } from '@sentry/nextjs';
 import { controllerNFTValue } from 'lib/controllers';
 import { useController } from 'hooks/useController';
+import { useControllerPricesData } from 'hooks/useControllerPricesData';
 
-type LoansProps = {
-  pricesData: ControllerPricesData | null;
-};
-
-export function Loans({ pricesData }: LoansProps) {
+export function Loans() {
+  const { pricesData } = useControllerPricesData();
   const paprController = useController();
   const currentVaults = useMemo(
     () => paprController.vaults?.filter((v) => v.debt > 0),

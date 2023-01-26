@@ -1,5 +1,5 @@
+import { useControllerPricesData } from 'hooks/useControllerPricesData';
 import { SECONDS_IN_A_YEAR } from 'lib/constants';
-import { ControllerPricesData } from 'lib/controllers/charts';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { percentChange } from 'lib/tokenPerformance';
 import { useMemo } from 'react';
@@ -7,11 +7,12 @@ import { Fieldset } from './Common';
 import { RatesNegative } from './RatesNegative';
 import { RatesPositive } from './RatesPositive';
 
-export type ContractStatusProps = {
-  pricesData: ControllerPricesData | null;
-};
-
-export function ContractStatus({ pricesData }: ContractStatusProps) {
+export function ContractStatus() {
+  const {
+    pricesData,
+    fetching: pricesDataFetching,
+    error: pricesDataError,
+  } = useControllerPricesData();
   const contractAPR = useMemo(() => {
     if (!pricesData) {
       return null;
@@ -44,7 +45,11 @@ export function ContractStatus({ pricesData }: ContractStatusProps) {
     return { mark, target };
   }, [pricesData]);
 
-  if (!contractAPR) {
+  if (pricesDataFetching) {
+    return <Fieldset>Loading price data ...</Fieldset>;
+  }
+
+  if (pricesDataError || !contractAPR) {
     return <Fieldset>Failed to load price data.</Fieldset>;
   }
 

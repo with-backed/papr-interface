@@ -1,5 +1,4 @@
 import { GetServerSideProps } from 'next';
-import { controllerPricesData_deprecated } from 'lib/controllers/charts';
 import { configs, getConfig, SupportedToken } from 'lib/config';
 import {
   ControllerOverviewContent,
@@ -11,7 +10,6 @@ import {
   SubgraphController,
 } from 'lib/PaprController';
 import { useConfig } from 'hooks/useConfig';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { useMemo } from 'react';
 import { OpenGraph } from 'components/OpenGraph';
@@ -66,16 +64,6 @@ export default function ControllerPage({
 }: ServerSideProps) {
   const config = useConfig();
 
-  const pricesData = useAsyncValue(
-    () =>
-      controllerPricesData_deprecated(
-        subgraphController,
-        config.tokenName as SupportedToken,
-        config.uniswapSubgraph,
-      ),
-    [config, subgraphController],
-  );
-
   const collections = useMemo(
     () => subgraphController.allowedCollateral.map((c) => c.token.id),
     [subgraphController.allowedCollateral],
@@ -85,10 +73,7 @@ export default function ControllerPage({
     <OracleInfoProvider collections={collections}>
       <ControllerContextProvider value={subgraphController}>
         <OpenGraph title={`${config.tokenName} | Performance`} />
-        <ControllerOverviewContent
-          pricesData={pricesData}
-          subgraphPool={subgraphPool}
-        />
+        <ControllerOverviewContent subgraphPool={subgraphPool} />
       </ControllerContextProvider>
     </OracleInfoProvider>
   );
