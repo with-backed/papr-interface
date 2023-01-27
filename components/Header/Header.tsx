@@ -1,7 +1,7 @@
 import { useConfig } from 'hooks/useConfig';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { ComponentProps, useCallback, useMemo, useState } from 'react';
+import React, { ComponentProps, useCallback, useMemo } from 'react';
 import styles from './Header.module.css';
 import paprTitle from 'public/logos/papr-title.png';
 import paprMemeTitle from 'public/logos/paprMEME-title.png';
@@ -33,10 +33,7 @@ type Page = {
   isNetworkSpecialCase?: boolean;
   externalRedirect?: boolean;
 };
-const prodPages = (
-  underlyingAddress: string,
-  paprTokenAddress: string,
-): Page[] => [
+const prodPages: Page[] = [
   {
     name: 'Performance',
     route: ``,
@@ -48,9 +45,8 @@ const prodPages = (
     matcher: 'borrow',
   },
   {
-    name: 'Swap ↗',
-    route: `https://app.uniswap.org/#/swap?chain=goerli&inputCurrency=${underlyingAddress}&outputCurrency=${paprTokenAddress}`,
-    externalRedirect: true,
+    name: 'Swap',
+    route: `swap`,
   },
 
   {
@@ -87,23 +83,16 @@ type NavLinksProps = {
   isHomePage: boolean;
 };
 function NavLinks({ activeRoute, isHomePage }: NavLinksProps) {
-  const { tokenName, underlyingAddress, paprTokenAddress } = useConfig();
+  const { tokenName } = useConfig();
   const theme = useTheme();
 
   const pages = useMemo(() => {
     const productSpecificPages = tokenName === 'paprHero' ? paprHeroPages : [];
     if (process.env.VERCEL_ENV === 'production') {
-      return [
-        ...productSpecificPages,
-        ...prodPages(underlyingAddress, paprTokenAddress),
-      ];
+      return [...productSpecificPages, ...prodPages];
     }
-    return [
-      ...productSpecificPages,
-      ...prodPages(underlyingAddress, paprTokenAddress),
-      ...stagingPages,
-    ];
-  }, [tokenName, underlyingAddress, paprTokenAddress]);
+    return [...productSpecificPages, ...prodPages, ...stagingPages];
+  }, [tokenName]);
 
   return (
     <ul className={styles.links}>
