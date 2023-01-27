@@ -40,7 +40,6 @@ export async function getSignedOracleFloorPriceMessage(
       },
     );
     const json = await reservoirRes.json();
-    console.log({ json });
     return json;
   } catch (e) {
     captureException(e);
