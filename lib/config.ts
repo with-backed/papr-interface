@@ -52,13 +52,13 @@ const paprHero: Config = {
   etherscanUrl: 'https://goerli.etherscan.io',
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
-  controllerAddress: '0x9b74e0be4220317dc2f796d3ed865ccb72698020',
-  underlyingAddress: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
-  paprTokenAddress: '0x1c15aee63c64d4e8fa5e62b45f21106f51916105',
+  controllerAddress: '0x1c262eca411891f984719edb9931354846e61756',
+  underlyingAddress: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+  paprTokenAddress: '0xbd3c7f5a433e9643eb0dd73880c902bc21734b15',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprMemeSubgraph: goerliSubgraph,
-  paprUnderlyingAddress: '0x68b7e050e6e2c7efe11439045c9d49813c1724b8',
+  paprUnderlyingAddress: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   reservoirMarketplace: 'https://goerli-marketplace-gules.vercel.app',
   erc721Subgraph:
