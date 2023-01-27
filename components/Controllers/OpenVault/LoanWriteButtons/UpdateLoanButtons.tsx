@@ -37,290 +37,48 @@ interface IncreaseDebtArgsStruct {
   amount: ethers.BigNumber;
   oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { TransactionButton } from 'components/Button';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useController } from 'hooks/useController';
+import { useVaultWrite } from 'hooks/useVaultWrite/useVaultWrite';
+import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
+import { ERC20Token } from 'lib/controllers';
 
-type BorrowOrRepayPerpetualButtonProps = {
+type VaultWriteButtonProps = {
+  writeType: VaultWriteType;
   collateralContractAddress: string;
   depositNFTs: string[];
   withdrawNFTs: string[];
-  amount: ethers.BigNumber | null;
-  oracleInfo: OracleInfo;
-  vaultHasDebt: boolean;
-  disabled: boolean;
-  refresh: () => void;
-};
-
-export function BorrowPerpetualButton({
-  collateralContractAddress,
-  depositNFTs,
-  withdrawNFTs,
-  amount,
-  oracleInfo,
-  vaultHasDebt,
-  disabled,
-  refresh,
-}: BorrowOrRepayPerpetualButtonProps) {
-  const { address } = useAccount();
-
-  const { addCollateralCalldata, removeCollateralCalldata } =
-    useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
-
-  const borrowPerpetualCalldata = useMemo(() => {
-    if (!amount || amount.isZero()) return '';
-
-    const args: IncreaseDebtArgsStruct = {
-      mintTo: address!,
-      asset: collateralContractAddress,
-      amount,
-      oracleInfo: getOraclePayloadFromReservoirObject(
-        oracleInfo[getAddress(collateralContractAddress)],
-      ),
-    };
-    return paprControllerIFace.encodeFunctionData(increaseDebtEncoderString, [
-      args.mintTo,
-      args.asset,
-      args.amount,
-      args.oracleInfo,
-    ]);
-  }, [amount, address, collateralContractAddress, oracleInfo]);
-
-  const calldata = useMemo(
-    () =>
-      [
-        addCollateralCalldata,
-        removeCollateralCalldata,
-        borrowPerpetualCalldata,
-      ].filter((c) => !!c),
-    [addCollateralCalldata, removeCollateralCalldata, borrowPerpetualCalldata],
-  );
-
-  const { data, write, error } = useMulticallWrite(calldata, refresh);
-
-  return (
-    <TransactionButton
-      kind="regular"
-      size="small"
-      theme="papr"
-      onClick={write!}
-      transactionData={data}
-      error={error?.message}
-      text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
-      disabled={disabled}
-    />
-  );
-}
-
-const reduceDebtEncoderString = `reduceDebt(address account, address asset, uint256 amount)`;
-
-interface ReduceDebtArgsStruct {
-  account: string;
-  asset: string;
   amount: ethers.BigNumber;
-}
-
-export function RepayPerpetualButton({
-  collateralContractAddress,
-  depositNFTs,
-  withdrawNFTs,
-  amount,
-  oracleInfo,
-  disabled,
-  refresh,
-}: BorrowOrRepayPerpetualButtonProps) {
-  const { address } = useAccount();
-
-  const { addCollateralCalldata, removeCollateralCalldata } =
-    useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
-
-  const repayPerpetualCalldata = useMemo(() => {
-    if (!amount || amount.isZero()) return '';
-
-    const args: ReduceDebtArgsStruct = {
-      account: address!,
-      asset: collateralContractAddress,
-      amount,
-    };
-    return paprControllerIFace.encodeFunctionData(reduceDebtEncoderString, [
-      args.account,
-      args.asset,
-      args.amount,
-    ]);
-  }, [amount, address, collateralContractAddress]);
-
-  const calldata = useMemo(
-    () =>
-      [
-        repayPerpetualCalldata,
-        addCollateralCalldata,
-        removeCollateralCalldata,
-      ].filter((c) => !!c),
-    [addCollateralCalldata, removeCollateralCalldata, repayPerpetualCalldata],
-  );
-
-  const { data, write, error } = useMulticallWrite(calldata, refresh);
-
-  return (
-    <TransactionButton
-      kind="regular"
-      size="small"
-      theme="papr"
-      onClick={write!}
-      transactionData={data}
-      error={error?.message}
-      text="Update Loan"
-      disabled={disabled}
-    />
-  );
-}
-
-export const BuyAndReduceEncoderString = `buyAndReduceDebt(address account, address collateralAsset, ${swapParamsArgEncoded})`;
-
-export interface BuyAndReduceArgsStruct {
-  account: string;
-  collateralAsset: string;
-  swapParams: IPaprController.SwapParamsStruct;
-}
-
-type BorrowOrRepayWithSwapButtonProps = {
-  collateralContractAddress: string;
-  depositNFTs: string[];
-  withdrawNFTs: string[];
-  amount: ethers.BigNumber | null;
   quote: ethers.BigNumber | null;
-  oracleInfo: OracleInfo;
   vaultHasDebt: boolean;
   disabled: boolean;
   refresh: () => void;
 };
 
-export function RepayWithSwapButton({
+export function VaultWriteButton({
+  writeType,
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
   amount,
   quote,
-  oracleInfo,
   vaultHasDebt,
   disabled,
   refresh,
-}: BorrowOrRepayWithSwapButtonProps) {
-  const { address } = useAccount();
-
-  const { addCollateralCalldata, removeCollateralCalldata } =
-    useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
-
-  const repayWithSwapCalldata = useMemo(() => {
-    if (!amount || !quote || amount.isZero()) return '';
-    const repayWithSwapArgs: BuyAndReduceArgsStruct = {
-      account: address!,
-      collateralAsset: collateralContractAddress,
-      swapParams: {
-        amount,
-        deadline: getCurrentUnixTime().add(ethers.BigNumber.from(60)),
-        minOut: quote,
-        sqrtPriceLimitX96: ethers.BigNumber.from(0),
-        swapFeeTo: SWAP_FEE_TO,
-        swapFeeBips: SWAP_FEE_BIPS,
-      },
-    };
-
-    return paprControllerIFace.encodeFunctionData(BuyAndReduceEncoderString, [
-      repayWithSwapArgs.account,
-      repayWithSwapArgs.collateralAsset,
-      repayWithSwapArgs.swapParams,
-    ]);
-  }, [address, collateralContractAddress, amount, quote]);
-
-  const calldata = useMemo(
-    () =>
-      [
-        repayWithSwapCalldata,
-        addCollateralCalldata,
-        removeCollateralCalldata,
-      ].filter((c) => !!c),
-    [addCollateralCalldata, removeCollateralCalldata, repayWithSwapCalldata],
+}: VaultWriteButtonProps) {
+  const { data, write, error } = useVaultWrite(
+    writeType,
+    collateralContractAddress,
+    depositNFTs,
+    withdrawNFTs,
+    amount,
+    quote,
+    refresh,
   );
-
-  const { data, write, error } = useMulticallWrite(calldata, refresh);
-
-  return (
-    <TransactionButton
-      kind="regular"
-      size="small"
-      theme="papr"
-      onClick={write!}
-      transactionData={data}
-      error={error?.message}
-      text="Update Loan"
-      disabled={disabled}
-    />
-  );
-}
-
-export const IncreaseAndSwapEncoderString = `increaseDebtAndSell(address proceedsTo, address collateralAsset, ${swapParamsArgEncoded}, ${oracleInfoArgEncoded})`;
-
-export interface IncreaseAndSwapStruct {
-  proceedsTo: string;
-  collateralAsset: string;
-  swapParams: IPaprController.SwapParamsStruct;
-  oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
-}
-
-export function BorrowWithSwapButton({
-  collateralContractAddress,
-  depositNFTs,
-  withdrawNFTs,
-  amount,
-  quote,
-  oracleInfo,
-  vaultHasDebt,
-  disabled,
-  refresh,
-}: BorrowOrRepayWithSwapButtonProps) {
-  const { address } = useAccount();
-
-  const { addCollateralCalldata, removeCollateralCalldata } =
-    useModifyCollateralCalldata(depositNFTs, withdrawNFTs, address, oracleInfo);
-
-  const borrowWithSwapCalldata = useMemo(() => {
-    if (!amount || !quote || amount.isZero()) return '';
-    const borrowWithSwapArgs: IncreaseAndSwapStruct = {
-      proceedsTo: address!,
-      collateralAsset: collateralContractAddress,
-      swapParams: {
-        amount,
-        minOut: quote,
-        deadline: getCurrentUnixTime().add(ethers.BigNumber.from(60)),
-        sqrtPriceLimitX96: ethers.BigNumber.from(0),
-        swapFeeTo: SWAP_FEE_TO,
-        swapFeeBips: SWAP_FEE_BIPS,
-      },
-      oracleInfo: getOraclePayloadFromReservoirObject(
-        oracleInfo[getAddress(collateralContractAddress)],
-      ),
-    };
-
-    return paprControllerIFace.encodeFunctionData(
-      IncreaseAndSwapEncoderString,
-      [
-        borrowWithSwapArgs.proceedsTo,
-        borrowWithSwapArgs.collateralAsset,
-        borrowWithSwapArgs.swapParams,
-        borrowWithSwapArgs.oracleInfo,
-      ],
-    );
-  }, [address, collateralContractAddress, amount, quote, oracleInfo]);
-
-  const calldata = useMemo(
-    () =>
-      [
-        addCollateralCalldata,
-        removeCollateralCalldata,
-        borrowWithSwapCalldata,
-      ].filter((c) => !!c),
-    [addCollateralCalldata, removeCollateralCalldata, borrowWithSwapCalldata],
-  );
-
-  const { data, write, error } = useMulticallWrite(calldata, refresh);
 
   return (
     <TransactionButton

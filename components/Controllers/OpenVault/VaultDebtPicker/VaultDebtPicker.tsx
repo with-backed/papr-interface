@@ -3,10 +3,7 @@ import { CenterAsset } from 'components/CenterAsset';
 import {
   ApproveNFTButton,
   ApproveTokenButton,
-  BorrowPerpetualButton,
-  BorrowWithSwapButton,
-  RepayPerpetualButton,
-  RepayWithSwapButton,
+  VaultWriteButton,
 } from 'components/Controllers/OpenVault/LoanWriteButtons/UpdateLoanButtons';
 import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
 import { Fieldset } from 'components/Fieldset';
@@ -49,8 +46,8 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
-
 import styles from './VaultDebtPicker.module.css';
+import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
 
 type VaultDebtPickerProps = {
   oracleInfo: OracleInfo;
@@ -517,50 +514,52 @@ export function VaultDebtPicker({
             )}
 
             {usingPerpetual && isBorrowing && (
-              <BorrowPerpetualButton
+              <VaultWriteButton
+                writeType={VaultWriteType.Borrow}
                 amount={amountToBorrowOrRepay}
+                quote={null}
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!collateralApproved}
                 refresh={refresh}
               />
             )}
             {usingPerpetual && !isBorrowing && (
-              <RepayPerpetualButton
+              <VaultWriteButton
+                writeType={VaultWriteType.Repay}
                 amount={amountToBorrowOrRepay}
+                quote={null}
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!!balanceErrorMessage || !debtTokenApproved}
                 refresh={refresh}
               />
             )}
             {!usingPerpetual && !isBorrowing && (
-              <RepayWithSwapButton
+              <VaultWriteButton
+                writeType={VaultWriteType.RepayWithSwap}
                 amount={amountToBorrowOrRepay}
                 quote={debtToBorrowOrRepay}
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!!balanceErrorMessage || !underlyingApproved}
                 refresh={refresh}
               />
             )}
             {!usingPerpetual && isBorrowing && (
-              <BorrowWithSwapButton
+              <VaultWriteButton
+                writeType={VaultWriteType.BorrowWithSwap}
                 amount={debtToBorrowOrRepay}
                 quote={underlyingToBorrow}
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!collateralApproved}
                 refresh={refresh}
