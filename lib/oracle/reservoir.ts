@@ -22,6 +22,7 @@ export type ReservoirResponseData = {
 };
 
 export const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 3600;
+export const SEVEN_DAYS_IN_SECONDS = 7 * 24 * 3600;
 
 export async function getSignedOracleFloorPriceMessage(
   collection: string,
@@ -31,7 +32,7 @@ export async function getSignedOracleFloorPriceMessage(
   let reservoirRes: Response;
   try {
     reservoirRes = await fetch(
-      `${config.reservoirAPI}/oracle/collections/${collection}/floor-ask/v3?kind=${kind}&currency=${config.paprUnderlyingAddress}&twapSeconds=${THIRTY_DAYS_IN_SECONDS}`,
+      `${config.reservoirAPI}/oracle/collections/top-bid/v2?collection=${collection}&kind=${kind}&currency=${config.paprUnderlyingAddress}&twapSeconds=${SEVEN_DAYS_IN_SECONDS}`,
       {
         headers: {
           'x-api-key': process.env.RESERVOIR_KEY!,
