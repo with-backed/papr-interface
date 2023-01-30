@@ -1,7 +1,12 @@
 import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { useControllerPricesData } from 'hooks/useControllerPricesData';
-import { formatPercentChange, formatTokenAmount } from 'lib/numberFormat';
+import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
+import {
+  formatPercent,
+  formatPercentChange,
+  formatTokenAmount,
+} from 'lib/numberFormat';
 import { percentChangeOverDuration } from 'lib/tokenPerformance';
 import { useMemo } from 'react';
 
@@ -38,6 +43,17 @@ export function MarketStatus() {
           )
         : '???',
     };
+  }, [pricesData]);
+
+  const realizedAPR30Day = useMemo(() => {
+    if (!pricesData) {
+      return '???';
+    }
+    const change = percentChangeOverDuration(pricesData.markValues, 30);
+    /// convert to APR
+    return formatPercent(
+      (change / (SECONDS_IN_A_DAY * 30)) * SECONDS_IN_A_YEAR,
+    );
   }, [pricesData]);
 
   if (error) {
@@ -82,7 +98,7 @@ export function MarketStatus() {
                 <td>{marketPrice}</td>
                 <td data-change={change7Days}>{change7Days}</td>
                 <td data-change={change30Days}>{change30Days}</td>
-                <td>22.48%</td>
+                <td>{realizedAPR30Day}</td>
               </tr>
             </tbody>
           </Table>
