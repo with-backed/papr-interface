@@ -87,6 +87,8 @@
     "babel-jest": "27.5.1",
     "eslint": "8.11.0",
     "eslint-config-next": "^13.0.6",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "husky": "7",
     "jest": "27.5.1",
     "jest-fetch-mock": "3.0.3",
