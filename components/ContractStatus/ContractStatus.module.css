@@ -46,7 +46,7 @@
 
 .explainer {
   font-size: var(--font-small);
-  margin: 6px 0 6px 1.7rem;
+  margin: 6px 0 6px 1.8rem;
   transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
   opacity: 0;
   line-height: 1.4rem;
