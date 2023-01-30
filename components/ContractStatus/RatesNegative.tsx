@@ -1,6 +1,7 @@
 import { useConfig } from 'hooks/useConfig';
 import { useMemo } from 'react';
 import { DisclosureContent, useDisclosureState } from 'reakit/Disclosure';
+
 import { Fieldset, Price, RatesProps, Summary } from './Common';
 import styles from './ContractStatus.module.css';
 

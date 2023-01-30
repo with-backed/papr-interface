@@ -1,7 +1,7 @@
-import { formatTokenAmount } from 'lib/numberFormat';
-import { TooltipStateReturn } from 'reakit';
 import styles from 'components/Controllers/TokenPerformance/tooltips.module.css';
 import { Tooltip } from 'components/Tooltip';
+import { formatTokenAmount } from 'lib/numberFormat';
+import { TooltipStateReturn } from 'reakit';
 
 export type TooltipProps = {
   tooltip: TooltipStateReturn;

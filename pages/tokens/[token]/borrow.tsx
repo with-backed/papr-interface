@@ -1,20 +1,20 @@
-import { configs, getConfig, SupportedToken } from 'lib/config';
-import { GetServerSideProps } from 'next';
+import { captureException } from '@sentry/nextjs';
 import {
   BorrowPageContent,
   BorrowPageProps,
 } from 'components/Controllers/BorrowPageContent';
+import { OpenGraph } from 'components/OpenGraph';
+import { useConfig } from 'hooks/useConfig';
+import { ControllerContextProvider } from 'hooks/useController';
+import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
+import { configs, getConfig, SupportedToken } from 'lib/config';
 import {
   fetchSubgraphData,
-  SubgraphPool,
   SubgraphController,
+  SubgraphPool,
 } from 'lib/PaprController';
-import { useConfig } from 'hooks/useConfig';
-import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
+import { GetServerSideProps } from 'next';
 import { useMemo } from 'react';
-import { OpenGraph } from 'components/OpenGraph';
-import { captureException } from '@sentry/nextjs';
-import { ControllerContextProvider } from 'hooks/useController';
 
 type ServerSideProps = Omit<
   BorrowPageProps,

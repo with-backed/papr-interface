@@ -1,4 +1,5 @@
 import { ConfigProvider } from 'hooks/useConfig';
+
 import { RatesNegative } from './RatesNegative';
 import { RatesPositive } from './RatesPositive';
 

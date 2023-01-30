@@ -1,20 +1,21 @@
-import { Fieldset } from 'components/Fieldset';
-import { ethers } from 'ethers';
-import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
-import React, { useMemo } from 'react';
-import styles from './Loans.module.css';
-import { VaultRow } from './VaultRow';
-import { Table } from 'components/Table';
-import { VaultHealth } from './VaultHealth';
-import { useShowMore } from 'hooks/useShowMore';
-import { TextButton } from 'components/Button';
-import { erc20ABI, useContractRead } from 'wagmi';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { OraclePriceType } from 'lib/oracle/reservoir';
 import { captureException } from '@sentry/nextjs';
-import { controllerNFTValue } from 'lib/controllers';
+import { TextButton } from 'components/Button';
+import { Fieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
+import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useShowMore } from 'hooks/useShowMore';
+import { controllerNFTValue } from 'lib/controllers';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import React, { useMemo } from 'react';
+import { erc20ABI, useContractRead } from 'wagmi';
+
+import styles from './Loans.module.css';
+import { VaultHealth } from './VaultHealth';
+import { VaultRow } from './VaultRow';
 
 export function Loans() {
   const { pricesData } = useControllerPricesData();

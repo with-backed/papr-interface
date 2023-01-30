@@ -1,5 +1,6 @@
 import { PaprControllerByIdQuery } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+
 import { SupportedToken } from './config';
 import { subgraphControllerByAddress } from './pAPRSubgraph';
 import { subgraphUniswapPoolById } from './uniswapSubgraph';

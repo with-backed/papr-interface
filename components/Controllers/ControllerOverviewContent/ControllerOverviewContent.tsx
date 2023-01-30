@@ -1,14 +1,14 @@
-import React, { ComponentProps } from 'react';
-import styles from 'components/Controllers/Controller.module.css';
-import { Collateral as CollateralComponent } from 'components/Controllers/Collateral';
+import { ContractStatus } from 'components/ContractStatus';
 import { Activity } from 'components/Controllers/Activity';
+import { Auctions } from 'components/Controllers/Auctions';
+import { Collateral as CollateralComponent } from 'components/Controllers/Collateral';
+import styles from 'components/Controllers/Controller.module.css';
 import { Loans as LoansComponent } from 'components/Controllers/Loans';
 import { TokenPerformance } from 'components/Controllers/TokenPerformance';
-import dynamic from 'next/dynamic';
-import { Auctions } from 'components/Controllers/Auctions';
 import { YourPositions as YourPositionsComponent } from 'components/YourPositions';
+import dynamic from 'next/dynamic';
+import React, { ComponentProps } from 'react';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
-import { ContractStatus } from 'components/ContractStatus';
 
 /* lightweight-charts uses canvas and cannot be SSRed */
 const Charts = dynamic(() => import('components/Controllers/Charts/Charts'), {

@@ -1,11 +1,11 @@
-import { useConfig } from 'hooks/useConfig';
-import React, { useMemo } from 'react';
-import { ethers } from 'ethers';
-import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
-import Link from 'next/link';
-import { useLTV } from 'hooks/useLTV';
+import { ethers } from 'ethers';
+import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
+import { useLTV } from 'hooks/useLTV';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
+import Link from 'next/link';
+import React, { useMemo } from 'react';
 import { Vault } from 'types/generated/graphql/inKindSubgraph';
 
 type VaultRowProps = {

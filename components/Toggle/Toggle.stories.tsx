@@ -1,4 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
+
 import { Toggle } from './Toggle';
 
 const Wrapper: FunctionComponent = ({ children }) => (

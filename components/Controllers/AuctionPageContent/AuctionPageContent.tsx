@@ -1,24 +1,25 @@
 import { CenterAsset } from 'components/CenterAsset';
+import { AuctionCountdown } from 'components/Controllers/AuctionPageContent/AuctionCountdown';
 import { Fieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
+import dayjs from 'dayjs';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
+import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { getUnitPriceForEth } from 'lib/coingecko';
 import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
 import { formatBigNum } from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useEffect, useMemo, useState } from 'react';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
-import { AuctionCountdown } from 'components/Controllers/AuctionPageContent/AuctionCountdown';
-import styles from './AuctionPageContent.module.css';
-import { Table } from 'components/Table';
-import dayjs from 'dayjs';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { OraclePriceType } from 'lib/oracle/reservoir';
-import { getUnitPriceForEth } from 'lib/coingecko';
-import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
-import { AuctionGraph } from './AuctionGraph';
-import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+
 import AuctionApproveAndBuy from './AuctionApproveAndBuy';
+import { AuctionGraph } from './AuctionGraph';
+import styles from './AuctionPageContent.module.css';
 
 export type AuctionPageContentProps = {
   auction: NonNullable<AuctionQuery['auction']>;

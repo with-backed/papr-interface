@@ -1,14 +1,3 @@
-import { Fieldset } from 'components/Fieldset';
-import {
-  formatThreeFractionDigits,
-  formatTokenAmount,
-  formatPercent,
-  formatPercentChange,
-} from 'lib/numberFormat';
-import React, { useMemo } from 'react';
-
-import styles from './TokenPerformance.module.css';
-import { TooltipReference, useTooltipState } from 'reakit';
 import {
   ContractAPRTooltip,
   MarketPriceTooltip,
@@ -16,18 +5,29 @@ import {
   RealizedAPRTooltip,
   TargetMarketTooltip,
 } from 'components/Controllers/TokenPerformance/Tooltips';
-import {
-  percentChangeOverDuration,
-  getValueDaysAgo,
-  percentChange,
-} from 'lib/tokenPerformance';
+import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { OraclePriceType } from 'lib/oracle/reservoir';
-import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
-import { controllerNFTValue } from 'lib/controllers';
 import { useController } from 'hooks/useController';
 import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
+import { controllerNFTValue } from 'lib/controllers';
+import {
+  formatPercent,
+  formatPercentChange,
+  formatThreeFractionDigits,
+  formatTokenAmount,
+} from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import {
+  getValueDaysAgo,
+  percentChange,
+  percentChangeOverDuration,
+} from 'lib/tokenPerformance';
+import React, { useMemo } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit';
+
+import styles from './TokenPerformance.module.css';
 
 export function TokenPerformance() {
   return (

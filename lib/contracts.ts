@@ -6,6 +6,7 @@ import {
   IQuoter__factory,
   PaprController__factory,
 } from 'types/generated/abis';
+
 import { configs, SupportedToken } from './config';
 
 export function makeProvider(jsonRpcProvider: string, token: SupportedToken) {

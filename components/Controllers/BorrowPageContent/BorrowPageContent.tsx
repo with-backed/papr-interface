@@ -1,17 +1,18 @@
-import React, { useCallback, useMemo } from 'react';
 import controllerStyles from 'components/Controllers/Controller.module.css';
-import { useAccount } from 'wagmi';
-import { useAccountNFTs } from 'hooks/useAccountNFTs';
-import { YourPositions } from 'components/YourPositions/YourPositions';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { VaultDebtPicker } from 'components/Controllers/OpenVault/VaultDebtPicker/VaultDebtPicker';
+import { YourPositions } from 'components/YourPositions/YourPositions';
 import { getAddress } from 'ethers/lib/utils';
-import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
-import { OraclePriceType } from 'lib/oracle/reservoir';
-import { Activity } from '../Activity';
-import { usePaprBalance } from 'hooks/usePaprBalance';
+import { useAccountNFTs } from 'hooks/useAccountNFTs';
 import { useController } from 'hooks/useController';
+import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { usePaprBalance } from 'hooks/usePaprBalance';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import React, { useCallback, useMemo } from 'react';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+import { useAccount } from 'wagmi';
+
+import { Activity } from '../Activity';
 
 export type BorrowPageProps = {
   subgraphPool: NonNullable<PoolByIdQuery['pool']>;

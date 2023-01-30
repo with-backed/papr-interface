@@ -1,8 +1,9 @@
-import { DISCORD_URL, GITHUB_URL, TWITTER_URL } from 'lib/constants';
+import { DISCORD_URL, TWITTER_URL } from 'lib/constants';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
 import Bunny from 'public/logos/backed-bunny.png';
+import React from 'react';
+
 import styles from './Footer.module.css';
 
 type Link = {

@@ -1,11 +1,13 @@
+import '@uniswap/widgets/fonts.css';
+
 import { JsonRpcSigner } from '@ethersproject/providers';
 import { SwapWidget, Theme } from '@uniswap/widgets';
-import '@uniswap/widgets/fonts.css';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useTheme } from 'hooks/useTheme';
 import { useMemo } from 'react';
 import { useSigner } from 'wagmi';
+
 import styles from './SwapPageContent.module.css';
 
 const BASE_THEME: Theme = {

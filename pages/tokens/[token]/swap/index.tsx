@@ -1,12 +1,12 @@
+import { captureException } from '@sentry/nextjs';
+import { OpenGraph } from 'components/OpenGraph';
+import { SwapPageContent } from 'components/SwapPageContent';
+import { ControllerContextProvider } from 'hooks/useController';
+import { configs, getConfig, SupportedToken } from 'lib/config';
+import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
+import capitalize from 'lodash/capitalize';
 import { GetServerSideProps } from 'next';
 import React from 'react';
-import { captureException } from '@sentry/nextjs';
-import { configs, getConfig, SupportedToken } from 'lib/config';
-import { OpenGraph } from 'components/OpenGraph';
-import capitalize from 'lodash/capitalize';
-import { SwapPageContent } from 'components/SwapPageContent';
-import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
-import { ControllerContextProvider } from 'hooks/useController';
 
 export const getServerSideProps: GetServerSideProps<SwapProps> = async (
   context,

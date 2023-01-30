@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+
 import styles from './Marquee.module.css';
 
 const MARQUEE_ITEM_COUNT = 2;

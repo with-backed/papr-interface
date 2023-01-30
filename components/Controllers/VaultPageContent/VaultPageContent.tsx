@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
-import controllerStyles from '../Controller.module.css';
-import { Collateral } from 'components/Controllers/Collateral';
 import { Activity } from 'components/Controllers/Activity';
+import { Collateral } from 'components/Controllers/Collateral';
 import { TokenPerformance } from 'components/Controllers/TokenPerformance';
+import React, { useMemo } from 'react';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
+
+import controllerStyles from '../Controller.module.css';
 
 type VaultPageContentProps = {
   vaultId: string;

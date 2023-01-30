@@ -1,26 +1,27 @@
-import styles from './YourPositions.module.css';
-import { useAccountNFTs } from 'hooks/useAccountNFTs';
-import { Fieldset } from 'components/Fieldset';
-import { useAccount } from 'wagmi';
-import { useMemo } from 'react';
-import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { SupportedToken } from 'lib/config';
-import { useConfig } from 'hooks/useConfig';
-import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
-import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
-import { Table } from 'components/Table';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
+import { Fieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
+import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
-import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
+import { useAccountNFTs } from 'hooks/useAccountNFTs';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useConfig } from 'hooks/useConfig';
+import { useController } from 'hooks/useController';
+import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
+import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useLTV } from 'hooks/useLTV';
 import { useMaxDebt } from 'hooks/useMaxDebt';
-import { useController } from 'hooks/useController';
-import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePaprBalance } from 'hooks/usePaprBalance';
+import { SupportedToken } from 'lib/config';
+import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
+import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
-import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
+import { useMemo } from 'react';
+import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
+import { useAccount } from 'wagmi';
+
+import styles from './YourPositions.module.css';
 
 export function YourPositions() {
   const { address } = useAccount();

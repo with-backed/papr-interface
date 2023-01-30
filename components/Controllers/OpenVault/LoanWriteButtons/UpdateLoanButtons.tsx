@@ -1,10 +1,24 @@
+import PaprControllerABI from 'abis/PaprController.json';
+import { TransactionButton } from 'components/Button';
 import { ethers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useController } from 'hooks/useController';
+import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
+import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
+import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { oracleInfoArgEncoded, swapParamsArgEncoded } from 'lib/constants';
+import { ERC20Token } from 'lib/controllers';
+import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
+import { getCurrentUnixTime } from 'lib/duration';
+import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import {
   IPaprController,
   ReservoirOracleUnderwriter,
 } from 'types/generated/abis/PaprController';
-import PaprControllerABI from 'abis/PaprController.json';
-import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import {
   erc20ABI,
   erc721ABI,
@@ -12,20 +26,6 @@ import {
   useContractWrite,
   usePrepareContractWrite,
 } from 'wagmi';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { TransactionButton } from 'components/Button';
-import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
-import { oracleInfoArgEncoded, swapParamsArgEncoded } from 'lib/constants';
-import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
-import { getAddress } from 'ethers/lib/utils';
-import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
-import { useController } from 'hooks/useController';
-import { ERC20Token } from 'lib/controllers';
-import { getCurrentUnixTime } from 'lib/duration';
-import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
 
 const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
 

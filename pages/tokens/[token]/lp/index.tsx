@@ -1,13 +1,13 @@
-import { GetServerSideProps } from 'next';
-import React from 'react';
 import { captureException } from '@sentry/nextjs';
-import { configs, getConfig, SupportedToken, validateToken } from 'lib/config';
-import { OpenGraph } from 'components/OpenGraph';
-import capitalize from 'lodash/capitalize';
 import { LPPageContent } from 'components/Controllers/LPPageContent';
-import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
+import { OpenGraph } from 'components/OpenGraph';
 import { useConfig } from 'hooks/useConfig';
 import { ControllerContextProvider } from 'hooks/useController';
+import { configs, getConfig, SupportedToken } from 'lib/config';
+import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
+import capitalize from 'lodash/capitalize';
+import { GetServerSideProps } from 'next';
+import React from 'react';
 
 type ServerSideProps = {
   subgraphController: SubgraphController;

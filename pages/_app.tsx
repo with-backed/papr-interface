@@ -1,4 +1,8 @@
 import '@rainbow-me/rainbowkit/styles.css';
+import 'normalize.css';
+import 'styles/fonts-maru.css';
+import 'styles/global.css';
+
 import { ApplicationProviders } from 'components/ApplicationProviders';
 import { ErrorBanners } from 'components/ErrorBanners';
 import { Footer } from 'components/Footer';
@@ -8,10 +12,7 @@ import { ConfigProvider } from 'hooks/useConfig';
 import { isSupportedToken, SupportedToken } from 'lib/config';
 import { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
-import 'normalize.css';
 import { useEffect, useState } from 'react';
-import 'styles/fonts-maru.css';
-import 'styles/global.css';
 
 const TOKEN_FROM_PATH_REGEXP = /\/tokens\/([^/]+)/;
 function tokenFromPath(path: string): SupportedToken {

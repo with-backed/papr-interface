@@ -1,5 +1,6 @@
 import { ButtonTheme } from 'components/Button/Button';
 import ReactSlider from 'react-slider';
+
 import styles from './Slider.module.css';
 
 export type SliderProps = {

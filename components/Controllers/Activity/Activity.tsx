@@ -4,8 +4,11 @@ import {
   EtherscanTransactionLink,
 } from 'components/EtherscanLink';
 import { Fieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useActivity } from 'hooks/useActivity';
+import { PaprController, useController } from 'hooks/useController';
+import { useShowMore } from 'hooks/useShowMore';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { humanizedTimestamp } from 'lib/duration';
 import { formatTokenAmount } from 'lib/numberFormat';
@@ -15,10 +18,8 @@ import {
   PoolByIdQuery,
   SwapsByPoolQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
+
 import styles from './Activity.module.css';
-import { Table } from 'components/Table';
-import { useShowMore } from 'hooks/useShowMore';
-import { PaprController, useController } from 'hooks/useController';
 
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;

@@ -1,16 +1,17 @@
+import { captureException } from '@sentry/nextjs';
+import { VaultPageContent } from 'components/Controllers/VaultPageContent';
+import { OpenGraph } from 'components/OpenGraph';
 import { useConfig } from 'hooks/useConfig';
+import { ControllerContextProvider } from 'hooks/useController';
 import { configs, getConfig, SupportedToken } from 'lib/config';
 import {
   fetchSubgraphData,
-  SubgraphPool,
   SubgraphController,
+  SubgraphPool,
 } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
+
 import styles from '../controller.module.css';
-import { VaultPageContent } from 'components/Controllers/VaultPageContent';
-import { OpenGraph } from 'components/OpenGraph';
-import { captureException } from '@sentry/nextjs';
-import { ControllerContextProvider } from 'hooks/useController';
 
 type ServerSideProps = {
   vaultId: string;

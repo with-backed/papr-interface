@@ -4,6 +4,7 @@ import { DisplayAddress } from 'components/DisplayAddress';
 import { useTheme } from 'hooks/useTheme';
 import { pirsch } from 'lib/pirsch';
 import React from 'react';
+
 import styles from './ConnectWallet.module.css';
 
 export const ConnectWallet = () => {

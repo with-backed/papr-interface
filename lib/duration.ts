@@ -1,7 +1,8 @@
-import { ethers } from 'ethers';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { ethers } from 'ethers';
+
 import { SECONDS_IN_A_DAY } from './constants';
 
 dayjs.extend(duration);

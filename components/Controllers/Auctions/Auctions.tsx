@@ -26,6 +26,7 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
+
 import styles from './Auctions.module.css';
 
 type Auction = AuctionsQuery['auctions'][number];

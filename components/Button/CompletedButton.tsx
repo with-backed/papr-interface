@@ -1,8 +1,9 @@
-import React from 'react';
 import { Checkmark } from 'components/Icons/Checkmark';
-import styles from './Button.module.css';
-import { ButtonSize } from './Button';
 import { X } from 'components/Icons/X';
+import React from 'react';
+
+import { ButtonSize } from './Button';
+import styles from './Button.module.css';
 
 interface CompletedButtonProps {
   buttonText: React.ReactNode;

@@ -1,13 +1,14 @@
-import React from 'react';
-import PaprHeroesLogo from 'public/logos/paprHeroes.png';
+import { ButtonLink } from 'components/Button';
+import { Disclosure } from 'components/Disclosure';
+import Image from 'next/legacy/image';
 import Hero1 from 'public/landing-page-nfts/hero-1.png';
 import Hero2 from 'public/landing-page-nfts/hero-2.png';
 import Hero3 from 'public/landing-page-nfts/hero-3.png';
 import Hero4 from 'public/landing-page-nfts/hero-4.png';
+import PaprHeroesLogo from 'public/logos/paprHeroes.png';
+import React from 'react';
+
 import styles from './LandingPageContent.module.css';
-import { ButtonLink } from 'components/Button';
-import { Disclosure } from 'components/Disclosure';
-import Image from 'next/legacy/image';
 
 const Logo = () => (
   <div className={styles.img}>

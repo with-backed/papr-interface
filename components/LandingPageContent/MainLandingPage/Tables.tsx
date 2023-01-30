@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+
 import styles from './LandingPageContent.module.css';
 
 const BORROWER_ENTRIES = [
