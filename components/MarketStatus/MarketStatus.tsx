@@ -51,40 +51,42 @@ export function MarketStatus() {
   return (
     <CustomFieldset>
       <div className={styles['market-status-wrapper']}>
-        <Table className={styles.table}>
-          <thead>
-            <tr>
-              <th>
-                Market
-                <br />
-                Price
-              </th>
-              <th>
-                7
-                <br />
-                Day
-              </th>
-              <th>
-                30
-                <br />
-                Day
-              </th>
-              <th>
-                30d rate
-                <br />
-                as APR
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{marketPrice}</td>
-              <td data-change={change7Days}>{change7Days}</td>
-              <td data-change={change30Days}>{change30Days}</td>
-              <td>22.48%</td>
-            </tr>
-          </tbody>
-        </Table>
+        <div className={styles['table-flex-fix']}>
+          <Table className={styles.table}>
+            <thead>
+              <tr>
+                <th>
+                  Market
+                  <br />
+                  Price
+                </th>
+                <th>
+                  7
+                  <br />
+                  Day
+                </th>
+                <th>
+                  30
+                  <br />
+                  Day
+                </th>
+                <th>
+                  30d rate
+                  <br />
+                  as APR
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{marketPrice}</td>
+                <td data-change={change7Days}>{change7Days}</td>
+                <td data-change={change30Days}>{change30Days}</td>
+                <td>22.48%</td>
+              </tr>
+            </tbody>
+          </Table>
+        </div>
         <Sparkline data={pricesData.markValues} />
       </div>
     </CustomFieldset>
