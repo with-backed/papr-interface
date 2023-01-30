@@ -1,0 +1,24 @@
+.market-status-wrapper {
+  display: flex;
+  gap: 1rem;
+}
+
+.table td {
+  text-align: center;
+}
+
+.chart-button {
+  text-transform: uppercase;
+}
+
+.chart-button-active {
+  composes: chart-button;
+  text-decoration: underline;
+}
+
+.chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 150px;
+}
