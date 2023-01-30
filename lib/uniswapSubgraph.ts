@@ -6,6 +6,7 @@ import {
   SwapsByPoolDocument,
   SwapsByPoolQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
+
 import { clientFromUrl } from './urql';
 
 export async function subgraphUniswapPriceByPool(

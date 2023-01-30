@@ -3,6 +3,7 @@ import { usePoolChartData } from 'hooks/usePoolChartData';
 import { useTheme } from 'hooks/useTheme';
 import { ChartOptions, createChart, DeepPartial } from 'lightweight-charts';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import styles from './LPPageContent.module.css';
 
 type ChartView = 'volumeUSD' | 'liquidityUSD' | 'feesUSD';

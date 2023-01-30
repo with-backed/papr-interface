@@ -1,9 +1,10 @@
+import { SendTransactionResult } from '@wagmi/core';
 import { Button } from 'components/Button';
 import { EtherscanTransactionLink } from 'components/EtherscanLink';
 import React, { useCallback, useEffect, useState } from 'react';
+
 import { ButtonProps } from './Button';
 import { CompletedButton } from './CompletedButton';
-import { SendTransactionResult } from '@wagmi/core';
 
 interface TransactionButtonProps extends ButtonProps {
   text: string;

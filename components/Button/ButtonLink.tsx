@@ -1,5 +1,6 @@
-import React, { ComponentProps } from 'react';
 import Link from 'next/link';
+import React, { ComponentProps } from 'react';
+
 import { ButtonKind, ButtonSize, ButtonTheme } from './Button';
 import styles from './Button.module.css';
 

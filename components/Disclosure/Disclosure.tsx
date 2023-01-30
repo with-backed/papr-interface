@@ -1,10 +1,11 @@
 import { Chevron } from 'components/Icons/Chevron';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-  useDisclosureState,
   Disclosure as ReakitDisclosure,
   DisclosureContent,
+  useDisclosureState,
 } from 'reakit/Disclosure';
+
 import styles from './Disclosure.module.css';
 
 type DisclosureProps = React.PropsWithChildren<{

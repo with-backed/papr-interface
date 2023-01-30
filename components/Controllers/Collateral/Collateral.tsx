@@ -1,18 +1,19 @@
-import { Fieldset } from 'components/Fieldset';
 import { useCollection } from '@center-inc/react';
-import React, { useMemo } from 'react';
-import styles from './Collateral.module.css';
-import { useConfig } from 'hooks/useConfig';
-import { TooltipReference, useTooltipState } from 'reakit';
+import { TextButton } from 'components/Button';
+import { CenterAsset } from 'components/CenterAsset';
+import { Fieldset } from 'components/Fieldset';
 import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
-import { formatPercent } from 'lib/numberFormat';
-import { CenterAsset } from 'components/CenterAsset';
-import { computeLTVFromDebts } from 'lib/controllers';
-import { useShowMore } from 'hooks/useShowMore';
-import { TextButton } from 'components/Button';
-import { useMaxDebt } from 'hooks/useMaxDebt';
+import { useConfig } from 'hooks/useConfig';
 import { PaprController, useController } from 'hooks/useController';
+import { useMaxDebt } from 'hooks/useMaxDebt';
+import { useShowMore } from 'hooks/useShowMore';
+import { computeLTVFromDebts } from 'lib/controllers';
+import { formatPercent } from 'lib/numberFormat';
+import React, { useMemo } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit';
+
+import styles from './Collateral.module.css';
 
 type CollateralProps = {
   // If scoping collateral view to just a specific vault

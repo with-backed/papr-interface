@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react';
 import controllerStyles from 'components/Controllers/Controller.module.css';
-import styles from './TestPageContent.module.css';
-import MintERC20 from './MintERC20';
-import MintCollateral from './MintCollateral';
-import { erc721Contract } from 'lib/contracts';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useController } from 'hooks/useController';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { erc721Contract } from 'lib/contracts';
+import React, { useMemo } from 'react';
+
+import MintCollateral from './MintCollateral';
+import MintERC20 from './MintERC20';
+import styles from './TestPageContent.module.css';
 
 export function TestPageContent() {
   const signerOrProvider = useSignerOrProvider();

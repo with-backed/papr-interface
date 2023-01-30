@@ -1,7 +1,8 @@
 import { Fieldset } from 'components/Fieldset';
+import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import { SECONDS_IN_A_YEAR } from 'lib/constants';
 import { ControllerPricesData, TimeSeriesValue } from 'lib/controllers/charts';
-import React, { useEffect, useMemo, useRef } from 'react';
-import styles from './Charts.module.css';
+import { percentChange } from 'lib/tokenPerformance';
 import {
   ChartOptions,
   createChart,
@@ -10,9 +11,9 @@ import {
   PriceScaleOptions,
   TimeScaleOptions,
 } from 'lightweight-charts';
-import { percentChange } from 'lib/tokenPerformance';
-import { SECONDS_IN_A_YEAR } from 'lib/constants';
-import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import React, { useEffect, useMemo, useRef } from 'react';
+
+import styles from './Charts.module.css';
 
 const APR_COLOR = '#0000ee';
 const PRICE_COLOR = '#FF659C';

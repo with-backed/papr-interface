@@ -1,23 +1,24 @@
-import { useMemo } from 'react';
 import {
-  Chart as ChartJS,
   CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
+  Chart as ChartJS,
   ChartOptions,
+  LinearScale,
+  LineElement,
+  PointElement,
   Tooltip,
 } from 'chart.js';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
-import { Line } from 'react-chartjs-2';
-import styles from './AuctionGraph.module.css';
-import { formatBigNum } from 'lib/numberFormat';
 import { ethers } from 'ethers';
-import { currentPrice } from 'lib/auctions';
-import { convertOneScaledValue } from 'lib/controllers';
-import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 import { useController } from 'hooks/useController';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { currentPrice } from 'lib/auctions';
+import { convertOneScaledValue } from 'lib/controllers';
+import { formatBigNum } from 'lib/numberFormat';
+import { useMemo } from 'react';
+import { Line } from 'react-chartjs-2';
+import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
+
+import styles from './AuctionGraph.module.css';
 
 ChartJS.register(
   CategoryScale,

@@ -1,21 +1,21 @@
-import controllerStyles from 'components/Controllers/Controller.module.css';
-import { useCallback, useMemo } from 'react';
-import { AuctionPageContent } from 'components/Controllers/AuctionPageContent/AuctionPageContent';
-import { ControllerContextProvider, PaprController } from 'hooks/useController';
-import { GetServerSideProps } from 'next';
-import { configs, getConfig, SupportedToken } from 'lib/config';
-import { fetchSubgraphData } from 'lib/PaprController';
 import { captureException } from '@sentry/nextjs';
+import { Activity } from 'components/Controllers/Activity';
+import { AuctionPageContent } from 'components/Controllers/AuctionPageContent/AuctionPageContent';
+import controllerStyles from 'components/Controllers/Controller.module.css';
+import { Custom404 } from 'components/Custom404';
+import { ControllerContextProvider, PaprController } from 'hooks/useController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
+import { configs, getConfig, SupportedToken } from 'lib/config';
+import { generateVaultId } from 'lib/controllers/vaults';
+import { fetchSubgraphData } from 'lib/PaprController';
+import { GetServerSideProps } from 'next';
+import { useCallback, useMemo } from 'react';
 import {
   AuctionDocument,
   AuctionQuery,
 } from 'types/generated/graphql/inKindSubgraph';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
-import { Activity } from 'components/Controllers/Activity';
-import { generateVaultId } from 'lib/controllers/vaults';
 import { useQuery } from 'urql';
-import { Custom404 } from 'components/Custom404';
 
 type AuctionProps = {
   subgraphController: PaprController;

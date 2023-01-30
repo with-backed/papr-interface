@@ -1,5 +1,6 @@
 import { ButtonTheme } from 'components/Button/Button';
 import React, { FunctionComponent } from 'react';
+
 import { Slider } from './Slider';
 
 const Wrapper: FunctionComponent = ({ children }) => (

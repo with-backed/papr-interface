@@ -1,6 +1,6 @@
 import { captureException } from '@sentry/nextjs';
 import { TestPageContent } from 'components/Controllers/TestPageContent';
-import { PaprController, ControllerContextProvider } from 'hooks/useController';
+import { ControllerContextProvider, PaprController } from 'hooks/useController';
 import { configs, getConfig, SupportedToken } from 'lib/config';
 import { fetchSubgraphData } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';

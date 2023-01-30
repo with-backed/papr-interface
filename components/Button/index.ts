@@ -1,5 +1,5 @@
 export { Button } from './Button';
-export { CompletedButton } from './CompletedButton';
 export { ButtonLink } from './ButtonLink';
-export { TransactionButton } from './TransactionButton';
+export { CompletedButton } from './CompletedButton';
 export { TextButton } from './TextButton';
+export { TransactionButton } from './TransactionButton';

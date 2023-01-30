@@ -1,5 +1,6 @@
 import { ButtonLink } from 'components/Button';
 import React from 'react';
+
 import styles from './LandingPageContent.module.css';
 
 export function Whitepaper() {

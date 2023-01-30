@@ -1,14 +1,15 @@
-import React from 'react';
-import LandingPageScale from 'public/landingpage-scale.png';
-import styles from './LandingPageContent.module.css';
 import Image from 'next/legacy/image';
-import { Tables } from './Tables';
+import LandingPageScale from 'public/landingpage-scale.png';
+import React from 'react';
+
 import { DashedLine } from './DashedLine';
-import { Whitepaper } from './Whitepaper';
+import { FAQ } from './FAQ';
+import styles from './LandingPageContent.module.css';
+import { LandingPageDiagram } from './LandingPageDiagram';
 import { PaprHeroes } from './PaprHeroes';
 import { PaprMeme } from './PaprMeme';
-import { FAQ } from './FAQ';
-import { LandingPageDiagram } from './LandingPageDiagram';
+import { Tables } from './Tables';
+import { Whitepaper } from './Whitepaper';
 
 export function LandingPageContent() {
   return (

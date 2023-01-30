@@ -3,6 +3,7 @@ import { SECONDS_IN_A_YEAR } from 'lib/constants';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { percentChange } from 'lib/tokenPerformance';
 import { useMemo } from 'react';
+
 import { Fieldset } from './Common';
 import { RatesNegative } from './RatesNegative';
 import { RatesPositive } from './RatesPositive';

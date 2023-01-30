@@ -2,6 +2,7 @@ import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { usePoolStats } from 'hooks/usePoolStats';
 import dynamic from 'next/dynamic';
+
 import styles from './LPPageContent.module.css';
 
 /* lightweight-charts uses canvas and cannot be SSRed */

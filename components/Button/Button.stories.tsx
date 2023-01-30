@@ -1,7 +1,8 @@
 import React, { FunctionComponent } from 'react';
+
 import { Button, ButtonKind, ButtonTheme } from './Button';
 import { ButtonLink } from './ButtonLink';
-import { TextButton, ButtonKind as TextButtonKind } from './TextButton';
+import { ButtonKind as TextButtonKind, TextButton } from './TextButton';
 import { TransactionButton } from './TransactionButton';
 
 const Wrapper: FunctionComponent = ({ children }) => (

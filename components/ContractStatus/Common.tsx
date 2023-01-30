@@ -1,3 +1,4 @@
+import useResizeObserver from '@react-hook/resize-observer';
 import { TextButton } from 'components/Button';
 import { Fieldset as BaseFieldset } from 'components/Fieldset';
 import {
@@ -10,7 +11,7 @@ import {
   useState,
 } from 'react';
 import { Disclosure, DisclosureStateReturn } from 'reakit/Disclosure';
-import useResizeObserver from '@react-hook/resize-observer';
+
 import styles from './ContractStatus.module.css';
 
 export type RatesProps = {

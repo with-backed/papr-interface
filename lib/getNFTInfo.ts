@@ -1,6 +1,7 @@
+import IPFSGatewayTools from '@pinata/ipfs-gateway-tools/dist/node';
 import { captureException } from '@sentry/nextjs';
 import { ethers } from 'ethers';
-import IPFSGatewayTools from '@pinata/ipfs-gateway-tools/dist/node';
+
 import { SupportedToken } from './config';
 
 const DATA_URI_MIME_REGEXP = /data:([^;]*)/;

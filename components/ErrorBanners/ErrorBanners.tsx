@@ -5,6 +5,7 @@ import { useGlobalMessages } from 'hooks/useGlobalMessages';
 import { SupportedNetwork } from 'lib/config';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
+
 import styles from './ErrorBanners.module.css';
 
 export function ErrorBanners() {

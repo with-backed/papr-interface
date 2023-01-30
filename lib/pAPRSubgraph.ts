@@ -1,13 +1,14 @@
 import {
-  PaprControllersDocument,
-  PaprControllersQuery,
+  AuctionDocument,
+  AuctionQuery,
   PaprControllerByIdDocument,
   PaprControllerByIdQuery,
+  PaprControllersDocument,
+  PaprControllersQuery,
   VaultsByOwnerForControllerDocument,
   VaultsByOwnerForControllerQuery,
-  AuctionQuery,
-  AuctionDocument,
 } from 'types/generated/graphql/inKindSubgraph';
+
 import { configs, SupportedToken } from './config';
 import { SubgraphController } from './PaprController';
 import { clientFromUrl } from './urql';

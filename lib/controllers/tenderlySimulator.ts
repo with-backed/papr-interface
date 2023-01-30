@@ -1,10 +1,11 @@
+import { abi as IUniswapRouterABI } from '@uniswap/v3-periphery/artifacts/contracts/interfaces/ISwapRouter.sol/ISwapRouter.json';
 import axios from 'axios';
 import { ethers } from 'ethers';
-import { abi as IUniswapRouterABI } from '@uniswap/v3-periphery/artifacts/contracts/interfaces/ISwapRouter.sol/ISwapRouter.json';
 import { IUniswapV3Pool__factory } from 'types/generated/abis';
+import { erc20ABI } from 'wagmi';
+
 import { ERC20Token } from '.';
 import { getPool } from './uniswap';
-import { erc20ABI } from 'wagmi';
 
 export async function simulateSwap(
   token0: ERC20Token,

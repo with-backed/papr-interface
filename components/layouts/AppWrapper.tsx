@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+
 import styles from './AppWrapper.module.css';
 
 export const AppWrapper: FunctionComponent = ({ children }) => {

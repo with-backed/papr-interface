@@ -1,8 +1,9 @@
 import { Slider } from 'components/Slider';
+import { useTheme } from 'hooks/useTheme';
 import { formatPercent } from 'lib/numberFormat';
 import { useCallback, useEffect, useState } from 'react';
+
 import styles from '../VaultDebtPicker/VaultDebtPicker.module.css';
-import { useTheme } from 'hooks/useTheme';
 
 type VaultDebtSliderProps = {
   maxDebtNumber: number;
