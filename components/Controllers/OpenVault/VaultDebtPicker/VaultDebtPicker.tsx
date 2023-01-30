@@ -814,8 +814,8 @@ function LoanActionSummary({
               type="checkbox"
               onChange={() => setUsingPerpetual(!usingPerpetual)}
             />
-            {isBorrowing && <p>Swap for USDC</p>}
-            {!isBorrowing && <p>Swap from USDC</p>}
+            {isBorrowing && <p>Swap for {controller.underlying.symbol}</p>}
+            {!isBorrowing && <p>Swap from {controller.underlying.symbol}</p>}
           </div>
           <div>
             {quote && (
