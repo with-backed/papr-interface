@@ -5,6 +5,12 @@ import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { formatBigNum } from 'lib/numberFormat';
+import { useMemo, useState } from 'react';
+import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
+import styles from './AuctionApproveAndBuy.module.css';
+import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
+import PaprControllerABI from 'abis/PaprController.json';
+import { INFTEDA } from 'types/generated/abis/PaprController';
 import {
   getOraclePayloadFromReservoirObject,
   OraclePriceType,
@@ -15,6 +21,8 @@ import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 
 import styles from './AuctionApproveAndBuy.module.css';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { ApproveTokenButton } from '../ApproveButtons/ApproveTokenButton';
 
 type AuctionApproveAndBuyProps = {
   auction: NonNullable<AuctionQuery['auction']>;

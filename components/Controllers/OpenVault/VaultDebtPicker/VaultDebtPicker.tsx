@@ -7,6 +7,9 @@ import {
 } from 'components/Controllers/OpenVault/LoanWriteButtons/UpdateLoanButtons';
 import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
 import { Fieldset } from 'components/Fieldset';
+import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
+import { Fieldset } from 'components/Fieldset';
+import { VaultWriteButton } from 'components/Controllers/OpenVault/VaultWriteButton';
 import { Table } from 'components/Table';
 import { Toggle } from 'components/Toggle';
 import { ethers } from 'ethers';
@@ -48,6 +51,8 @@ import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
 import styles from './VaultDebtPicker.module.css';
 import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
+import { ApproveTokenButton } from 'components/Controllers/ApproveButtons/ApproveTokenButton';
+import { ApproveNFTButton } from 'components/Controllers/ApproveButtons/ApproveNFTButton';
 
 type VaultDebtPickerProps = {
   oracleInfo: OracleInfo;
