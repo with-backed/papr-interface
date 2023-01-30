@@ -7,6 +7,13 @@
   text-align: center;
 }
 
+.table td[data-change^='+'] {
+  color: var(--highlight-success-100);
+}
+.table td[data-change^='-'] {
+  color: var(--highlight-alert-100);
+}
+
 .chart-button {
   text-transform: uppercase;
 }

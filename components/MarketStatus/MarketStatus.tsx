@@ -1,7 +1,9 @@
 import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { useControllerPricesData } from 'hooks/useControllerPricesData';
-import { formatTokenAmount } from 'lib/numberFormat';
+import { formatPercentChange, formatTokenAmount } from 'lib/numberFormat';
+import { percentChangeOverDuration } from 'lib/tokenPerformance';
+import { useMemo } from 'react';
 
 import styles from './MarketStatus.module.css';
 import { Sparkline } from './Sparkline';
@@ -12,6 +14,31 @@ const CustomFieldset: React.FunctionComponent = ({ children }) => (
 
 export function MarketStatus() {
   const { pricesData, fetching, error } = useControllerPricesData();
+
+  const marketPrice = useMemo(
+    () =>
+      pricesData
+        ? formatTokenAmount(
+            pricesData.markValues[pricesData.markValues.length - 1].value,
+          )
+        : '???',
+    [pricesData],
+  );
+
+  const { change7Days, change30Days } = useMemo(() => {
+    return {
+      change7Days: pricesData
+        ? formatPercentChange(
+            percentChangeOverDuration(pricesData.markValues, 7),
+          )
+        : '???',
+      change30Days: pricesData
+        ? formatPercentChange(
+            percentChangeOverDuration(pricesData.markValues, 30),
+          )
+        : '???',
+    };
+  }, [pricesData]);
 
   if (error) {
     return <MarketStatusError />;
@@ -51,13 +78,9 @@ export function MarketStatus() {
           </thead>
           <tbody>
             <tr>
-              <td>
-                {formatTokenAmount(
-                  pricesData.markValues[pricesData.markValues.length - 1].value,
-                )}
-              </td>
-              <td>+0.02%</td>
-              <td>+3.10%</td>
+              <td>{marketPrice}</td>
+              <td data-change={change7Days}>{change7Days}</td>
+              <td data-change={change30Days}>{change30Days}</td>
               <td>22.48%</td>
             </tr>
           </tbody>
