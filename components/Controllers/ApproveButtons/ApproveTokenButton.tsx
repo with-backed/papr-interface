@@ -1,16 +1,16 @@
+import { TransactionButton } from 'components/Button';
 import { ethers } from 'ethers';
+import { useController } from 'hooks/useController';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { ERC20Token } from 'lib/controllers';
+import { useCallback, useEffect, useState } from 'react';
+import { ERC20__factory } from 'types/generated/abis';
 import {
   erc20ABI,
   useAccount,
   useContractWrite,
   usePrepareContractWrite,
 } from 'wagmi';
-import { useCallback, useEffect, useState } from 'react';
-import { TransactionButton } from 'components/Button';
-import { ERC20__factory } from 'types/generated/abis';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
-import { useController } from 'hooks/useController';
-import { ERC20Token } from 'lib/controllers';
 
 type ApproveTokenButtonProps = {
   token: ERC20Token;

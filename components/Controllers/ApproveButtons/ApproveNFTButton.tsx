@@ -1,15 +1,15 @@
+import { TransactionButton } from 'components/Button';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useController } from 'hooks/useController';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ERC721__factory } from 'types/generated/abis';
 import {
   erc721ABI,
   useAccount,
   useContractWrite,
   usePrepareContractWrite,
 } from 'wagmi';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { TransactionButton } from 'components/Button';
-import { useAsyncValue } from 'hooks/useAsyncValue';
-import { ERC721__factory } from 'types/generated/abis';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
-import { useController } from 'hooks/useController';
 
 type ApproveNFTButtonProps = {
   collateralContractAddress: string;

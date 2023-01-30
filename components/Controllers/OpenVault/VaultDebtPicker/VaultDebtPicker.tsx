@@ -1,15 +1,10 @@
 import { Button } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
-import {
-  ApproveNFTButton,
-  ApproveTokenButton,
-  VaultWriteButton,
-} from 'components/Controllers/OpenVault/LoanWriteButtons/UpdateLoanButtons';
+import { ApproveNFTButton } from 'components/Controllers/ApproveButtons/ApproveNFTButton';
+import { ApproveTokenButton } from 'components/Controllers/ApproveButtons/ApproveTokenButton';
 import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
-import { Fieldset } from 'components/Fieldset';
-import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
-import { Fieldset } from 'components/Fieldset';
 import { VaultWriteButton } from 'components/Controllers/OpenVault/VaultWriteButton';
+import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { Toggle } from 'components/Toggle';
 import { ethers } from 'ethers';
@@ -23,6 +18,7 @@ import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePaprBalance } from 'hooks/usePaprBalance';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useTheme } from 'hooks/useTheme';
+import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
 import { SupportedToken } from 'lib/config';
 import {
   computeSlippageForSwap,
@@ -49,10 +45,8 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
+
 import styles from './VaultDebtPicker.module.css';
-import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
-import { ApproveTokenButton } from 'components/Controllers/ApproveButtons/ApproveTokenButton';
-import { ApproveNFTButton } from 'components/Controllers/ApproveButtons/ApproveNFTButton';
 
 type VaultDebtPickerProps = {
   oracleInfo: OracleInfo;

@@ -1,7 +1,7 @@
-import { ethers } from 'ethers';
 import { TransactionButton } from 'components/Button';
-import { useVaultWrite } from 'hooks/useVaultWrite/useVaultWrite';
+import { ethers } from 'ethers';
 import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
+import { useVaultWrite } from 'hooks/useVaultWrite/useVaultWrite';
 
 type VaultWriteButtonProps = {
   writeType: VaultWriteType;
