@@ -5,6 +5,7 @@ import { Collateral as CollateralComponent } from 'components/Controllers/Collat
 import styles from 'components/Controllers/Controller.module.css';
 import { Loans as LoansComponent } from 'components/Controllers/Loans';
 import { TokenPerformance } from 'components/Controllers/TokenPerformance';
+import { MarketStatus } from 'components/MarketStatus';
 import { YourPositions as YourPositionsComponent } from 'components/YourPositions';
 import dynamic from 'next/dynamic';
 import React, { ComponentProps } from 'react';
@@ -44,6 +45,7 @@ export function ControllerOverviewContent({
     <div className={styles.wrapper}>
       <YourPositions />
       <ContractStatus />
+      <MarketStatus />
       <TokenPerformance />
       <Collateral />
       <Activity subgraphPool={subgraphPool} />

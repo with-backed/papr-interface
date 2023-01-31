@@ -1,0 +1,35 @@
+.market-status-wrapper {
+  display: flex;
+  gap: 1rem;
+}
+
+.table td {
+  text-align: center;
+}
+
+.table td[data-change^='+'] {
+  color: var(--highlight-success-100);
+}
+.table td[data-change^='-'] {
+  color: var(--highlight-alert-100);
+}
+
+.table-flex-fix {
+  width: 100%;
+}
+
+.chart-button {
+  text-transform: uppercase;
+}
+
+.chart-button-active {
+  composes: chart-button;
+  text-decoration: underline;
+}
+
+.chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 150px;
+}
