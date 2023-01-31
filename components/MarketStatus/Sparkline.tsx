@@ -6,7 +6,6 @@ import {
   PointElement,
 } from 'chart.js';
 import { TextButton } from 'components/Button';
-import { useTheme } from 'hooks/useTheme';
 import { TimeSeriesValue } from 'lib/controllers/charts';
 import { getTimestampNDaysAgo } from 'lib/duration';
 import { ComponentProps, useCallback, useMemo, useState } from 'react';
@@ -66,43 +65,39 @@ const StyledTextButton: React.FunctionComponent<
 
 export function Sparkline({ data }: SparklineProps) {
   const [view, setView] = useState<ChartView>('All');
-  const theme = useTheme();
+
+  const dataForPeriod = useMemo(() => {
+    const cutoff =
+      view === 'All'
+        ? 0
+        : getTimestampNDaysAgo(parseInt(view.slice(0, view.length)));
+    return data.filter((d) => d.time > cutoff);
+  }, [data, view]);
 
   const borderColor = useMemo(() => {
-    switch (theme) {
-      case 'hero':
-        return '#4c45d9';
-      case 'meme':
-        return '#06846f';
-      case 'papr':
-        return '#0064fa';
-      case 'trash':
-        return '#e03400';
+    const first = dataForPeriod[0];
+    const last = dataForPeriod[dataForPeriod.length - 1];
+
+    if (last.value >= first.value) {
+      // --highlight-success-100
+      return '#317049';
     }
-  }, [theme]);
+    // --highlight-alert-100
+    return '#db004d';
+  }, [dataForPeriod]);
 
   const chartData = useMemo(() => {
-    let cutoff = 0;
-    if (view === '1d') {
-      cutoff = getTimestampNDaysAgo(1);
-    } else if (view === '7d') {
-      cutoff = getTimestampNDaysAgo(7);
-    } else if (view === '30d') {
-      cutoff = getTimestampNDaysAgo(30);
-    }
-    const filteredData = data.filter((d) => d.time > cutoff);
-    console.log({ filteredData, cutoff });
     return {
-      labels: filteredData.map((d) => d.time),
+      labels: dataForPeriod.map((d) => d.time),
       datasets: [
         {
           ...BASE_DATASET_OPTIONS,
-          data: filteredData.map((d) => d.value),
+          data: dataForPeriod.map((d) => d.value),
           borderColor: borderColor,
         },
       ],
     };
-  }, [borderColor, data, view]);
+  }, [borderColor, dataForPeriod]);
 
   const viewSelectorFactory = useCallback(
     (view: ChartView) => () => setView(view),
