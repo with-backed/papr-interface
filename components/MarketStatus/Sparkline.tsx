@@ -36,6 +36,12 @@ const BASE_CHART_OPTIONS = {
       display: false,
     },
   },
+  layout: {
+    padding: {
+      bottom: 10,
+      top: 10,
+    },
+  },
 };
 
 const BASE_DATASET_OPTIONS = {
