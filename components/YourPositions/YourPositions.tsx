@@ -57,7 +57,10 @@ export function YourPositions() {
     [currentVaults, userCollectionNFTs],
   );
 
-  const maxLoanInDebtTokens = useMaxDebt(collateralAssets);
+  const maxLoanInDebtTokens = useMaxDebt(
+    collateralAssets,
+    OraclePriceType.lower,
+  );
 
   const maxLoanMinusCurrentDebt = useMemo(() => {
     if (!maxLoanInDebtTokens) {

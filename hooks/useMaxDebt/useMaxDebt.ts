@@ -15,11 +15,20 @@ export function maxDebt(
   return maxLoanUnderlying.div(target);
 }
 
-export function useMaxDebt(collateralAsset: string): BigNumber | null;
-export function useMaxDebt(collateralAssets: string[]): BigNumber | null;
-export function useMaxDebt(collateral: string | string[]): BigNumber | null {
+export function useMaxDebt(
+  collateralAsset: string,
+  oraclePriceType: OraclePriceType,
+): BigNumber | null;
+export function useMaxDebt(
+  collateralAssets: string[],
+  oraclePriceType: OraclePriceType,
+): BigNumber | null;
+export function useMaxDebt(
+  collateral: string | string[],
+  oraclePriceType: OraclePriceType,
+): BigNumber | null {
   const target = useTarget();
-  const oracleInfo = useOracleInfo(OraclePriceType.lower);
+  const oracleInfo = useOracleInfo(oraclePriceType);
   const {
     underlying: { decimals },
     maxLTV,
