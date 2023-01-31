@@ -1,6 +1,6 @@
 import PaprControllerABI from 'abis/PaprController.json';
 import { TransactionButton } from 'components/Button';
-import { ApproveTokenButton } from 'components/Controllers/OpenVault/LoanWriteButtons/UpdateLoanButtons';
+import { ApproveTokenButton } from 'components/Controllers/ApproveButtons/ApproveTokenButton';
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';

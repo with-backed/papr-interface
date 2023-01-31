@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { oracleInfoArgEncoded } from 'lib/constants';
 import { deconstructFromId } from 'lib/controllers';
 import { useMemo } from 'react';
@@ -8,8 +8,11 @@ import {
   ReservoirOracleUnderwriter,
 } from 'types/generated/abis/PaprController';
 import PaprControllerABI from 'abis/PaprController.json';
-import { getOraclePayloadFromReservoirObject } from 'lib/oracle/reservoir';
-import { getAddress } from 'ethers/lib/utils';
+import {
+  getOraclePayloadFromReservoirObject,
+  OraclePriceType,
+} from 'lib/oracle/reservoir';
+import { useAccount } from 'wagmi';
 
 const AddCollateralEncoderString =
   'addCollateral(tuple(address addr, uint256 id)[] collateralArr)';
@@ -31,9 +34,10 @@ const paprControllerIFace = new ethers.utils.Interface(PaprControllerABI.abi);
 export function useModifyCollateralCalldata(
   depositNFTs: string[],
   withdrawNFTs: string[],
-  address: string | undefined,
-  oracleInfo: OracleInfo,
 ) {
+  const { address } = useAccount();
+  const oracleInfo = useOracleInfo(OraclePriceType.lower);
+
   const depositContractsAndTokenIds = useMemo(() => {
     return depositNFTs.map((id) => deconstructFromId(id));
   }, [depositNFTs]);
@@ -80,7 +84,6 @@ export function useModifyCollateralCalldata(
 
   const removeCollateralCalldata = useMemo(() => {
     if (
-      !address ||
       withdrawContractsAndTokenIds.length === 0 ||
       !allWithdrawNFTsEqualContracts
     )
@@ -95,7 +98,7 @@ export function useModifyCollateralCalldata(
         }),
       ),
       oracleInfo: getOraclePayloadFromReservoirObject(
-        oracleInfo[getAddress(withdrawContractsAndTokenIds[0][0])],
+        oracleInfo && oracleInfo[withdrawContractsAndTokenIds[0][0]],
       ),
     };
 

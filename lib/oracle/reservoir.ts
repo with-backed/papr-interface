@@ -48,8 +48,23 @@ export async function getSignedOracleFloorPriceMessage(
 }
 
 export function getOraclePayloadFromReservoirObject(
-  oracleFromReservoir: ReservoirResponseData,
+  oracleFromReservoir: ReservoirResponseData | undefined,
 ): ReservoirOracleUnderwriter.OracleInfoStruct {
+  // on initial page load, reservoir data is undefined -- return empty contract structs if so
+  if (!oracleFromReservoir)
+    return {
+      message: {
+        id: '',
+        payload: '',
+        signature: '',
+        timestamp: '',
+      },
+      sig: {
+        v: '',
+        r: '',
+        s: '',
+      },
+    };
   const { v, r, s } = ethers.utils.splitSignature(
     oracleFromReservoir.message.signature,
   );

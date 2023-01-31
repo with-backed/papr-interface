@@ -1,14 +1,9 @@
 import { Button } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
-import {
-  ApproveNFTButton,
-  ApproveTokenButton,
-  BorrowPerpetualButton,
-  BorrowWithSwapButton,
-  RepayPerpetualButton,
-  RepayWithSwapButton,
-} from 'components/Controllers/OpenVault/LoanWriteButtons/UpdateLoanButtons';
+import { ApproveNFTButton } from 'components/Controllers/ApproveButtons/ApproveNFTButton';
+import { ApproveTokenButton } from 'components/Controllers/ApproveButtons/ApproveTokenButton';
 import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
+import { VaultWriteButton } from 'components/Controllers/OpenVault/VaultWriteButton';
 import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { Toggle } from 'components/Toggle';
@@ -23,6 +18,7 @@ import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePaprBalance } from 'hooks/usePaprBalance';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useTheme } from 'hooks/useTheme';
+import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
 import { SupportedToken } from 'lib/config';
 import {
   computeSlippageForSwap,
@@ -517,50 +513,52 @@ export function VaultDebtPicker({
             )}
 
             {usingPerpetual && isBorrowing && (
-              <BorrowPerpetualButton
+              <VaultWriteButton
+                writeType={VaultWriteType.Borrow}
                 amount={amountToBorrowOrRepay}
+                quote={null}
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!collateralApproved}
                 refresh={refresh}
               />
             )}
             {usingPerpetual && !isBorrowing && (
-              <RepayPerpetualButton
+              <VaultWriteButton
+                writeType={VaultWriteType.Repay}
                 amount={amountToBorrowOrRepay}
+                quote={null}
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!!balanceErrorMessage || !debtTokenApproved}
                 refresh={refresh}
               />
             )}
             {!usingPerpetual && !isBorrowing && (
-              <RepayWithSwapButton
+              <VaultWriteButton
+                writeType={VaultWriteType.RepayWithSwap}
                 amount={amountToBorrowOrRepay}
                 quote={debtToBorrowOrRepay}
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!!balanceErrorMessage || !underlyingApproved}
                 refresh={refresh}
               />
             )}
             {!usingPerpetual && isBorrowing && (
-              <BorrowWithSwapButton
+              <VaultWriteButton
+                writeType={VaultWriteType.BorrowWithSwap}
                 amount={debtToBorrowOrRepay}
                 quote={underlyingToBorrow}
                 collateralContractAddress={collateralContractAddress}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
-                oracleInfo={oracleInfo}
                 vaultHasDebt={vaultHasDebt}
                 disabled={!collateralApproved}
                 refresh={refresh}
