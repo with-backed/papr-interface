@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { computeLTVFromDebts } from 'lib/controllers';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useMemo } from 'react';
 
 export function useLTV(
@@ -13,7 +14,10 @@ export function useLTV(
     maxLTV,
     paprToken: { decimals },
   } = useController();
-  const maxDebtForToken = useMaxDebt(collateralContractAddress);
+  const maxDebtForToken = useMaxDebt(
+    collateralContractAddress,
+    OraclePriceType.twap,
+  );
 
   const ltv = useMemo(() => {
     if (!maxDebtForToken) {

@@ -10,6 +10,7 @@ import { useMaxDebt } from 'hooks/useMaxDebt';
 import { useShowMore } from 'hooks/useShowMore';
 import { computeLTVFromDebts } from 'lib/controllers';
 import { formatPercent } from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 import React, { useMemo } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
 
@@ -80,7 +81,7 @@ function Tile({ address, tokenId, vault }: TileProps) {
   const { centerNetwork } = useConfig();
 
   const result = useCollection({ network: centerNetwork as any, address });
-  const maxDebt = useMaxDebt(address);
+  const maxDebt = useMaxDebt(address, OraclePriceType.twap);
   const debt = useMemo(() => ethers.BigNumber.from(vault.debt), [vault.debt]);
   const ltv = useMemo(() => {
     if (!maxLTV || !maxDebt) return null;

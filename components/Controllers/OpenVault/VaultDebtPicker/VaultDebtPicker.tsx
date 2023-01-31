@@ -29,6 +29,7 @@ import {
 } from 'lib/controllers';
 import { calculateSwapFee } from 'lib/controllers/fees';
 import { formatBigNum } from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 import {
   Dispatch,
   SetStateAction,
@@ -128,7 +129,10 @@ export function VaultDebtPicker({
   }, [userNFTsForVault, vault, auctionsByNftOwner?.auctions]);
 
   // debt variables
-  const maxDebtPerNFTInPerpetual = useMaxDebt(collateralContractAddress);
+  const maxDebtPerNFTInPerpetual = useMaxDebt(
+    collateralContractAddress,
+    OraclePriceType.lower,
+  );
 
   const maxDebtPerNFTInUnderlying = useAsyncValue(async () => {
     if (!oracleInfo || !maxDebtPerNFTInPerpetual) return null;
