@@ -1,4 +1,5 @@
 import { ButtonTheme } from 'components/Button/Button';
+import { useMemo } from 'react';
 import ReactSlider from 'react-slider';
 
 import styles from './Slider.module.css';
@@ -34,6 +35,11 @@ export function Slider({
   hideBlackTrack,
   theme,
 }: SliderProps) {
+  const step = useMemo(() => {
+    const divisibleSteps = (max - min) / 100;
+    if (divisibleSteps < 1) return divisibleSteps;
+    return 1;
+  }, [max, min]);
   return (
     <>
       <div
@@ -54,6 +60,7 @@ export function Slider({
         renderTrack={renderTrack}
         min={min}
         max={max}
+        step={step}
         pearling
         onChange={onChange}
         onAfterChange={onAfterChange}
