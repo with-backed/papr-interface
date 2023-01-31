@@ -13,8 +13,10 @@ import { useMemo } from 'react';
 import styles from './MarketStatus.module.css';
 import { Sparkline } from './Sparkline';
 
-const CustomFieldset: React.FunctionComponent = ({ children }) => (
-  <Fieldset legend="📈 Market Status">{children}</Fieldset>
+const CustomFieldset: React.FunctionComponent = ({ children, ...props }) => (
+  <Fieldset legend="📈 Market Status" {...props}>
+    {children}
+  </Fieldset>
 );
 
 export function MarketStatus() {
@@ -50,7 +52,7 @@ export function MarketStatus() {
       return '???';
     }
     const change = percentChangeOverDuration(pricesData.markValues, 30);
-    /// convert to APR
+    // convert to APR
     return formatPercent(
       (change / (SECONDS_IN_A_DAY * 30)) * SECONDS_IN_A_YEAR,
     );
@@ -110,9 +112,17 @@ export function MarketStatus() {
 }
 
 function MarketStatusError() {
-  return <CustomFieldset>Error loading market price data.</CustomFieldset>;
+  return (
+    <CustomFieldset data-testid="market-status-error">
+      Error loading market price data.
+    </CustomFieldset>
+  );
 }
 
 function MarketStatusFetching() {
-  return <CustomFieldset>Loading market price data...</CustomFieldset>;
+  return (
+    <CustomFieldset data-testid="market-status-fetching">
+      Loading market price data...
+    </CustomFieldset>
+  );
 }
