@@ -53,7 +53,7 @@ const paprHero: Config = {
   siteUrl: 'https://staging.withbacked.xyz',
   network: 'goerli',
   controllerAddress: '0xd50004ec23ad97cf3a3bbd9718ad9bd274dc1764',
-  underlyingAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6 ',
+  underlyingAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
   paprTokenAddress: '0x9E1fb473788BbA070F3cd19fF1E9bBBFA776a477',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
