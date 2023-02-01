@@ -18,6 +18,7 @@ jest.mock('hooks/usePoolStats', () => ({
     fees24h: '$313.37',
     totalValueLocked: '$1010101.01',
     volume24h: '$0.16',
+    feeTier: '1%',
   }),
 }));
 
