@@ -4,8 +4,8 @@ import { Auctions } from 'components/Controllers/Auctions';
 import { Collateral as CollateralComponent } from 'components/Controllers/Collateral';
 import styles from 'components/Controllers/Controller.module.css';
 import { Loans as LoansComponent } from 'components/Controllers/Loans';
-import { TokenPerformance } from 'components/Controllers/TokenPerformance';
 import { MarketStatus } from 'components/MarketStatus';
+import { PoolStats } from 'components/PoolStats';
 import { YourPositions as YourPositionsComponent } from 'components/YourPositions';
 import dynamic from 'next/dynamic';
 import React, { ComponentProps } from 'react';
@@ -46,7 +46,7 @@ export function ControllerOverviewContent({
       <YourPositions />
       <ContractStatus />
       <MarketStatus />
-      <TokenPerformance />
+      <PoolStats />
       <Collateral />
       <Activity subgraphPool={subgraphPool} />
       <Charts />

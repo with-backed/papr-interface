@@ -1,7 +1,7 @@
 import controllerStyles from 'components/Controllers/Controller.module.css';
+import { PoolStats } from 'components/PoolStats';
 
 import { HowToLP } from './HowToLP';
-import { PoolStats } from './PoolStats';
 
 export function LPPageContent() {
   return (
