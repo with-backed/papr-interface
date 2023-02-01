@@ -8,7 +8,6 @@ import { lambertW0 } from 'lambert-w-function';
 import { configs, SupportedToken } from 'lib/config';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
 import { makeProvider, Quoter } from 'lib/contracts';
-import { getCurrentUnixTime } from 'lib/duration';
 import { formatBigNum } from 'lib/numberFormat';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { SubgraphController } from 'lib/PaprController';
@@ -350,10 +349,7 @@ export async function computeNewProjectedRate(
   );
   const fundingPeriod = (await controller.fundingPeriod()).toNumber();
 
-  const tenMinutesFromNow = getCurrentUnixTime().add(secondsHeld).toNumber();
-  const period = tenMinutesFromNow - getCurrentUnixTime().toNumber();
-
-  const periodRatio = period / fundingPeriod;
+  const periodRatio = secondsHeld / fundingPeriod;
   let targetMarkRatio: number;
   if (newMark === 0) {
     targetMarkRatio = targetMarkRatioMax;
