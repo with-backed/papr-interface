@@ -38,6 +38,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { Input } from 'reakit';
 import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import {
@@ -603,20 +604,17 @@ function AmountToBorrowOrRepayInput({
   const [editingInput, setEditingInput] = useState<boolean>(false);
 
   const inputValue = useMemo(() => {
+    if (editingInput) return amount;
     const amountBigNumber = amount
       ? ethers.utils.parseUnits(amount, decimals)
       : ethers.BigNumber.from(0);
     return formatBigNum(amountBigNumber, decimals);
-  }, [amount, decimals]);
+  }, [amount, decimals, editingInput]);
 
-  // TODO: need to debounce this
   const handleInputValueChanged = useCallback(
-    async (raw: string) => {
-      if (!raw) setAmount('0');
-
-      const val = raw.substring(0, raw.indexOf(' '));
-
+    async (val: string) => {
       setAmount(val);
+      if (!val || isNaN(parseFloat(val)) || parseFloat(val) < 0) return; // do not change slider if input is invalid
 
       const debtDelta: ethers.BigNumber = ethers.utils.parseUnits(
         val,
@@ -647,12 +645,15 @@ function AmountToBorrowOrRepayInput({
   }, [debtToBorrowOrRepay, decimals, editingInput]);
 
   return (
-    <input
-      value={`${inputValue} papr`}
-      onChange={(e) => handleInputValueChanged(e.target.value)}
-      onFocus={() => setEditingInput(true)}
-      onBlur={() => setEditingInput(false)}
-    />
+    <span className={styles.debtAmountInputWrapper}>
+      <Input
+        value={`${inputValue}`}
+        type="number"
+        onChange={(e) => handleInputValueChanged(e.target.value)}
+        onFocus={() => setEditingInput(true)}
+        onBlur={() => setEditingInput(false)}
+      />
+    </span>
   );
 }
 

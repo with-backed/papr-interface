@@ -117,9 +117,27 @@
   background-color: white;
   border-radius: var(--border-radius);
   padding: 12px;
-  text-align: right;
   font-size: var(--font-large);
   max-width: 150px;
+  text-align: right;
+  appearance: none;
+}
+
+.editLoanForm div input::-webkit-outer-spin-button,
+.editLoanForm div input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+span.debtAmountInputWrapper {
+  position: relative;
+}
+
+span.debtAmountInputWrapper:before {
+  position: absolute;
+  top: -4px;
+  content: 'papr';
+  left: 7px;
 }
 
 .slippage {
