@@ -6,12 +6,14 @@ import { PaprController } from 'hooks/useController';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { lambertW0 } from 'lambert-w-function';
 import { configs, SupportedToken } from 'lib/config';
-import { SECONDS_IN_A_DAY } from 'lib/constants';
-import { Quoter } from 'lib/contracts';
+import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
+import { makeProvider, Quoter } from 'lib/contracts';
+import { getCurrentUnixTime } from 'lib/duration';
 import { formatBigNum } from 'lib/numberFormat';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { SubgraphController } from 'lib/PaprController';
-import { ERC20, ERC721 } from 'types/generated/abis';
+import { percentChange } from 'lib/tokenPerformance';
+import { ERC20, ERC721, PaprController__factory } from 'types/generated/abis';
 
 import { ONE } from './constants';
 
@@ -326,4 +328,48 @@ export function controllerNFTValue(
     0,
   );
   return value;
+}
+
+export async function computeNewProjectedRate(
+  newMark: number,
+  target: number,
+  token: SupportedToken,
+): Promise<number> {
+  const rpcProvider = makeProvider(configs[token].jsonRpcProvider, token);
+  const controller = PaprController__factory.connect(
+    configs[token].controllerAddress,
+    rpcProvider,
+  );
+
+  const targetMarkRatioMax = parseFloat(
+    ethers.utils.formatEther(await controller.targetMarkRatioMax()),
+  );
+  const targetMarkRatioMin = parseFloat(
+    ethers.utils.formatEther(await controller.targetMarkRatioMin()),
+  );
+  const fundingPeriod = (await controller.fundingPeriod()).toNumber();
+
+  const tenMinutesFromNow = getCurrentUnixTime()
+    .add(10 * 60)
+    .toNumber();
+  const period = tenMinutesFromNow - getCurrentUnixTime().toNumber();
+
+  const periodRatio = period / fundingPeriod;
+  let targetMarkRatio: number;
+  if (newMark === 0) {
+    targetMarkRatio = targetMarkRatioMax;
+  } else {
+    targetMarkRatio = target / newMark;
+    if (targetMarkRatio > targetMarkRatioMax) {
+      targetMarkRatio = targetMarkRatioMax;
+    } else if (targetMarkRatio < targetMarkRatioMin) {
+      targetMarkRatio = targetMarkRatioMin;
+    }
+  }
+  const m = Math.pow(targetMarkRatio, periodRatio);
+
+  const newTarget = target * m;
+  const change = percentChange(target, newTarget);
+  const apr = (change / (10 * 60)) * SECONDS_IN_A_YEAR;
+  return apr;
 }
