@@ -38,3 +38,8 @@ export const COMMUNITY_NFT_SUBGRAPH =
 
 export const OPENGRAPH_DEFAULT_DESCRIPTION =
   'Welcome to Backed protocol - NFT Lending. View existing loans, lend against NFTs, or propose loan terms on your own NFTs.';
+
+/// Uniswap subgraph constants
+// Fri Apr 23 2021 09:42:55 GMT+0000 (beginning of Uniswap V3, can probably make this beginning of papr)
+export const UNISWAP_SUBGRAPH_START = 1619170975;
+export const UNISWAP_SUBGRAPH_END = Date.now() / 1000;

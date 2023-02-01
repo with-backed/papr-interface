@@ -1,6 +1,7 @@
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { formatDollars } from 'lib/numberFormat';
+import { usePoolDayDatas } from 'hooks/usePoolDayDatas';
+import { formatDollars, formatPercent } from 'lib/numberFormat';
 import { useMemo } from 'react';
 import {
   PoolByIdDocument,
@@ -8,11 +9,15 @@ import {
 } from 'types/generated/graphql/uniswapSubgraph';
 import { useQuery } from 'urql';
 
+const LOADING = 'Loading...';
+const NO_DATA = '---';
+
 export function usePoolStats() {
   const { uniswapSubgraph } = useConfig();
   const { poolAddress } = useController();
+  const { data: poolDayDatas, allFound } = usePoolDayDatas();
 
-  const [{ data, fetching, error }] = useQuery<PoolByIdQuery>({
+  const [{ data: poolByIdData, fetching, error }] = useQuery<PoolByIdQuery>({
     query: PoolByIdDocument,
     variables: { id: poolAddress },
     context: useMemo(
@@ -25,42 +30,57 @@ export function usePoolStats() {
 
   const volume24h = useMemo(() => {
     if (fetching) {
-      return 'Loading...';
+      return LOADING;
     }
-    if (error || !data?.pool) {
-      return '---';
-    }
-
-    return formatDollars(data.pool.volumeUSD);
-  }, [data, error, fetching]);
-
-  const totalValueLocked = useMemo(() => {
-    if (fetching) {
-      return 'Loading...';
-    }
-    if (error || !data?.pool) {
-      return '---';
+    if (error || !poolByIdData?.pool) {
+      return NO_DATA;
     }
 
-    return formatDollars(data.pool.totalValueLockedUSD);
-  }, [data, error, fetching]);
+    return formatDollars(poolByIdData.pool.volumeUSD);
+  }, [poolByIdData, error, fetching]);
 
   const fees24h = useMemo(() => {
     if (fetching) {
-      return 'Loading...';
+      return LOADING;
     }
-    if (error || !data?.pool) {
-      return '---';
+    if (error || !poolByIdData?.pool) {
+      return NO_DATA;
     }
-    const { feeTier, volumeUSD } = data.pool;
+    const { feeTier, volumeUSD } = poolByIdData.pool;
     const volumeNum = parseFloat(volumeUSD);
     const feeTierNum = parseInt(feeTier);
     return formatDollars(volumeNum * (feeTierNum / 1000000));
-  }, [data, error, fetching]);
+  }, [poolByIdData, error, fetching]);
+
+  const totalVolume = useMemo(() => {
+    if (!allFound) {
+      return LOADING;
+    }
+
+    return formatDollars(
+      poolDayDatas.reduce(
+        (acc, { volumeUSD }) => acc + parseFloat(volumeUSD),
+        0,
+      ),
+    );
+  }, [allFound, poolDayDatas]);
+
+  const feeTier = useMemo(() => {
+    if (fetching) {
+      return LOADING;
+    }
+    if (error || !poolByIdData?.pool) {
+      return NO_DATA;
+    }
+
+    const { feeTier } = poolByIdData.pool;
+    return formatPercent(feeTier / 1000000);
+  }, [error, fetching, poolByIdData]);
 
   return {
     fees24h,
-    totalValueLocked,
     volume24h,
+    totalVolume,
+    feeTier,
   };
 }
