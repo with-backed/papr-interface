@@ -333,6 +333,7 @@ export function controllerNFTValue(
 export async function computeNewProjectedRate(
   newMark: number,
   target: number,
+  secondsHeld: number,
   token: SupportedToken,
 ): Promise<number> {
   const rpcProvider = makeProvider(configs[token].jsonRpcProvider, token);
@@ -349,9 +350,7 @@ export async function computeNewProjectedRate(
   );
   const fundingPeriod = (await controller.fundingPeriod()).toNumber();
 
-  const tenMinutesFromNow = getCurrentUnixTime()
-    .add(10 * 60)
-    .toNumber();
+  const tenMinutesFromNow = getCurrentUnixTime().add(secondsHeld).toNumber();
   const period = tenMinutesFromNow - getCurrentUnixTime().toNumber();
 
   const periodRatio = period / fundingPeriod;
@@ -370,6 +369,6 @@ export async function computeNewProjectedRate(
 
   const newTarget = target * m;
   const change = percentChange(target, newTarget);
-  const apr = (change / (10 * 60)) * SECONDS_IN_A_YEAR;
+  const apr = (change / secondsHeld) * SECONDS_IN_A_YEAR;
   return apr;
 }
