@@ -7,12 +7,12 @@ import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { lambertW0 } from 'lambert-w-function';
 import { configs, SupportedToken } from 'lib/config';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
-import { makeProvider, Quoter } from 'lib/contracts';
+import { jsonRpcControllerContract, Quoter } from 'lib/contracts';
 import { formatBigNum } from 'lib/numberFormat';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { SubgraphController } from 'lib/PaprController';
 import { percentChange } from 'lib/tokenPerformance';
-import { ERC20, ERC721, PaprController__factory } from 'types/generated/abis';
+import { ERC20, ERC721 } from 'types/generated/abis';
 
 import { ONE } from './constants';
 
@@ -329,16 +329,16 @@ export function controllerNFTValue(
   return value;
 }
 
-export async function computeNewProjectedRate(
+export async function computeNewProjectedAPR(
   newMark: number,
   target: number,
   secondsHeld: number,
   token: SupportedToken,
 ): Promise<number> {
-  const rpcProvider = makeProvider(configs[token].jsonRpcProvider, token);
-  const controller = PaprController__factory.connect(
+  const controller = jsonRpcControllerContract(
     configs[token].controllerAddress,
-    rpcProvider,
+    configs[token].jsonRpcProvider,
+    token,
   );
 
   const targetMarkRatioMax = parseFloat(
