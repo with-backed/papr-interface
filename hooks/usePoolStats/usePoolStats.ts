@@ -9,8 +9,8 @@ import {
 } from 'types/generated/graphql/uniswapSubgraph';
 import { useQuery } from 'urql';
 
-const POOL_STATS_LOADING = 'Loading...';
-const POOL_STATS_NO_DATA = '---';
+const LOADING = 'Loading...';
+const NO_DATA = '---';
 
 export function usePoolStats() {
   const { uniswapSubgraph } = useConfig();
@@ -30,10 +30,10 @@ export function usePoolStats() {
 
   const volume24h = useMemo(() => {
     if (fetching) {
-      return POOL_STATS_LOADING;
+      return LOADING;
     }
     if (error || !poolByIdData?.pool) {
-      return POOL_STATS_NO_DATA;
+      return NO_DATA;
     }
 
     return formatDollars(poolByIdData.pool.volumeUSD);
@@ -41,10 +41,10 @@ export function usePoolStats() {
 
   const fees24h = useMemo(() => {
     if (fetching) {
-      return POOL_STATS_LOADING;
+      return LOADING;
     }
     if (error || !poolByIdData?.pool) {
-      return POOL_STATS_NO_DATA;
+      return NO_DATA;
     }
     const { feeTier, volumeUSD } = poolByIdData.pool;
     const volumeNum = parseFloat(volumeUSD);
@@ -54,7 +54,7 @@ export function usePoolStats() {
 
   const totalVolume = useMemo(() => {
     if (!allFound) {
-      return POOL_STATS_LOADING;
+      return LOADING;
     }
 
     return formatDollars(
@@ -67,10 +67,10 @@ export function usePoolStats() {
 
   const feeTier = useMemo(() => {
     if (fetching) {
-      return POOL_STATS_LOADING;
+      return LOADING;
     }
     if (error || !poolByIdData?.pool) {
-      return POOL_STATS_NO_DATA;
+      return NO_DATA;
     }
 
     const { feeTier } = poolByIdData.pool;
