@@ -15,6 +15,7 @@ div.indicator {
   font-size: 12px;
   display: flex;
   flex-direction: row;
+  justify-content: center;
 }
 
 div.indicator p {
