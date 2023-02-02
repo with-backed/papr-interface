@@ -82,5 +82,6 @@ export function usePoolStats() {
     volume24h,
     totalVolume,
     feeTier,
+    fetching,
   };
 }
