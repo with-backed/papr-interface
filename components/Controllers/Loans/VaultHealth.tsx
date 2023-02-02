@@ -22,7 +22,7 @@ export function VaultHealth({ ltv }: VaultHealthProps) {
 
   const indicator = useMemo(() => {
     const totalElements = 6;
-    // Ratio, but as a number out of 10 rather than a decimal out of 1
+    // Ratio, but as a number out of totalElements rather than a decimal out of 1
     const numHashes = Math.round(ratio * totalElements);
     const empty = Array(totalElements).fill('░░');
     const filled = Array(numHashes).fill('▓▓');
