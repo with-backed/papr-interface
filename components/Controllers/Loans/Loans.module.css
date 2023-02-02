@@ -11,8 +11,14 @@
   white-space: nowrap;
 }
 
-.indicator {
-  cursor: pointer;
+div.indicator {
+  font-size: 12px;
+  display: flex;
+  flex-direction: row;
+}
+
+div.indicator p {
+  margin: 0px 0.5px;
 }
 
 .indicator-danger {
