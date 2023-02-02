@@ -260,3 +260,42 @@
   composes: text-button;
   color: var(--highlight-success-100);
 }
+
+.gradient-button {
+  composes: button;
+  composes: small;
+}
+
+.gradient-button-orange {
+  composes: gradient-button;
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.85),
+      rgba(255, 255, 255, 0.85)
+    ),
+    linear-gradient(#faff00, #ff5c00);
+}
+
+.gradient-button-orange:hover {
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.75),
+      rgba(255, 255, 255, 0.75)
+    ),
+    linear-gradient(#faff00, #ff5c00);
+}
+
+.gradient-button-blue {
+  composes: gradient-button;
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.85),
+      rgba(255, 255, 255, 0.85)
+    ),
+    linear-gradient(#5397FF, #00F0FF);
+}
+
+.gradient-button-blue:hover {
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.75),
+      rgba(255, 255, 255, 0.75)
+    ),
+    linear-gradient(#5397FF, #00F0FF);
+}
