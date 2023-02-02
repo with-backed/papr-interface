@@ -266,6 +266,10 @@
   composes: small;
 }
 
+.gradient-button:visited {
+  color: black;
+}
+
 .gradient-button-orange {
   composes: gradient-button;
   background: linear-gradient(
