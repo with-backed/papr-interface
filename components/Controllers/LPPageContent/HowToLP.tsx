@@ -1,17 +1,13 @@
 import { Fieldset } from 'components/Fieldset';
 import { useConfig } from 'hooks/useConfig';
 import { usePoolStats } from 'hooks/usePoolStats';
-import {
-  POOL_STATS_LOADING,
-  POOL_STATS_NO_DATA,
-} from 'hooks/usePoolStats/usePoolStats';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
 export function HowToLP() {
   const { network, paprTokenAddress, tokenName, underlyingAddress } =
     useConfig();
-  const { feeTier } = usePoolStats();
+  const { feeTier, fetching } = usePoolStats();
 
   const poolURL = useMemo(
     () =>
@@ -19,11 +15,11 @@ export function HowToLP() {
     [network, paprTokenAddress, underlyingAddress],
   );
   const formattedFeeTier = useMemo(() => {
-    if (feeTier === POOL_STATS_LOADING || feeTier === POOL_STATS_NO_DATA) {
+    if (fetching) {
       return '...';
     }
     return feeTier;
-  }, [feeTier]);
+  }, [feeTier, fetching]);
   return (
     <Fieldset legend="🦄 How to LP">
       <p>

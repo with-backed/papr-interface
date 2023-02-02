@@ -9,8 +9,8 @@ import {
 } from 'types/generated/graphql/uniswapSubgraph';
 import { useQuery } from 'urql';
 
-export const POOL_STATS_LOADING = 'Loading...';
-export const POOL_STATS_NO_DATA = '---';
+const POOL_STATS_LOADING = 'Loading...';
+const POOL_STATS_NO_DATA = '---';
 
 export function usePoolStats() {
   const { uniswapSubgraph } = useConfig();
@@ -82,5 +82,6 @@ export function usePoolStats() {
     volume24h,
     totalVolume,
     feeTier,
+    fetching,
   };
 }
