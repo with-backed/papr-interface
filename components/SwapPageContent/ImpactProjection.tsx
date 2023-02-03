@@ -164,17 +164,17 @@ function ImpactProjectionLoaded({
 function Separator() {
   return (
     <div className={styles.separator}>
-      <span>.</span>
-      <span>.</span>
-      <span>.</span>
+      <span>·</span>
+      <span>·</span>
+      <span>·</span>
       <span className={styles.pipe}>|</span>
       <span className={styles.pipe}>|</span>
       <span className={styles.pipe}>|</span>
       <span className={styles.pipe}>|</span>
       <span className={styles.pipe}>|</span>
-      <span>.</span>
-      <span>.</span>
-      <span>.</span>
+      <span>·</span>
+      <span>·</span>
+      <span>·</span>
     </div>
   );
 }
