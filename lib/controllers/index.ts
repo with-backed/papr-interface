@@ -179,6 +179,7 @@ export async function computeSlippageForSwap(
   useExactInput: boolean,
   tokenName: SupportedToken,
 ) {
+  const withoutSlippageAmount = ethers.BigNumber.from('10000000');
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   let quoteWithoutSlippage: ethers.BigNumber;
   if (useExactInput) {
@@ -186,7 +187,7 @@ export async function computeSlippageForSwap(
       tokenIn.id,
       tokenOut.id,
       ethers.BigNumber.from(10).pow(4),
-      ethers.utils.parseUnits('1', tokenIn.decimals),
+      withoutSlippageAmount,
       0,
     );
   } else {
@@ -194,7 +195,7 @@ export async function computeSlippageForSwap(
       tokenIn.id,
       tokenOut.id,
       ethers.BigNumber.from(10).pow(4),
-      ethers.utils.parseUnits('1', tokenOut.decimals),
+      withoutSlippageAmount,
       0,
     );
   }
@@ -216,17 +217,10 @@ export async function computeSlippageForSwap(
     ),
   );
 
-  // since quoteWithoutSlippage was 1 unit, scale it up to what it would have been had we tried to quote amount
+  // since quoteWithoutSlippage was a fixed number of units, scale it up to what it would have been had we tried to quote amount
   const quoteWithoutSlippageScaled =
     quoteWithoutSlippageFloat *
-    parseFloat(
-      ethers.utils.formatUnits(
-        amount,
-        ethers.BigNumber.from(
-          useExactInput ? tokenIn.decimals : tokenOut.decimals,
-        ),
-      ),
-    );
+    parseFloat(amount.div(withoutSlippageAmount).toString());
 
   const priceImpact =
     Math.abs(quoteWithoutSlippageScaled - quoteWithSlippageFloat) /
