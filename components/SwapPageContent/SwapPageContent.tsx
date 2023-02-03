@@ -10,6 +10,7 @@ import {
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useTheme } from 'hooks/useTheme';
+import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
 import { useCallback, useMemo, useState } from 'react';
 import { useSigner } from 'wagmi';
 
@@ -105,6 +106,8 @@ export function SwapPageContent() {
         hideConnectionUI={true}
         onInitialSwapQuote={onInitialSwapQuote}
         onSwapPriceUpdateAck={onSwapPriceUpdateAck}
+        convenienceFee={SWAP_FEE_BIPS}
+        convenienceFeeRecipient={SWAP_FEE_TO}
       />
       <ImpactProjection marketPriceImpact={marketPriceImpact} />
     </div>
