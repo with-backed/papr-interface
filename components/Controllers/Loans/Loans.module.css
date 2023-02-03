@@ -11,8 +11,12 @@
   white-space: nowrap;
 }
 
-.indicator {
-  cursor: pointer;
+div.indicator {
+  font-size: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  font-family: 'Arial';
 }
 
 .indicator-danger {

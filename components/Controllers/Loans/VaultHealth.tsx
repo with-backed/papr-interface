@@ -21,22 +21,25 @@ export function VaultHealth({ ltv }: VaultHealthProps) {
   const ratio = ltv / formattedMaxLTV;
 
   const indicator = useMemo(() => {
-    // Ratio, but as a number out of 10 rather than a decimal out of 1
-    const numHashes = Math.round(ratio * 10);
-    const dashes = Array(10).fill('-');
-    const hashes = Array(numHashes).fill('#');
-    return hashes.concat(dashes).join('').substring(0, 10);
+    const totalElements = 8;
+    // Ratio, but as a number out of totalElements rather than a decimal out of 1
+    const numHashes = Math.round(ratio * totalElements);
+    const empty = Array(totalElements).fill('░░');
+    const filled = Array(numHashes).fill('▓▓');
+    return filled.concat(empty).slice(0, totalElements);
   }, [ratio]);
 
   return (
     <>
       <TooltipReference {...healthTooltip}>
-        <span
+        <div
           className={
             ratio > 0.5 ? styles['indicator-danger'] : styles.indicator
           }>
-          {indicator}
-        </span>
+          {indicator.map((char, i) => (
+            <p key={i}>{char}</p>
+          ))}
+        </div>
       </TooltipReference>
       <Tooltip {...healthTooltip}>
         <div className={styles.tooltip}>
