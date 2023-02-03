@@ -155,6 +155,39 @@ export function VaultDebtPicker({
       ethers.utils.formatUnits(maxDebt, paprController.paprToken.decimals),
     );
   }, [maxDebt, paprController.paprToken.decimals]);
+  const maxDebtUnderlying = useAsyncValue(async () => {
+    if (!maxDebtPerNFTInPerpetual) return null;
+    const maxDebtForAllNFTs = maxDebtPerNFTInPerpetual.mul(
+      userNFTsForVault.length,
+    );
+    return getQuoteForSwap(
+      maxDebtForAllNFTs,
+      paprController.paprToken.id,
+      paprController.underlying.id,
+      tokenName as SupportedToken,
+    );
+  }, [
+    maxDebtPerNFTInPerpetual,
+    userNFTsForVault.length,
+    paprController.paprToken.id,
+    paprController.underlying.id,
+    tokenName,
+  ]);
+
+  const debtInUnderlying = useAsyncValue(async () => {
+    if (!vault) return null;
+    return getQuoteForSwap(
+      vault.debt,
+      paprController.paprToken.id,
+      paprController.underlying.id,
+      tokenName as SupportedToken,
+    );
+  }, [
+    vault,
+    paprController.paprToken.id,
+    paprController.underlying.id,
+    tokenName,
+  ]);
 
   const vaultHasDebt = useMemo(() => {
     if (!vault) return false;
@@ -470,6 +503,11 @@ export function VaultDebtPicker({
                   />
                 </div>
               )}
+              {!vaultHasDebt && (
+                <div>
+                  <p>Loan Amount</p>
+                </div>
+              )}
               <div>
                 <AmountToBorrowOrRepayInput
                   paprController={paprController}
@@ -569,6 +607,11 @@ export function VaultDebtPicker({
                 refresh={refresh}
               />
             )}
+            <CostToCloseOrMaximumLoan
+              vaultHasDebt={vaultHasDebt}
+              maximumLoan={maxDebtUnderlying}
+              costToClose={debtInUnderlying}
+            />
           </div>
         )}
       </div>
@@ -880,4 +923,44 @@ function LoanActionSummary({
       </div>
     </div>
   );
+}
+
+type CostToCloseOrMaximumLoanProps = {
+  vaultHasDebt: boolean;
+  vaultDebt: ethers.BigNumber | undefined;
+  costToClose: ethers.BigNumber | null;
+  maximumLoan: ethers.BigNumber | null;
+};
+
+function CostToCloseOrMaximumLoan({
+  vaultHasDebt,
+  costToClose,
+  maximumLoan,
+}: CostToCloseOrMaximumLoanProps) {
+  const controller = useController();
+  if (vaultHasDebt) {
+    return (
+      <div className={styles.costToCloseOrMax}>
+        <div>Cost to close:</div>
+        <div>
+          $
+          {costToClose
+            ? formatBigNum(costToClose, controller.underlying.decimals)
+            : '...'}
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <div className={styles.costToCloseOrMax}>
+        <div>Max Loan Amount:</div>{' '}
+        <div>
+          $
+          {maximumLoan
+            ? formatBigNum(maximumLoan, controller.underlying.decimals)
+            : '...'}
+        </div>
+      </div>
+    );
+  }
 }
