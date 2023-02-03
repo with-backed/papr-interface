@@ -148,7 +148,7 @@ function ImpactProjectionLoaded({
           className={
             currentMarket > currentTarget
               ? styles['pointers']
-              : styles['pointer-reverse']
+              : styles['pointers-reverse']
           }>
           <PriceProjection
             kind="market"
