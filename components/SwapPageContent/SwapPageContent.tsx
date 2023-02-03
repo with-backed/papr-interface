@@ -1,11 +1,16 @@
 import '@uniswap/widgets/fonts.css';
 
 import { JsonRpcSigner } from '@ethersproject/providers';
-import { SwapWidget, Theme } from '@uniswap/widgets';
+import {
+  OnInitialSwapQuote,
+  OnSwapPriceUpdateAck,
+  SwapWidget,
+  Theme,
+} from '@uniswap/widgets';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useTheme } from 'hooks/useTheme';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useSigner } from 'wagmi';
 
 import { ImpactProjection } from './ImpactProjection';
@@ -29,6 +34,10 @@ export function SwapPageContent() {
   const { chainId, jsonRpcProvider, tokenName } = useConfig();
   const paprTheme = useTheme();
   const provider = useSigner<JsonRpcSigner>().data?.provider;
+
+  const [marketPriceImpact, setMarketPriceImpact] = useState<number | null>(
+    null,
+  );
 
   const jsonRpcUrlMap = useMemo(
     () => ({ [chainId]: jsonRpcProvider }),
@@ -68,6 +77,24 @@ export function SwapPageContent() {
     }
   }, [paprTheme]);
 
+  const onInitialSwapQuote: OnInitialSwapQuote = useCallback(
+    ({ priceImpact }) => {
+      const impactPercent = parseFloat(priceImpact.toFixed(6));
+      setMarketPriceImpact(impactPercent);
+    },
+    [],
+  );
+
+  const onSwapPriceUpdateAck: OnSwapPriceUpdateAck = useCallback(
+    (_stale, update) => {
+      const impactPercent = parseFloat(update.priceImpact.toFixed(6));
+      setMarketPriceImpact(impactPercent);
+    },
+    [],
+  );
+
+  console.log({ marketPriceImpact });
+
   return (
     <div className={styles.wrapper}>
       <SwapWidget
@@ -78,8 +105,10 @@ export function SwapPageContent() {
         defaultInputTokenAddress={paprToken.id}
         defaultOutputTokenAddress={underlying.id}
         hideConnectionUI={true}
+        onInitialSwapQuote={onInitialSwapQuote}
+        onSwapPriceUpdateAck={onSwapPriceUpdateAck}
       />
-      <ImpactProjection />
+      <ImpactProjection marketPriceImpact={marketPriceImpact} />
     </div>
   );
 }

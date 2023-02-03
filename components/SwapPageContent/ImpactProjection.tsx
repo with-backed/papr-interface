@@ -1,12 +1,109 @@
 import { Fieldset } from 'components/Fieldset';
-import { formatPercentChange } from 'lib/numberFormat';
-import { useMemo } from 'react';
+import { useConfig } from 'hooks/useConfig';
+import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import { SupportedToken } from 'lib/config';
+import { SECONDS_IN_A_YEAR } from 'lib/constants';
+import { computeNewProjectedAPR } from 'lib/controllers';
+import { ControllerPricesData } from 'lib/controllers/charts';
+import {
+  formatPercent,
+  formatPercentChange,
+  formatTokenAmount,
+} from 'lib/numberFormat';
+import { percentChange } from 'lib/tokenPerformance';
+import { useEffect, useMemo, useState } from 'react';
 
 import styles from './ImpactProjection.module.css';
 
-export function ImpactProjection() {
+const LEGEND = '🔮 Impact Projection';
+
+interface ImpactProjectionProps {
+  marketPriceImpact: number | null;
+}
+
+export function ImpactProjection({ marketPriceImpact }: ImpactProjectionProps) {
+  const { pricesData, fetching, error } = useControllerPricesData();
+  if (marketPriceImpact === null) {
+    return <ImpactProjectionLoading />;
+  }
+
+  if (fetching) {
+    return <ImpactProjectionPricesLoading />;
+  }
+
+  if (error) {
+    return <ImpactProjectionPricesError />;
+  }
+
   return (
-    <Fieldset legend="🔮 Impact Projection">
+    <ImpactProjectionLoaded
+      marketPriceImpact={marketPriceImpact}
+      pricesData={pricesData}
+    />
+  );
+}
+
+function ImpactProjectionLoading() {
+  return (
+    <Fieldset legend={LEGEND}>
+      Waiting on impact info from swap widget.
+    </Fieldset>
+  );
+}
+function ImpactProjectionPricesLoading() {
+  return <Fieldset legend={LEGEND}>Waiting on protocol price data.</Fieldset>;
+}
+function ImpactProjectionPricesError() {
+  return (
+    <Fieldset legend={LEGEND}>
+      Error fetching protocol price data; cannot compute impact.
+    </Fieldset>
+  );
+}
+
+interface ImpactProjectionLoadedProps {
+  marketPriceImpact: number;
+  pricesData: ControllerPricesData;
+}
+function ImpactProjectionLoaded({
+  marketPriceImpact,
+  pricesData,
+}: ImpactProjectionLoadedProps) {
+  const { tokenName } = useConfig();
+  const { targetValues, markValues } = pricesData;
+  const currentTarget = targetValues[targetValues.length - 1].value;
+  const currentMarket = markValues[markValues.length - 1].value;
+  const [projectedData, setProjectedData] = useState<{
+    newApr: number;
+    newTarget: number;
+  } | null>(null);
+
+  const newMark = useMemo(
+    () => currentMarket * marketPriceImpact,
+    [currentMarket, marketPriceImpact],
+  );
+
+  const currentAPR = useMemo(() => {
+    const current = targetValues[targetValues.length - 1];
+    const previous = targetValues[targetValues.length - 2];
+    return (
+      (percentChange(previous.value, current.value) /
+        (current.time - previous.time)) *
+      SECONDS_IN_A_YEAR
+    );
+  }, [targetValues]);
+
+  useEffect(() => {
+    computeNewProjectedAPR(
+      newMark,
+      currentTarget,
+      600 /* 10 minutes */,
+      tokenName as SupportedToken,
+    ).then(setProjectedData);
+  }, [currentTarget, newMark, tokenName]);
+
+  return (
+    <Fieldset legend={LEGEND}>
       <p>
         Interest rate updates lag swaps due to the use of time-weighted values.
         Rates are modeled as if the price after the swap were to hold for 10
@@ -16,7 +113,7 @@ export function ImpactProjection() {
         <div className={styles.negative + ' ' + styles.right}>
           Projected:
           <br />
-          -12.6%
+          {projectedData?.newApr ? formatPercent(projectedData.newApr) : '---'}
         </div>
         <Direction direction="down" />
         <div className={styles.right}>
@@ -24,33 +121,41 @@ export function ImpactProjection() {
           <br />
           Rate
           <br />
-          -12.2%
+          {formatPercent(currentAPR)}
         </div>
-        <div className={styles.separator}>
-          <span>.</span>
-          <span>.</span>
-          <span>.</span>
-          <span className={styles.pipe}>|</span>
-          <span className={styles.pipe}>|</span>
-          <span className={styles.pipe}>|</span>
-          <span className={styles.pipe}>|</span>
-          <span className={styles.pipe}>|</span>
-          <span>.</span>
-          <span>.</span>
-          <span>.</span>
-        </div>
+        <Separator />
         <div className={styles['pointers']}>
-          <div>
-            <Pointer kind="market" price="1.26 USDC" />
-            <PriceProjection amount="1.31" percentChange={0.0323} />
-          </div>
-          <div>
-            <Pointer kind="target" price="1.13 USDC" />
-            <PriceProjection amount="1.09" percentChange={-0.0212} />
-          </div>
+          <PriceProjection
+            kind="market"
+            currentPrice={currentMarket}
+            newPrice={newMark}
+          />
+          <PriceProjection
+            kind="target"
+            currentPrice={currentTarget}
+            newPrice={projectedData?.newTarget || null}
+          />
         </div>
       </div>
     </Fieldset>
+  );
+}
+
+function Separator() {
+  return (
+    <div className={styles.separator}>
+      <span>.</span>
+      <span>.</span>
+      <span>.</span>
+      <span className={styles.pipe}>|</span>
+      <span className={styles.pipe}>|</span>
+      <span className={styles.pipe}>|</span>
+      <span className={styles.pipe}>|</span>
+      <span className={styles.pipe}>|</span>
+      <span>.</span>
+      <span>.</span>
+      <span>.</span>
+    </div>
   );
 }
 
@@ -58,46 +163,56 @@ interface DirectionProps {
   direction: 'up' | 'down';
 }
 function Direction({ direction }: DirectionProps) {
-  const symbols = useMemo(
-    () => new Array(3).fill(direction === 'down' ? 'v' : '^'),
-    [direction],
-  );
+  const symbol = useMemo(() => (direction === 'down' ? 'v' : '^'), [direction]);
   return (
     <div className={styles.direction}>
-      {symbols.map((s, i) => (
-        <span key={i}>{s}</span>
-      ))}
-    </div>
-  );
-}
-
-interface PointerProps {
-  kind: 'market' | 'target';
-  price: string;
-}
-function Pointer({ kind, price }: PointerProps) {
-  return (
-    <div className={styles['pointer-wrapper']}>
-      <span className={styles['pointer-arrow']}>&lt;</span>
-      <span>
-        {kind.charAt(0).toUpperCase() + kind.slice(1)} Price
-        <br />
-        {price}
-      </span>
+      <span>{symbol}</span>
+      <span>{symbol}</span>
+      <span>{symbol}</span>
     </div>
   );
 }
 
 interface PriceProjectionProps {
-  amount: string;
-  percentChange: number;
+  currentPrice: number;
+  newPrice: number | null;
+  kind: 'market' | 'target';
 }
-function PriceProjection({ amount, percentChange }: PriceProjectionProps) {
+function PriceProjection({
+  currentPrice,
+  newPrice,
+  kind,
+}: PriceProjectionProps) {
+  const formattedPrice = useMemo(
+    () => formatTokenAmount(currentPrice),
+    [currentPrice],
+  );
+
+  const formattedNewPrice = useMemo(
+    () => (newPrice ? formatTokenAmount(newPrice) : '---'),
+    [newPrice],
+  );
+
+  const change = useMemo(
+    () => (newPrice ? percentChange(currentPrice, newPrice) : 0),
+    [currentPrice, newPrice],
+  );
+
   return (
-    <div className={styles[percentChange < 0 ? 'negative' : 'positive']}>
-      Projected:
-      <br />
-      {amount} ({formatPercentChange(percentChange)})
+    <div>
+      <div className={styles['pointer-wrapper']}>
+        <span className={styles['pointer-arrow']}>&lt;</span>
+        <span>
+          {kind.charAt(0).toUpperCase() + kind.slice(1)} Price
+          <br />
+          {formattedPrice}
+        </span>
+      </div>
+      <div className={styles[change < 0 ? 'negative' : 'positive']}>
+        Projected:
+        <br />
+        {formattedNewPrice} ({formatPercentChange(change)})
+      </div>
     </div>
   );
 }
