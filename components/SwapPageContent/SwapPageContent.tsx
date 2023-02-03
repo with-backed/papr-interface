@@ -7,6 +7,7 @@ import {
   SwapWidget,
   Theme,
 } from '@uniswap/widgets';
+import { Fieldset } from 'components/Fieldset';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useTheme } from 'hooks/useTheme';
@@ -96,19 +97,23 @@ export function SwapPageContent() {
 
   return (
     <div className={styles.wrapper}>
-      <SwapWidget
-        theme={swapWidgetTheme}
-        jsonRpcUrlMap={jsonRpcUrlMap}
-        provider={provider}
-        tokenList={tokenList}
-        defaultInputTokenAddress={paprToken.id}
-        defaultOutputTokenAddress={underlying.id}
-        hideConnectionUI={true}
-        onInitialSwapQuote={onInitialSwapQuote}
-        onSwapPriceUpdateAck={onSwapPriceUpdateAck}
-        convenienceFee={SWAP_FEE_BIPS}
-        convenienceFeeRecipient={SWAP_FEE_TO}
-      />
+      <Fieldset legend="🦄 Uniswap">
+        <SwapWidget
+          theme={swapWidgetTheme}
+          jsonRpcUrlMap={jsonRpcUrlMap}
+          provider={provider}
+          tokenList={tokenList}
+          defaultInputTokenAddress={paprToken.id}
+          defaultOutputTokenAddress={underlying.id}
+          hideConnectionUI={true}
+          onInitialSwapQuote={onInitialSwapQuote}
+          onSwapPriceUpdateAck={onSwapPriceUpdateAck}
+          convenienceFee={SWAP_FEE_BIPS}
+          convenienceFeeRecipient={SWAP_FEE_TO}
+          width="100%"
+        />
+        <p className={styles.fee}>papr.wtf swap fee: 0.3%</p>
+      </Fieldset>
       <ImpactProjection marketPriceImpact={marketPriceImpact} />
     </div>
   );
