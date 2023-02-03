@@ -33,9 +33,7 @@ export function Loans() {
 
   const { data: totalSupply } = useContractRead({
     abi: erc20ABI,
-    address: paprController[
-      paprController.token0IsUnderlying ? 'paprToken' : 'underlying'
-    ].id as `0x${string}`,
+    address: paprController['paprToken'].id as `0x${string}`,
     functionName: 'totalSupply',
   });
 
@@ -56,6 +54,7 @@ export function Loans() {
     const nftValueInPapr = NFTValue / target;
 
     const totalSupplyNum = parseFloat(ethers.utils.formatEther(totalSupply));
+    console.log({ target, nftValueInPapr, totalSupplyNum });
     return totalSupplyNum / nftValueInPapr;
   }, [NFTValue, pricesData, totalSupply]);
 
