@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 
 import { Button, ButtonKind, ButtonTheme } from './Button';
 import { ButtonLink } from './ButtonLink';
+import { GradientButtonLink } from './GradientButtonLink';
 import { ButtonKind as TextButtonKind, TextButton } from './TextButton';
 import { TransactionButton } from './TransactionButton';
 
@@ -97,5 +98,16 @@ export const TransactionButtons = () => (
     <TransactionButton text="Hello" />
     <TransactionButton text="Hello" completed />
     <TransactionButton text="Hello" disabled />
+  </Wrapper>
+);
+
+export const GradientButtonLinks = () => (
+  <Wrapper>
+    <GradientButtonLink href="" color="orange">
+      Henlo
+    </GradientButtonLink>
+    <GradientButtonLink href="" color="blue">
+      Henlo
+    </GradientButtonLink>
   </Wrapper>
 );
