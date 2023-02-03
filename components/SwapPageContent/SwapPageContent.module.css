@@ -14,3 +14,7 @@
 .fee {
   text-align: center;
 }
+
+.wrapper div {
+  padding: 0;
+}
