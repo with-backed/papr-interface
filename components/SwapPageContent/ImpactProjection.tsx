@@ -131,7 +131,7 @@ function ImpactProjectionLoaded({
         <div className={aprProjectionClassName}>
           Projected
           <br />
-          Rate:
+          Rate
           <br />
           {projectedData?.newApr ? formatPercent(projectedData.newApr) : '---'}
         </div>

@@ -93,8 +93,6 @@ export function SwapPageContent() {
     [],
   );
 
-  console.log({ marketPriceImpact });
-
   return (
     <div className={styles.wrapper}>
       <SwapWidget
