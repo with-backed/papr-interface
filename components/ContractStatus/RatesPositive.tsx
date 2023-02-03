@@ -56,25 +56,25 @@ export function RatesPositive({
           <span data-pointer-target="target">
             🍜 Contract&apos;s valuation of {tokenName}
           </span>
-          <DisclosureContent {...disclosureState}>
+          <DisclosureContent {...disclosureState} className={styles.explainer}>
             {explainers.valuation}
           </DisclosureContent>
           <span>🔥 Contract Rate raised to {contractRate}</span>
-          <DisclosureContent {...disclosureState}>
+          <DisclosureContent {...disclosureState} className={styles.explainer}>
             {explainers.contractRate}
           </DisclosureContent>
           <span>🔥 Borrowers: loans get more expensive</span>
-          <DisclosureContent {...disclosureState}>
+          <DisclosureContent {...disclosureState} className={styles.explainer}>
             {explainers.borrowers}
           </DisclosureContent>
           <span>🔥 Lenders: incentivized by price increase</span>
-          <DisclosureContent {...disclosureState}>
+          <DisclosureContent {...disclosureState} className={styles.explainer}>
             {explainers.lenders}
           </DisclosureContent>
           <span data-pointer-target="market">
             🧊 Borrower demand supports higher rates
           </span>
-          <DisclosureContent {...disclosureState}>
+          <DisclosureContent {...disclosureState} className={styles.explainer}>
             {explainers.demand}
           </DisclosureContent>
           <span>∙</span>
