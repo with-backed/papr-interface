@@ -16,10 +16,7 @@ div.indicator {
   display: flex;
   flex-direction: row;
   justify-content: center;
-}
-
-div.indicator p {
-  margin: 0px 0.5px;
+  font-family: 'Arial';
 }
 
 .indicator-danger {
