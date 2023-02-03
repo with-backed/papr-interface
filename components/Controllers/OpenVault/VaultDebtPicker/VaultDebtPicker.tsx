@@ -470,6 +470,11 @@ export function VaultDebtPicker({
                   />
                 </div>
               )}
+              {!vaultHasDebt && (
+                <div>
+                  <p>Loan Amount</p>
+                </div>
+              )}
               <div>
                 <AmountToBorrowOrRepayInput
                   paprController={paprController}
@@ -569,6 +574,12 @@ export function VaultDebtPicker({
                 refresh={refresh}
               />
             )}
+            <CostToCloseOrMaximumLoan
+              vaultHasDebt={vaultHasDebt}
+              vaultDebt={currentVaultDebt}
+              maxLoanPerNFT={maxDebtPerNFTInPerpetual}
+              numberOfNFTs={userNFTsForVault.length}
+            />
           </div>
         )}
       </div>
@@ -880,4 +891,81 @@ function LoanActionSummary({
       </div>
     </div>
   );
+}
+
+type CostToCloseOrMaximumLoanProps = {
+  vaultHasDebt: boolean;
+  vaultDebt: ethers.BigNumber;
+  maxLoanPerNFT: ethers.BigNumber | null;
+  numberOfNFTs: number;
+};
+
+function CostToCloseOrMaximumLoan({
+  vaultHasDebt,
+  vaultDebt,
+  maxLoanPerNFT,
+  numberOfNFTs,
+}: CostToCloseOrMaximumLoanProps) {
+  const { tokenName } = useConfig();
+  const controller = useController();
+
+  const costToClose = useAsyncValue(async () => {
+    if (!vaultHasDebt) return null;
+    return getQuoteForSwapOutput(
+      vaultDebt,
+      controller.paprToken.id,
+      controller.underlying.id,
+      tokenName as SupportedToken,
+    );
+  }, [
+    vaultHasDebt,
+    vaultDebt,
+    controller.paprToken.id,
+    controller.underlying.id,
+    tokenName,
+  ]);
+
+  const maxDebtUnderlying = useAsyncValue(async () => {
+    if (!maxLoanPerNFT || vaultHasDebt) return null;
+    const maxDebtForAllNFTs = maxLoanPerNFT.mul(numberOfNFTs);
+    return getQuoteForSwap(
+      maxDebtForAllNFTs,
+      controller.paprToken.id,
+      controller.underlying.id,
+      tokenName as SupportedToken,
+    );
+  }, [
+    vaultHasDebt,
+    maxLoanPerNFT,
+    numberOfNFTs,
+    controller.paprToken.id,
+    controller.underlying.id,
+    tokenName,
+  ]);
+
+  if (vaultDebt && vaultDebt.gt(0)) {
+    return (
+      <div className={styles.costToCloseOrMax}>
+        <div>Cost to close:</div>
+        <div>
+          $
+          {costToClose
+            ? formatBigNum(costToClose, controller.underlying.decimals)
+            : '...'}
+        </div>
+      </div>
+    );
+  } else {
+    return (
+      <div className={styles.costToCloseOrMax}>
+        <div>Max Loan Amount:</div>{' '}
+        <div>
+          $
+          {maxDebtUnderlying
+            ? formatBigNum(maxDebtUnderlying, controller.underlying.decimals)
+            : '...'}
+        </div>
+      </div>
+    );
+  }
 }
