@@ -102,6 +102,24 @@ function ImpactProjectionLoaded({
     ).then(setProjectedData);
   }, [currentTarget, newMark, tokenName]);
 
+  const aprProjectionClassName = useMemo(() => {
+    if (projectedData) {
+      if (projectedData.newApr < currentAPR) {
+        return [styles.negative, styles.right].join(' ');
+      } else if (projectedData.newApr >= currentAPR) {
+        return [styles.positive, styles.right].join(' ');
+      }
+    }
+    return undefined;
+  }, [currentAPR, projectedData]);
+
+  const direction = useMemo(() => {
+    if (!projectedData) {
+      return 'down';
+    }
+    return currentAPR > projectedData.newApr ? 'down' : 'up';
+  }, [currentAPR, projectedData]);
+
   return (
     <Fieldset legend={LEGEND}>
       <p>
@@ -110,12 +128,14 @@ function ImpactProjectionLoaded({
         minutes.
       </p>
       <div className={styles['projection-wrapper']}>
-        <div className={styles.negative + ' ' + styles.right}>
-          Projected:
+        <div className={aprProjectionClassName}>
+          Projected
+          <br />
+          Rate:
           <br />
           {projectedData?.newApr ? formatPercent(projectedData.newApr) : '---'}
         </div>
-        <Direction direction="down" />
+        <Direction direction={direction} />
         <div className={styles.right}>
           Contract
           <br />
