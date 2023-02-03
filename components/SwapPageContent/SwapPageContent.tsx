@@ -25,7 +25,7 @@ const BASE_THEME: Theme = {
   module: '#F2F9F8', // -5
   accent: '#0000EE',
   outline: '#000',
-  dialog: '#000',
+  dialog: '#fff',
   fontFamily: 'Courier Prime',
   borderRadius: 0.5,
 };
