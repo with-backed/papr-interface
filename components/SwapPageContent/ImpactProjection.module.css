@@ -1,0 +1,59 @@
+.projection-wrapper {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.direction {
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.negative {
+  color: var(--highlight-alert-100);
+}
+
+.positive {
+  color: var(--highlight-success-100);
+}
+
+.right {
+  text-align: right;
+}
+
+.separator {
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+.separator > span:not(.pipe) {
+  line-height: 16px;
+}
+
+.pipe {
+  line-height: 12px;
+}
+
+.pointer-wrapper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pointer-arrow {
+  user-select: none;
+}
+
+.pointers {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pointers > div {
+  display: flex;
+  gap: 1.5rem;
+}

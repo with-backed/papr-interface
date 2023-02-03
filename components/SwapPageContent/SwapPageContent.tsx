@@ -8,6 +8,7 @@ import { useTheme } from 'hooks/useTheme';
 import { useMemo } from 'react';
 import { useSigner } from 'wagmi';
 
+import { ImpactProjection } from './ImpactProjection';
 import styles from './SwapPageContent.module.css';
 
 const BASE_THEME: Theme = {
@@ -76,7 +77,9 @@ export function SwapPageContent() {
         tokenList={tokenList}
         defaultInputTokenAddress={paprToken.id}
         defaultOutputTokenAddress={underlying.id}
+        hideConnectionUI={true}
       />
+      <ImpactProjection />
     </div>
   );
 }
