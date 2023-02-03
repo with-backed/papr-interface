@@ -144,7 +144,12 @@ function ImpactProjectionLoaded({
           {formatPercent(currentAPR)}
         </div>
         <Separator />
-        <div className={styles['pointers']}>
+        <div
+          className={
+            currentMarket > currentTarget
+              ? styles['pointers']
+              : styles['pointer-reverse']
+          }>
           <PriceProjection
             kind="market"
             currentPrice={currentMarket}
