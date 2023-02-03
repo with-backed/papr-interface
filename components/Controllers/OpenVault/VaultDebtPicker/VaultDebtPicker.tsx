@@ -943,20 +943,6 @@ function CostToCloseOrMaximumLoan({
     tokenName,
   ]);
 
-  if (!vaultHasDebt) {
-    console.log({
-      maxLoanPerNFT: formatBigNum(
-        maxLoanPerNFT || ethers.BigNumber.from(0),
-        18,
-      ),
-      numberOfNFTs,
-      maxDebtUnderlying: formatBigNum(
-        maxDebtUnderlying || ethers.BigNumber.from(0),
-        6,
-      ),
-    });
-  }
-
   if (vaultDebt && vaultDebt.gt(0)) {
     return (
       <div className={styles.costToCloseOrMax}>
