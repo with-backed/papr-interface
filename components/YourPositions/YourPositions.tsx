@@ -66,11 +66,14 @@ export function YourPositions() {
     if (!maxLoanInDebtTokens) {
       return null;
     }
-    return maxLoanInDebtTokens.sub(
+    const maxLoanMinusCurrentDebt = maxLoanInDebtTokens.sub(
       (currentVaults || [])
         .map((v) => ethers.BigNumber.from(v.debt))
         .reduce((a, b) => a.add(b), ethers.BigNumber.from(0)),
     );
+    return maxLoanMinusCurrentDebt.isNegative()
+      ? ethers.BigNumber.from(0)
+      : maxLoanMinusCurrentDebt;
   }, [currentVaults, maxLoanInDebtTokens]);
 
   const maxLoanAmountInUnderlying = useMemo(() => {
