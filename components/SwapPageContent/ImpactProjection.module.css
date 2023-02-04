@@ -55,6 +55,7 @@
 }
 
 .pointers-reverse {
+  composes: pointers;
   flex-direction: column-reverse;
 }
 
