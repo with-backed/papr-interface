@@ -16,6 +16,6 @@
   font-size: 12px;
 }
 
-.wrapper div {
+.wrapper > div {
   padding: 0;
 }
