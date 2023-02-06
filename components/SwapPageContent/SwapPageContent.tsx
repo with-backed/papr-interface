@@ -41,7 +41,7 @@ export function SwapPageContent() {
   const [paprTokenField, setPaprTokenField] = useState<Field | null>(
     Field.OUTPUT,
   );
-  const [exectionPrice, setExecutionPrice] = useState<number | null>(null);
+  const [executionPrice, setExecutionPrice] = useState<number | null>(null);
   const [paprPrice, setPaprPrice] = useState<number | null>(null);
 
   const jsonRpcUrlMap = useMemo(
@@ -83,18 +83,18 @@ export function SwapPageContent() {
   }, [paprTheme]);
 
   useEffect(() => {
-    if (!exectionPrice) return;
+    if (!executionPrice) return;
     if (!paprTokenField) {
       setPaprPrice(null);
       return;
     }
 
-    let p = exectionPrice;
+    let p = executionPrice;
     if (paprTokenField == Field.OUTPUT) {
-      p = 1 / exectionPrice;
+      p = 1 / executionPrice;
     }
     setPaprPrice(p);
-  }, [exectionPrice, paprTokenField]);
+  }, [executionPrice, paprTokenField]);
 
   const OnSwitchTokens = useCallback(() => {
     if (!paprTokenField) return;
