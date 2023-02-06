@@ -80,8 +80,8 @@ export function SwapPageContent() {
   }, [paprTheme]);
 
   const onInitialSwapQuote: OnInitialSwapQuote = useCallback(
-    ({ priceImpact }) => {
-      const impactPercent = parseFloat(priceImpact.toFixed(6));
+    ({ executionPrice }) => {
+      const impactPercent = parseFloat(executionPrice.toFixed(6));
       setMarketPriceImpact(impactPercent);
     },
     [],
@@ -89,7 +89,7 @@ export function SwapPageContent() {
 
   const onSwapPriceUpdateAck: OnSwapPriceUpdateAck = useCallback(
     (_stale, update) => {
-      const impactPercent = parseFloat(update.priceImpact.toFixed(6));
+      const impactPercent = parseFloat(update.executionPrice.toFixed(6));
       setMarketPriceImpact(impactPercent);
     },
     [],
