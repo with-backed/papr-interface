@@ -1,9 +1,9 @@
 import useResizeObserver from '@react-hook/resize-observer';
 import { TextButton } from 'components/Button';
 import { Fieldset as BaseFieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
 import {
   FunctionComponent,
-  PropsWithChildren,
   useCallback,
   useLayoutEffect,
   useMemo,
@@ -26,18 +26,48 @@ export const Fieldset: FunctionComponent = ({ children }) => {
 
 type SummaryProps = {
   disclosureState: DisclosureStateReturn;
+  contractRate: string;
+  direction: 'negative' | 'positive';
 };
 export function Summary({
-  children,
   disclosureState,
-}: PropsWithChildren<SummaryProps>) {
+  direction,
+  contractRate,
+}: SummaryProps) {
+  const adjustedContractRate = useMemo(
+    // Design could not squeeze into normal table, this hack
+    // avoids us having to reimplement percent formatting
+    // for this one special case.
+    () => contractRate.replace(/(\d+\.\d)(\d)(%)/, '$1$3'),
+    [contractRate],
+  );
   return (
-    <div className={styles.summary}>
-      {children}
-      <Disclosure as={TextButton} {...disclosureState}>
-        {disclosureState.visible ? 'Collapse' : 'Expand'}
-      </Disclosure>
-    </div>
+    <Table>
+      <thead>
+        <tr>
+          <th className={styles.right}>Rate</th>
+          <th className={styles.left + ' ' + styles.description}>Summary</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td className={styles.right}>
+            {direction === 'positive' ? '🔥' : '🧊'} {adjustedContractRate}
+          </td>
+          <td className={styles.description}>
+            {direction === 'positive'
+              ? 'Contract is acting to raise Market Price'
+              : 'Contract is acting to lower Market Price'}
+          </td>
+          <td className={styles.details}>
+            <Disclosure as={TextButton} {...disclosureState}>
+              {disclosureState.visible ? 'Collapse' : 'Expand'}
+            </Disclosure>
+          </td>
+        </tr>
+      </tbody>
+    </Table>
   );
 }
 

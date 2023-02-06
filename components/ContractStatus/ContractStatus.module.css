@@ -7,8 +7,19 @@
   height: 30px;
 }
 
-.summary > button {
+.details {
+  /* design could not squeeze into normal table, this hack resolves */
+  padding-right: 0 !important;
+}
+
+.details > button {
   color: var(--highlight-clickable-100);
+  min-width: 80px;
+}
+
+.description {
+  /* design butts up 2 elements next to each other, this hack resolves */
+  padding-left: 16px !important;
 }
 
 .chart {
@@ -54,4 +65,12 @@
 
 .explainer[data-enter] {
   opacity: 1;
+}
+
+.right {
+  text-align: right;
+}
+
+.left {
+  text-align: left;
 }
