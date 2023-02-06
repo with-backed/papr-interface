@@ -15,12 +15,18 @@
   letter-spacing: 0.06em;
 }
 
-.price-label {
-  color: #ff659c;
+.price-label-paprMeme {
+  color: var(--paprMEME-50);
+}
+.price-label-paprHero {
+  color: var(--paprHERO-50);
+}
+.price-label-paprTrash {
+  color: var(--paprTRASH-50);
 }
 
 .apr-label {
-  color: #0000ee;
+  color: var(--papr-100);
 }
 
 .positive {

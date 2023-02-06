@@ -1,5 +1,7 @@
 import { Fieldset } from 'components/Fieldset';
+import { useConfig } from 'hooks/useConfig';
 import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import { useTheme } from 'hooks/useTheme';
 import { SECONDS_IN_A_YEAR } from 'lib/constants';
 import { ControllerPricesData, TimeSeriesValue } from 'lib/controllers/charts';
 import { percentChange } from 'lib/tokenPerformance';
@@ -15,8 +17,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 
 import styles from './Charts.module.css';
 
-const APR_COLOR = '#0000ee';
-const PRICE_COLOR = '#FF659C';
+const APR_COLOR = '#0064FA';
 
 export function Charts() {
   const { pricesData } = useControllerPricesData();
@@ -69,6 +70,20 @@ function RateOfGrowth({
   pricesData: { markValues, targetValues },
 }: RateOfGrowthProps) {
   const chartRef = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
+  const { tokenName } = useConfig();
+
+  const priceColor = useMemo(() => {
+    if (theme === 'hero') {
+      return '#908ee7';
+    } else if (theme === 'meme') {
+      return '#47b79c';
+    } else if (theme === 'papr') {
+      return '#5397ff';
+    } else if (theme === 'trash') {
+      return '#ff6333';
+    }
+  }, [theme]);
 
   const contractAPRs: TimeSeriesValue[] = useMemo(
     () =>
@@ -100,7 +115,7 @@ function RateOfGrowth({
 
       const priceSeries = chart.addLineSeries({
         ...BASE_LINE_SERIES_OPTIONS,
-        color: PRICE_COLOR,
+        color: priceColor,
         priceFormat: { type: 'price', minMove: 0.001, precision: 3 },
         priceScaleId: 'left',
       });
@@ -110,12 +125,14 @@ function RateOfGrowth({
 
       return () => chart.remove();
     }
-  }, [contractAPRs, markValues]);
+  }, [contractAPRs, markValues, priceColor]);
 
   return (
     <div className={styles.wrapper}>
       <div className={styles.label}>
-        <span className={styles['price-label']}>papr price in USDC</span>{' '}
+        <span className={styles[`price-label-${tokenName}`]}>
+          papr price in USDC
+        </span>{' '}
       </div>
       <div className={styles.chart} ref={chartRef} />
       <div className={styles.label}>
