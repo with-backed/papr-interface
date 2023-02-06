@@ -14,7 +14,7 @@ import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useTheme } from 'hooks/useTheme';
 import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSigner } from 'wagmi';
 
 import { ImpactProjection } from './ImpactProjection';
@@ -38,11 +38,11 @@ export function SwapPageContent() {
   const { chainId, jsonRpcProvider, tokenName } = useConfig();
   const paprTheme = useTheme();
   const provider = useSigner<JsonRpcSigner>().data?.provider;
-  const [paprTokenField, setPaprTokenField] = useState<Field | null>(null);
-
-  const [marketPriceImpact, setMarketPriceImpact] = useState<number | null>(
-    null,
+  const [paprTokenField, setPaprTokenField] = useState<Field | null>(
+    Field.OUTPUT,
   );
+  const [exectionPrice, setExecutionPrice] = useState<number | null>(null);
+  const [paprPrice, setPaprPrice] = useState<number | null>(null);
 
   const jsonRpcUrlMap = useMemo(
     () => ({ [chainId]: jsonRpcProvider }),
@@ -55,8 +55,8 @@ export function SwapPageContent() {
         address: underlying.id,
         chainId,
         decimals: underlying.decimals,
-        name: 'USD Coin',
-        symbol: 'USDC',
+        name: underlying.name,
+        symbol: underlying.symbol,
       },
       {
         address: paprToken.id,
@@ -82,43 +82,66 @@ export function SwapPageContent() {
     }
   }, [paprTheme]);
 
-  const updatePrice = useCallback((newPrice: number, paprField: Field) => {
-    if (paprField == Field.OUTPUT) {
-      newPrice = 1 / newPrice;
+  useEffect(() => {
+    if (!exectionPrice) return;
+    if (!paprTokenField) {
+      setPaprPrice(null);
+      return;
     }
-    setMarketPriceImpact(newPrice);
-  }, []);
+
+    let p = exectionPrice;
+    if (paprTokenField == Field.OUTPUT) {
+      p = 1 / exectionPrice;
+    }
+    setPaprPrice(p);
+  }, [exectionPrice, paprTokenField]);
+
+  const OnSwitchTokens = useCallback(() => {
+    if (!paprTokenField) return;
+    if (paprTokenField == Field.INPUT) {
+      setPaprTokenField(Field.OUTPUT);
+    } else {
+      setPaprTokenField(Field.INPUT);
+    }
+  }, [paprTokenField]);
 
   const OnTokenChange = useCallback(
     (field: Field, token: Currency) => {
-      if (!token.isToken) return;
-
-      if (token.address != paprToken.id) return;
-      setPaprTokenField(field);
-
-      if (!marketPriceImpact) return;
-
-      updatePrice(marketPriceImpact, field);
+      if (field == paprTokenField) {
+        // changing papr token field
+        if (
+          field == paprTokenField &&
+          (!token.isToken || token.address.toLowerCase() !== paprToken.id)
+        ) {
+          // setting papr token to something else
+          setPaprPrice(null);
+          setPaprTokenField(null);
+          return;
+        }
+        // setting papr token field to papr token
+        return;
+      } else {
+        // changing field that is not paprTokenField
+        if (token.isToken && token.address.toLowerCase() == paprToken.id) {
+          setPaprTokenField(field);
+        }
+      }
     },
-    [marketPriceImpact, updatePrice, paprToken],
+    [paprToken, paprTokenField],
   );
 
   const onInitialSwapQuote: OnInitialSwapQuote = useCallback(
     ({ executionPrice }) => {
-      if (!paprTokenField) return;
-
-      updatePrice(parseFloat(executionPrice.toFixed(6)), paprTokenField);
+      setExecutionPrice(parseFloat(executionPrice.toFixed(6)));
     },
-    [paprTokenField, updatePrice],
+    [],
   );
 
   const onSwapPriceUpdateAck: OnSwapPriceUpdateAck = useCallback(
     (_stale, update) => {
-      if (!paprTokenField) return;
-
-      updatePrice(parseFloat(update.executionPrice.toFixed(6)), paprTokenField);
+      setExecutionPrice(parseFloat(update.executionPrice.toFixed(6)));
     },
-    [paprTokenField, updatePrice],
+    [],
   );
 
   return (
@@ -129,11 +152,12 @@ export function SwapPageContent() {
           jsonRpcUrlMap={jsonRpcUrlMap}
           provider={provider}
           tokenList={tokenList}
-          defaultInputTokenAddress={paprToken.id}
-          defaultOutputTokenAddress={underlying.id}
+          defaultInputTokenAddress={underlying.id}
+          defaultOutputTokenAddress={paprToken.id}
           hideConnectionUI={true}
           onInitialSwapQuote={onInitialSwapQuote}
           onSwapPriceUpdateAck={onSwapPriceUpdateAck}
+          onSwitchTokens={OnSwitchTokens}
           onTokenChange={OnTokenChange}
           convenienceFee={SWAP_FEE_BIPS}
           convenienceFeeRecipient={SWAP_FEE_TO}
@@ -141,7 +165,7 @@ export function SwapPageContent() {
         />
         <p className={styles.fee}>papr.wtf swap fee: 0.3%</p>
       </Fieldset>
-      <ImpactProjection marketPriceImpact={marketPriceImpact} />
+      <ImpactProjection marketPriceImpact={paprPrice} />
     </div>
   );
 }
