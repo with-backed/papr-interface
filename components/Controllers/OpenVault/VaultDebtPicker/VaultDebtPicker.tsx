@@ -383,23 +383,19 @@ export function VaultDebtPicker({
         <thead>
           <tr>
             <th></th>
+            <th>ID</th>
             <th>
-              <p>ID</p>
+              VALUE
+              <br />
+              (WETH)
             </th>
             <th>
-              <p>FLOOR VALUE</p>
+              MAX BORROW
+              <br />
+              (WETH)
             </th>
-            <th>
-              <p>MAX BORROW</p>
-            </th>
-            <th>
-              <p>DEPOSIT</p>
-            </th>
-            {vaultHasCollateral && (
-              <th>
-                <p>WITHDRAW</p>
-              </th>
-            )}
+            <th>DEPOSIT</th>
+            {vaultHasCollateral && <th>WITHDRAW</th>}
           </tr>
         </thead>
         <tbody>
@@ -702,6 +698,7 @@ function CollateralRow({
   setDepositNFTs,
   setWithdrawNFTs,
 }: CollateralRowProps) {
+  const controller = useController();
   const uniqueNFTId = useMemo(
     () => getUniqueNFTId(contractAddress, tokenId),
     [contractAddress, tokenId],
@@ -749,11 +746,11 @@ function CollateralRow({
       </td>
       <td>
         {isLiquidated && <p>---</p>}
-        {!isLiquidated && <p>${floorPrice}</p>}
+        {!isLiquidated && <p>{floorPrice}</p>}
       </td>
       <td>
         {isLiquidated && <p>---</p>}
-        {!isLiquidated && <p>${maxBorrow}</p>}
+        {!isLiquidated && <p>{maxBorrow}</p>}
       </td>
       <td>
         {!isLiquidating && !isLiquidated && (
@@ -953,10 +950,10 @@ function CostToCloseOrMaximumLoan({
       <div className={styles.costToCloseOrMax}>
         <div>Cost to close:</div>
         <div>
-          $
           {costToClose
             ? formatBigNum(costToClose, controller.underlying.decimals)
-            : '...'}
+            : '...'}{' '}
+          {controller.underlying.symbol}
         </div>
       </div>
     );
@@ -965,10 +962,10 @@ function CostToCloseOrMaximumLoan({
       <div className={styles.costToCloseOrMax}>
         <div>Max Loan Amount:</div>{' '}
         <div>
-          $
           {maxDebtUnderlying
             ? formatBigNum(maxDebtUnderlying, controller.underlying.decimals)
-            : '...'}
+            : '...'}{' '}
+          {controller.underlying.symbol}
         </div>
       </div>
     );
