@@ -4,6 +4,7 @@ import {
   NftsForAccountAndCollectionQuery,
 } from 'types/generated/graphql/erc721';
 import { useQuery } from 'urql';
+
 import { useConfig } from './useConfig';
 
 export type AccountNFTsResponse = {

@@ -78,10 +78,12 @@ export function TransactionButton({
         message = 'Failed';
         break;
     }
-    const transactionLink = (
-      <EtherscanTransactionLink transactionHash={transactionData!.hash}>
+    const transactionLink = transactionData ? (
+      <EtherscanTransactionLink transactionHash={transactionData.hash}>
         view transaction
       </EtherscanTransactionLink>
+    ) : (
+      ''
     );
     return (
       <CompletedButton

@@ -38,8 +38,8 @@ export function BorrowPageContent({ subgraphPool }: BorrowPageProps) {
   );
 
   const refresh = useCallback(() => {
-    refreshAccountNFTs({ requestPolicy: 'network-only' });
-    refreshCurrentVaults({ requestPolicy: 'network-only' });
+    refreshAccountNFTs({ requestPolicy: 'cache-and-network' });
+    refreshCurrentVaults({ requestPolicy: 'cache-and-network' });
     refreshBalance();
   }, [refreshAccountNFTs, refreshBalance, refreshCurrentVaults]);
 
