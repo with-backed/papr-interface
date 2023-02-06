@@ -18,8 +18,8 @@
 }
 
 .description {
-  /* design could not squeeze into normal table, this hack resolves */
-  padding-left: 5px !important;
+  /* design butts up 2 elements next to each other, this hack resolves */
+  padding-left: 16px !important;
 }
 
 .chart {

@@ -52,13 +52,13 @@ export function Summary({
       </thead>
       <tbody>
         <tr>
-          <td>
+          <td className={styles.right}>
             {direction === 'positive' ? '🔥' : '🧊'} {adjustedContractRate}
           </td>
           <td className={styles.description}>
             {direction === 'positive'
               ? 'Contract is acting to raise Market Price'
-              : 'Contract is acting to cool down Market Price'}
+              : 'Contract is acting to lower Market Price'}
           </td>
           <td className={styles.details}>
             <Disclosure as={TextButton} {...disclosureState}>
