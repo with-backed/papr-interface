@@ -7,9 +7,19 @@
   height: 30px;
 }
 
+.details {
+  /* design could not squeeze into normal table, this hack resolves */
+  padding-right: 0 !important;
+}
+
 .details > button {
   color: var(--highlight-clickable-100);
   min-width: 80px;
+}
+
+.description {
+  /* design could not squeeze into normal table, this hack resolves */
+  padding-left: 5px !important;
 }
 
 .chart {

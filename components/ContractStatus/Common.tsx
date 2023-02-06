@@ -34,21 +34,28 @@ export function Summary({
   direction,
   contractRate,
 }: SummaryProps) {
+  const adjustedContractRate = useMemo(
+    // Design could not squeeze into normal table, this hack
+    // avoids us having to reimplement percent formatting
+    // for this one special case.
+    () => contractRate.replace(/(\d+\.\d)(\d)(%)/, '$1$3'),
+    [contractRate],
+  );
   return (
     <Table>
       <thead>
         <tr>
           <th className={styles.right}>Rate</th>
-          <th className={styles.left}>Summary</th>
+          <th className={styles.left + ' ' + styles.description}>Summary</th>
           <th>Details</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>
-            {direction === 'positive' ? '🔥' : '🧊'} {contractRate}
+            {direction === 'positive' ? '🔥' : '🧊'} {adjustedContractRate}
           </td>
-          <td>
+          <td className={styles.description}>
             {direction === 'positive'
               ? 'Contract is acting to raise Market Price'
               : 'Contract is acting to cool down Market Price'}
