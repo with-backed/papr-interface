@@ -2,6 +2,8 @@ import '@uniswap/widgets/fonts.css';
 
 import { JsonRpcSigner } from '@ethersproject/providers';
 import {
+  Currency,
+  Field,
   OnInitialSwapQuote,
   OnSwapPriceUpdateAck,
   SwapWidget,
@@ -36,6 +38,7 @@ export function SwapPageContent() {
   const { chainId, jsonRpcProvider, tokenName } = useConfig();
   const paprTheme = useTheme();
   const provider = useSigner<JsonRpcSigner>().data?.provider;
+  const [paprTokenField, setPaprTokenField] = useState<Field | null>(null);
 
   const [marketPriceImpact, setMarketPriceImpact] = useState<number | null>(
     null,
@@ -79,20 +82,43 @@ export function SwapPageContent() {
     }
   }, [paprTheme]);
 
+  const updatePrice = useCallback((newPrice: number, paprField: Field) => {
+    if (paprField == Field.OUTPUT) {
+      newPrice = 1 / newPrice;
+    }
+    setMarketPriceImpact(newPrice);
+  }, []);
+
+  const OnTokenChange = useCallback(
+    (field: Field, token: Currency) => {
+      if (!token.isToken) return;
+
+      if (token.address != paprToken.id) return;
+      setPaprTokenField(field);
+
+      if (!marketPriceImpact) return;
+
+      updatePrice(marketPriceImpact, field);
+    },
+    [marketPriceImpact, updatePrice, paprToken],
+  );
+
   const onInitialSwapQuote: OnInitialSwapQuote = useCallback(
     ({ executionPrice }) => {
-      const impactPercent = parseFloat(executionPrice.toFixed(6));
-      setMarketPriceImpact(impactPercent);
+      if (!paprTokenField) return;
+
+      updatePrice(parseFloat(executionPrice.toFixed(6)), paprTokenField);
     },
-    [],
+    [paprTokenField, updatePrice],
   );
 
   const onSwapPriceUpdateAck: OnSwapPriceUpdateAck = useCallback(
     (_stale, update) => {
-      const impactPercent = parseFloat(update.executionPrice.toFixed(6));
-      setMarketPriceImpact(impactPercent);
+      if (!paprTokenField) return;
+
+      updatePrice(parseFloat(update.executionPrice.toFixed(6)), paprTokenField);
     },
-    [],
+    [paprTokenField, updatePrice],
   );
 
   return (
@@ -108,6 +134,7 @@ export function SwapPageContent() {
           hideConnectionUI={true}
           onInitialSwapQuote={onInitialSwapQuote}
           onSwapPriceUpdateAck={onSwapPriceUpdateAck}
+          onTokenChange={OnTokenChange}
           convenienceFee={SWAP_FEE_BIPS}
           convenienceFeeRecipient={SWAP_FEE_TO}
           width="100%"
