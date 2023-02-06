@@ -22,7 +22,7 @@ export function useSwapParams(
     return {
       amount,
       minOut,
-      deadline: getCurrentUnixTime().add(ethers.BigNumber.from(60)),
+      deadline: getCurrentUnixTime().add(30 * 60),
       sqrtPriceLimitX96: ethers.BigNumber.from(0),
       swapFeeTo: SWAP_FEE_TO,
       swapFeeBips: SWAP_FEE_BIPS,
