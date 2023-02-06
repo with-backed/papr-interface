@@ -71,12 +71,8 @@
   margin-bottom: 20px;
 }
 
-.editLoanPreview > div:first-of-type {
+.editLoanPreview .editLoanButtonWrapper {
   width: 40%;
-}
-
-.editLoanPreview > div:nth-of-type(2) {
-  width: 60%;
 }
 
 .editLoanPreview p:first-of-type span {
@@ -92,7 +88,7 @@
 }
 
 .editLoanForm {
-  width: 100%;
+  width: 60%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -277,5 +273,8 @@ span.debtAmountInputWrapper:before {
 .costToCloseOrMax {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+}
+
+.costToCloseOrMax > div:first-of-type {
+  margin-right: 10px;
 }

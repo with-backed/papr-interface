@@ -444,7 +444,10 @@ export function VaultDebtPicker({
       </div>
       <div className={styles.editLoanPreviewWrapper}>
         <div className={styles.editLoanPreview}>
-          <div className={`${!vaultHasDebt ? styles.hidden : ''}`}>
+          <div
+            className={`${styles.editLoanButtonWrapper} ${
+              !vaultHasDebt ? styles.hidden : ''
+            }`}>
             <Button
               size="small"
               theme={theme}
@@ -453,6 +456,14 @@ export function VaultDebtPicker({
               Edit Loan
             </Button>
           </div>
+          {loanFormHidden && (
+            <CostToCloseOrMaximumLoan
+              vaultHasDebt={vaultHasDebt}
+              vaultDebt={currentVaultDebt}
+              maxLoanPerNFT={maxDebtPerNFTInPerpetual}
+              numberOfNFTs={userNFTsForVault.length}
+            />
+          )}
           {!loanFormHidden && (
             <div className={styles.editLoanForm}>
               {vaultHasDebt && (
@@ -574,12 +585,6 @@ export function VaultDebtPicker({
                 refresh={refresh}
               />
             )}
-            <CostToCloseOrMaximumLoan
-              vaultHasDebt={vaultHasDebt}
-              vaultDebt={currentVaultDebt}
-              maxLoanPerNFT={maxDebtPerNFTInPerpetual}
-              numberOfNFTs={userNFTsForVault.length}
-            />
           </div>
         )}
       </div>
