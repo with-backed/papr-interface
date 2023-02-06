@@ -62,6 +62,14 @@ const BASE_CHART_OPTIONS: DeepPartial<ChartOptions> = {
   },
 };
 
+// Not responsive, but at least the default mobile experience will
+// not blow the layout.
+const SMOL_CHART_OPTIONS = {
+  ...BASE_CHART_OPTIONS,
+  height: 300,
+  width: 320,
+};
+
 type RateOfGrowthProps = {
   pricesData: ControllerPricesData;
 };
@@ -86,9 +94,10 @@ function RateOfGrowth({
 
   useEffect(() => {
     if (chartRef.current) {
-      const chart = createChart(chartRef.current, {
-        ...BASE_CHART_OPTIONS,
-      });
+      const chart = createChart(
+        chartRef.current,
+        window.innerWidth < 600 ? SMOL_CHART_OPTIONS : BASE_CHART_OPTIONS,
+      );
       chart.timeScale().applyOptions({ ...BASE_TIME_SCALE_OPTIONS });
 
       const contractAPRSeries = chart.addLineSeries({
