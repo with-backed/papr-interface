@@ -334,7 +334,7 @@ export async function computeNewProjectedAPR(
   target: number,
   secondsHeld: number,
   token: SupportedToken,
-): Promise<number> {
+): Promise<{ newApr: number; newTarget: number }> {
   const controller = jsonRpcControllerContract(
     configs[token].controllerAddress,
     configs[token].jsonRpcProvider,
@@ -365,6 +365,6 @@ export async function computeNewProjectedAPR(
 
   const newTarget = target * m;
   const change = percentChange(target, newTarget);
-  const apr = (change / secondsHeld) * SECONDS_IN_A_YEAR;
-  return apr;
+  const newApr = (change / secondsHeld) * SECONDS_IN_A_YEAR;
+  return { newApr, newTarget };
 }
