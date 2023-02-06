@@ -23,7 +23,7 @@ const USD_FORMATTER = new Intl.NumberFormat(LOCALE, {
 export function formatBigNum(
   num: ethers.BigNumber,
   decimals: ethers.BigNumberish,
-  precision = 3,
+  precision = 5,
 ): string {
   return parseFloat(ethers.utils.formatUnits(num, decimals)).toFixed(precision);
 }
