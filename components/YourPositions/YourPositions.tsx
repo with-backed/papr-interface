@@ -88,7 +88,7 @@ export function YourPositions() {
           paprController.paprToken.decimals,
         ),
       ) * latestMarketPrice
-    );
+    ).toFixed(5);
   }, [
     latestMarketPrice,
     maxLoanMinusCurrentDebt,
