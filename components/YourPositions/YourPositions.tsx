@@ -53,7 +53,16 @@ export function YourPositions() {
     () =>
       userCollectionNFTs
         .map((nft) => nft.address)
-        .concat((currentVaults || []).map((v) => getAddress(v.token.id))),
+        .concat(
+          (currentVaults || [])
+            .map((v) =>
+              Array(v.collateralCount)
+                .fill('')
+                .map((_) => getAddress(v.token.id))
+                .flat(),
+            )
+            .flat(),
+        ),
     [currentVaults, userCollectionNFTs],
   );
 
@@ -140,7 +149,11 @@ export function YourPositions() {
         Based on the NFTs in your wallet, you&apos;re eligible for loans from{' '}
         {uniqueCollections.length} collection(s), with a max loan amount of{' '}
         {!maxLoanAmountInUnderlying && <span>...</span>}
-        {maxLoanAmountInUnderlying && <>${maxLoanAmountInUnderlying}</>}
+        {maxLoanAmountInUnderlying && (
+          <>
+            {maxLoanAmountInUnderlying} {paprController.underlying.symbol}
+          </>
+        )}
       </div>
       <div>{totalPaprMemeDebt.isZero() && <p>No {tokenName} loans yet</p>}</div>
       <div className={styles.paragraphs}>
@@ -152,7 +165,7 @@ export function YourPositions() {
                 totalPaprMemeDebt,
                 paprController.paprToken.decimals,
               )}{' '}
-              {tokenName}
+              {paprController.paprToken.symbol}
             </b>{' '}
             worth{' '}
             <b>
@@ -243,11 +256,14 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
       </td>
       <td>
         <p>
-          {formatBigNum(vaultInfo.debt, paprToken.decimals)} {tokenName}
+          {formatBigNum(vaultInfo.debt, paprToken.decimals)} {paprToken.symbol}
         </p>
       </td>
       <td>
-        <p>${costToClose && formatBigNum(costToClose, underlying.decimals)} </p>
+        <p>
+          {costToClose && formatBigNum(costToClose, underlying.decimals)}{' '}
+          {underlying.symbol}
+        </p>
       </td>
       <td>
         <VaultHealth ltv={ltv || 0} />
@@ -260,7 +276,7 @@ type BalanceInfoProps = {
   balance: ethers.BigNumber | null;
 };
 function BalanceInfo({ balance }: BalanceInfoProps) {
-  const { paprToken } = useController();
+  const { paprToken, underlying } = useController();
   const latestMarketPrice = useLatestMarketPrice();
   const paprMemeBalance = useMemo(
     () => ethers.BigNumber.from(balance || 0),
@@ -275,14 +291,17 @@ function BalanceInfo({ balance }: BalanceInfoProps) {
   }, [paprMemeBalance, paprToken]);
   const formattedValue = useMemo(() => {
     if (!latestMarketPrice) {
-      return 'an unknown amount of USDC (no market data available)';
+      return 'an unknown amount of WETH (no market data available)';
     }
 
     const convertedBalance = parseFloat(
       ethers.utils.formatUnits(paprMemeBalance, paprToken.decimals),
     );
-    return formatTokenAmount(convertedBalance * latestMarketPrice) + ' USDC';
-  }, [paprToken, paprMemeBalance, latestMarketPrice]);
+    return (
+      formatTokenAmount(convertedBalance * latestMarketPrice) +
+      ` ${underlying.symbol}`
+    );
+  }, [paprToken, paprMemeBalance, latestMarketPrice, underlying.symbol]);
   return (
     <p>
       You hold <b>{formattedBalance}</b> worth <b>{formattedValue}</b>.
