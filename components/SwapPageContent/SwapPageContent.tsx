@@ -10,11 +10,13 @@ import {
   Theme,
 } from '@uniswap/widgets';
 import { Fieldset } from 'components/Fieldset';
+import { Tooltip } from 'components/Tooltip';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useTheme } from 'hooks/useTheme';
 import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit';
 import { useSigner } from 'wagmi';
 
 import { ImpactProjection } from './ImpactProjection';
@@ -37,6 +39,7 @@ export function SwapPageContent() {
   const { paprToken, underlying } = useController();
   const { chainId, jsonRpcProvider, tokenName } = useConfig();
   const paprTheme = useTheme();
+  const feeTooltip = useTooltipState();
   const provider = useSigner<JsonRpcSigner>().data?.provider;
   const [paprTokenField, setPaprTokenField] = useState<Field | null>(
     Field.OUTPUT,
@@ -163,7 +166,13 @@ export function SwapPageContent() {
           convenienceFeeRecipient={SWAP_FEE_TO}
           width="100%"
         />
-        <p className={styles.fee}>papr.wtf swap fee: 0.3%</p>
+        <TooltipReference {...feeTooltip}>
+          <p className={styles.fee}>papr.wtf swap fee: 0.3%</p>
+        </TooltipReference>
+        <Tooltip {...feeTooltip}>
+          Papr protocol itself has no fees. This is an app fee to support
+          operation of this website.
+        </Tooltip>
       </Fieldset>
       <ImpactProjection marketPriceImpact={paprPrice} />
     </div>
