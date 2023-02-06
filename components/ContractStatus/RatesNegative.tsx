@@ -24,9 +24,9 @@ export function RatesNegative({
       meaning that the Contract is levying a charge against Lenders, to
       the benefit of Borrowers.`,
       borrowers: `Because the protocol uses Contract Rate to assess loan
-      values and liquidations, Borrowers can borrow more, minting and
-      selling ${tokenName} in the process, which exerts a downward pressure
-      on Market Price.`,
+      values and liquidations, existing loans become further from the liquidation
+      threshold. Borrowers can borrow more, minting and selling ${tokenName} in 
+      the process, which exerts a downward pressure on Market Price.`,
       lenders: `Lenders accrue interest in the form of price appreciation of
       ${tokenName}, so if the contract moves to lower rates, it means potential
       negative returns for Lenders, who may sell, driving down Market Price.`,
@@ -40,7 +40,7 @@ export function RatesNegative({
   return (
     <Fieldset>
       <Summary disclosureState={disclosureState}>
-        🧊 Contract is trying to cool down Market Price
+        🧊 Contract is acting to cool down Market Price
       </Summary>
       <div data-testid="rates-negative" className={styles.chart}>
         <div className={styles['chart-prices']}>
@@ -57,7 +57,7 @@ export function RatesNegative({
           <DisclosureContent {...disclosureState} className={styles.explainer}>
             {explainers.demand}
           </DisclosureContent>
-          <span>🧊 Contract: sets Rate to {contractRate}</span>
+          <span>🧊 Contract: rate set to {contractRate}</span>
           <DisclosureContent {...disclosureState} className={styles.explainer}>
             {explainers.setsRate}
           </DisclosureContent>
@@ -65,7 +65,7 @@ export function RatesNegative({
           <DisclosureContent {...disclosureState} className={styles.explainer}>
             {explainers.borrowers}
           </DisclosureContent>
-          <span>🧊 Lenders: Low/no return from holding {tokenName}</span>
+          <span>🧊 Lenders: Lower return from holding {tokenName}</span>
           <DisclosureContent {...disclosureState} className={styles.explainer}>
             {explainers.lenders}
           </DisclosureContent>
