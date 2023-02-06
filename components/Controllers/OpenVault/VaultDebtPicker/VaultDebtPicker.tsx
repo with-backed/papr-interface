@@ -950,10 +950,10 @@ function CostToCloseOrMaximumLoan({
       <div className={styles.costToCloseOrMax}>
         <div>Cost to close:</div>
         <div>
-          $
           {costToClose
             ? formatBigNum(costToClose, controller.underlying.decimals)
-            : '...'}
+            : '...'}{' '}
+          {controller.underlying.symbol}
         </div>
       </div>
     );
@@ -962,10 +962,10 @@ function CostToCloseOrMaximumLoan({
       <div className={styles.costToCloseOrMax}>
         <div>Max Loan Amount:</div>{' '}
         <div>
-          $
           {maxDebtUnderlying
             ? formatBigNum(maxDebtUnderlying, controller.underlying.decimals)
-            : '...'}
+            : '...'}{' '}
+          {controller.underlying.symbol}
         </div>
       </div>
     );
