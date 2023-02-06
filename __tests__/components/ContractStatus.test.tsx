@@ -33,6 +33,11 @@ jest.mock('hooks/useControllerPricesData', () => ({
   useControllerPricesData: jest.fn(),
 }));
 
+jest.mock('hooks/useTheme', () => ({
+  ...jest.requireActual('hooks/useTheme'),
+  useTheme: () => 'trash',
+}));
+
 const mockedUseControllerPricesData =
   useControllerPricesData as jest.MockedFunction<
     typeof useControllerPricesData
