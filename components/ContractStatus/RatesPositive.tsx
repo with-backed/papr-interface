@@ -40,9 +40,11 @@ export function RatesPositive({
 
   return (
     <Fieldset>
-      <Summary disclosureState={disclosureState}>
-        🔥 Contract is acting to raise Market Price
-      </Summary>
+      <Summary
+        contractRate={contractRate}
+        direction="positive"
+        disclosureState={disclosureState}
+      />
       <div data-testid="rates-positive" className={styles.chart}>
         <div className={styles['chart-prices']}>
           <Price kind="target" value={targetPrice} />

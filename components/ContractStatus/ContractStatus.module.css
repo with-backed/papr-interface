@@ -7,8 +7,9 @@
   height: 30px;
 }
 
-.summary > button {
+.details > button {
   color: var(--highlight-clickable-100);
+  min-width: 80px;
 }
 
 .chart {
@@ -54,4 +55,12 @@
 
 .explainer[data-enter] {
   opacity: 1;
+}
+
+.right {
+  text-align: right;
+}
+
+.left {
+  text-align: left;
 }

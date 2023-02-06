@@ -39,9 +39,11 @@ export function RatesNegative({
 
   return (
     <Fieldset>
-      <Summary disclosureState={disclosureState}>
-        🧊 Contract is acting to cool down Market Price
-      </Summary>
+      <Summary
+        contractRate={contractRate}
+        direction="negative"
+        disclosureState={disclosureState}
+      />
       <div data-testid="rates-negative" className={styles.chart}>
         <div className={styles['chart-prices']}>
           <Price kind="market" value={marketPrice} />
