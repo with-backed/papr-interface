@@ -3,16 +3,16 @@ import { ethers } from 'ethers';
 const LOCALE = 'en-US';
 const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
   notation: 'compact',
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
+  minimumFractionDigits: 3,
+  maximumFractionDigits: 3,
 });
 
 const USD_FORMATTER = new Intl.NumberFormat(LOCALE, {
   notation: 'compact',
   style: 'currency',
   currency: 'USD',
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
+  minimumFractionDigits: 3,
+  maximumFractionDigits: 3,
 });
 /**
  * Formats a number representing a quantity of tokens consistent with our design.
