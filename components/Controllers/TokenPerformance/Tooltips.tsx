@@ -100,3 +100,14 @@ export function NFTCapTooltip({
     </Tooltip>
   );
 }
+
+export function NFTValueTooltip({ tooltip }: TooltipProps) {
+  return (
+    <Tooltip {...tooltip}>
+      <p>
+        Value is assessed as the lesser of the current top bid and the 7-day
+        average top bid
+      </p>
+    </Tooltip>
+  );
+}

@@ -4,6 +4,7 @@ import { ApproveNFTButton } from 'components/Controllers/ApproveButtons/ApproveN
 import { ApproveTokenButton } from 'components/Controllers/ApproveButtons/ApproveTokenButton';
 import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
 import { VaultWriteButton } from 'components/Controllers/OpenVault/VaultWriteButton';
+import { NFTValueTooltip } from 'components/Controllers/TokenPerformance/Tooltips';
 import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { Toggle } from 'components/Toggle';
@@ -38,7 +39,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Input } from 'reakit';
+import { Input, TooltipReference, useTooltipState } from 'reakit';
 import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import {
@@ -377,6 +378,8 @@ export function VaultDebtPicker({
     underlyingRepayQuote,
   ]);
 
+  const nftValueTooltip = useTooltipState({ placement: 'bottom-start' });
+
   return (
     <Fieldset legend={`💸 ${nftSymbol}`}>
       <Table className={styles.collateralTable}>
@@ -385,10 +388,13 @@ export function VaultDebtPicker({
             <th></th>
             <th>ID</th>
             <th>
-              VALUE
-              <br />
-              (WETH)
+              <TooltipReference {...nftValueTooltip}>
+                VALUE
+                <br />
+                (WETH)
+              </TooltipReference>
             </th>
+            <NFTValueTooltip tooltip={nftValueTooltip} />
             <th>
               MAX BORROW
               <br />
