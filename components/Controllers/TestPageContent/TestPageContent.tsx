@@ -1,5 +1,6 @@
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { useController } from 'hooks/useController';
+import { useControllerPricesData } from 'hooks/useControllerPricesData';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { erc721Contract } from 'lib/contracts';
 import React, { useMemo } from 'react';
@@ -11,6 +12,8 @@ import styles from './TestPageContent.module.css';
 export function TestPageContent() {
   const signerOrProvider = useSignerOrProvider();
   const controller = useController();
+  const thing = useControllerPricesData();
+  console.log({ thing });
 
   const collateral = useMemo(
     () =>
