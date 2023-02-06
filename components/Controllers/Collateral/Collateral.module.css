@@ -19,3 +19,26 @@
   text-align: center;
   margin-top: 1.5rem;
 }
+
+.stats {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.stats > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.stats > div:first-of-type,
+.stats > div:nth-of-type(3) {
+  background-color: var(--papr-5);
+}
+
+.stats p {
+  margin: 0;
+  padding: 0 8px;
+}
