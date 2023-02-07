@@ -1,3 +1,5 @@
+import { GradientButtonLink } from 'components/Button';
+import { useConfig } from 'hooks/useConfig';
 import { FunctionComponent } from 'react';
 
 import styles from './LandingPageContent.module.css';
@@ -41,6 +43,7 @@ const Header: FunctionComponent = ({ children }) => (
 const Background = () => <div className={styles['table-background']} />;
 
 function BorrowerTable() {
+  const { tokenName } = useConfig();
   return (
     <div className={styles['table-wrapper']}>
       <table className={styles.table}>
@@ -51,14 +54,15 @@ function BorrowerTable() {
           ))}
         </tbody>
       </table>
-      {/* <ButtonLink href="" kind="outline" theme="papr">
+      <GradientButtonLink href={`/tokens/${tokenName}/borrow`} color="orange">
         Get a loan
-      </ButtonLink> */}
+      </GradientButtonLink>
     </div>
   );
 }
 
 function LPTable() {
+  const { tokenName } = useConfig();
   return (
     <div className={styles['table-wrapper']}>
       <table className={styles.table}>
@@ -69,9 +73,9 @@ function LPTable() {
           ))}
         </tbody>
       </table>
-      {/* <ButtonLink href="" kind="outline" theme="papr">
+      <GradientButtonLink href={`/tokens/${tokenName}/swap`} color="orange">
         Buy papr
-      </ButtonLink> */}
+      </GradientButtonLink>
     </div>
   );
 }

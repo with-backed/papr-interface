@@ -1,4 +1,4 @@
-import { ButtonLink } from 'components/Button';
+import { GradientButtonLink } from 'components/Button';
 import React from 'react';
 
 import styles from './LandingPageContent.module.css';
@@ -16,13 +16,12 @@ export function Whitepaper() {
         a perpetual feedback loop for discovering the optimal APR for loans.
       </p>
       <p className={styles.highlight}>papr = perpetual APR</p>
-      <ButtonLink
-        kind="outline"
-        theme="papr"
+      <GradientButtonLink
+        color="blue"
         href="https://backed.mirror.xyz/8SslPvU8of0h-fxoo6AybCpm51f30nd0qxPST8ep08c"
         newTab>
         Read the whitepaper
-      </ButtonLink>
+      </GradientButtonLink>
     </div>
   );
 }
