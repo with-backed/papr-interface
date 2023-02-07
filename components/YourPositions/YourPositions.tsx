@@ -19,19 +19,24 @@ import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useMemo } from 'react';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
-import { useAccount } from 'wagmi';
+import { useAccount, useNetwork } from 'wagmi';
 
 import styles from './YourPositions.module.css';
 
 export function YourPositions() {
   const { address } = useAccount();
-  const { tokenName } = useConfig();
+  const { tokenName, network } = useConfig();
+  const { chain } = useNetwork();
   const paprController = useController();
 
   const latestMarketPrice = useLatestMarketPrice();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const { balance } = usePaprBalance(paprController.paprToken.id);
   const { currentVaults } = useCurrentVaults(address);
+
+  const wrongNetwork = useMemo(() => {
+    return chain?.network !== network;
+  }, [chain?.network, network]);
 
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.token.id);
@@ -129,14 +134,22 @@ export function YourPositions() {
     totalPaprMemeDebt,
   ]);
 
-  if (!address) {
+  if (!address || wrongNetwork) {
     return (
       <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>
         <div>
-          <p>
-            Connect your wallet to see eligible collections and your maximum
-            loan amount
-          </p>
+          {!address && (
+            <p>
+              Connect your wallet to see eligible collections and your maximum
+              loan amount
+            </p>
+          )}
+          {wrongNetwork && !!address && (
+            <p>
+              Switch your wallet to the correct network to see eligible
+              collections and your maximum loan amount
+            </p>
+          )}
         </div>
       </Fieldset>
     );
