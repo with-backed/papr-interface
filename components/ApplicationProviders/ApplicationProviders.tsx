@@ -41,7 +41,7 @@ const Disclaimer: DisclaimerComponent = ({ Text, Link }) => (
 );
 
 export const ApplicationProviders: FunctionComponent = ({ children }) => {
-  const { infuraId, alchemyId, network, centerNetwork, paprMemeSubgraph } =
+  const { infuraId, alchemyId, network, centerNetwork, paprSubgraph } =
     useConfig();
   const orderedChains = useMemo(() => {
     const thisChain = CHAINS.find((c) => c.name.toLowerCase() === network)!;
@@ -77,9 +77,9 @@ export const ApplicationProviders: FunctionComponent = ({ children }) => {
 
   const inKindClient = useMemo(() => {
     return createUrqlClient({
-      url: paprMemeSubgraph,
+      url: paprSubgraph,
     });
-  }, [paprMemeSubgraph]);
+  }, [paprSubgraph]);
 
   return (
     <GlobalMessagingProvider>

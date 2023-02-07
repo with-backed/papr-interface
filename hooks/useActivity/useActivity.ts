@@ -1,12 +1,12 @@
 import { useConfig } from 'hooks/useConfig';
 import { useMemo } from 'react';
 import {
+  ActivityByControllerAndAccountDocument,
+  ActivityByControllerAndAccountQuery,
+  ActivityByControllerAndVaultDocument,
+  ActivityByControllerAndVaultQuery,
   ActivityByControllerDocument,
   ActivityByControllerQuery,
-  ActivityByControllerAndAccountQuery,
-  ActivityByControllerAndVaultQuery,
-  ActivityByControllerAndVaultDocument,
-  ActivityByControllerAndAccountDocument,
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
@@ -21,7 +21,7 @@ export function useActivity(
   account?: string,
   vault?: string,
 ) {
-  const { paprMemeSubgraph } = useConfig();
+  const { paprSubgraph } = useConfig();
   const byAccount = useMemo(() => !!account && !vault, [account, vault]);
   const byVault = useMemo(() => !!vault && !account, [account, vault]);
   const byController = useMemo(
@@ -36,9 +36,9 @@ export function useActivity(
     variables: { controllerId },
     context: useMemo(
       () => ({
-        url: paprMemeSubgraph,
+        url: paprSubgraph,
       }),
-      [paprMemeSubgraph],
+      [paprSubgraph],
     ),
     pause: !byController,
   });
@@ -49,9 +49,9 @@ export function useActivity(
       variables: { controllerId, account },
       context: useMemo(
         () => ({
-          url: paprMemeSubgraph,
+          url: paprSubgraph,
         }),
-        [paprMemeSubgraph],
+        [paprSubgraph],
       ),
       pause: !byAccount,
     });
@@ -62,9 +62,9 @@ export function useActivity(
       variables: { controllerId, vault },
       context: useMemo(
         () => ({
-          url: paprMemeSubgraph,
+          url: paprSubgraph,
         }),
-        [paprMemeSubgraph],
+        [paprSubgraph],
       ),
       pause: !byVault,
     });
