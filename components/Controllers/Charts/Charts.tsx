@@ -140,7 +140,7 @@ function RateOfGrowth({
     <div className={styles.wrapper}>
       <div className={styles.label}>
         <span className={styles[`price-label-${tokenName}`]}>
-          papr price in USDC
+          papr price in WETH
         </span>{' '}
       </div>
       <div className={styles.chart} ref={chartRef} />

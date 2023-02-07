@@ -110,7 +110,7 @@ export function Price({ kind, value }: PriceProps) {
     <span ref={ref} className={styles.price} style={style}>
       {label} Price &gt;
       <br />
-      {value} USDC
+      {value} WETH
     </span>
   );
 }

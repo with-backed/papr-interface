@@ -24,11 +24,11 @@ export function HowToLP() {
     <Fieldset legend="🦄 How to LP">
       <p>
         Liquidity providers earn a {formattedFeeTier} fee from facilitating
-        swaps in the USDC/
+        swaps in the WETH/
         {tokenName} pool on Uniswap. Here&apos;s how to join:
       </p>
       <ol>
-        <li>You&apos;ll need either USDC, {tokenName} or both</li>
+        <li>You&apos;ll need either WETH, {tokenName} or both</li>
         <li>
           Visit the{' '}
           <Link href={poolURL} target="_blank">
