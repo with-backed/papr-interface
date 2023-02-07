@@ -1,8 +1,8 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
-import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils';
+import { formatUnits, getAddress } from 'ethers/lib/utils';
 import { useAccountNFTs } from 'hooks/useAccountNFTs';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
@@ -77,11 +77,11 @@ export function YourPositions() {
     }
     const maxLoanMinusCurrentDebt = maxLoanInDebtTokens.sub(
       (currentVaults || [])
-        .map((v) => ethers.BigNumber.from(v.debt))
-        .reduce((a, b) => a.add(b), ethers.BigNumber.from(0)),
+        .map((v) => BigNumber.from(v.debt))
+        .reduce((a, b) => a.add(b), BigNumber.from(0)),
     );
     return maxLoanMinusCurrentDebt.isNegative()
-      ? ethers.BigNumber.from(0)
+      ? BigNumber.from(0)
       : maxLoanMinusCurrentDebt;
   }, [currentVaults, maxLoanInDebtTokens]);
 
@@ -92,10 +92,7 @@ export function YourPositions() {
 
     return (
       parseFloat(
-        ethers.utils.formatUnits(
-          maxLoanMinusCurrentDebt,
-          paprController.paprToken.decimals,
-        ),
+        formatUnits(maxLoanMinusCurrentDebt, paprController.paprToken.decimals),
       ) * latestMarketPrice
     ).toFixed(5);
   }, [
@@ -105,12 +102,12 @@ export function YourPositions() {
   ]);
 
   const totalPaprMemeDebt = useMemo(() => {
-    if (!currentVaults) return ethers.BigNumber.from(0);
+    if (!currentVaults) return BigNumber.from(0);
     return currentVaults
       .map((vault) => vault.debt)
       .reduce(
-        (a, b) => ethers.BigNumber.from(a).add(ethers.BigNumber.from(b)),
-        ethers.BigNumber.from(0),
+        (a, b) => BigNumber.from(a).add(BigNumber.from(b)),
+        BigNumber.from(0),
       );
   }, [currentVaults]);
 
@@ -230,10 +227,9 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
   const { paprToken, underlying } = useController();
   const nftSymbol = vaultInfo.token.symbol;
   const costToClose = useAsyncValue(async () => {
-    if (ethers.BigNumber.from(vaultInfo.debt).isZero())
-      return ethers.BigNumber.from(0);
+    if (BigNumber.from(vaultInfo.debt).isZero()) return BigNumber.from(0);
     return getQuoteForSwapOutput(
-      ethers.BigNumber.from(vaultInfo.debt),
+      BigNumber.from(vaultInfo.debt),
       underlying.id,
       paprToken.id,
       tokenName as SupportedToken,
@@ -241,7 +237,7 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
   }, [vaultInfo.debt, tokenName, paprToken.id, underlying.id]);
 
   if (
-    ethers.BigNumber.from(vaultInfo.debt).isZero() &&
+    BigNumber.from(vaultInfo.debt).isZero() &&
     vaultInfo.collateral.length === 0
   )
     return <></>;
@@ -273,19 +269,19 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
 }
 
 type BalanceInfoProps = {
-  balance: ethers.BigNumber | null;
+  balance: BigNumber | null;
 };
 function BalanceInfo({ balance }: BalanceInfoProps) {
   const { paprToken, underlying } = useController();
   const latestMarketPrice = useLatestMarketPrice();
   const paprMemeBalance = useMemo(
-    () => ethers.BigNumber.from(balance || 0),
+    () => BigNumber.from(balance || 0),
     [balance],
   );
 
   const formattedBalance = useMemo(() => {
     const convertedBalance = parseFloat(
-      ethers.utils.formatUnits(paprMemeBalance, paprToken.decimals),
+      formatUnits(paprMemeBalance, paprToken.decimals),
     );
     return formatTokenAmount(convertedBalance) + ` ${paprToken.symbol}`;
   }, [paprMemeBalance, paprToken]);
@@ -295,7 +291,7 @@ function BalanceInfo({ balance }: BalanceInfoProps) {
     }
 
     const convertedBalance = parseFloat(
-      ethers.utils.formatUnits(paprMemeBalance, paprToken.decimals),
+      formatUnits(paprMemeBalance, paprToken.decimals),
     );
     return (
       formatTokenAmount(convertedBalance * latestMarketPrice) +

@@ -186,7 +186,7 @@ export function Header() {
 
   return (
     <nav
-      data-testId="header"
+      data-testid="header"
       className={[
         styles.nav,
         isHomePage ? styles.homepage : styles[theme],

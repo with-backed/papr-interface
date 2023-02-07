@@ -1,12 +1,17 @@
 import { captureException } from '@sentry/nextjs';
 import { OpenGraph } from 'components/OpenGraph';
-import { SwapPageContent } from 'components/SwapPageContent';
 import { ControllerContextProvider } from 'hooks/useController';
 import { configs, getConfig, SupportedToken } from 'lib/config';
 import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
 import capitalize from 'lodash/capitalize';
 import { GetServerSideProps } from 'next';
+import dynamic from 'next/dynamic';
 import React from 'react';
+
+const SwapPageContent = dynamic(
+  () => import('components/SwapPageContent').then((mod) => mod.SwapPageContent),
+  {},
+);
 
 export const getServerSideProps: GetServerSideProps<SwapProps> = async (
   context,
