@@ -5,7 +5,7 @@ import { FunctionComponent } from 'react';
 import styles from './LandingPageContent.module.css';
 
 const BORROWER_ENTRIES = [
-  ['💰', 'USDC loans, instantly'],
+  ['💰', 'ETH loans, instantly'],
   ['💸', 'Borrow and repay as you go'],
   ['⏱', 'Unlimited duration'],
   ['👜', 'Borrow with many NFTs in a single tx'],
@@ -16,7 +16,7 @@ const LP_ENTRIES = [
   ['🌈', 'Exposure across many loans and collections'],
   ['💎', 'Low maintenance, just buy and hold'],
   ['🛌', 'Zero unused capital'],
-  ['🪙', 'Convert back to USDC whenever you want, no lockups'],
+  ['🪙', 'Convert back to ETH whenever you want, no lockups'],
 ];
 
 type RowProps = {
