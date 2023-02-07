@@ -101,6 +101,7 @@ function NavLinks({ activeRoute, isHomePage }: NavLinksProps) {
       {pages.map((p) => (
         <li key={p.name}>
           <Link
+            prefetch={false}
             href={
               p.isNetworkSpecialCase
                 ? `/${p.route}`
