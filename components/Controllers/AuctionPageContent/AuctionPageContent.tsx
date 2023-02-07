@@ -54,14 +54,14 @@ export function AuctionPageContent({
     );
   }, [controller.underlying.id, tokenName]);
 
-  const liveAuctionPriceEth = useMemo(() => {
+  const liveAuctionPriceUSD = useMemo(() => {
     if (!liveAuctionPriceUnderlying || !ethPrice) return null;
-    return liveAuctionPriceUnderlying.div(ethers.BigNumber.from(ethPrice));
+    return liveAuctionPriceUnderlying.mul(ethers.BigNumber.from(ethPrice));
   }, [liveAuctionPriceUnderlying, ethPrice]);
 
-  const floorEthPrice = useMemo(() => {
+  const floorUSDPrice = useMemo(() => {
     if (!oracleInfo || !ethPrice) return 0;
-    return oracleInfo[auction.auctionAssetContract.id].price / ethPrice;
+    return oracleInfo[auction.auctionAssetContract.id].price * ethPrice;
   }, [oracleInfo, ethPrice, auction.auctionAssetContract.id]);
 
   const auctionCompleted = useMemo(() => {
@@ -113,11 +113,11 @@ export function AuctionPageContent({
               <p>
                 {liveAuctionPriceUnderlying && (
                   <>
-                    $
                     {formatBigNum(
                       liveAuctionPriceUnderlying,
                       controller.underlying.decimals,
-                    )}
+                    )}{' '}
+                    {controller.underlying.symbol}
                   </>
                 )}
               </p>
@@ -127,16 +127,16 @@ export function AuctionPageContent({
                 {tokenName}
               </p>
               <p>
-                {liveAuctionPriceEth && (
+                {liveAuctionPriceUSD && (
                   <>
+                    $
                     {formatBigNum(
-                      liveAuctionPriceEth,
+                      liveAuctionPriceUSD,
                       controller.underlying.decimals,
                     )}{' '}
-                    ETH
                   </>
                 )}
-                {!liveAuctionPriceEth && <>...</>}
+                {!liveAuctionPriceUSD && <>...</>}
               </p>
             </div>
           </div>
@@ -158,7 +158,7 @@ export function AuctionPageContent({
         timeElapsed={timeElapsed}
         oracleInfo={oracleInfo}
         latestUniswapPrice={latestUniswapPrice}
-        floorEthPrice={floorEthPrice}
+        floorUSDPrice={floorUSDPrice}
       />
       {!auctionCompleted && (
         <AuctionApproveAndBuy
