@@ -5,21 +5,17 @@ import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { useShowMore } from 'hooks/useShowMore';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { erc20Contract } from 'lib/contracts';
 import { getDaysHoursMinutesSeconds } from 'lib/duration';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
-import {
-  getOraclePayloadFromReservoirObject,
-  OraclePriceType,
-} from 'lib/oracle/reservoir';
-import React, { useCallback, useMemo, useState } from 'react';
-import { ERC20, PaprController__factory } from 'types/generated/abis';
-import { INFTEDA } from 'types/generated/abis/PaprController';
+import Link from 'next/link';
+import React, { useMemo } from 'react';
+import { ERC20 } from 'types/generated/abis';
 import {
   AuctionsDocument,
   AuctionsQuery,
@@ -134,6 +130,7 @@ function ActiveAuctionRow({
   tokenContract: ERC20;
   paprApproved: boolean | null;
 }) {
+  const { tokenName } = useConfig();
   const decimals = auction.paymentAsset.decimals;
   const symbol = auction.paymentAsset.symbol;
 
@@ -179,91 +176,9 @@ function ActiveAuctionRow({
         {symbol}
       </td>
       <td className={styles.center}>
-        <BuyButton
-          auction={auction}
-          maxPrice={liveAuctionPrice}
-          tokenContract={tokenContract}
-          paprApproved={paprApproved}
-        />
+        <Link href={`/tokens/${tokenName}/auctions/${auction.id}`}>View</Link>
       </td>
     </tr>
-  );
-}
-
-type BuyButtonProps = {
-  auction: ActiveAuction;
-  maxPrice: ethers.BigNumber;
-  tokenContract: ERC20;
-  paprApproved: boolean | null;
-};
-function BuyButton({
-  auction,
-  maxPrice,
-  tokenContract,
-  paprApproved,
-}: BuyButtonProps) {
-  const signerOrProvider = useSignerOrProvider();
-  const controller = useController();
-  const { address } = useAccount();
-  const oracleInfo = useOracleInfo(OraclePriceType.twap);
-  const [buyingState, setBuyingState] = useState<
-    'idle' | 'approving' | 'buying'
-  >('idle');
-  const handleClick = useCallback(async () => {
-    if (!oracleInfo) {
-      console.error('no oracle info, cannot buy');
-      return;
-    }
-
-    if (!paprApproved) {
-      const approvalTx = await tokenContract.approve(
-        controller.id,
-        ethers.constants.MaxUint256,
-      );
-      setBuyingState('approving');
-      await approvalTx.wait();
-    }
-
-    const oracleDetails = oracleInfo[auction.auctionAssetContract.id];
-    const oracleInfoStruct = getOraclePayloadFromReservoirObject(oracleDetails);
-    const contract = PaprController__factory.connect(
-      controller.id,
-      signerOrProvider,
-    );
-    const tx = await contract.purchaseLiquidationAuctionNFT(
-      {
-        ...auction,
-        nftOwner: auction.vault.account,
-        paymentAsset: auction.paymentAsset.id,
-        auctionAssetContract: auction.auctionAssetContract.id,
-      } as INFTEDA.AuctionStruct,
-      maxPrice,
-      address!,
-      oracleInfoStruct,
-    );
-    setBuyingState('buying');
-    await tx.wait();
-    window.location.reload();
-  }, [
-    address,
-    auction,
-    controller,
-    maxPrice,
-    oracleInfo,
-    tokenContract,
-    paprApproved,
-    signerOrProvider,
-  ]);
-
-  return (
-    <TextButton
-      disabled={!address || buyingState !== 'idle'}
-      kind="clickable"
-      onClick={handleClick}>
-      {buyingState === 'idle' && <span>Buy</span>}
-      {buyingState === 'approving' && <span>Approving...</span>}
-      {buyingState === 'buying' && <span>Buying...</span>}
-    </TextButton>
   );
 }
 
