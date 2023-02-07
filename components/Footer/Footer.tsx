@@ -44,7 +44,7 @@ const LINKS: Link[] = [
 
 export function Footer() {
   return (
-    <footer className={styles.footer} data-testId="footer">
+    <footer className={styles.footer} data-testid="footer">
       <Image src={Bunny} alt="Backed Bunny Logo" height={64} />
       <ul className={styles['footer-links']}>
         {LINKS.map((link) => {

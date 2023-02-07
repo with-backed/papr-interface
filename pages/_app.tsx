@@ -4,13 +4,11 @@ import 'styles/fonts-maru.css';
 import 'styles/global.css';
 
 import { ApplicationProviders } from 'components/ApplicationProviders';
-import { ErrorBanners } from 'components/ErrorBanners';
-import { Footer } from 'components/Footer';
-import { Header } from 'components/Header';
 import { AppWrapper } from 'components/layouts/AppWrapper';
 import { ConfigProvider } from 'hooks/useConfig';
 import { isSupportedToken, SupportedToken } from 'lib/config';
 import { AppProps } from 'next/app';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
@@ -24,6 +22,16 @@ function tokenFromPath(path: string): SupportedToken {
   // is paprHero. We will change to paprMeme when that launches.
   return 'paprHero';
 }
+
+const ErrorBanners = dynamic(() =>
+  import('components/ErrorBanners').then((mod) => mod.ErrorBanners),
+);
+const Footer = dynamic(() =>
+  import('components/Footer').then((mod) => mod.Footer),
+);
+const Header = dynamic(() =>
+  import('components/Header').then((mod) => mod.Header),
+);
 
 export default function App({ Component, pageProps }: AppProps) {
   const { asPath } = useRouter();

@@ -101,6 +101,7 @@ function NavLinks({ activeRoute, isHomePage }: NavLinksProps) {
       {pages.map((p) => (
         <li key={p.name}>
           <Link
+            prefetch={false}
             href={
               p.isNetworkSpecialCase
                 ? `/${p.route}`
@@ -186,7 +187,7 @@ export function Header() {
 
   return (
     <nav
-      data-testId="header"
+      data-testid="header"
       className={[
         styles.nav,
         isHomePage ? styles.homepage : styles[theme],

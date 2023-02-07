@@ -1,6 +1,4 @@
 import controllerStyles from 'components/Controllers/Controller.module.css';
-import { VaultDebtPicker } from 'components/Controllers/OpenVault/VaultDebtPicker/VaultDebtPicker';
-import { YourPositions } from 'components/YourPositions/YourPositions';
 import { getAddress } from 'ethers/lib/utils';
 import { useAccountNFTs } from 'hooks/useAccountNFTs';
 import { useController } from 'hooks/useController';
@@ -8,11 +6,22 @@ import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePaprBalance } from 'hooks/usePaprBalance';
 import { OraclePriceType } from 'lib/oracle/reservoir';
+import dynamic from 'next/dynamic';
 import React, { useCallback, useMemo } from 'react';
 import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 import { useAccount } from 'wagmi';
 
-import { Activity } from '../Activity';
+const YourPositions = dynamic(() =>
+  import('components/YourPositions').then((mod) => mod.YourPositions),
+);
+const Activity = dynamic(() =>
+  import('components/Controllers/Activity').then((mod) => mod.Activity),
+);
+const VaultDebtPicker = dynamic(() =>
+  import(
+    'components/Controllers/OpenVault/VaultDebtPicker/VaultDebtPicker'
+  ).then((mod) => mod.VaultDebtPicker),
+);
 
 export type BorrowPageProps = {
   subgraphPool: NonNullable<PoolByIdQuery['pool']>;
