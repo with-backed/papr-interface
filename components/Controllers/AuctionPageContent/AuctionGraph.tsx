@@ -13,7 +13,7 @@ import { useController } from 'hooks/useController';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { currentPrice } from 'lib/auctions';
 import { convertOneScaledValue } from 'lib/controllers';
-import { formatBigNum } from 'lib/numberFormat';
+import { formatBigNum, formatDollars } from 'lib/numberFormat';
 import { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
@@ -171,23 +171,24 @@ export function AuctionGraph({
   }, [oracleInfo, timestampAndPricesAllTime, auction.auctionAssetContract.id]);
 
   const startLabel = useMemo(() => {
-    const floorPrice =
+    const floorPriceString =
       oracleInfo[auction.auctionAssetContract.id].price.toFixed(4);
+    const floorUSDPriceString = formatDollars(floorUSDPrice);
     const startingString = 'Start @ 3x Floor';
     const paddingForTimeAgo = Array(startingString.length - timeAgo.length)
       .fill('\t')
       .join('');
     const paddingForUSDPrice = Array(
-      startingString.length - (floorUSDPrice.toString().length + 1),
+      startingString.length - floorUSDPriceString.toString().length,
     )
       .fill('\t')
       .join('');
     const paddingForFloorPrice = Array(
-      startingString.length - (floorPrice.toString().length + 5),
+      startingString.length - (floorPriceString.toString().length + 5),
     )
       .fill('\t')
       .join('');
-    return `\n\n\n${startingString}\n${paddingForTimeAgo}${timeAgo}\n${paddingForFloorPrice}${floorPrice} WETH\n${paddingForUSDPrice}$${floorUSDPrice}`;
+    return `\n\n\n${startingString}\n${paddingForTimeAgo}${timeAgo}\n${paddingForFloorPrice}${floorPriceString} WETH\n${paddingForUSDPrice}${floorUSDPriceString}`;
   }, [timeAgo, oracleInfo, floorUSDPrice, auction.auctionAssetContract.id]);
 
   const buyNowLabel = useMemo(() => {
@@ -209,14 +210,17 @@ export function AuctionGraph({
   }, [auctionUnderlyingPrice, controller.underlying, auctionCompleted]);
 
   const floorLabel = useMemo(() => {
-    const floorPrice =
+    const floorPriceString =
       oracleInfo[auction.auctionAssetContract.id].price.toFixed(4);
+    const floorUSDPriceString = formatDollars(floorUSDPrice);
     const floorPricePadding = Array(
-      floorPrice.toString().length + 5 - (floorUSDPrice.toString().length + 1),
+      floorPriceString.toString().length +
+        5 -
+        floorUSDPriceString.toString().length,
     )
       .fill('\t')
       .join('');
-    return `\n\n\n\n${floorPrice} WETH\n${floorPricePadding}$${floorUSDPrice}`;
+    return `\n\n\n\n${floorPriceString} WETH\n${floorPricePadding}${floorUSDPriceString}`;
   }, [oracleInfo, floorUSDPrice, auction.auctionAssetContract.id]);
 
   const chartOptions: ChartOptions = useMemo(
@@ -247,7 +251,7 @@ export function AuctionGraph({
               floorDataPoint,
               'black',
               'white',
-              auctionCompleted ? 'black' : '#0000c2',
+              auctionCompleted ? 'black' : '#0064FA',
               '#b1aeae',
               'black',
               'black',
@@ -259,7 +263,7 @@ export function AuctionGraph({
               context,
               floorDataPoint,
               'white',
-              auctionCompleted ? 'black' : '#0000c2',
+              auctionCompleted ? 'black' : '#0064FA',
               '',
               '',
               '',
@@ -352,7 +356,7 @@ export function AuctionGraph({
       datasets: [
         {
           data: timestampAndPricesCurrent[1],
-          borderColor: auctionCompleted ? 'black' : '#0000c2',
+          borderColor: auctionCompleted ? 'black' : '#0064FA',
           ...baseChartProperties,
           pointRadius: Array(timestampAndPricesCurrent[1].length)
             .fill('')
