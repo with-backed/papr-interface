@@ -121,7 +121,7 @@ type AuctionGraphProps = {
   timeElapsed: number;
   oracleInfo: OracleInfo;
   latestUniswapPrice: number;
-  floorEthPrice: number;
+  floorUSDPrice: number;
 };
 
 export function AuctionGraph({
@@ -131,7 +131,7 @@ export function AuctionGraph({
   timeElapsed,
   oracleInfo,
   latestUniswapPrice,
-  floorEthPrice,
+  floorUSDPrice,
 }: AuctionGraphProps) {
   const controller = useController();
   const timestampAndPricesAllTime = useMemo(() => {
@@ -172,31 +172,31 @@ export function AuctionGraph({
 
   const startLabel = useMemo(() => {
     const floorPrice =
-      oracleInfo[auction.auctionAssetContract.id].price.toFixed(2);
+      oracleInfo[auction.auctionAssetContract.id].price.toFixed(4);
     const startingString = 'Start @ 3x Floor';
     const paddingForTimeAgo = Array(startingString.length - timeAgo.length)
       .fill('\t')
       .join('');
-    const paddingForEthPrice = Array(
-      startingString.length - (floorEthPrice.toString().length + 4),
+    const paddingForUSDPrice = Array(
+      startingString.length - (floorUSDPrice.toString().length + 1),
     )
       .fill('\t')
       .join('');
     const paddingForFloorPrice = Array(
-      startingString.length - (floorPrice.toString().length + 1),
+      startingString.length - (floorPrice.toString().length + 5),
     )
       .fill('\t')
       .join('');
-    return `\n\n\n${startingString}\n${paddingForTimeAgo}${timeAgo}\n${paddingForEthPrice}${floorEthPrice} ETH\n${paddingForFloorPrice}$${floorPrice}`;
-  }, [timeAgo, oracleInfo, floorEthPrice, auction.auctionAssetContract.id]);
+    return `\n\n\n${startingString}\n${paddingForTimeAgo}${timeAgo}\n${paddingForFloorPrice}${floorPrice} WETH\n${paddingForUSDPrice}$${floorUSDPrice}`;
+  }, [timeAgo, oracleInfo, floorUSDPrice, auction.auctionAssetContract.id]);
 
   const buyNowLabel = useMemo(() => {
     if (!auctionCompleted)
       return auctionUnderlyingPrice
-        ? `Buy now: $${formatBigNum(
+        ? `Buy now: ${formatBigNum(
             auctionUnderlyingPrice,
             controller.underlying.decimals,
-          )}`
+          )} ${controller.underlying.symbol}`
         : 'Buy now: ......';
     else {
       return auctionUnderlyingPrice
@@ -206,22 +206,18 @@ export function AuctionGraph({
           )}`
         : 'SOLD: ......';
     }
-  }, [
-    auctionUnderlyingPrice,
-    controller.underlying.decimals,
-    auctionCompleted,
-  ]);
+  }, [auctionUnderlyingPrice, controller.underlying, auctionCompleted]);
 
   const floorLabel = useMemo(() => {
     const floorPrice =
-      oracleInfo[auction.auctionAssetContract.id].price.toFixed(2);
+      oracleInfo[auction.auctionAssetContract.id].price.toFixed(4);
     const floorPricePadding = Array(
-      floorEthPrice.toString().length + 4 - (floorPrice.toString().length + 1),
+      floorPrice.toString().length + 5 - (floorUSDPrice.toString().length + 1),
     )
       .fill('\t')
       .join('');
-    return `\n\n\n\n${floorEthPrice} ETH\n${floorPricePadding}$${floorPrice}`;
-  }, [oracleInfo, floorEthPrice, auction.auctionAssetContract.id]);
+    return `\n\n\n\n${floorPrice} WETH\n${floorPricePadding}$${floorUSDPrice}`;
+  }, [oracleInfo, floorUSDPrice, auction.auctionAssetContract.id]);
 
   const chartOptions: ChartOptions = useMemo(
     () => ({
@@ -277,7 +273,7 @@ export function AuctionGraph({
               floorDataPoint,
               -160,
               20,
-              -190,
+              -176,
               -100,
               -200,
               10,
