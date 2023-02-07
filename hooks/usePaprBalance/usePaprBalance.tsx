@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
+import { useConfig } from 'hooks/useConfig';
 import {
   createContext,
   PropsWithChildren,
@@ -9,7 +10,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { erc20ABI, useAccount, useContractRead } from 'wagmi';
+import { erc20ABI, useAccount, useContractRead, useNetwork } from 'wagmi';
 
 type Balance = ethers.BigNumber | null;
 type ContextValue = {
@@ -22,14 +23,25 @@ const PaprBalanceContext = createContext<ContextValue>({} as any);
 
 export function PaprBalanceProvider({ children }: PropsWithChildren<{}>) {
   const { address: connectedAddress } = useAccount();
+  const { chain } = useNetwork();
+  const { network } = useConfig();
   const [debtTokenAddress, setDebtTokenAddress] = useState<string | undefined>(
     undefined,
   );
 
+  const addressForBalanceRead = useMemo(() => {
+    if (chain?.network !== network) {
+      return undefined;
+    } else if (!connectedAddress) {
+      return undefined;
+    }
+    return connectedAddress;
+  }, [chain?.network, network, connectedAddress]);
+
   const { data: rawPaprBalance, refetch: refresh } = useContractRead({
     // If address is undefined, hook will not run. Take advantage of this
     // to not run the hook if there is no connected user.
-    address: connectedAddress ? (debtTokenAddress as `0x${string}`) : undefined,
+    address: addressForBalanceRead,
     abi: erc20ABI,
     functionName: 'balanceOf',
     args: [connectedAddress as `0x${string}`],
