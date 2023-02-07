@@ -2,6 +2,7 @@ import { useCollection } from '@center-inc/react';
 import { TextButton } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
 import { Fieldset } from 'components/Fieldset';
+import { Table } from 'components/Table';
 import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
@@ -90,47 +91,51 @@ export function Collateral({ vaultId }: CollateralProps) {
 
   return (
     <Fieldset legend="🖼 Collateral">
-      <div className={styles.stats}>
-        <div>
-          <div>
-            <p>Floor value of all deposited collateral</p>
-          </div>
-          <div>
-            {!totalCollateralValue && <p>...</p>}
-            {totalCollateralValue && (
+      <Table className={styles.statsTable}>
+        <tbody>
+          <tr>
+            <div>
+              <p>Floor value of all deposited collateral</p>
+            </div>
+            <div>
+              {!totalCollateralValue && <p>...</p>}
+              {totalCollateralValue && (
+                <p>
+                  {totalCollateralValue.toFixed(4)}{' '}
+                  {paprController.underlying.symbol}
+                </p>
+              )}
+            </div>
+          </tr>
+          <tr>
+            <div>
               <p>
-                {totalCollateralValue.toFixed(4)}{' '}
-                {paprController.underlying.symbol}
+                Market value of all {paprController.paprToken.symbol} tokens
               </p>
-            )}
-          </div>
-        </div>
-        <div>
-          <div>
-            <p>Market value of all {paprController.paprToken.symbol} tokens</p>
-          </div>
-          <div>
-            {!totalSupplyInUnderlying && <p>...</p>}
-            {totalSupplyInUnderlying && (
-              <p>
-                {totalSupplyInUnderlying.toFixed(4)}{' '}
-                {paprController.underlying.symbol}
-              </p>
-            )}
-          </div>
-        </div>
-        <div>
-          <div>
-            <p>Collateralization ratio (NFT value/token value)</p>
-          </div>
-          <div>
-            {!collateralizationRatio && <p>...</p>}
-            {collateralizationRatio && (
-              <p>{collateralizationRatio.toFixed(2)}</p>
-            )}
-          </div>
-        </div>
-      </div>
+            </div>
+            <div>
+              {!totalSupplyInUnderlying && <p>...</p>}
+              {totalSupplyInUnderlying && (
+                <p>
+                  {totalSupplyInUnderlying.toFixed(4)}{' '}
+                  {paprController.underlying.symbol}
+                </p>
+              )}
+            </div>
+          </tr>
+          <tr>
+            <div>
+              <p>Collateralization ratio (NFT value/token value)</p>
+            </div>
+            <div>
+              {!collateralizationRatio && <p>...</p>}
+              {collateralizationRatio && (
+                <p>{collateralizationRatio.toFixed(2)}</p>
+              )}
+            </div>
+          </tr>
+        </tbody>
+      </Table>
       <div className={styles.wrapper}>
         {feed.map(({ vault: v, collateral: c }) => (
           <Tile key={c.id} address={v.token.id} tokenId={c.tokenId} vault={v} />
