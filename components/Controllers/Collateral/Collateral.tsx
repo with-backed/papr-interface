@@ -94,30 +94,32 @@ export function Collateral({ vaultId }: CollateralProps) {
       <Table className={styles.statsTable}>
         <tbody>
           <tr>
-            <p>Floor value of all deposited collateral</p>
-            {!totalCollateralValue && <p>...</p>}
+            <span>Floor value of all deposited collateral</span>
+            {!totalCollateralValue && <span>...</span>}
             {totalCollateralValue && (
-              <p>
+              <span>
                 {totalCollateralValue.toFixed(4)}{' '}
                 {paprController.underlying.symbol}
-              </p>
+              </span>
             )}
           </tr>
           <tr>
-            <p>Market value of all {paprController.paprToken.symbol} tokens</p>
-            {!totalSupplyInUnderlying && <p>...</p>}
+            <span>
+              Market value of all {paprController.paprToken.symbol} tokens
+            </span>
+            {!totalSupplyInUnderlying && <span>...</span>}
             {totalSupplyInUnderlying && (
-              <p>
+              <span>
                 {totalSupplyInUnderlying.toFixed(4)}{' '}
                 {paprController.underlying.symbol}
-              </p>
+              </span>
             )}
           </tr>
           <tr>
-            <p>Collateralization ratio (NFT value/token value)</p>
-            {!collateralizationRatio && <p>...</p>}
+            <span>Collateralization ratio (NFT value/token value)</span>
+            {!collateralizationRatio && <span>...</span>}
             {collateralizationRatio && (
-              <p>{collateralizationRatio.toFixed(2)}</p>
+              <span>{collateralizationRatio.toFixed(2)}</span>
             )}
           </tr>
         </tbody>
