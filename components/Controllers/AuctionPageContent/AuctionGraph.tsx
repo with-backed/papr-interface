@@ -133,7 +133,6 @@ export function AuctionGraph({
   latestUniswapPrice,
   floorUSDPrice,
 }: AuctionGraphProps) {
-  console.log({ floorUSDPrice });
   const controller = useController();
   const timestampAndPricesAllTime = useMemo(() => {
     return generateTimestampsAndPrices(auction, latestUniswapPrice);
