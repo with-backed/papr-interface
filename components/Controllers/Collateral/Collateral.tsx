@@ -94,45 +94,31 @@ export function Collateral({ vaultId }: CollateralProps) {
       <Table className={styles.statsTable}>
         <tbody>
           <tr>
-            <div>
-              <p>Floor value of all deposited collateral</p>
-            </div>
-            <div>
-              {!totalCollateralValue && <p>...</p>}
-              {totalCollateralValue && (
-                <p>
-                  {totalCollateralValue.toFixed(4)}{' '}
-                  {paprController.underlying.symbol}
-                </p>
-              )}
-            </div>
-          </tr>
-          <tr>
-            <div>
+            <p>Floor value of all deposited collateral</p>
+            {!totalCollateralValue && <p>...</p>}
+            {totalCollateralValue && (
               <p>
-                Market value of all {paprController.paprToken.symbol} tokens
+                {totalCollateralValue.toFixed(4)}{' '}
+                {paprController.underlying.symbol}
               </p>
-            </div>
-            <div>
-              {!totalSupplyInUnderlying && <p>...</p>}
-              {totalSupplyInUnderlying && (
-                <p>
-                  {totalSupplyInUnderlying.toFixed(4)}{' '}
-                  {paprController.underlying.symbol}
-                </p>
-              )}
-            </div>
+            )}
           </tr>
           <tr>
-            <div>
-              <p>Collateralization ratio (NFT value/token value)</p>
-            </div>
-            <div>
-              {!collateralizationRatio && <p>...</p>}
-              {collateralizationRatio && (
-                <p>{collateralizationRatio.toFixed(2)}</p>
-              )}
-            </div>
+            <p>Market value of all {paprController.paprToken.symbol} tokens</p>
+            {!totalSupplyInUnderlying && <p>...</p>}
+            {totalSupplyInUnderlying && (
+              <p>
+                {totalSupplyInUnderlying.toFixed(4)}{' '}
+                {paprController.underlying.symbol}
+              </p>
+            )}
+          </tr>
+          <tr>
+            <p>Collateralization ratio (NFT value/token value)</p>
+            {!collateralizationRatio && <p>...</p>}
+            {collateralizationRatio && (
+              <p>{collateralizationRatio.toFixed(2)}</p>
+            )}
           </tr>
         </tbody>
       </Table>
