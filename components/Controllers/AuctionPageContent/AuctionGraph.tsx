@@ -171,23 +171,24 @@ export function AuctionGraph({
   }, [oracleInfo, timestampAndPricesAllTime, auction.auctionAssetContract.id]);
 
   const startLabel = useMemo(() => {
-    const floorPrice =
+    const floorPriceString =
       oracleInfo[auction.auctionAssetContract.id].price.toFixed(4);
+    const floorUSDPriceString = floorUSDPrice.toFixed(2);
     const startingString = 'Start @ 3x Floor';
     const paddingForTimeAgo = Array(startingString.length - timeAgo.length)
       .fill('\t')
       .join('');
     const paddingForUSDPrice = Array(
-      startingString.length - (floorUSDPrice.toString().length + 1),
+      startingString.length - (floorUSDPriceString.toString().length + 1),
     )
       .fill('\t')
       .join('');
     const paddingForFloorPrice = Array(
-      startingString.length - (floorPrice.toString().length + 5),
+      startingString.length - (floorPriceString.toString().length + 5),
     )
       .fill('\t')
       .join('');
-    return `\n\n\n${startingString}\n${paddingForTimeAgo}${timeAgo}\n${paddingForFloorPrice}${floorPrice} WETH\n${paddingForUSDPrice}$${floorUSDPrice}`;
+    return `\n\n\n${startingString}\n${paddingForTimeAgo}${timeAgo}\n${paddingForFloorPrice}${floorPriceString} WETH\n${paddingForUSDPrice}$${floorUSDPriceString}`;
   }, [timeAgo, oracleInfo, floorUSDPrice, auction.auctionAssetContract.id]);
 
   const buyNowLabel = useMemo(() => {
@@ -209,14 +210,17 @@ export function AuctionGraph({
   }, [auctionUnderlyingPrice, controller.underlying, auctionCompleted]);
 
   const floorLabel = useMemo(() => {
-    const floorPrice =
+    const floorPriceString =
       oracleInfo[auction.auctionAssetContract.id].price.toFixed(4);
+    const floorUSDPriceString = floorUSDPrice.toFixed(2);
     const floorPricePadding = Array(
-      floorPrice.toString().length + 5 - (floorUSDPrice.toString().length + 1),
+      floorPriceString.toString().length +
+        5 -
+        (floorUSDPriceString.toString().length + 1),
     )
       .fill('\t')
       .join('');
-    return `\n\n\n\n${floorPrice} WETH\n${floorPricePadding}$${floorUSDPrice}`;
+    return `\n\n\n\n${floorPriceString} WETH\n${floorPricePadding}$${floorUSDPriceString}`;
   }, [oracleInfo, floorUSDPrice, auction.auctionAssetContract.id]);
 
   const chartOptions: ChartOptions = useMemo(
