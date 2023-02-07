@@ -16,7 +16,7 @@ export function RatesNegative({
   const explainers = useMemo(
     () => ({
       demand: `Liquidity for loans comes from the Uniswap pool, which
-      lenders add to by swapping USDC for ${tokenName}. So Lender demand
+      lenders add to by swapping WETH for ${tokenName}. So Lender demand
       corresponds to BUY pressure on papr, driving up the market price
       of ${tokenName}.`,
       setsRate: `Contract Rate is the current rate the protocol uses to
