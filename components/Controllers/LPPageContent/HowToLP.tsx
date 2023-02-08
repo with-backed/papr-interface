@@ -11,7 +11,13 @@ export function HowToLP() {
 
   const poolURL = useMemo(
     () =>
-      `https://app.uniswap.org/#/add/${underlyingAddress}/${paprTokenAddress}/10000?chain=${network}`,
+      `https://app.uniswap.org/#/add/${
+        underlyingAddress.toLowerCase() ==
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+          ? 'ETH'
+          : underlyingAddress
+      }/${paprTokenAddress}/10000?chain=${network}`,
+    // if underlying is WETH then send to ETH interface, is same pool but easier
     [network, paprTokenAddress, underlyingAddress],
   );
   const formattedFeeTier = useMemo(() => {

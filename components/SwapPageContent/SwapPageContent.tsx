@@ -68,6 +68,20 @@ export function SwapPageContent() {
         name: tokenName,
         symbol: tokenName,
       },
+      {
+        address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+        chainId,
+        decimals: 18,
+        name: 'Dai Stablecoin',
+        symbol: 'DAI',
+      },
+      {
+        address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+        chainId,
+        decimals: 6,
+        name: 'USD Coin',
+        symbol: 'USDC',
+      },
     ],
     [chainId, paprToken, tokenName, underlying],
   );
@@ -155,7 +169,7 @@ export function SwapPageContent() {
           jsonRpcUrlMap={jsonRpcUrlMap}
           provider={provider}
           tokenList={tokenList}
-          defaultInputTokenAddress={underlying.id}
+          defaultInputTokenAddress={''}
           defaultOutputTokenAddress={paprToken.id}
           hideConnectionUI={true}
           onInitialSwapQuote={onInitialSwapQuote}
