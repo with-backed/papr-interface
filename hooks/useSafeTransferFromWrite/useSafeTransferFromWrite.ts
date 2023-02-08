@@ -28,10 +28,6 @@ interface OnERC721ReceivedArgsStruct {
   oracleInfo: ReservoirOracleUnderwriter.OracleInfoStruct;
 }
 
-const overrides = {
-  gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
-};
-
 export function useSafeTransferFromWrite(
   nftContractAddress: string,
   nftTokenId: string,
@@ -69,7 +65,6 @@ export function useSafeTransferFromWrite(
       ethers.BigNumber.from(nftTokenId),
       onERC721ReceivedData as `0x${string}`,
     ],
-    overrides,
   });
 
   const { data, write, error } = useContractWrite({
