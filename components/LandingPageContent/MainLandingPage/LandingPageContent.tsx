@@ -7,13 +7,14 @@ import { FAQ } from './FAQ';
 import styles from './LandingPageContent.module.css';
 import { LandingPageDiagram } from './LandingPageDiagram';
 import { PaprHeroes } from './PaprHeroes';
-import { PaprMeme } from './PaprMeme';
+import { PaprMemeBanner } from './PaprMemeBanner';
 import { Tables } from './Tables';
 import { Whitepaper } from './Whitepaper';
 
 export function LandingPageContent() {
   return (
     <div className={styles.wrapper}>
+      <PaprMemeBanner />
       <h1 className={styles.heading}>
         NFT lending
         <br />
@@ -28,7 +29,6 @@ export function LandingPageContent() {
         <LandingPageDiagram />
         <Whitepaper />
         <PaprHeroes />
-        <PaprMeme />
         <FAQ />
       </div>
     </div>
