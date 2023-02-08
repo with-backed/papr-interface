@@ -25,7 +25,7 @@ import styles from './YourPositions.module.css';
 
 export function YourPositions() {
   const { address } = useAccount();
-  const { tokenName, network } = useConfig();
+  const { tokenName, chainId } = useConfig();
   const { chain } = useNetwork();
   const paprController = useController();
 
@@ -35,8 +35,8 @@ export function YourPositions() {
   const { currentVaults } = useCurrentVaults(address);
 
   const wrongNetwork = useMemo(() => {
-    return chain?.network !== network;
-  }, [chain?.network, network]);
+    return chain?.id !== chainId;
+  }, [chain?.id, chainId]);
 
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.token.id);
