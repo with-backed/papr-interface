@@ -26,7 +26,6 @@ export function VaultDebtSlider({
   setIsBorrowing,
   setHideLoanFormToggle,
 }: VaultDebtSliderProps) {
-  console.log({ maxDebtNumber, currentVaultDebtNumber });
   const theme = useTheme();
   const [hideMaxLTV, setHideMaxLTV] = useState<boolean>(false);
   const [blackTrackWidth, setBlackTrackWidth] = useState<[string, number]>([
