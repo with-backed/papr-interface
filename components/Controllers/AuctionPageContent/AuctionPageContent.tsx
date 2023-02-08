@@ -9,7 +9,7 @@ import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
-import { useNFTFlagged } from 'hooks/useNFTFlagged/useNFTFlagged';
+import { useNFTFlagged } from 'hooks/useNFTFlagged';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { getUnitPriceForEth } from 'lib/coingecko';
 import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
