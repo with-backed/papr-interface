@@ -66,10 +66,6 @@ export default function AuctionApproveAndBuy({
   );
 }
 
-const overrides = {
-  gasLimit: ethers.BigNumber.from(ethers.utils.hexValue(3000000)),
-};
-
 type BuyButtonProps = {
   auction: NonNullable<AuctionQuery['auction']>;
   liveAuctionPrice: ethers.BigNumber;
@@ -114,7 +110,6 @@ function BuyButton({
       purchaseArgs?.sendTo,
       purchaseArgs?.oracleInfoStruct,
     ],
-    overrides,
   });
 
   const { data, write, error } = useContractWrite({
