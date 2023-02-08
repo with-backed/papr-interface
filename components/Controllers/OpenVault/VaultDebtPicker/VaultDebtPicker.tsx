@@ -1,7 +1,5 @@
 import { Button } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
-import { ApproveNFTButton } from 'components/Controllers/ApproveButtons/ApproveNFTButton';
-import { ApproveTokenButton } from 'components/Controllers/ApproveButtons/ApproveTokenButton';
 import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
 import { VaultWriteButton } from 'components/Controllers/OpenVault/VaultWriteButton';
 import { NFTValueTooltip } from 'components/Controllers/TokenPerformance/Tooltips';
@@ -16,7 +14,6 @@ import { useConfig } from 'hooks/useConfig';
 import { PaprController, useController } from 'hooks/useController';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { usePaprBalance } from 'hooks/usePaprBalance';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { useTheme } from 'hooks/useTheme';
 import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
@@ -40,7 +37,7 @@ import {
   useState,
 } from 'react';
 import { Input, TooltipReference, useTooltipState } from 'reakit';
-import { ERC20__factory, ERC721__factory } from 'types/generated/abis';
+import { ERC721__factory } from 'types/generated/abis';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import {
   AuctionsByNftOwnerDocument,
@@ -196,6 +193,7 @@ export function VaultDebtPicker({
   const [isBorrowing, setIsBorrowing] = useState<boolean>(true);
   const [usingPerpetual, setUsingPerpetual] = useState<boolean>(true);
   const [hideLoanFormToggle, setHideLoanFormToggle] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const loanFormHidden = useMemo(() => {
     return hideLoanFormToggle && vaultHasDebt;
@@ -288,19 +286,6 @@ export function VaultDebtPicker({
     return underlyingRepayQuote[1];
   }, [underlyingRepayQuote]);
 
-  const amountToBorrowOrRepay = useMemo(() => {
-    if (usingPerpetual) return debtToBorrowOrRepay;
-    else {
-      return isBorrowing ? underlyingToBorrow : underlyingToRepay;
-    }
-  }, [
-    usingPerpetual,
-    isBorrowing,
-    underlyingToBorrow,
-    underlyingToRepay,
-    debtToBorrowOrRepay,
-  ]);
-
   useEffect(() => {
     if (chosenDebt.lt(currentVaultDebt)) setIsBorrowing(false);
   }, [chosenDebt, currentVaultDebt]);
@@ -312,6 +297,29 @@ export function VaultDebtPicker({
       );
     }
   }, [currentVaultDebt, userNFTsForVault]);
+
+  const writeType: VaultWriteType = useMemo(() => {
+    if (isBorrowing && usingPerpetual) return VaultWriteType.Borrow;
+    else if (isBorrowing && !usingPerpetual)
+      return VaultWriteType.BorrowWithSwap;
+    else if (!isBorrowing && usingPerpetual) return VaultWriteType.Repay;
+    else if (!isBorrowing && !usingPerpetual)
+      return VaultWriteType.RepayWithSwap;
+    else return VaultWriteType.Borrow; // should never happen
+  }, [isBorrowing, usingPerpetual]);
+
+  const [amount, quote] = useMemo(() => {
+    switch (writeType) {
+      case VaultWriteType.Borrow:
+        return [debtToBorrowOrRepay, null];
+      case VaultWriteType.BorrowWithSwap:
+        return [debtToBorrowOrRepay, underlyingToBorrow];
+      case VaultWriteType.Repay:
+        return [debtToBorrowOrRepay, null];
+      case VaultWriteType.RepayWithSwap:
+        return [underlyingToRepay, debtToBorrowOrRepay];
+    }
+  }, [writeType, debtToBorrowOrRepay, underlyingToRepay, underlyingToBorrow]);
 
   const connectedNFT = useMemo(() => {
     return ERC721__factory.connect(collateralContractAddress, signerOrProvider);
@@ -338,45 +346,6 @@ export function VaultDebtPicker({
     },
     [paprController.paprToken.decimals],
   );
-
-  const [collateralApproved, setCollateralApproved] = useState<boolean>(false);
-  const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
-  const [debtTokenApproved, setDebtTokenApproved] = useState<boolean>(false);
-
-  const underlyingBalance = useAsyncValue(async () => {
-    if (!address) return null;
-    return ERC20__factory.connect(
-      paprController.underlying.id,
-      signerOrProvider,
-    ).balanceOf(address);
-  }, [paprController.underlying.id, signerOrProvider, address]);
-  const { balance: debtTokenBalance } = usePaprBalance(
-    paprController.paprToken.id,
-  );
-
-  const balanceErrorMessage = useMemo(() => {
-    if (!underlyingBalance || !debtTokenBalance) return '';
-    if (isBorrowing) return '';
-    if (usingPerpetual)
-      return debtTokenBalance.lt(debtToBorrowOrRepay)
-        ? `Insufficient ${paprController.paprToken.symbol} balance`
-        : '';
-    if (!usingPerpetual && !!underlyingRepayQuote)
-      return underlyingBalance.lt(underlyingRepayQuote[0])
-        ? `Insufficient ${paprController.underlying.symbol} balance`
-        : '';
-
-    return '';
-  }, [
-    paprController.paprToken.symbol,
-    paprController.underlying.symbol,
-    underlyingBalance,
-    debtTokenBalance,
-    isBorrowing,
-    usingPerpetual,
-    debtToBorrowOrRepay,
-    underlyingRepayQuote,
-  ]);
 
   const nftValueTooltip = useTooltipState({ placement: 'bottom-start' });
 
@@ -512,81 +481,20 @@ export function VaultDebtPicker({
               usingPerpetual={usingPerpetual}
               setUsingPerpetual={setUsingPerpetual}
               slippage={isBorrowing ? slippageForBorrow : slippageForRepay}
-              errorMessage={balanceErrorMessage}
+              errorMessage={errorMessage}
             />
-
-            <ApproveNFTButton
+            <VaultWriteButton
+              writeType={writeType}
+              amount={amount}
+              quote={quote}
               collateralContractAddress={collateralContractAddress}
-              approved={collateralApproved}
-              setApproved={setCollateralApproved}
+              depositNFTs={depositNFTs}
+              withdrawNFTs={withdrawNFTs}
+              vaultHasDebt={vaultHasDebt}
+              errorMessage={errorMessage}
+              setErrorMessage={setErrorMessage}
+              refresh={refresh}
             />
-            {usingPerpetual && !isBorrowing && (
-              <ApproveTokenButton
-                token={paprController.paprToken}
-                tokenApproved={debtTokenApproved}
-                setTokenApproved={setDebtTokenApproved}
-              />
-            )}
-            {!usingPerpetual && !isBorrowing && (
-              <ApproveTokenButton
-                token={paprController.underlying}
-                tokenApproved={underlyingApproved}
-                setTokenApproved={setUnderlyingApproved}
-              />
-            )}
-
-            {usingPerpetual && isBorrowing && (
-              <VaultWriteButton
-                writeType={VaultWriteType.Borrow}
-                amount={amountToBorrowOrRepay}
-                quote={null}
-                collateralContractAddress={collateralContractAddress}
-                depositNFTs={depositNFTs}
-                withdrawNFTs={withdrawNFTs}
-                vaultHasDebt={vaultHasDebt}
-                disabled={!collateralApproved}
-                refresh={refresh}
-              />
-            )}
-            {usingPerpetual && !isBorrowing && (
-              <VaultWriteButton
-                writeType={VaultWriteType.Repay}
-                amount={amountToBorrowOrRepay}
-                quote={null}
-                collateralContractAddress={collateralContractAddress}
-                depositNFTs={depositNFTs}
-                withdrawNFTs={withdrawNFTs}
-                vaultHasDebt={vaultHasDebt}
-                disabled={!!balanceErrorMessage || !debtTokenApproved}
-                refresh={refresh}
-              />
-            )}
-            {!usingPerpetual && !isBorrowing && (
-              <VaultWriteButton
-                writeType={VaultWriteType.RepayWithSwap}
-                amount={amountToBorrowOrRepay}
-                quote={debtToBorrowOrRepay}
-                collateralContractAddress={collateralContractAddress}
-                depositNFTs={depositNFTs}
-                withdrawNFTs={withdrawNFTs}
-                vaultHasDebt={vaultHasDebt}
-                disabled={!!balanceErrorMessage || !underlyingApproved}
-                refresh={refresh}
-              />
-            )}
-            {!usingPerpetual && isBorrowing && (
-              <VaultWriteButton
-                writeType={VaultWriteType.BorrowWithSwap}
-                amount={debtToBorrowOrRepay}
-                quote={underlyingToBorrow}
-                collateralContractAddress={collateralContractAddress}
-                depositNFTs={depositNFTs}
-                withdrawNFTs={withdrawNFTs}
-                vaultHasDebt={vaultHasDebt}
-                disabled={!collateralApproved}
-                refresh={refresh}
-              />
-            )}
           </div>
         )}
       </div>

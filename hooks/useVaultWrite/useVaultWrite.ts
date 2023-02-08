@@ -116,7 +116,7 @@ export function useVaultWrite(
     refresh,
   );
 
-  const { data, write, error } = useMemo(() => {
+  const { data, write, error, usingSafeTransferFrom } = useMemo(() => {
     if (
       depositNFTs.length === 1 &&
       withdrawNFTs.length === 0 &&
@@ -127,12 +127,14 @@ export function useVaultWrite(
         data: safeTransferFromData,
         write: safeTransferFromWrite,
         error: safeTransferFromError,
+        usingSafeTransferFrom: true,
       };
     else {
       return {
         data: multicallData,
         write: multicallWrite,
         error: multicallError,
+        usingSafeTransferFrom: false,
       };
     }
   }, [
@@ -147,5 +149,5 @@ export function useVaultWrite(
     writeType,
   ]);
 
-  return { data, write, error };
+  return { data, write, error, usingSafeTransferFrom };
 }
