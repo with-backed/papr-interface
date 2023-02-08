@@ -26,6 +26,7 @@ export function VaultDebtSlider({
   setIsBorrowing,
   setHideLoanFormToggle,
 }: VaultDebtSliderProps) {
+  console.log({ maxDebtNumber, currentVaultDebtNumber });
   const theme = useTheme();
   const [hideMaxLTV, setHideMaxLTV] = useState<boolean>(false);
   const [blackTrackWidth, setBlackTrackWidth] = useState<[string, number]>([
@@ -54,9 +55,13 @@ export function VaultDebtSlider({
   ]);
 
   useEffect(() => {
-    if (maxDebtNumber !== blackTrackWidth[1]) {
-      const newBlackTrackPosition =
-        Math.min(1, currentVaultDebtNumber / maxDebtNumber) * 100 * 5.7;
+    const newBlackTrackPosition =
+      Math.min(1, currentVaultDebtNumber / maxDebtNumber) * 100 * 5.7;
+    const newPositionPixels = `${newBlackTrackPosition}px`;
+    if (
+      newPositionPixels !== blackTrackWidth[0] ||
+      maxDebtNumber !== blackTrackWidth[1]
+    ) {
       setBlackTrackWidth([`${newBlackTrackPosition}px`, maxDebtNumber]);
     }
   }, [maxDebtNumber, blackTrackWidth, currentVaultDebtNumber]);
