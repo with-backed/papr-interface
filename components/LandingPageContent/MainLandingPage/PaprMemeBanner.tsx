@@ -1,14 +1,14 @@
 import { Button } from 'components/Button';
 import Image from 'next/image';
-import CatThing from 'public/landing-page-nfts/cat-thing.png';
+import CoolCat from 'public/landing-page-nfts/cool-cat.png';
 import Dickbutt from 'public/landing-page-nfts/dickbutt.png';
 import Loot from 'public/landing-page-nfts/loot.png';
 import Mfer from 'public/landing-page-nfts/mfer.png';
 import Milady from 'public/landing-page-nfts/milady.png';
-import OtherCatThing from 'public/landing-page-nfts/other-cat-thing.png';
-import Penguin from 'public/landing-page-nfts/penguin.png';
+import PudgyPenguin from 'public/landing-page-nfts/pudgy-penguin.png';
 import RoundThing from 'public/landing-page-nfts/round-thing.png';
 import Toad from 'public/landing-page-nfts/toad.png';
+import TubbyCat from 'public/landing-page-nfts/tubby-cat.png';
 import Wizard from 'public/landing-page-nfts/wizard.png';
 import { ComponentProps } from 'react';
 
@@ -78,14 +78,14 @@ function ImageGrid() {
       </div>
       <div>
         <CustomImage src={Toad} />
-        <CustomImage src={Penguin} />
+        <CustomImage src={PudgyPenguin} />
         <CustomImage src={RoundThing} />
         <CustomImage src={Dickbutt} />
       </div>
       <div>
         <CustomImage src={Mfer} />
-        <CustomImage src={CatThing} />
-        <CustomImage src={OtherCatThing} />
+        <CustomImage src={TubbyCat} />
+        <CustomImage src={CoolCat} />
       </div>
     </div>
   );
