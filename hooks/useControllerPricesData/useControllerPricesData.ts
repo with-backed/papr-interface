@@ -146,7 +146,7 @@ function targets(
 ) {
   const now = Math.floor(Date.now() / 1000);
   const sortedTargets = [...targetUpdates].sort(
-    (a, b) => parseInt(a.timestamp) - parseInt(b.timestamp),
+    (a, b) => a.timestamp - b.timestamp,
   );
 
   // get what target would be if updated at this moment and add to array
@@ -154,12 +154,12 @@ function targets(
     sortedTargets.push({
       id: 'filler',
       newTarget,
-      timestamp: now.toString(),
+      timestamp: now,
     });
   }
 
   const formattedTargets = sortedTargets.map((target) => {
-    const t = parseInt(target.timestamp);
+    const t = target.timestamp;
     return {
       value: parseFloat(
         ethers.utils.formatUnits(

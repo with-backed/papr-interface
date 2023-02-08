@@ -32,7 +32,7 @@ export async function getSignedOracleFloorPriceMessage(
   let reservoirRes: Response;
   try {
     reservoirRes = await fetch(
-      `${config.reservoirAPI}/oracle/collections/top-bid/v2?collection=${collection}&kind=${kind}&currency=${config.paprUnderlyingAddress}&twapSeconds=${SEVEN_DAYS_IN_SECONDS}`,
+      `${config.reservoirAPI}/oracle/collections/top-bid/v2?collection=${collection}&kind=${kind}&currency=${config.underlyingAddress}&twapSeconds=${SEVEN_DAYS_IN_SECONDS}`,
       {
         headers: {
           'x-api-key': process.env.RESERVOIR_KEY!,

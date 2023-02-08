@@ -18,7 +18,7 @@ export async function subgraphControllerByAddress(
   token: SupportedToken,
 ) {
   // TODO: dynamic client address
-  const client = clientFromUrl(configs[token].paprMemeSubgraph);
+  const client = clientFromUrl(configs[token].paprSubgraph);
   const { data, error } = await client
     .query<PaprControllerByIdQuery>(PaprControllerByIdDocument, { id })
     .toPromise();
@@ -34,7 +34,7 @@ export async function subgraphControllerByAddress(
 export async function getAllPaprControllers(
   token: SupportedToken,
 ): Promise<SubgraphController[]> {
-  const client = clientFromUrl(configs[token].paprMemeSubgraph);
+  const client = clientFromUrl(configs[token].paprSubgraph);
   const { data, error } = await client
     .query<PaprControllersQuery>(PaprControllersDocument, {})
     .toPromise();
@@ -52,7 +52,7 @@ export async function getAllVaultsForControllerForUser(
   owner: string,
   token: SupportedToken,
 ) {
-  const client = clientFromUrl(configs[token].paprMemeSubgraph);
+  const client = clientFromUrl(configs[token].paprSubgraph);
   const { data, error } = await client
     .query<VaultsByOwnerForControllerQuery>(
       VaultsByOwnerForControllerDocument,
@@ -72,7 +72,7 @@ export async function getAllVaultsForControllerForUser(
 }
 
 export async function auctionById(auctionId: string, token: SupportedToken) {
-  const client = clientFromUrl(configs[token].paprMemeSubgraph);
+  const client = clientFromUrl(configs[token].paprSubgraph);
   const { data, error } = await client
     .query<AuctionQuery>(AuctionDocument, {
       id: auctionId,
