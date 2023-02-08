@@ -367,7 +367,7 @@ export function VaultDebtPicker({
             <th>
               MAX BORROW
               <br />
-              (WETH)
+              (PAPR)
             </th>
             <th>DEPOSIT</th>
             {vaultHasCollateral && <th>WITHDRAW</th>}
