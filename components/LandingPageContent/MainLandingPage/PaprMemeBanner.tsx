@@ -84,8 +84,8 @@ function ImageGrid() {
       </div>
       <div>
         <CustomImage src={Mfer} />
-        <CustomImage src={TubbyCat} />
         <CustomImage src={CoolCat} />
+        <CustomImage src={TubbyCat} />
       </div>
     </div>
   );
