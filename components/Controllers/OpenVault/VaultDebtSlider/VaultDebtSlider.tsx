@@ -35,8 +35,9 @@ export function VaultDebtSlider({
 
   const initBlackTrackWidth = useCallback(
     (val: string) => {
-      if (!blackTrackWidth[0] && val !== '0px')
+      if (!blackTrackWidth[0] && val !== '0px') {
         setBlackTrackWidth([val, maxDebtNumber]);
+      }
     },
     [blackTrackWidth, maxDebtNumber],
   );

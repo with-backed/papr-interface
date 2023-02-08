@@ -24,24 +24,24 @@ const PaprBalanceContext = createContext<ContextValue>({} as any);
 export function PaprBalanceProvider({ children }: PropsWithChildren<{}>) {
   const { address: connectedAddress } = useAccount();
   const { chain } = useNetwork();
-  const { network } = useConfig();
+  const { chainId } = useConfig();
   const [debtTokenAddress, setDebtTokenAddress] = useState<string | undefined>(
     undefined,
   );
 
-  const addressForBalanceRead = useMemo(() => {
-    if (chain?.network !== network) {
+  const tokenAddressForBalanceRead = useMemo(() => {
+    if (chain?.id !== chainId) {
       return undefined;
     } else if (!connectedAddress) {
       return undefined;
     }
-    return connectedAddress;
-  }, [chain?.network, network, connectedAddress]);
+    return debtTokenAddress;
+  }, [chain?.id, chainId, connectedAddress]);
 
   const { data: rawPaprBalance, refetch: refresh } = useContractRead({
     // If address is undefined, hook will not run. Take advantage of this
     // to not run the hook if there is no connected user.
-    address: addressForBalanceRead,
+    address: tokenAddressForBalanceRead as `0x${string}`,
     abi: erc20ABI,
     functionName: 'balanceOf',
     args: [connectedAddress as `0x${string}`],

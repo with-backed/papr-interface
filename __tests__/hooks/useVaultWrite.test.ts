@@ -114,6 +114,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(true);
       expect(result.current.data).toBe('0xsafetransferfromdata');
     });
 
@@ -135,6 +136,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -157,6 +159,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
   });
@@ -180,6 +183,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(true);
       expect(result.current.data).toBe('0xsafetransferfromdata');
     });
     it('should return the multicall transaction data when borrowing multiple NFTs', () => {
@@ -200,6 +204,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
     it('should return the multicall transaction data when depositing one NFT and withdrawing one NFT', () => {
@@ -221,6 +226,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
   });
@@ -244,6 +250,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -265,6 +272,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -287,6 +295,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
   });
@@ -310,6 +319,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -331,6 +341,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -353,6 +364,7 @@ describe('useVaultWrite', () => {
           ),
         {},
       );
+      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
   });

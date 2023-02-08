@@ -1,7 +1,17 @@
 import { TransactionButton } from 'components/Button';
 import { ethers } from 'ethers';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useController } from 'hooks/useController';
+import { usePaprBalance } from 'hooks/usePaprBalance';
+import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
 import { useVaultWrite } from 'hooks/useVaultWrite/useVaultWrite';
+import { useEffect, useMemo, useState } from 'react';
+import { ERC20__factory } from 'types/generated/abis';
+import { useAccount } from 'wagmi';
+
+import { ApproveNFTButton } from '../ApproveButtons/ApproveNFTButton';
+import { ApproveTokenButton } from '../ApproveButtons/ApproveTokenButton';
 
 type VaultWriteButtonProps = {
   writeType: VaultWriteType;
@@ -11,7 +21,8 @@ type VaultWriteButtonProps = {
   amount: ethers.BigNumber;
   quote: ethers.BigNumber | null;
   vaultHasDebt: boolean;
-  disabled: boolean;
+  errorMessage: string;
+  setErrorMessage: (message: string) => void;
   refresh: () => void;
 };
 
@@ -23,10 +34,15 @@ export function VaultWriteButton({
   amount,
   quote,
   vaultHasDebt,
-  disabled,
+  errorMessage,
+  setErrorMessage,
   refresh,
 }: VaultWriteButtonProps) {
-  const { data, write, error } = useVaultWrite(
+  const { address } = useAccount();
+  const signerOrProvider = useSignerOrProvider();
+  const paprController = useController();
+
+  const { data, write, error, usingSafeTransferFrom } = useVaultWrite(
     writeType,
     collateralContractAddress,
     depositNFTs,
@@ -35,17 +51,115 @@ export function VaultWriteButton({
     quote,
     refresh,
   );
+  const [collateralApproved, setCollateralApproved] = useState<boolean>(false);
+  const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
+  const [debtTokenApproved, setDebtTokenApproved] = useState<boolean>(false);
+
+  const underlyingBalance = useAsyncValue(async () => {
+    if (!address) return null;
+    return ERC20__factory.connect(
+      paprController.underlying.id,
+      signerOrProvider,
+    ).balanceOf(address);
+  }, [paprController.underlying.id, signerOrProvider, address]);
+  const { balance: debtTokenBalance } = usePaprBalance(
+    paprController.paprToken.id,
+  );
+
+  useEffect(() => {
+    if (!underlyingBalance || !debtTokenBalance) {
+      setErrorMessage('');
+      return;
+    }
+    if (
+      writeType === VaultWriteType.Borrow ||
+      writeType === VaultWriteType.BorrowWithSwap
+    ) {
+      setErrorMessage('');
+      return;
+    }
+    if (writeType === VaultWriteType.Repay) {
+      setErrorMessage(
+        debtTokenBalance.lt(amount)
+          ? `Insufficient ${paprController.paprToken.symbol} balance`
+          : '',
+      );
+      return;
+    }
+    if (writeType === VaultWriteType.RepayWithSwap && !!quote) {
+      setErrorMessage(
+        underlyingBalance.lt(quote)
+          ? `Insufficient ${paprController.underlying.symbol} balance`
+          : '',
+      );
+      return;
+    }
+
+    setErrorMessage('');
+  }, [
+    writeType,
+    setErrorMessage,
+    paprController.paprToken.symbol,
+    paprController.underlying.symbol,
+    underlyingBalance,
+    debtTokenBalance,
+    amount,
+    quote,
+  ]);
+
+  const disabled = useMemo(() => {
+    switch (writeType) {
+      case VaultWriteType.Borrow:
+        return !usingSafeTransferFrom && !collateralApproved;
+      case VaultWriteType.BorrowWithSwap:
+        return !usingSafeTransferFrom && !collateralApproved;
+      case VaultWriteType.Repay:
+        return !!errorMessage || !debtTokenApproved;
+      case VaultWriteType.RepayWithSwap:
+        return !!errorMessage || !underlyingApproved;
+    }
+  }, [
+    writeType,
+    usingSafeTransferFrom,
+    underlyingApproved,
+    collateralApproved,
+    debtTokenApproved,
+    errorMessage,
+  ]);
 
   return (
-    <TransactionButton
-      kind="regular"
-      size="small"
-      theme="papr"
-      onClick={write!}
-      transactionData={data}
-      error={error?.message}
-      text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
-      disabled={disabled}
-    />
+    <>
+      {!usingSafeTransferFrom && (
+        <ApproveNFTButton
+          collateralContractAddress={collateralContractAddress}
+          approved={collateralApproved}
+          setApproved={setCollateralApproved}
+        />
+      )}
+      {writeType === VaultWriteType.Repay && (
+        <ApproveTokenButton
+          token={paprController.paprToken}
+          tokenApproved={debtTokenApproved}
+          setTokenApproved={setDebtTokenApproved}
+        />
+      )}
+      {writeType === VaultWriteType.RepayWithSwap && (
+        <ApproveTokenButton
+          token={paprController.underlying}
+          tokenApproved={underlyingApproved}
+          setTokenApproved={setUnderlyingApproved}
+        />
+      )}
+      <TransactionButton
+        kind="regular"
+        size="small"
+        theme="papr"
+        onClick={write!}
+        transactionData={data}
+        error={error?.message}
+        text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
+        disabled={disabled}
+      />
+    </>
   );
 }
