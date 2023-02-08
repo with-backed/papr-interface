@@ -24,13 +24,12 @@
   margin-bottom: 26px;
 }
 
-.statsTable p {
-  margin: 0;
-  padding: 0 10px;
-}
-
 .statsTable tr {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+
+.statsTable tr td {
+  padding: 6px;
 }
