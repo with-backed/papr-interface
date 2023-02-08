@@ -111,3 +111,14 @@ export function NFTValueTooltip({ tooltip }: TooltipProps) {
     </Tooltip>
   );
 }
+
+export function NFTFlaggedTooltip({ tooltip }: TooltipProps) {
+  return (
+    <Tooltip {...tooltip}>
+      <p>
+        This item has been flagged for suspicious activity, and cannot be sold
+        on OpenSea.
+      </p>
+    </Tooltip>
+  );
+}
