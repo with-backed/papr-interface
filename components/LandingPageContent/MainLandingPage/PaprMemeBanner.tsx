@@ -18,26 +18,39 @@ const Background = () => <div className={styles['papr-meme-background']} />;
 
 export function PaprMemeBanner() {
   return (
-    <div className={styles['papr-meme-layered']}>
-      <Background />
-      <div className={styles['papr-meme-wrapper']}>
-        <ImageGrid />
-        <div>
-          <p>
-            <u>First papr token ever!</u> paprans to these 10 collections
-          </p>
-          <p className={styles.pointer}>👈 INSTANT LOANS FOR MEMEish* NFTs</p>
-          <ul className={styles['star-list']}>
-            <li>popular but underserved</li>
-            <li>durable value</li>
-            <li>fun to experiment with</li>
-            <li>maybe you have one</li>
-          </ul>
-          <Button disabled size="small">
-            Coming Soon!
-          </Button>
+    <>
+      <div className={styles['papr-meme-layered']}>
+        <Background />
+        <div className={styles['papr-meme-wrapper']}>
+          <ImageGrid />
+          <Text />
         </div>
       </div>
+      <div className={styles['papr-meme-mobile']}>
+        <ImageGrid />
+        <Text />
+      </div>
+    </>
+  );
+}
+
+function Text() {
+  return (
+    <div>
+      <p>
+        <u>First papr token ever!</u> paprMEME is a <br /> token for loans to
+        these 10 collections
+      </p>
+      <p className={styles.pointer}>👈 INSTANT LOANS FOR MEMEish* NFTs</p>
+      <ul className={styles['star-list']}>
+        <li>popular but underserved</li>
+        <li>durable value</li>
+        <li>fun to experiment with</li>
+        <li>maybe you have one</li>
+      </ul>
+      <Button disabled size="small">
+        Coming Soon!
+      </Button>
     </div>
   );
 }

@@ -313,11 +313,6 @@
   z-index: 0;
 }
 
-.memes {
-  display: flex;
-  gap: 2%;
-}
-
 .papr-meme-wrapper {
   display: flex;
   gap: 60px;
@@ -338,6 +333,34 @@
   margin: 0;
 }
 
+.papr-meme-mobile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media screen and (max-width: 780px) {
+  .papr-meme-layered {
+    display: none;
+  }
+  .papr-meme-mobile {
+    display: flex;
+  }
+  .pointer {
+    text-indent: 0;
+    margin: 0;
+  }
+}
+
+@media screen and (min-width: 781px) {
+  .papr-meme-layered {
+    display: flex;
+  }
+  .papr-meme-mobile {
+    display: none;
+  }
+}
+
 @counter-style stars {
   system: cyclic;
   symbols: '*';
@@ -353,6 +376,7 @@
 .meme-grid {
   display: flex;
   gap: 30px;
+  justify-content: center;
 }
 
 .meme-grid > div {
