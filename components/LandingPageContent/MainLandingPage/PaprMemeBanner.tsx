@@ -1,6 +1,5 @@
 import { Button } from 'components/Button';
 import { Tooltip } from 'components/Tooltip';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Bean from 'public/landing-page-nfts/bean.png';
 import CoolCat from 'public/landing-page-nfts/cool-cat.png';
@@ -13,14 +12,9 @@ import Toad from 'public/landing-page-nfts/toad.png';
 import TubbyCat from 'public/landing-page-nfts/tubby-cat.png';
 import Wizard from 'public/landing-page-nfts/wizard.png';
 import { useEffect, useState } from 'react';
-import { useTooltipState } from 'reakit/Tooltip';
+import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
 
 import styles from './LandingPageContent.module.css';
-
-const TooltipReference = dynamic(
-  () => import('reakit/Tooltip').then((mod) => mod.TooltipReference),
-  { ssr: false },
-);
 
 const Background = () => <div className={styles['papr-meme-background']} />;
 
