@@ -133,16 +133,6 @@ export function VaultDebtPicker({
     OraclePriceType.lower,
   );
 
-  const maxDebtPerNFTInUnderlying = useAsyncValue(async () => {
-    if (!oracleInfo || !maxDebtPerNFTInPerpetual) return null;
-    return getQuoteForSwap(
-      maxDebtPerNFTInPerpetual,
-      paprController.paprToken.id,
-      paprController.underlying.id,
-      tokenName as SupportedToken,
-    );
-  }, [maxDebtPerNFTInPerpetual, tokenName, paprController, oracleInfo]);
-
   const maxDebt = useMemo(() => {
     if (!maxDebtPerNFTInPerpetual) return null;
     return maxDebtPerNFTInPerpetual.mul(numCollateralForMaxDebt);
@@ -216,6 +206,7 @@ export function VaultDebtPicker({
         paprController.underlying.id,
         tokenName as SupportedToken,
       );
+      if (!quote) return null;
       const slippage = await computeSlippageForSwap(
         quote,
         paprController.paprToken,
@@ -256,6 +247,7 @@ export function VaultDebtPicker({
         paprController.paprToken.id,
         tokenName as SupportedToken,
       );
+      if (!quote) return null;
       const slippage = await computeSlippageForSwap(
         quote,
         paprController.underlying,
@@ -374,7 +366,7 @@ export function VaultDebtPicker({
           </tr>
         </thead>
         <tbody>
-          {maxDebtPerNFTInUnderlying &&
+          {maxDebtPerNFTInPerpetual &&
             userAndVaultNFTs.map((nft) => (
               <CollateralRow
                 key={`${nft.address}-${nft.tokenId}`}
@@ -388,8 +380,8 @@ export function VaultDebtPicker({
                 isLiquidated={nft.isLiquidated}
                 vaultHasCollateral={vaultHasCollateral}
                 maxBorrow={formatBigNum(
-                  maxDebtPerNFTInUnderlying,
-                  paprController.underlying.decimals,
+                  maxDebtPerNFTInPerpetual,
+                  paprController.paprToken.decimals,
                 )}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
