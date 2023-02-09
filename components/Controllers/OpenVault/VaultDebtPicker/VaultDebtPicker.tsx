@@ -37,7 +37,6 @@ import {
   useState,
 } from 'react';
 import { Input, TooltipReference, useTooltipState } from 'reakit';
-import { ERC721__factory } from 'types/generated/abis';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import {
   AuctionsByNftOwnerDocument,
@@ -313,13 +312,14 @@ export function VaultDebtPicker({
     }
   }, [writeType, debtToBorrowOrRepay, underlyingToRepay, underlyingToBorrow]);
 
-  const connectedNFT = useMemo(() => {
-    return ERC721__factory.connect(collateralContractAddress, signerOrProvider);
-  }, [collateralContractAddress, signerOrProvider]);
-  // TODO we should vault.token.symbol here but vault is possibly undefined
-  // need a rework of these components, ideally we pass ERC721 token to this
-  // component as a prop
-  const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
+  const nftSymbol = useMemo(
+    () =>
+      paprController.allowedCollateral.find(
+        (ac) =>
+          getAddress(ac.token.id) === getAddress(collateralContractAddress),
+      )!.token.symbol,
+    [paprController.allowedCollateral, collateralContractAddress],
+  );
 
   const maxLTV = useMemo(
     () =>
