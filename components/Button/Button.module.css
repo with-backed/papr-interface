@@ -264,6 +264,8 @@
 .gradient-button {
   composes: button;
   composes: small;
+  color: black;
+  font-size: var(--font-huge);
 }
 
 .gradient-button:visited {
@@ -273,16 +275,16 @@
 .gradient-button-orange {
   composes: gradient-button;
   background: linear-gradient(
-      rgba(255, 255, 255, 0.85),
-      rgba(255, 255, 255, 0.85)
+      rgba(255, 255, 255, 0.7),
+      rgba(255, 255, 255, 0.7)
     ),
     linear-gradient(#faff00, #ff5c00);
 }
 
 .gradient-button-orange:hover {
   background: linear-gradient(
-      rgba(255, 255, 255, 0.75),
-      rgba(255, 255, 255, 0.75)
+      rgba(255, 255, 255, 0.6),
+      rgba(255, 255, 255, 0.6)
     ),
     linear-gradient(#faff00, #ff5c00);
 }
@@ -290,16 +292,16 @@
 .gradient-button-blue {
   composes: gradient-button;
   background: linear-gradient(
-      rgba(255, 255, 255, 0.85),
-      rgba(255, 255, 255, 0.85)
+      rgba(255, 255, 255, 0.7),
+      rgba(255, 255, 255, 0.7)
     ),
-    linear-gradient(#5397FF, #00F0FF);
+    linear-gradient(#5397ff, #00f0ff);
 }
 
 .gradient-button-blue:hover {
   background: linear-gradient(
-      rgba(255, 255, 255, 0.75),
-      rgba(255, 255, 255, 0.75)
+      rgba(255, 255, 255, 0.6),
+      rgba(255, 255, 255, 0.6)
     ),
-    linear-gradient(#5397FF, #00F0FF);
+    linear-gradient(#5397ff, #00f0ff);
 }
