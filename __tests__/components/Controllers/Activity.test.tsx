@@ -35,7 +35,7 @@ const mockedUseActivity = useActivity as jest.MockedFunction<
 
 const addCollateralEvent = {
   id: '0xdf5bc3c8b2c7769fadc88b573318b46c156cc00b9b119544503903b60bd8fb9c',
-  timestamp: '1665517104',
+  timestamp: 1665517104,
   vault: {
     id: '0xd2ccc7970501f2802783acd750ee350fcf758349-0x6b2770a75a928989c1d7356366d4665a6487e1b4-0x6ef2c9cb23f03014d18d7e4ceeaec497db00247c',
     token: {
