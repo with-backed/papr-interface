@@ -385,7 +385,7 @@
   gap: 30px;
 }
 
-.meme-grid > div > img {
+.meme-grid img {
   box-shadow: 0px 5px 14px #addbc0;
 }
 
