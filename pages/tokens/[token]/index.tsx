@@ -22,6 +22,7 @@ type ServerSideProps = Omit<
 > & {
   subgraphController: SubgraphController;
   subgraphPool: SubgraphPool;
+  query: any;
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
@@ -54,6 +55,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     props: {
       subgraphController: paprController,
       subgraphPool: pool,
+      query: context.query,
     },
   };
 };
@@ -61,6 +63,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
 export default function ControllerPage({
   subgraphController,
   subgraphPool,
+  query,
 }: ServerSideProps) {
   const config = useConfig();
 
@@ -68,6 +71,8 @@ export default function ControllerPage({
     () => subgraphController.allowedCollateral.map((c) => c.token.id),
     [subgraphController.allowedCollateral],
   );
+
+  console.log({ query });
 
   return (
     <OracleInfoProvider collections={collections}>
