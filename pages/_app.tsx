@@ -18,9 +18,8 @@ function tokenFromPath(path: string): SupportedToken {
   if (match && isSupportedToken(match[1])) {
     return match[1];
   }
-  // For the time being, the "default network" (e.g. on the home page)
-  // is paprHero. We will change to paprMeme when that launches.
-  return 'paprHero';
+  // The "default network" (e.g. on the home page)
+  return 'paprMeme';
 }
 
 const ErrorBanners = dynamic(() =>

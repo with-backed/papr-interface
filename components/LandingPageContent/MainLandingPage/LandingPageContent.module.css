@@ -397,6 +397,15 @@
   margin-top: 30px;
 }
 
+.tooltip-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.tooltip-container span:nth-child(even) {
+  justify-self: end;
+}
+
 /* FAQ */
 .faq-container {
   composes: product-container;
