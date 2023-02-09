@@ -14,7 +14,7 @@ import { SubgraphController } from 'lib/PaprController';
 import { percentChange } from 'lib/tokenPerformance';
 import { ERC20, ERC721 } from 'types/generated/abis';
 
-import { ONE } from './constants';
+import { FEE_TIER, ONE } from './constants';
 
 dayjs.extend(duration);
 
@@ -104,14 +104,18 @@ export async function getQuoteForSwap(
   tokenName: SupportedToken,
 ) {
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
-  const q = await quoter.callStatic.quoteExactInputSingle(
-    tokenIn,
-    tokenOut,
-    ethers.BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
-    amount,
-    0,
-  );
-  return q;
+  try {
+    const q = await quoter.callStatic.quoteExactInputSingle(
+      tokenIn,
+      tokenOut,
+      FEE_TIER,
+      amount,
+      0,
+    );
+    return q;
+  } catch (_e) {
+    return null;
+  }
 }
 
 export async function getQuoteForSwapOutput(
@@ -121,14 +125,18 @@ export async function getQuoteForSwapOutput(
   tokenName: SupportedToken,
 ) {
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
-  const q = await quoter.callStatic.quoteExactOutputSingle(
-    tokenIn,
-    tokenOut,
-    ethers.BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
-    amount,
-    0,
-  );
-  return q;
+  try {
+    const q = await quoter.callStatic.quoteExactOutputSingle(
+      tokenIn,
+      tokenOut,
+      FEE_TIER,
+      amount,
+      0,
+    );
+    return q;
+  } catch (_e) {
+    return null;
+  }
 }
 
 export async function computeLiquidationEstimation(

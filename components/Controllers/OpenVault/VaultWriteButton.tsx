@@ -112,11 +112,11 @@ export function VaultWriteButton({
       case VaultWriteType.Borrow:
         return !usingSafeTransferFrom && !collateralApproved;
       case VaultWriteType.BorrowWithSwap:
-        return !usingSafeTransferFrom && !collateralApproved;
+        return (!usingSafeTransferFrom && !collateralApproved) || !quote;
       case VaultWriteType.Repay:
         return !!errorMessage || !debtTokenApproved;
       case VaultWriteType.RepayWithSwap:
-        return !!errorMessage || !underlyingApproved;
+        return !!errorMessage || !underlyingApproved || !quote;
     }
   }, [
     writeType,
@@ -125,6 +125,7 @@ export function VaultWriteButton({
     collateralApproved,
     debtTokenApproved,
     errorMessage,
+    quote,
   ]);
 
   return (

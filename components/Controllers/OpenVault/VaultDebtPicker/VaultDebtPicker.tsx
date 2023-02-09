@@ -37,7 +37,6 @@ import {
   useState,
 } from 'react';
 import { Input, TooltipReference, useTooltipState } from 'reakit';
-import { ERC721__factory } from 'types/generated/abis';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import {
   AuctionsByNftOwnerDocument,
@@ -133,16 +132,6 @@ export function VaultDebtPicker({
     OraclePriceType.lower,
   );
 
-  const maxDebtPerNFTInUnderlying = useAsyncValue(async () => {
-    if (!oracleInfo || !maxDebtPerNFTInPerpetual) return null;
-    return getQuoteForSwap(
-      maxDebtPerNFTInPerpetual,
-      paprController.paprToken.id,
-      paprController.underlying.id,
-      tokenName as SupportedToken,
-    );
-  }, [maxDebtPerNFTInPerpetual, tokenName, paprController, oracleInfo]);
-
   const maxDebt = useMemo(() => {
     if (!maxDebtPerNFTInPerpetual) return null;
     return maxDebtPerNFTInPerpetual.mul(numCollateralForMaxDebt);
@@ -216,6 +205,7 @@ export function VaultDebtPicker({
         paprController.underlying.id,
         tokenName as SupportedToken,
       );
+      if (!quote) return null;
       const slippage = await computeSlippageForSwap(
         quote,
         paprController.paprToken,
@@ -256,6 +246,7 @@ export function VaultDebtPicker({
         paprController.paprToken.id,
         tokenName as SupportedToken,
       );
+      if (!quote) return null;
       const slippage = await computeSlippageForSwap(
         quote,
         paprController.underlying,
@@ -321,13 +312,14 @@ export function VaultDebtPicker({
     }
   }, [writeType, debtToBorrowOrRepay, underlyingToRepay, underlyingToBorrow]);
 
-  const connectedNFT = useMemo(() => {
-    return ERC721__factory.connect(collateralContractAddress, signerOrProvider);
-  }, [collateralContractAddress, signerOrProvider]);
-  // TODO we should vault.token.symbol here but vault is possibly undefined
-  // need a rework of these components, ideally we pass ERC721 token to this
-  // component as a prop
-  const nftSymbol = useAsyncValue(() => connectedNFT.symbol(), [connectedNFT]);
+  const nftSymbol = useMemo(
+    () =>
+      paprController.allowedCollateral.find(
+        (ac) =>
+          getAddress(ac.token.id) === getAddress(collateralContractAddress),
+      )!.token.symbol,
+    [paprController.allowedCollateral, collateralContractAddress],
+  );
 
   const maxLTV = useMemo(
     () =>
@@ -374,7 +366,7 @@ export function VaultDebtPicker({
           </tr>
         </thead>
         <tbody>
-          {maxDebtPerNFTInUnderlying &&
+          {maxDebtPerNFTInPerpetual &&
             userAndVaultNFTs.map((nft) => (
               <CollateralRow
                 key={`${nft.address}-${nft.tokenId}`}
@@ -388,8 +380,8 @@ export function VaultDebtPicker({
                 isLiquidated={nft.isLiquidated}
                 vaultHasCollateral={vaultHasCollateral}
                 maxBorrow={formatBigNum(
-                  maxDebtPerNFTInUnderlying,
-                  paprController.underlying.decimals,
+                  maxDebtPerNFTInPerpetual,
+                  paprController.paprToken.decimals,
                 )}
                 depositNFTs={depositNFTs}
                 withdrawNFTs={withdrawNFTs}
