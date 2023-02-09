@@ -110,15 +110,25 @@ export function VaultWriteButton({
   const disabled = useMemo(() => {
     switch (writeType) {
       case VaultWriteType.Borrow:
-        return !usingSafeTransferFrom && !collateralApproved;
+        return (
+          !usingSafeTransferFrom &&
+          !collateralApproved &&
+          depositNFTs.length > 0
+        );
       case VaultWriteType.BorrowWithSwap:
-        return (!usingSafeTransferFrom && !collateralApproved) || !quote;
+        return (
+          (!usingSafeTransferFrom &&
+            !collateralApproved &&
+            depositNFTs.length > 0) ||
+          !quote
+        );
       case VaultWriteType.Repay:
         return !!errorMessage || !debtTokenApproved;
       case VaultWriteType.RepayWithSwap:
         return !!errorMessage || !underlyingApproved || !quote;
     }
   }, [
+    depositNFTs,
     writeType,
     usingSafeTransferFrom,
     underlyingApproved,
