@@ -6,7 +6,6 @@ import { DashedLine } from './DashedLine';
 import { FAQ } from './FAQ';
 import styles from './LandingPageContent.module.css';
 import { LandingPageDiagram } from './LandingPageDiagram';
-import { PaprHeroes } from './PaprHeroes';
 import { PaprMemeBanner } from './PaprMemeBanner';
 import { Tables } from './Tables';
 import { Whitepaper } from './Whitepaper';
@@ -28,7 +27,6 @@ export function LandingPageContent() {
         <Tables />
         <LandingPageDiagram />
         <Whitepaper />
-        <PaprHeroes />
         <FAQ />
       </div>
     </div>
