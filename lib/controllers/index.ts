@@ -14,7 +14,7 @@ import { SubgraphController } from 'lib/PaprController';
 import { percentChange } from 'lib/tokenPerformance';
 import { ERC20, ERC721 } from 'types/generated/abis';
 
-import { ONE } from './constants';
+import { FEE_TIER, ONE } from './constants';
 
 dayjs.extend(duration);
 
@@ -108,7 +108,7 @@ export async function getQuoteForSwap(
     const q = await quoter.callStatic.quoteExactInputSingle(
       tokenIn,
       tokenOut,
-      ethers.BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
+      FEE_TIER,
       amount,
       0,
     );
@@ -129,7 +129,7 @@ export async function getQuoteForSwapOutput(
     const q = await quoter.callStatic.quoteExactOutputSingle(
       tokenIn,
       tokenOut,
-      ethers.BigNumber.from(10).pow(4), // TODO(adamgobes): don't hardcode this
+      FEE_TIER,
       amount,
       0,
     );

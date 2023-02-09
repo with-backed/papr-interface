@@ -10,6 +10,8 @@ import { IUniswapV3Pool } from 'types/generated/abis';
 
 // const poolContract = new ethers.Contract(poolAddress, IUniswapV3PoolABI, provider)
 
+export const FEE_TIER = ethers.BigNumber.from(10).pow(4);
+
 interface Immutables {
   factory: string;
   token0: string;
