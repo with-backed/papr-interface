@@ -9,14 +9,17 @@ import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
+import { useNFTFlagged } from 'hooks/useNFTFlagged';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { getUnitPriceForEth } from 'lib/coingecko';
 import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
 import { formatBigNum } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useEffect, useMemo, useState } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 
+import { NFTFlaggedTooltip } from '../TokenPerformance/Tooltips';
 import AuctionApproveAndBuy from './AuctionApproveAndBuy';
 import { AuctionGraph } from './AuctionGraph';
 import styles from './AuctionPageContent.module.css';
@@ -83,7 +86,13 @@ export function AuctionPageContent({
 
   return (
     <Fieldset
-      legend={`${auction.auctionAssetContract.symbol} #${auction.auctionAssetID}`}>
+      legend={
+        <FieldsetHeader
+          contractAddress={auction.auctionAssetContract.id}
+          tokenId={auction.auctionAssetID}
+          symbol={auction.auctionAssetContract.symbol}
+        />
+      }>
       <div className={styles.headerWrapper}>
         <div className={styles.nft}>
           <CenterAsset
@@ -242,4 +251,40 @@ function SummaryTable({
       </tbody>
     </Table>
   );
+}
+
+type FieldsetHeaderProps = {
+  contractAddress: string;
+  tokenId: string;
+  symbol: string;
+};
+
+function FieldsetHeader({
+  contractAddress,
+  tokenId,
+  symbol,
+}: FieldsetHeaderProps) {
+  const nftFlagged = useNFTFlagged(contractAddress, tokenId);
+
+  const nftFlaggedTooltip = useTooltipState({
+    placement: 'bottom-start',
+  });
+  if (nftFlagged) {
+    return (
+      <>
+        <TooltipReference {...nftFlaggedTooltip}>
+          <p>
+            🔨 {symbol} #{tokenId} {nftFlagged ? '⚠️' : ''}
+          </p>
+        </TooltipReference>
+        <NFTFlaggedTooltip tooltip={nftFlaggedTooltip} />
+      </>
+    );
+  } else {
+    return (
+      <p>
+        🔨 {symbol} #{tokenId}
+      </p>
+    );
+  }
 }

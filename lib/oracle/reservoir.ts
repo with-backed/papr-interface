@@ -85,3 +85,26 @@ export function getOraclePayloadFromReservoirObject(
 
   return oraclePayload;
 }
+
+export async function getNFTIsFlagged(
+  contractAddress: string,
+  tokenId: string,
+  config: Config,
+): Promise<boolean> {
+  const encodedQueryParams = new URLSearchParams({
+    tokens: `${contractAddress}:${tokenId}`,
+  }).toString();
+
+  const reservoirTokenRes = await fetch(
+    `${config.reservoirAPI}/tokens/v5?${encodedQueryParams}`,
+    {
+      headers: {
+        'x-api-key': process.env.RESERVOIR_KEY!,
+      },
+    },
+  );
+  const json = await reservoirTokenRes.json();
+
+  if (!json.tokens || json.tokens.length === 0) return false;
+  return json.tokens[0].token.isFlagged;
+}
