@@ -335,12 +335,8 @@ export async function computeNewProjectedAPR(
     token,
   );
 
-  const targetMarkRatioMax = parseFloat(
-    ethers.utils.formatEther(await controller.targetMarkRatioMax()),
-  );
-  const targetMarkRatioMin = parseFloat(
-    ethers.utils.formatEther(await controller.targetMarkRatioMin()),
-  );
+  const targetMarkRatioMax = 3.0;
+  const targetMarkRatioMin = 0.5;
   const fundingPeriod = (await controller.fundingPeriod()).toNumber();
 
   const periodRatio = secondsHeld / fundingPeriod;

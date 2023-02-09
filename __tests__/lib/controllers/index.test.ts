@@ -3,8 +3,6 @@ import { computeNewProjectedAPR } from 'lib/controllers';
 
 jest.mock('lib/contracts', () => ({
   jsonRpcControllerContract: jest.fn().mockReturnValue({
-    targetMarkRatioMax: () => ethers.utils.parseEther('3'),
-    targetMarkRatioMin: () => ethers.utils.parseEther('0.5'),
     fundingPeriod: () => ethers.BigNumber.from(7776000),
   }),
 }));
