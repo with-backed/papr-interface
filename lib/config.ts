@@ -70,7 +70,7 @@ const paprMeme = {
   paprTokenAddress: '0xa52CAdA413572617D417d5920ACb324bf869163B',
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprSubgraph:
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr/0.1.92/gn',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr/0.1.93/gn',
   reservoirAPI: 'https://api.reservoir.tools',
   erc721Subgraph:
     'https://api.thegraph.com/subgraphs/name/sunguru98/mainnet-erc721-subgraph',
