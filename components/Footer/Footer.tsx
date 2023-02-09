@@ -1,4 +1,4 @@
-import { DISCORD_URL, TWITTER_URL } from 'lib/constants';
+import { DISCORD_URL, GITHUB_URL, TWITTER_URL } from 'lib/constants';
 import Image from 'next/image';
 import Link from 'next/link';
 import Bunny from 'public/logos/backed-bunny.png';
@@ -20,14 +20,14 @@ const LINKS: Link[] = [
     title: '🔒 Privacy Policy',
     href: '/legal/privacy-policy.pdf',
   },
-  // {
-  //   title: '💼 Contract Audits',
-  //   href: 'https://code4rena.com/reports/2022-04-backed/',
-  // },
-  // {
-  //   title: '⚙️ GitHub',
-  //   href: GITHUB_URL,
-  // },
+  {
+    title: '💼 Contract Audits',
+    href: 'https://github.com/with-backed/papr/tree/master/audits',
+  },
+  {
+    title: '⚙️ GitHub',
+    href: GITHUB_URL,
+  },
   {
     title: '🐦 Twitter',
     href: TWITTER_URL,

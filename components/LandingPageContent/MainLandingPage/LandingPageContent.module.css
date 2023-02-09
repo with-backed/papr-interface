@@ -410,6 +410,7 @@
 .faq-container {
   composes: product-container;
   background: url('/graph-square.png'), var(--background-green-paper);
+  margin-top: 2rem;
 }
 
 .faq-container h2 {
