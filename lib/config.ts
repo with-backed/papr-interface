@@ -65,9 +65,9 @@ const paprMeme = {
   jsonRpcProvider: `https://eth-mainnet.alchemyapi.io/v2/${alchemyId}`,
   alchemyId,
   network: 'ethereum',
-  controllerAddress: '0xF4d4e4ae7fd9CbAfc24b9B0Da2596260c8368314',
+  controllerAddress: '0x3b29c19ff2fcea0ff98d0ef5b184354d74ea74b0',
   underlyingAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-  paprTokenAddress: '0xa52CAdA413572617D417d5920ACb324bf869163B',
+  paprTokenAddress: '0x320aaab3038bc08317f5a4be19ea1d9608551d79',
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprSubgraph:
     'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr/0.1.93/gn',
