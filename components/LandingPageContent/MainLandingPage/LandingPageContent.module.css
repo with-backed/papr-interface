@@ -308,7 +308,7 @@
       var(--paprMEME-100-gradient) 100%
     );
   width: 100%;
-  height: 85%;
+  height: 391px;
   position: absolute;
   z-index: 0;
 }
@@ -317,7 +317,7 @@
   display: flex;
   gap: 60px;
   align-items: center;
-  font-size: var(--font-huge);
+  font-size: var(--font-large);
   z-index: 1;
 }
 
@@ -329,7 +329,7 @@
 }
 
 .pointer {
-  text-indent: -38px;
+  text-indent: -30px;
   margin: 0;
 }
 
