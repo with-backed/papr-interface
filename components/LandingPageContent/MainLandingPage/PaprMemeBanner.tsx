@@ -1,5 +1,6 @@
 import { Button } from 'components/Button';
 import { Tooltip } from 'components/Tooltip';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Bean from 'public/landing-page-nfts/bean.png';
 import CoolCat from 'public/landing-page-nfts/cool-cat.png';
@@ -11,9 +12,15 @@ import PudgyPenguin from 'public/landing-page-nfts/pudgy-penguin.png';
 import Toad from 'public/landing-page-nfts/toad.png';
 import TubbyCat from 'public/landing-page-nfts/tubby-cat.png';
 import Wizard from 'public/landing-page-nfts/wizard.png';
-import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
+import { useEffect, useState } from 'react';
+import { useTooltipState } from 'reakit/Tooltip';
 
 import styles from './LandingPageContent.module.css';
+
+const TooltipReference = dynamic(
+  () => import('reakit/Tooltip').then((mod) => mod.TooltipReference),
+  { ssr: false },
+);
 
 const Background = () => <div className={styles['papr-meme-background']} />;
 
@@ -114,8 +121,21 @@ type NFTImageTileProps = {
 };
 
 const NFTImageTile: React.FunctionComponent<NFTImageTileProps> = ({ nft }) => {
+  const [mounted, setMounted] = useState(false);
   const tooltipState = useTooltipState();
   const { name, image } = COLLECTIONS[nft];
+
+  useEffect(() => setMounted(true), []);
+
+  // Hack to avoid hydration error caused by reakit tooltip
+  // When we start fetching oracle info etc instead of checking mounted
+  // we can avoid rendering tooltip until we have data.
+  if (!mounted) {
+    return (
+      <Image src={image} alt="" height={90} width={90} placeholder="blur" />
+    );
+  }
+
   return (
     <>
       <TooltipReference {...tooltipState}>
