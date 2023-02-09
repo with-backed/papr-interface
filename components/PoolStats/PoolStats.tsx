@@ -5,12 +5,14 @@ import { usePoolStats } from 'hooks/usePoolStats';
 import styles from './PoolStats.module.css';
 
 export function PoolStats() {
-  const { fees24h, volume24h, totalVolume, feeTier } = usePoolStats();
+  const { fees24h, volume24h, totalVolume, feeTier, totalValueLocked } =
+    usePoolStats();
   return (
     <Fieldset legend="🦄 Pool Stats">
       <Table>
         <thead>
           <tr>
+            <th>TVL</th>
             <th>Total Volume</th>
             <th>24H Volume</th>
             <th>24H Fees</th>
@@ -19,6 +21,7 @@ export function PoolStats() {
         </thead>
         <tbody>
           <tr className={styles.row}>
+            <td>{totalValueLocked}</td>
             <td>{totalVolume}</td>
             <td>{volume24h}</td>
             <td>{fees24h}</td>

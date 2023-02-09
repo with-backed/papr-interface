@@ -77,11 +77,23 @@ export function usePoolStats() {
     return formatPercent(feeTier / 1000000);
   }, [error, fetching, poolByIdData]);
 
+  const totalValueLocked = useMemo(() => {
+    if (fetching) {
+      return LOADING;
+    }
+    if (error || !poolByIdData?.pool) {
+      return NO_DATA;
+    }
+    const { totalValueLockedUSD } = poolByIdData.pool;
+    return formatDollars(totalValueLockedUSD);
+  }, [error, fetching, poolByIdData]);
+
   return {
     fees24h,
     volume24h,
     totalVolume,
     feeTier,
     fetching,
+    totalValueLocked,
   };
 }
