@@ -13,8 +13,6 @@ const RESTRICTED_COUNTRIES = new Set([
   'KP',
   // Syria
   'SY',
-  // temp
-  'US',
 ]);
 
 /**
