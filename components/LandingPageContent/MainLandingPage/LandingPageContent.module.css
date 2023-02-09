@@ -409,8 +409,9 @@
 /* FAQ */
 .faq-container {
   composes: product-container;
-  background: url('/graph-square.png'), var(--background-green-paper);
+  background: url('/graph-dense.png'), var(--background-green-paper);
   margin-top: 2rem;
+  padding-bottom: 109px;
 }
 
 .faq-container h2 {
