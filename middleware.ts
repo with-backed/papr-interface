@@ -35,13 +35,8 @@ export function middleware(request: NextRequest) {
     RESTRICTED_REGIONS.has(request.geo?.region || 'US-ME');
 
   if (isRestricted) {
-    return new NextResponse(
-      JSON.stringify({
-        success: false,
-        message: 'Cannot access from restricted territory.',
-      }),
-      { status: 403, headers: { 'content-type': 'application/json' } },
-    );
+    return new NextResponse(null, { status: 403 });
   }
-  return NextResponse.redirect(new URL('/about-2', request.url));
+
+  return NextResponse.next();
 }
