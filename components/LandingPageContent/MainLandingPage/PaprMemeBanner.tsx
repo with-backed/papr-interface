@@ -1,4 +1,4 @@
-import { ButtonLink } from 'components/Button';
+import { GradientButtonLink } from 'components/Button';
 import { Tooltip } from 'components/Tooltip';
 import { useConfig } from 'hooks/useConfig';
 import Image from 'next/image';
@@ -105,9 +105,9 @@ function Text() {
         <li>fun to experiment with</li>
         <li>maybe you have one</li>
       </ul>
-      <ButtonLink href={`/tokens/${tokenName}`} kind="white" size="small">
-        Let&apos;s Meme
-      </ButtonLink>
+      <GradientButtonLink href={`/tokens/${tokenName}`} color="green">
+        Let&apos;s Meme!
+      </GradientButtonLink>
     </div>
   );
 }

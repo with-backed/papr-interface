@@ -4,7 +4,7 @@ import { ComponentProps, useMemo } from 'react';
 import styles from './Button.module.css';
 
 interface GradientButtonLinkProps extends ComponentProps<typeof Link> {
-  color: 'blue' | 'orange';
+  color: 'blue' | 'green' | 'orange';
   newTab?: boolean;
 }
 
