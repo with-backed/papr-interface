@@ -1,1 +1,0 @@
-export { useOracleSync } from './useOracleSync';

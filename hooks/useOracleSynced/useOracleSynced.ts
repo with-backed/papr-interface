@@ -4,7 +4,7 @@ import { getLatestBlockTimestamp } from 'lib/chainHelpers';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useEffect, useState } from 'react';
 
-export function useOracleSync(
+export function useOracleSynced(
   collateralContractAddress: string,
   oracleKind: OraclePriceType,
 ) {

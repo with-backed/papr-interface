@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-hooks';
-import { useOracleSync } from 'hooks/useOracleSync';
+import { useOracleSynced } from 'hooks/useOracleSynced';
 import { getLatestBlockTimestamp } from 'lib/chainHelpers';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 
@@ -33,7 +33,7 @@ describe('useOracleSync', () => {
   it('returns true when oracle message is older than latest block timestamp', async () => {
     mockedGetLatestBlockTimestamp.mockResolvedValue(1001);
     const { result, waitForNextUpdate } = renderHook(() =>
-      useOracleSync(
+      useOracleSynced(
         '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
         OraclePriceType.lower,
       ),
@@ -46,7 +46,7 @@ describe('useOracleSync', () => {
   it('returns false when oracle message is newer than latest block timestamp', async () => {
     mockedGetLatestBlockTimestamp.mockResolvedValue(999);
     const { result, waitForNextUpdate } = renderHook(() =>
-      useOracleSync(
+      useOracleSynced(
         '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
         OraclePriceType.lower,
       ),

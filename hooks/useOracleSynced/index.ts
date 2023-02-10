@@ -1,0 +1,1 @@
+export { useOracleSynced } from './useOracleSynced';

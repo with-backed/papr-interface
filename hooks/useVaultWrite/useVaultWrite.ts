@@ -2,7 +2,7 @@ import { ethers } from 'ethers';
 import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
 import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { useOracleSync } from 'hooks/useOracleSync';
+import { useOracleSynced } from 'hooks/useOracleSynced';
 import { useSafeTransferFromWrite } from 'hooks/useSafeTransferFromWrite';
 import { useSwapParams } from 'hooks/useSwapParams';
 import { deconstructFromId } from 'lib/controllers';
@@ -29,7 +29,7 @@ export function useVaultWrite(
 ) {
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
-  const oracleInfoSynced = useOracleSync(
+  const oracleInfoSynced = useOracleSynced(
     collateralContractAddress,
     OraclePriceType.lower,
   );
