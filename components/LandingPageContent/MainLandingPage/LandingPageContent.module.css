@@ -347,6 +347,10 @@
   align-self: center;
 }
 
+.papr-meme-wrapper-mobile .text {
+  padding: 0 20px;
+}
+
 .papr-meme-wrapper a {
   margin-top: 1rem;
   width: 100%;

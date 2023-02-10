@@ -104,8 +104,8 @@ function Text({ mobile = false }: TextProps) {
   return (
     <div className={styles.text}>
       <p>
-        <u>First papr token ever!</u> paprMEME is a <br /> token for loans to
-        these 10 collections
+        <u>First papr token ever!</u> paprMEME is a {mobile ? '' : <br />}token
+        for loans to these 10 collections
       </p>
       <p className={styles.pointer}>
         {mobile ? '' : '👈'} INSTANT LOANS FOR MEMEish* NFTs
