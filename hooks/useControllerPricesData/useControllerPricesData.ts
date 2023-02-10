@@ -170,6 +170,7 @@ function targets(
       time: t as UTCTimestamp,
     };
   });
+  console.log({ formattedTargets });
   return formattedTargets;
 }
 
@@ -207,5 +208,15 @@ function marks(
     });
   }
 
-  return formattedSwaps.filter(({ time }) => time !== OUTLIER_TIMESTAMP);
+  const result: typeof formattedSwaps = [];
+  const seenTimestamps = new Set([OUTLIER_TIMESTAMP]);
+  formattedSwaps.forEach((swap) => {
+    if (seenTimestamps.has(swap.time)) {
+      return;
+    }
+    seenTimestamps.add(swap.time);
+    result.push(swap);
+  });
+
+  return result;
 }
