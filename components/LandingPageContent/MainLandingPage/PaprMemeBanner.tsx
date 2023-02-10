@@ -18,6 +18,9 @@ import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
 import styles from './LandingPageContent.module.css';
 
 const Background = () => <div className={styles['papr-meme-background']} />;
+const BackgroundMobile = () => (
+  <div className={styles['papr-meme-background-mobile']} />
+);
 
 const COLLECTIONS = {
   'Cool Cats': {
@@ -83,22 +86,30 @@ export function PaprMemeBanner() {
         </div>
       </div>
       <div className={styles['papr-meme-mobile']}>
-        <ImageGrid />
-        <Text />
+        <BackgroundMobile />
+        <div className={styles['papr-meme-wrapper-mobile']}>
+          <ImageGrid />
+          <Text mobile={true} />
+        </div>
       </div>
     </>
   );
 }
 
-function Text() {
+type TextProps = {
+  mobile?: boolean;
+};
+function Text({ mobile = false }: TextProps) {
   const { tokenName } = useConfig();
   return (
-    <div>
+    <div className={styles.text}>
       <p>
         <u>First papr token ever!</u> paprMEME is a <br /> token for loans to
         these 10 collections
       </p>
-      <p className={styles.pointer}>👈 INSTANT LOANS FOR MEMEish* NFTs</p>
+      <p className={styles.pointer}>
+        {mobile ? '' : '👈'} INSTANT LOANS FOR MEMEish* NFTs
+      </p>
       <ul className={styles['star-list']}>
         <li>popular but underserved</li>
         <li>durable value</li>
