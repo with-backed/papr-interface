@@ -173,6 +173,12 @@ function targets(
   return formattedTargets;
 }
 
+/**
+ * On one swap there was a tremendous market price which ruins the chart.
+ * Let's filter that one out.
+ */
+const OUTLIER_TIMESTAMP = 1675965383;
+
 function marks(
   swaps: SwapsByPoolQuery['swaps'],
   baseCurrency: Token,
@@ -201,5 +207,5 @@ function marks(
     });
   }
 
-  return formattedSwaps;
+  return formattedSwaps.filter(({ time }) => time !== OUTLIER_TIMESTAMP);
 }
