@@ -1,5 +1,5 @@
 query targetUpdatesByController($controller: String) {
-  targetUpdates(where: { controller: $controller }) {
+  targetUpdates(first: 1000, where: { controller: $controller }) {
     id
     timestamp
     newTarget
