@@ -42,15 +42,16 @@ export function VaultWriteButton({
   const signerOrProvider = useSignerOrProvider();
   const paprController = useController();
 
-  const { data, write, error, usingSafeTransferFrom } = useVaultWrite(
-    writeType,
-    collateralContractAddress,
-    depositNFTs,
-    withdrawNFTs,
-    amount,
-    quote,
-    refresh,
-  );
+  const { data, write, error, usingSafeTransferFrom, oracleInfoSynced } =
+    useVaultWrite(
+      writeType,
+      collateralContractAddress,
+      depositNFTs,
+      withdrawNFTs,
+      amount,
+      quote,
+      refresh,
+    );
   const [collateralApproved, setCollateralApproved] = useState<boolean>(false);
   const [underlyingApproved, setUnderlyingApproved] = useState<boolean>(false);
   const [debtTokenApproved, setDebtTokenApproved] = useState<boolean>(false);
@@ -108,6 +109,7 @@ export function VaultWriteButton({
   ]);
 
   const disabled = useMemo(() => {
+    if (!oracleInfoSynced) return true;
     switch (writeType) {
       case VaultWriteType.Borrow:
         return (
@@ -128,6 +130,7 @@ export function VaultWriteButton({
         return !!errorMessage || !underlyingApproved || !quote;
     }
   }, [
+    oracleInfoSynced,
     depositNFTs,
     writeType,
     usingSafeTransferFrom,
@@ -137,6 +140,11 @@ export function VaultWriteButton({
     errorMessage,
     quote,
   ]);
+
+  const buttonText = useMemo(() => {
+    if (!oracleInfoSynced) return 'Waiting for oracle...';
+    return vaultHasDebt ? 'Update Loan' : 'Borrow';
+  }, [oracleInfoSynced, vaultHasDebt]);
 
   return (
     <>
@@ -168,7 +176,7 @@ export function VaultWriteButton({
         onClick={write!}
         transactionData={data}
         error={error?.message}
-        text={vaultHasDebt ? 'Update Loan' : 'Borrow'}
+        text={buttonText}
         disabled={disabled}
       />
     </>
