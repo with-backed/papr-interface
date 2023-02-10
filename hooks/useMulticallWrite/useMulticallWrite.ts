@@ -16,19 +16,19 @@ export function useMulticallWrite(
     functionName: 'multicall',
     args: [calldata as `0x${string}`[]],
   });
-  const gasLimit = useMemo(() => {
-    if (!multicallConfig.request) return ethers.BigNumber.from(0);
-    return multicallConfig.request.gasLimit.add(5000);
-  }, [multicallConfig]);
-
-  const { data, write, error } = useContractWrite({
-    ...{
+  const configWithGasOverride = useMemo(() => {
+    if (!multicallConfig.request) return multicallConfig;
+    return {
       ...multicallConfig,
       request: {
         ...multicallConfig.request,
-        gasLimit,
+        gasLimit: multicallConfig.request.gasLimit.add(5000),
       },
-    },
+    };
+  }, [multicallConfig]);
+
+  const { data, write, error } = useContractWrite({
+    ...configWithGasOverride,
     onSuccess: (data: any) => {
       data.wait().then(refresh);
     },
