@@ -2,19 +2,21 @@ import { ethers } from 'ethers';
 import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
 import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useOracleSynced } from 'hooks/useOracleSynced';
 import { useSafeTransferFromWrite } from 'hooks/useSafeTransferFromWrite';
+import { useSwapParams } from 'hooks/useSwapParams';
 import { deconstructFromId } from 'lib/controllers';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useMemo } from 'react';
 import { useAccount } from 'wagmi';
+
 import {
-  generateBorrowWithSwapCalldata,
   generateBorrowCalldata,
-  VaultWriteType,
+  generateBorrowWithSwapCalldata,
   generateRepayCalldata,
   generateRepayWithSwapCalldata,
+  VaultWriteType,
 } from './helpers';
-import { useSwapParams } from 'hooks/useSwapParams';
 
 export function useVaultWrite(
   writeType: VaultWriteType,
@@ -27,6 +29,10 @@ export function useVaultWrite(
 ) {
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
+  const oracleInfoSynced = useOracleSynced(
+    collateralContractAddress,
+    OraclePriceType.lower,
+  );
   const swapParams = useSwapParams(amount, quote);
 
   const { addCollateralCalldata, removeCollateralCalldata } =
@@ -98,7 +104,7 @@ export function useVaultWrite(
     data: multicallData,
     write: multicallWrite,
     error: multicallError,
-  } = useMulticallWrite(calldata, refresh);
+  } = useMulticallWrite(calldata, !oracleInfoSynced, refresh);
 
   const [_, nftTokenId] = useMemo(() => {
     if (depositNFTs.length === 0) return [ethers.constants.AddressZero, '0'];
@@ -113,6 +119,7 @@ export function useVaultWrite(
     nftTokenId,
     amount,
     quote,
+    !oracleInfoSynced,
     refresh,
   );
 
@@ -149,5 +156,5 @@ export function useVaultWrite(
     writeType,
   ]);
 
-  return { data, write, error, usingSafeTransferFrom };
+  return { data, write, error, usingSafeTransferFrom, oracleInfoSynced };
 }
