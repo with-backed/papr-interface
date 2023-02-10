@@ -321,7 +321,7 @@
   z-index: 1;
 }
 
-.papr-meme-wrapper button {
+.papr-meme-wrapper a {
   margin-top: 1rem;
   width: 100%;
   background-color: white !important;

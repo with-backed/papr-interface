@@ -1,5 +1,6 @@
-import { Button } from 'components/Button';
+import { ButtonLink } from 'components/Button';
 import { Tooltip } from 'components/Tooltip';
+import { useConfig } from 'hooks/useConfig';
 import Image from 'next/image';
 import Bean from 'public/landing-page-nfts/bean.png';
 import CoolCat from 'public/landing-page-nfts/cool-cat.png';
@@ -90,6 +91,7 @@ export function PaprMemeBanner() {
 }
 
 function Text() {
+  const { tokenName } = useConfig();
   return (
     <div>
       <p>
@@ -103,9 +105,9 @@ function Text() {
         <li>fun to experiment with</li>
         <li>maybe you have one</li>
       </ul>
-      <Button disabled size="small">
-        Coming Soon!
-      </Button>
+      <ButtonLink href={`/tokens/${tokenName}`} kind="white" size="small">
+        Let&apos;s Meme
+      </ButtonLink>
     </div>
   );
 }
@@ -133,7 +135,13 @@ const NFTImageTile: React.FunctionComponent<NFTImageTileProps> = ({ nft }) => {
   return (
     <>
       <TooltipReference {...tooltipState}>
-        <Image src={image} alt="" height={90} width={90} placeholder="blur" />
+        <Image
+          src={image}
+          alt={name}
+          height={90}
+          width={90}
+          placeholder="blur"
+        />
       </TooltipReference>
       <Tooltip {...tooltipState}>
         <span>{name}</span>
