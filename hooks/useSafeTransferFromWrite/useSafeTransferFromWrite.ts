@@ -67,9 +67,19 @@ export function useSafeTransferFromWrite(
       onERC721ReceivedData as `0x${string}`,
     ],
   });
+  const configWithGasOverride = useMemo(() => {
+    if (!safeTransferFromConfig.request) return safeTransferFromConfig;
+    return {
+      ...safeTransferFromConfig,
+      request: {
+        ...safeTransferFromConfig.request,
+        gasLimit: safeTransferFromConfig.request.gasLimit.add(5000),
+      },
+    };
+  }, [safeTransferFromConfig]);
 
   const { data, write, error } = useContractWrite({
-    ...safeTransferFromConfig,
+    ...configWithGasOverride,
     onSuccess: (data: any) => {
       data.wait().then(refresh);
     },
