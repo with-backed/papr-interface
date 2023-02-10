@@ -33,6 +33,7 @@ export function useSafeTransferFromWrite(
   nftTokenId: string,
   debt: ethers.BigNumber,
   quote: ethers.BigNumber | null,
+  skip: boolean,
   refresh: () => void,
 ) {
   const controller = useController();
@@ -56,7 +57,7 @@ export function useSafeTransferFromWrite(
   }, [debt, swapParams, oracleInfo, nftContractAddress, address]);
 
   const { config: safeTransferFromConfig } = usePrepareContractWrite({
-    address: nftContractAddress as `0x${string}`,
+    address: skip ? undefined : (nftContractAddress as `0x${string}`),
     abi: erc721ABI,
     functionName: 'safeTransferFrom',
     args: [

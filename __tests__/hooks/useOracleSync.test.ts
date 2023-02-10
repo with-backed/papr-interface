@@ -21,7 +21,7 @@ jest.mock('hooks/useOracleInfo/useOracleInfo', () => ({
 }));
 
 jest.mock('lib/chainHelpers', () => ({
-  getLatestBlocktimestamp: jest.fn(),
+  getLatestBlockTimestamp: jest.fn(),
 }));
 
 const mockedGetLatestBlockTimestamp =

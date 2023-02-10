@@ -104,7 +104,7 @@ export function useVaultWrite(
     data: multicallData,
     write: multicallWrite,
     error: multicallError,
-  } = useMulticallWrite(calldata, refresh);
+  } = useMulticallWrite(calldata, !oracleInfoSynced, refresh);
 
   const [_, nftTokenId] = useMemo(() => {
     if (depositNFTs.length === 0) return [ethers.constants.AddressZero, '0'];
@@ -119,6 +119,7 @@ export function useVaultWrite(
     nftTokenId,
     amount,
     quote,
+    !oracleInfoSynced,
     refresh,
   );
 

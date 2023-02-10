@@ -1,11 +1,15 @@
 import PaprControllerABI from 'abis/PaprController.json';
-import { useContractWrite, usePrepareContractWrite } from 'wagmi';
 import { useController } from 'hooks/useController';
+import { useContractWrite, usePrepareContractWrite } from 'wagmi';
 
-export function useMulticallWrite(calldata: string[], refresh: () => void) {
+export function useMulticallWrite(
+  calldata: string[],
+  skip: boolean,
+  refresh: () => void,
+) {
   const controller = useController();
   const { config: multicallConfig } = usePrepareContractWrite({
-    address: controller.id as `0x${string}`,
+    address: skip ? undefined : (controller.id as `0x${string}`),
     abi: PaprControllerABI.abi,
     functionName: 'multicall',
     args: [calldata as `0x${string}`[]],
