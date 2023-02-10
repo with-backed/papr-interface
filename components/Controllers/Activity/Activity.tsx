@@ -52,11 +52,22 @@ export function Activity({
     vault,
   );
 
+  const filteredSwaps = useMemo(() => {
+    if (account && swapsData?.swaps) {
+      return swapsData.swaps.filter(
+        ({ sender, recipient }) =>
+          ethers.utils.getAddress(sender) === account ||
+          ethers.utils.getAddress(recipient) === account,
+      );
+    }
+    return swapsData?.swaps;
+  }, [account, swapsData]);
+
   const allEvents = useMemo(() => {
     const unsortedEvents = [
       ...(activityData?.addCollateralEvents || []),
       ...(activityData?.removeCollateralEvents || []),
-      ...(swapsData?.swaps && showSwaps ? swapsData.swaps : []),
+      ...(filteredSwaps && showSwaps ? filteredSwaps : []),
       ...(activityData?.auctionStartEvents.filter(
         (e) => e.auction.vault.controller.id === paprController.id,
       ) || []),
@@ -65,7 +76,7 @@ export function Activity({
       ) || []),
     ];
     return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
-  }, [activityData, paprController.id, showSwaps, swapsData]);
+  }, [activityData, paprController.id, showSwaps, filteredSwaps]);
 
   const { feed, amountThatWillShowNext, remainingLength, showMore } =
     useShowMore(allEvents, EVENT_INCREMENT);
