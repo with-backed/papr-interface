@@ -170,7 +170,6 @@ function targets(
       time: t as UTCTimestamp,
     };
   });
-  console.log({ formattedTargets });
   return formattedTargets;
 }
 
