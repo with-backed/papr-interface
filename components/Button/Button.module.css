@@ -263,6 +263,7 @@
 
 .gradient-button {
   composes: button;
+  composes: button-link;
   composes: small;
   color: black;
   font-size: var(--font-huge);
@@ -304,4 +305,21 @@
       rgba(255, 255, 255, 0.6)
     ),
     linear-gradient(#5397ff, #00f0ff);
+}
+
+.gradient-button-green {
+  composes: gradient-button;
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.7),
+      rgba(255, 255, 255, 0.7)
+    ),
+    linear-gradient(var(--paprMEME-offset), var(--paprMEME-50));
+}
+
+.gradient-button-green:hover {
+  background: linear-gradient(
+      rgba(255, 255, 255, 0.6),
+      rgba(255, 255, 255, 0.6)
+    ),
+    linear-gradient(var(--paprMEME-offset), var(--paprMEME-50));
 }

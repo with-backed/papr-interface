@@ -1,5 +1,6 @@
-import { Button } from 'components/Button';
+import { GradientButtonLink } from 'components/Button';
 import { Tooltip } from 'components/Tooltip';
+import { useConfig } from 'hooks/useConfig';
 import Image from 'next/image';
 import Bean from 'public/landing-page-nfts/bean.png';
 import CoolCat from 'public/landing-page-nfts/cool-cat.png';
@@ -17,6 +18,9 @@ import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
 import styles from './LandingPageContent.module.css';
 
 const Background = () => <div className={styles['papr-meme-background']} />;
+const BackgroundMobile = () => (
+  <div className={styles['papr-meme-background-mobile']} />
+);
 
 const COLLECTIONS = {
   'Cool Cats': {
@@ -82,30 +86,39 @@ export function PaprMemeBanner() {
         </div>
       </div>
       <div className={styles['papr-meme-mobile']}>
-        <ImageGrid />
-        <Text />
+        <BackgroundMobile />
+        <div className={styles['papr-meme-wrapper-mobile']}>
+          <ImageGrid />
+          <Text mobile={true} />
+        </div>
       </div>
     </>
   );
 }
 
-function Text() {
+type TextProps = {
+  mobile?: boolean;
+};
+function Text({ mobile = false }: TextProps) {
+  const { tokenName } = useConfig();
   return (
-    <div>
+    <div className={styles.text}>
       <p>
-        <u>First papr token ever!</u> paprMEME is a <br /> token for loans to
-        these 10 collections
+        <u>First papr token ever!</u> paprMEME is a {mobile ? '' : <br />}token
+        for loans to these 10 collections
       </p>
-      <p className={styles.pointer}>👈 INSTANT LOANS FOR MEMEish* NFTs</p>
+      <p className={styles.pointer}>
+        {mobile ? '' : '👈'} INSTANT LOANS FOR MEMEish* NFTs
+      </p>
       <ul className={styles['star-list']}>
         <li>popular but underserved</li>
         <li>durable value</li>
         <li>fun to experiment with</li>
         <li>maybe you have one</li>
       </ul>
-      <Button disabled size="small">
-        Coming Soon!
-      </Button>
+      <GradientButtonLink href={`/tokens/${tokenName}`} color="green">
+        Let&apos;s Meme!
+      </GradientButtonLink>
     </div>
   );
 }
@@ -133,7 +146,13 @@ const NFTImageTile: React.FunctionComponent<NFTImageTileProps> = ({ nft }) => {
   return (
     <>
       <TooltipReference {...tooltipState}>
-        <Image src={image} alt="" height={90} width={90} placeholder="blur" />
+        <Image
+          src={image}
+          alt={name}
+          height={90}
+          width={90}
+          placeholder="blur"
+        />
       </TooltipReference>
       <Tooltip {...tooltipState}>
         <span>{name}</span>
