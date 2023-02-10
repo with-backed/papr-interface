@@ -1,6 +1,6 @@
 import { useConfig } from 'hooks/useConfig';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { getLatestBlocktimestamp } from 'lib/chainHelpers';
+import { getLatestBlockTimestamp } from 'lib/chainHelpers';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useEffect, useState } from 'react';
 
@@ -16,7 +16,7 @@ export function useOracleSync(
 
   useEffect(() => {
     const fetchBlockTimestamp = async () => {
-      const blockTimestamp = await getLatestBlocktimestamp(jsonRpcProvider);
+      const blockTimestamp = await getLatestBlockTimestamp(jsonRpcProvider);
       setBlockTimestamp(blockTimestamp);
     };
 

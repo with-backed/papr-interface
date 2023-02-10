@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks';
 import { useOracleSync } from 'hooks/useOracleSync';
-import { getLatestBlocktimestamp } from 'lib/chainHelpers';
+import { getLatestBlockTimestamp } from 'lib/chainHelpers';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 
 jest.mock('hooks/useOracleInfo/useOracleInfo', () => ({
@@ -24,14 +24,14 @@ jest.mock('lib/chainHelpers', () => ({
   getLatestBlocktimestamp: jest.fn(),
 }));
 
-const mockedGetLatestBlocktimestamp =
-  getLatestBlocktimestamp as jest.MockedFunction<
-    typeof getLatestBlocktimestamp
+const mockedGetLatestBlockTimestamp =
+  getLatestBlockTimestamp as jest.MockedFunction<
+    typeof getLatestBlockTimestamp
   >;
 
 describe('useOracleSync', () => {
   it('returns true when oracle message is older than latest block timestamp', async () => {
-    mockedGetLatestBlocktimestamp.mockResolvedValue(1001);
+    mockedGetLatestBlockTimestamp.mockResolvedValue(1001);
     const { result, waitForNextUpdate } = renderHook(() =>
       useOracleSync(
         '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
@@ -44,7 +44,7 @@ describe('useOracleSync', () => {
   });
 
   it('returns false when oracle message is newer than latest block timestamp', async () => {
-    mockedGetLatestBlocktimestamp.mockResolvedValue(999);
+    mockedGetLatestBlockTimestamp.mockResolvedValue(999);
     const { result, waitForNextUpdate } = renderHook(() =>
       useOracleSync(
         '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
