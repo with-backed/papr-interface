@@ -54,10 +54,12 @@ export function useLatestMarketPrice() {
       ? [token1, token0]
       : [token0, token1];
 
+    console.log(data.pool);
+
     const uniswapPrice = tickToPrice(
       baseToken,
       quoteToken,
-      parseInt(data.pool.tick),
+      parseInt(data.pool.tick || 0),
     );
     return parseFloat(uniswapPrice.toFixed(4));
   }, [data, token0, token0IsUnderlying, token1]);
