@@ -114,8 +114,6 @@ export function useControllerPricesData(): ControllerPricesDataReturn {
     );
   }, [newTarget, targetUpdatesData, underlyingDecimals]);
 
-  console.log({ targetValues });
-
   const index = useMemo(() => parseFloat(ethers.utils.formatEther(1)), []);
 
   if (poolFetching || swapsFetching || targetUpdatesFetching) {
