@@ -71,12 +71,10 @@ export function Collateral({ vaultId }: CollateralProps) {
     );
   }, [latestMarketPrice, paprController.paprToken.decimals, totalSupply]);
   const collateralizationRatio = useMemo(() => {
-    if (!totalCollateralValue || !totalSupply) return null;
-    const totalSupplyNum = parseFloat(
-      ethers.utils.formatUnits(totalSupply, paprController.paprToken.decimals),
-    );
-    return totalCollateralValue / totalSupplyNum;
-  }, [totalCollateralValue, totalSupply, paprController.paprToken.decimals]);
+    if (!totalCollateralValue || !totalSupplyInUnderlying) return null;
+
+    return totalCollateralValue / totalSupplyInUnderlying;
+  }, [totalCollateralValue, totalSupplyInUnderlying]);
 
   const { feed, remainingLength, showMore, amountThatWillShowNext } =
     useShowMore(collateral, COLLATERAL_INCREMENT);
