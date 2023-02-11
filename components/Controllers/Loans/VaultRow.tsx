@@ -21,7 +21,7 @@ export function VaultRow({ account, vault }: VaultRowProps) {
     const debt = parseFloat(
       ethers.utils.formatUnits(vault.debt, paprToken.decimals),
     );
-    return `$ ${formatTokenAmount(debt)}`;
+    return `${formatTokenAmount(debt)}`;
   }, [paprToken.decimals, vault]);
 
   const ltv = useLTV(

@@ -70,7 +70,7 @@ export function Loans() {
     const debtNum = parseFloat(
       ethers.utils.formatUnits(debtBigNum, paprController.paprToken.decimals),
     );
-    return '$' + formatTokenAmount(debtNum);
+    return formatTokenAmount(debtNum);
   }, [currentVaults, paprController.paprToken]);
 
   const { feed, remainingLength, showMore, amountThatWillShowNext } =
@@ -82,7 +82,11 @@ export function Loans() {
         <thead>
           <tr>
             <th>Total</th>
-            <th>Amount</th>
+            <th>
+              Amount
+              <br />
+              (PAPR)
+            </th>
             <th>Avg.LTV</th>
             <th>Health</th>
           </tr>
@@ -102,7 +106,11 @@ export function Loans() {
         <thead>
           <tr>
             <th>Loan</th>
-            <th>Amount</th>
+            <th>
+              Amount
+              <br />
+              (PAPR)
+            </th>
             <th>LTV</th>
             <th>Health</th>
           </tr>
