@@ -18,12 +18,12 @@ import styles from './ImpactProjection.module.css';
 const LEGEND = '🔮 Impact Projection';
 
 interface ImpactProjectionProps {
-  marketPriceImpact: number | null;
+  paprPrice: number | null;
 }
 
-export function ImpactProjection({ marketPriceImpact }: ImpactProjectionProps) {
+export function ImpactProjection({ paprPrice }: ImpactProjectionProps) {
   const { pricesData, fetching, error } = useControllerPricesData();
-  if (marketPriceImpact === null) {
+  if (paprPrice === null) {
     return <ImpactProjectionLoading />;
   }
 
@@ -36,10 +36,7 @@ export function ImpactProjection({ marketPriceImpact }: ImpactProjectionProps) {
   }
 
   return (
-    <ImpactProjectionLoaded
-      marketPriceImpact={marketPriceImpact}
-      pricesData={pricesData}
-    />
+    <ImpactProjectionLoaded paprPrice={paprPrice} pricesData={pricesData} />
   );
 }
 
@@ -62,11 +59,11 @@ function ImpactProjectionPricesError() {
 }
 
 interface ImpactProjectionLoadedProps {
-  marketPriceImpact: number;
+  paprPrice: number;
   pricesData: ControllerPricesData;
 }
 function ImpactProjectionLoaded({
-  marketPriceImpact,
+  paprPrice,
   pricesData,
 }: ImpactProjectionLoadedProps) {
   const { tokenName } = useConfig();
@@ -77,11 +74,6 @@ function ImpactProjectionLoaded({
     newApr: number;
     newTarget: number;
   } | null>(null);
-
-  const newMark = useMemo(
-    () => currentMarket * marketPriceImpact,
-    [currentMarket, marketPriceImpact],
-  );
 
   const currentAPR = useMemo(() => {
     const current = targetValues[targetValues.length - 1];
@@ -95,12 +87,12 @@ function ImpactProjectionLoaded({
 
   useEffect(() => {
     computeNewProjectedAPR(
-      newMark,
+      paprPrice,
       currentTarget,
       600 /* 10 minutes */,
       tokenName as SupportedToken,
     ).then(setProjectedData);
-  }, [currentTarget, newMark, tokenName]);
+  }, [currentTarget, paprPrice, tokenName]);
 
   const aprProjectionClassName = useMemo(() => {
     if (projectedData) {
@@ -153,7 +145,7 @@ function ImpactProjectionLoaded({
           <PriceProjection
             kind="market"
             currentPrice={currentMarket}
-            newPrice={newMark}
+            newPrice={paprPrice}
           />
           <PriceProjection
             kind="target"

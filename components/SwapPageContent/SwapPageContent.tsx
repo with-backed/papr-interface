@@ -188,6 +188,7 @@ export function SwapPageContent() {
           operation of this website.
         </Tooltip>
       </Fieldset>
+      <p> {paprPrice}</p>
       <ImpactProjection marketPriceImpact={paprPrice} />
     </div>
   );
