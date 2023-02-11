@@ -114,6 +114,8 @@ export function useControllerPricesData(): ControllerPricesDataReturn {
     );
   }, [newTarget, targetUpdatesData, underlyingDecimals]);
 
+  console.log({ targetValues });
+
   const index = useMemo(() => parseFloat(ethers.utils.formatEther(1)), []);
 
   if (poolFetching || swapsFetching || targetUpdatesFetching) {
@@ -211,6 +213,9 @@ function marks(
   const seenTimestamps = new Set([OUTLIER_TIMESTAMP]);
   formattedSwaps.forEach((swap) => {
     if (seenTimestamps.has(swap.time)) {
+      return;
+    }
+    if (swap.value > 10000) {
       return;
     }
     seenTimestamps.add(swap.time);
