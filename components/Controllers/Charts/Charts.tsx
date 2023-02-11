@@ -110,8 +110,6 @@ function RateOfGrowth({
     [targetValues],
   );
 
-  console.log({ contractAPRs });
-
   useEffect(() => {
     if (chartRef.current) {
       const chart = createChart(
