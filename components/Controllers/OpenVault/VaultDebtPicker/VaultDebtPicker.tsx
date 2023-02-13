@@ -821,8 +821,8 @@ function CostToCloseOrMaximumLoan({
     if (!vaultHasDebt) return null;
     return getQuoteForSwapOutput(
       vaultDebt,
-      controller.paprToken.id,
       controller.underlying.id,
+      controller.paprToken.id,
       tokenName as SupportedToken,
     );
   }, [
