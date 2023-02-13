@@ -37,6 +37,6 @@ describe('LPPageContent', () => {
   it('renders', () => {
     const { getByText } = render(<LPPageContent />);
 
-    getByText('$0.16');
+    getByText('$1010101.01');
   });
 });
