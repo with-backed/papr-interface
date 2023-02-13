@@ -1,5 +1,5 @@
 query swapsByPool($pool: String) {
-  swaps(where: { pool: $pool }) {
+  swaps(first: 1000, where: { pool: $pool }) {
     id
     timestamp
     sender
