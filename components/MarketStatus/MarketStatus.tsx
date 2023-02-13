@@ -21,7 +21,7 @@ const CustomFieldset: React.FunctionComponent = ({ children, ...props }) => (
 
 export function MarketStatus() {
   const { pricesData, fetching, error } = useControllerPricesData();
-  console.log({ pricesData });
+
   const marketPrice = useMemo(
     () =>
       pricesData
