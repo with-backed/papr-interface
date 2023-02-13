@@ -34,7 +34,7 @@ export function VaultHealth({ ltv }: VaultHealthProps) {
       <TooltipReference {...healthTooltip}>
         <div
           className={
-            ratio > 0.8 ? styles['indicator-danger'] : styles.indicator
+            ratio > 0.85 ? styles['indicator-danger'] : styles.indicator
           }>
           {indicator.map((char, i) => (
             <p key={i}>{char}</p>
