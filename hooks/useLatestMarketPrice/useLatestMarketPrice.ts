@@ -12,7 +12,7 @@ import { useQuery } from 'urql';
 export function useLatestMarketPrice() {
   const { chainId, uniswapSubgraph } = useConfig();
   const { poolAddress, token0IsUnderlying } = useController();
-  const [{ data, error }] = useQuery<PoolByIdQuery>({
+  const [{ data }] = useQuery<PoolByIdQuery>({
     query: PoolByIdDocument,
     variables: { id: poolAddress },
     context: useMemo(
@@ -53,8 +53,6 @@ export function useLatestMarketPrice() {
     const [baseToken, quoteToken] = token0IsUnderlying
       ? [token1, token0]
       : [token0, token1];
-
-    console.log(data.pool);
 
     const uniswapPrice = tickToPrice(
       baseToken,
