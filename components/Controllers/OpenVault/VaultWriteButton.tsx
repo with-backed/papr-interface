@@ -18,6 +18,7 @@ type VaultWriteButtonProps = {
   collateralContractAddress: string;
   depositNFTs: string[];
   withdrawNFTs: string[];
+  vaultCollateralCount: number;
   amount: ethers.BigNumber;
   quote: ethers.BigNumber | null;
   vaultHasDebt: boolean;
@@ -31,6 +32,7 @@ export function VaultWriteButton({
   collateralContractAddress,
   depositNFTs,
   withdrawNFTs,
+  vaultCollateralCount,
   amount,
   quote,
   vaultHasDebt,
@@ -143,8 +145,27 @@ export function VaultWriteButton({
 
   const buttonText = useMemo(() => {
     if (!oracleInfoSynced) return 'Waiting for oracle...';
-    return vaultHasDebt ? 'Update Loan' : 'Borrow';
-  }, [oracleInfoSynced, vaultHasDebt]);
+    const updateOrBorrowText =
+      vaultHasDebt || vaultCollateralCount > 0 ? 'Update Loan' : 'Borrow';
+    if (amount.isZero()) {
+      if (depositNFTs.length > 0 && withdrawNFTs.length === 0) {
+        return depositNFTs.length === 1 ? 'Add NFT' : 'Add NFTs';
+      } else if (withdrawNFTs.length > 0 && depositNFTs.length === 0) {
+        return withdrawNFTs.length === 1 ? 'Withdraw NFT' : 'Withdraw NFTs';
+      } else {
+        return updateOrBorrowText;
+      }
+    } else {
+      return updateOrBorrowText;
+    }
+  }, [
+    oracleInfoSynced,
+    vaultHasDebt,
+    vaultCollateralCount,
+    depositNFTs.length,
+    withdrawNFTs.length,
+    amount,
+  ]);
 
   return (
     <>

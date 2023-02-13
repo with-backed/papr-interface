@@ -482,6 +482,7 @@ export function VaultDebtPicker({
               collateralContractAddress={collateralContractAddress}
               depositNFTs={depositNFTs}
               withdrawNFTs={withdrawNFTs}
+              vaultCollateralCount={vault?.collateralCount || 0}
               vaultHasDebt={vaultHasDebt}
               errorMessage={errorMessage}
               setErrorMessage={setErrorMessage}
