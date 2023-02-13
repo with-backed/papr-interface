@@ -44,6 +44,7 @@ export function Activity({
   const paprController = useController();
   const { data: swapsData, fetching: swapsFetching } = useUniswapSwapsByPool(
     paprController.poolAddress,
+    account,
   );
 
   const { data: activityData, fetching: activityFetching } = useActivity(
