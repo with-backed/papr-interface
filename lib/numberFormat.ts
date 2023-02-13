@@ -1,11 +1,7 @@
 import { ethers } from 'ethers';
+import numeral from 'numeral';
 
 const LOCALE = 'en-US';
-const USDC_FORMATTER = new Intl.NumberFormat(LOCALE, {
-  notation: 'compact',
-  minimumFractionDigits: 3,
-  maximumFractionDigits: 3,
-});
 
 const USD_FORMATTER = new Intl.NumberFormat(LOCALE, {
   notation: 'compact',
@@ -29,11 +25,13 @@ export function formatBigNum(
 }
 
 export function formatTokenAmount(amount: number) {
-  return USDC_FORMATTER.format(amount);
+  const n = numeral(amount);
+  return n.format('0.000a');
 }
 
 export function formatDollars(amount: number) {
-  return USD_FORMATTER.format(amount);
+  const n = numeral(amount);
+  return n.format('$0.000a');
 }
 
 const PERCENT_FORMATTER = new Intl.NumberFormat(LOCALE, {
