@@ -145,9 +145,27 @@ export function VaultWriteButton({
 
   const buttonText = useMemo(() => {
     if (!oracleInfoSynced) return 'Waiting for oracle...';
-    else if (vaultHasDebt || vaultCollateralCount > 0) return 'Update Loan';
-    return 'Borrow';
-  }, [oracleInfoSynced, vaultHasDebt, vaultCollateralCount]);
+    const updateOrBorrowText =
+      vaultHasDebt || vaultCollateralCount > 0 ? 'Update Loan' : 'Borrow';
+    if (amount.isZero()) {
+      if (depositNFTs.length > 0) {
+        return 'Add NFT';
+      } else if (withdrawNFTs.length > 0) {
+        return 'Withdraw NFT';
+      } else {
+        return updateOrBorrowText;
+      }
+    } else {
+      return updateOrBorrowText;
+    }
+  }, [
+    oracleInfoSynced,
+    vaultHasDebt,
+    vaultCollateralCount,
+    depositNFTs.length,
+    withdrawNFTs.length,
+    amount,
+  ]);
 
   return (
     <>
