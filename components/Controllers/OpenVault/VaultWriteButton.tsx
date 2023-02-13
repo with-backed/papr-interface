@@ -149,9 +149,9 @@ export function VaultWriteButton({
       vaultHasDebt || vaultCollateralCount > 0 ? 'Update Loan' : 'Borrow';
     if (amount.isZero()) {
       if (depositNFTs.length > 0 && withdrawNFTs.length === 0) {
-        return 'Add NFT(s)';
+        return depositNFTs.length === 1 ? 'Add NFT' : 'Add NFTs';
       } else if (withdrawNFTs.length > 0 && depositNFTs.length === 0) {
-        return 'Withdraw NFT(s)';
+        return withdrawNFTs.length === 1 ? 'Withdraw NFT' : 'Withdraw NFTs';
       } else {
         return updateOrBorrowText;
       }
