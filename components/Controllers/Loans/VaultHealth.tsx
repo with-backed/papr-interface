@@ -21,11 +21,11 @@ export function VaultHealth({ ltv }: VaultHealthProps) {
   const ratio = ltv / formattedMaxLTV;
 
   const indicator = useMemo(() => {
-    const totalElements = 8;
+    const totalElements = 16;
     // Ratio, but as a number out of totalElements rather than a decimal out of 1
     const numHashes = Math.round(ratio * totalElements);
-    const empty = Array(totalElements).fill('░░');
-    const filled = Array(numHashes).fill('▓▓');
+    const empty = Array(totalElements).fill('░');
+    const filled = Array(numHashes).fill('▓');
     return filled.concat(empty).slice(0, totalElements);
   }, [ratio]);
 
