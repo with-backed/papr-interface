@@ -27,7 +27,7 @@ export function useUniswapSwapsByPool(pool: string, userAddress?: string) {
   const [{ data: withAddressData, fetching: withAddressFetching }] =
     useQuery<SwapsByPoolByAddressQuery>({
       query: SwapsByPoolByAddressDocument,
-      variables: { pool },
+      variables: { pool, userAddress },
       pause: !queryByAddress,
       context: useMemo(
         () => ({
