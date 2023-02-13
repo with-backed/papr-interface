@@ -1,4 +1,6 @@
 import { TextButton } from 'components/Button';
+import { DisplayAddress } from 'components/DisplayAddress';
+import { DisplayAddressType } from 'components/DisplayAddress/DisplayAddress';
 import {
   EtherscanAddressLink,
   EtherscanTransactionLink,
@@ -185,7 +187,10 @@ function CollateralAdded({
       <td>
         <span>
           <EtherscanAddressLink address={vaultOwner}>
-            {vaultOwner.substring(0, 8)}
+            <DisplayAddress
+              address={vaultOwner}
+              displayType={DisplayAddressType.TRUNCATED}
+            />
           </EtherscanAddressLink>{' '}
           deposited {event.vault.token.symbol} #{event.collateral.tokenId} and
           minted {borrowedAmount || 'nothing'}

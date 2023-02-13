@@ -2,13 +2,20 @@ import { useConfig } from 'hooks/useConfig';
 import { addressToENS } from 'lib/account';
 import React, { useEffect, useMemo, useState } from 'react';
 
+export enum DisplayAddressType {
+  ELLIPSIS = 'ELLIPSIS',
+  TRUNCATED = 'TRUNCATED',
+}
+
 export interface DisplayAddressProps {
   address: string;
+  displayType?: DisplayAddressType;
   useEns?: boolean;
 }
 
 export function DisplayAddress({
   address,
+  displayType = DisplayAddressType.ELLIPSIS,
   useEns = true,
 }: DisplayAddressProps) {
   const { jsonRpcProvider } = useConfig();
@@ -17,8 +24,19 @@ export function DisplayAddress({
 
   const formattedAddress = useMemo(
     // leading 0x + first four digits + ellipsis + last 4 digits
-    () => address.substring(0, 6) + '…' + address.substring(address.length - 4),
-    [address],
+    () => {
+      switch (displayType) {
+        case DisplayAddressType.ELLIPSIS:
+          return (
+            address.substring(0, 6) +
+            '…' +
+            address.substring(address.length - 4)
+          );
+        case DisplayAddressType.TRUNCATED:
+          return address.substring(0, 8);
+      }
+    },
+    [address, displayType],
   );
 
   useEffect(() => {
