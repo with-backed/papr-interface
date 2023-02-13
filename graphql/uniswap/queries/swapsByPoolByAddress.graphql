@@ -1,0 +1,15 @@
+query swapsByPoolByAddress($pool: String, $userAddress: Bytes) {
+  swaps(first: 1000, where: { pool: $pool, sender: $userAddress }) {
+    id
+    timestamp
+    sender
+    recipient
+    amount0
+    amount1
+    amountUSD
+    sqrtPriceX96
+    transaction {
+      id
+    }
+  }
+}
