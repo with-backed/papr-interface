@@ -1,28 +1,18 @@
 import { useConfig } from 'hooks/useConfig';
-import { SupportedToken } from 'lib/config';
-import {
-  BUNNY_IMG_URL_MAP,
-  OPENGRAPH_DEFAULT_DESCRIPTION,
-} from 'lib/constants';
+import { OPENGRAPH_DEFAULT_DESCRIPTION } from 'lib/constants';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 type OpenGraphProps = {
-  imageUrl?: string;
   title: string;
   type?: 'website' | 'profile';
-  description?: string;
 };
 
-export function OpenGraph({
-  imageUrl,
-  title,
-  type = 'website',
-  description = OPENGRAPH_DEFAULT_DESCRIPTION,
-}: OpenGraphProps) {
-  const { siteUrl, tokenName } = useConfig();
+export function OpenGraph({ title, type = 'website' }: OpenGraphProps) {
+  const { siteUrl } = useConfig();
   const { pathname } = useRouter();
-  const img = imageUrl || BUNNY_IMG_URL_MAP[tokenName as SupportedToken];
+  const img = '/logos/graph-bunny.png';
+  const description = OPENGRAPH_DEFAULT_DESCRIPTION;
   return (
     <Head>
       <meta property="og:title" content={title} />
@@ -40,8 +30,8 @@ export function OpenGraph({
           <meta name="description" content={description} />
         </>
       )}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="backed_xyz" />
+      <meta name="twitter:card" content="summary" />
+      <meta name="twitter:site" content="@backed_xyz" />
     </Head>
   );
 }

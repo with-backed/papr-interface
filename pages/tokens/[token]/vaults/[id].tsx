@@ -64,10 +64,7 @@ export default function VaultPage({
 
   return (
     <>
-      <OpenGraph
-        title={`${tokenName} | Vault`}
-        description={`Vault ${vaultId}`}
-      />
+      <OpenGraph title={`${tokenName} | Vault`} />
       <div className={styles.column}>
         <a href={`/tokens/${tokenName}`}>⬅ controller</a>
         <ControllerContextProvider value={subgraphController}>
