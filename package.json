@@ -22,9 +22,7 @@
   },
   "dependencies": {
     "@center-inc/react": "1.1.7",
-    "@ethersproject/bignumber": "^5.7.0",
-    "@pinata/ipfs-gateway-tools": "1.1.6",
-    "@pinata/sdk": "^1.1.26",
+    "@ethersproject/bignumber": "5.7.0",
     "@rainbow-me/rainbowkit": "0.8.1",
     "@react-hook/resize-observer": "^1.2.6",
     "@sentry/nextjs": "^7.24.2",
