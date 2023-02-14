@@ -21,8 +21,8 @@ export function OpenGraph({ title, type = 'website' }: OpenGraphProps) {
       <meta property="og:type" content={type} />
       <meta property="og:url" content={siteUrl + pathname} />
       <meta property="twitter:url" content={siteUrl + pathname} />
-      <meta property="og:image" content={img} />
-      <meta property="twitter:image" content={img} />
+      <meta property="og:image" content={siteUrl + img} />
+      <meta property="twitter:image" content={siteUrl + img} />
       {!!description && (
         <>
           <meta property="og:description" content={description} />
