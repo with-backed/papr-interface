@@ -95,15 +95,18 @@ function RateOfGrowth({
 
   const contractAPRs: TimeSeriesValue[] = useMemo(
     () =>
-      targetValues.slice(1).map((curr, i) => {
-        const prev = targetValues[i];
-        // lightweight-charts expects percentages as the actual value, not a ratio
-        const change =
-          ((percentChange(prev.value, curr.value) * 100) /
-            (curr.time - prev.time)) *
-          SECONDS_IN_A_YEAR;
-        return { value: change, time: curr.time };
-      }),
+      targetValues
+        .slice(1)
+        .map((curr, i) => {
+          const prev = targetValues[i];
+          // lightweight-charts expects percentages as the actual value, not a ratio
+          const change =
+            ((percentChange(prev.value, curr.value) * 100) /
+              (curr.time - prev.time)) *
+            SECONDS_IN_A_YEAR;
+          return { value: change, time: curr.time };
+        })
+        .filter((a) => Math.abs(a.value) < 10000),
     [targetValues],
   );
 

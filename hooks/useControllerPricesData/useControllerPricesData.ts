@@ -213,6 +213,9 @@ function marks(
     if (seenTimestamps.has(swap.time)) {
       return;
     }
+    if (swap.value > 10000) {
+      return;
+    }
     seenTimestamps.add(swap.time);
     result.push(swap);
   });
