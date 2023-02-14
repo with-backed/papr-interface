@@ -35,7 +35,6 @@
     "chart.js": "4.2.1",
     "chartjs-plugin-datalabels": "2.2.0",
     "dayjs": "1.11.7",
-    "ethereumjs-util": "^7.1.5",
     "ethers": "5.7.2",
     "graphql": "16.3.0",
     "jotai-immer": "^0.1.0",
