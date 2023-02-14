@@ -4,21 +4,15 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 type OpenGraphProps = {
-  imageUrl?: string;
   title: string;
   type?: 'website' | 'profile';
-  description?: string;
 };
 
-export function OpenGraph({
-  imageUrl,
-  title,
-  type = 'website',
-  description = OPENGRAPH_DEFAULT_DESCRIPTION,
-}: OpenGraphProps) {
+export function OpenGraph({ title, type = 'website' }: OpenGraphProps) {
   const { siteUrl } = useConfig();
   const { pathname } = useRouter();
-  const img = imageUrl || '/logos/graph-bunny.png';
+  const img = '/logos/graph-bunny.png';
+  const description = OPENGRAPH_DEFAULT_DESCRIPTION;
   return (
     <Head>
       <meta property="og:title" content={title} />

@@ -5,11 +5,7 @@ import React from 'react';
 export default function Home() {
   return (
     <>
-      <OpenGraph
-        title="Papr"
-        description="NFT lending powered by Uniswap V3."
-        imageUrl="/papr-scale-og.png"
-      />
+      <OpenGraph title="Papr" />
       <LandingPageContent />
     </>
   );
