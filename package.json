@@ -21,7 +21,7 @@
     "abis:generate": "yarn typechain --target ethers-v5 --out-dir ./types/generated/abis './abis/*.json'"
   },
   "dependencies": {
-    "@center-inc/react": "1.1.5",
+    "@center-inc/react": "1.1.7",
     "@ethersproject/bignumber": "^5.7.0",
     "@pinata/ipfs-gateway-tools": "1.1.6",
     "@pinata/sdk": "^1.1.26",
