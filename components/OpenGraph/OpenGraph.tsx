@@ -31,7 +31,7 @@ export function OpenGraph({ title, type = 'website' }: OpenGraphProps) {
         </>
       )}
       <meta name="twitter:card" content="summary" />
-      <meta name="twitter:site" content="backed_xyz" />
+      <meta name="twitter:site" content="@backed_xyz" />
     </Head>
   );
 }
