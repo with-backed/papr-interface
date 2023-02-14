@@ -34,7 +34,6 @@
     "@urql/core": "3.1.1",
     "chart.js": "4.2.1",
     "chartjs-plugin-datalabels": "2.2.0",
-    "datebook": "7.0.8",
     "dayjs": "1.11.0",
     "ethereumjs-util": "^7.1.5",
     "ethers": "5.7.2",
