@@ -1,9 +1,5 @@
 import { useConfig } from 'hooks/useConfig';
-import { SupportedToken } from 'lib/config';
-import {
-  BUNNY_IMG_URL_MAP,
-  OPENGRAPH_DEFAULT_DESCRIPTION,
-} from 'lib/constants';
+import { OPENGRAPH_DEFAULT_DESCRIPTION } from 'lib/constants';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
@@ -20,9 +16,9 @@ export function OpenGraph({
   type = 'website',
   description = OPENGRAPH_DEFAULT_DESCRIPTION,
 }: OpenGraphProps) {
-  const { siteUrl, tokenName } = useConfig();
+  const { siteUrl } = useConfig();
   const { pathname } = useRouter();
-  const img = imageUrl || BUNNY_IMG_URL_MAP[tokenName as SupportedToken];
+  const img = imageUrl || '/logos/graph-bunny.png';
   return (
     <Head>
       <meta property="og:title" content={title} />

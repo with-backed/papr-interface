@@ -37,7 +37,7 @@ export const COMMUNITY_NFT_SUBGRAPH =
   'https://api.thegraph.com/subgraphs/name/with-backed/backed-community-nft';
 
 export const OPENGRAPH_DEFAULT_DESCRIPTION =
-  'Welcome to Backed protocol - NFT Lending. View existing loans, lend against NFTs, or propose loan terms on your own NFTs.';
+  'Instant loans for NFT owners, instant exposure for lenders, powered by Uniswap V3';
 
 /// Uniswap subgraph constants
 // Fri Apr 23 2021 09:42:55 GMT+0000 (beginning of Uniswap V3, can probably make this beginning of papr)
