@@ -1,9 +1,16 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { useConfig } from 'hooks/useConfig';
-import { createContext, FunctionComponent, useContext } from 'react';
+import { useTimestamp } from 'hooks/useTimestamp';
+import {
+  createContext,
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useContractRead } from 'wagmi';
 
-const TargetContext = createContext<BigNumber | undefined>(undefined);
+const TargetContext = createContext<TargetUpdate | undefined>(undefined);
 
 const newTargetAbi = [
   {
@@ -20,21 +27,36 @@ const newTargetAbi = [
   },
 ] as const;
 
+export type TargetUpdate = {
+  newTarget: BigNumber;
+  timestamp: number;
+};
+
 export const TargetProvider: FunctionComponent = ({ children }) => {
+  const timestampResult = useTimestamp();
   const { controllerAddress } = useConfig();
   const { chainId } = useConfig();
   const { data: newTarget } = useContractRead({
-    address: controllerAddress as `0x${string}`,
+    // read won't run until address is defined, using this as a pause mechanism
+    // to wait for us to have the block height
+    address: timestampResult ? (controllerAddress as `0x${string}`) : undefined,
     abi: newTargetAbi,
     functionName: 'newTarget',
-    staleTime: 1000 * 60 * 2, // refresh target every 2 minutes
+    overrides: {
+      blockTag: timestampResult?.blockNumber,
+    },
     chainId,
   } as const);
+  const [result, setResult] = useState<TargetUpdate | undefined>();
+
+  useEffect(() => {
+    if (timestampResult?.timestamp && newTarget) {
+      setResult({ newTarget, timestamp: timestampResult.timestamp });
+    }
+  }, [newTarget, timestampResult]);
 
   return (
-    <TargetContext.Provider value={newTarget}>
-      {children}
-    </TargetContext.Provider>
+    <TargetContext.Provider value={result}>{children}</TargetContext.Provider>
   );
 };
 
