@@ -65,7 +65,7 @@ export default function ControllerPage({
   const config = useConfig();
 
   const collections = useMemo(() => {
-    if (!subgraphController.allowedCollateral) {
+    if (!subgraphController?.allowedCollateral) {
       console.log({ subgraphController });
       return [];
     }
