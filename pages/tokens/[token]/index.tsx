@@ -14,7 +14,7 @@ import {
   SubgraphPool,
 } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 type ServerSideProps = Omit<
   ControllerPageProps,
@@ -63,12 +63,14 @@ export default function ControllerPage({
   subgraphPool,
 }: ServerSideProps) {
   const config = useConfig();
-  useEffect(() => console.log({ subgraphController }), [subgraphController]);
 
-  const collections = useMemo(
-    () => subgraphController.allowedCollateral.map((c) => c.token.id),
-    [subgraphController.allowedCollateral],
-  );
+  const collections = useMemo(() => {
+    if (!subgraphController.allowedCollateral) {
+      console.log({ subgraphController });
+      return [];
+    }
+    return subgraphController.allowedCollateral.map((c) => c.token.id);
+  }, [subgraphController]);
 
   return (
     <OracleInfoProvider collections={collections}>
