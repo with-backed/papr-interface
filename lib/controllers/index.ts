@@ -97,12 +97,27 @@ export function secondsForRatePeriod(period: RatePeriod): number {
   }
 }
 
+export type QuoterResult = {
+  quote: ethers.BigNumber | null;
+  sqrtPriceX96After: ethers.BigNumber | null;
+};
+
+export const emptyQuoteResult: QuoterResult = {
+  quote: ethers.BigNumber.from(0),
+  sqrtPriceX96After: ethers.BigNumber.from(0),
+};
+
+export const nullQuoteResult: QuoterResult = {
+  quote: null,
+  sqrtPriceX96After: null,
+};
+
 export async function getQuoteForSwap(
   amount: ethers.BigNumber,
   tokenIn: string,
   tokenOut: string,
   tokenName: SupportedToken,
-): Promise<QuoterResult | null> {
+): Promise<QuoterResult> {
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   try {
     const q = await quoter.callStatic.quoteExactInputSingle({
@@ -114,26 +129,16 @@ export async function getQuoteForSwap(
     });
     return { quote: q.amountOut, sqrtPriceX96After: q.sqrtPriceX96After };
   } catch (_e) {
-    return null;
+    return nullQuoteResult;
   }
 }
-
-export type QuoterResult = {
-  quote: ethers.BigNumber;
-  sqrtPriceX96After: ethers.BigNumber;
-};
-
-export const emptyQuoteResult: QuoterResult = {
-  quote: ethers.BigNumber.from(0),
-  sqrtPriceX96After: ethers.BigNumber.from(0),
-};
 
 export async function getQuoteForSwapOutput(
   amount: ethers.BigNumber,
   tokenIn: string,
   tokenOut: string,
   tokenName: SupportedToken,
-): Promise<QuoterResult | null> {
+): Promise<QuoterResult> {
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   try {
     const q = await quoter.callStatic.quoteExactOutputSingle({
@@ -145,7 +150,7 @@ export async function getQuoteForSwapOutput(
     });
     return { quote: q.amountIn, sqrtPriceX96After: q.sqrtPriceX96After };
   } catch (_e) {
-    return null;
+    return nullQuoteResult;
   }
 }
 

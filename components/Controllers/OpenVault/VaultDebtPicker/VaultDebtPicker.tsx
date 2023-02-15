@@ -211,7 +211,7 @@ export function VaultDebtPicker({
         paprController.underlying.id,
         tokenName as SupportedToken,
       );
-      if (!quoteResult) return null;
+      if (!quoteResult.quote) return null;
       const slippage = await computeSlippageForSwap(
         quoteResult.quote,
         paprController.paprToken,
@@ -233,7 +233,7 @@ export function VaultDebtPicker({
     return underlyingBorrowQuote.quote;
   }, [underlyingBorrowQuote]);
   const underlyingBorrowFee = useMemo(() => {
-    if (!underlyingBorrowQuote || usingPerpetual) return null;
+    if (!underlyingBorrowQuote?.quote || usingPerpetual) return null;
     return calculateSwapFee(underlyingBorrowQuote.quote);
   }, [underlyingBorrowQuote, usingPerpetual]);
 
@@ -257,7 +257,7 @@ export function VaultDebtPicker({
         paprController.paprToken.id,
         tokenName as SupportedToken,
       );
-      if (!quoteResult) return null;
+      if (!quoteResult.quote) return null;
       const slippage = await computeSlippageForSwap(
         quoteResult.quote,
         paprController.underlying,
@@ -275,11 +275,11 @@ export function VaultDebtPicker({
       tokenName,
     ]);
   const underlyingToRepay = useMemo(() => {
-    if (!underlyingRepayQuote) return ethers.BigNumber.from(0);
+    if (!underlyingRepayQuote?.quote) return ethers.BigNumber.from(0);
     return underlyingRepayQuote.quote;
   }, [underlyingRepayQuote]);
   const underlyingRepayFee = useMemo(() => {
-    if (!underlyingRepayQuote || usingPerpetual) return null;
+    if (!underlyingRepayQuote?.quote || usingPerpetual) return null;
     return calculateSwapFee(underlyingRepayQuote.quote);
   }, [underlyingRepayQuote, usingPerpetual]);
 
@@ -331,7 +331,7 @@ export function VaultDebtPicker({
     const newSqrtPriceX96 = isBorrowing
       ? nextPriceForBorrow
       : nextPriceForRepay;
-    if (!newSqrtPriceX96 || !target) return null;
+    if (!newSqrtPriceX96 || !target || newSqrtPriceX96.isZero()) return null;
 
     const token0 = paprController.token0IsUnderlying
       ? paprController.underlying
@@ -913,7 +913,7 @@ function CostToCloseOrMaximumLoan({
       controller.paprToken.id,
       tokenName as SupportedToken,
     );
-    return quoteResult?.quote || null;
+    return quoteResult.quote;
   }, [
     vaultHasDebt,
     vaultDebt,
@@ -931,7 +931,7 @@ function CostToCloseOrMaximumLoan({
       controller.underlying.id,
       tokenName as SupportedToken,
     );
-    return quoteResult?.quote || null;
+    return quoteResult.quote;
   }, [
     vaultHasDebt,
     maxLoanPerNFT,

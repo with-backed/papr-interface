@@ -79,7 +79,7 @@ export function useLiveAuctionPrice(
 
   useEffect(() => {
     calculateLiveAuctionPriceUnderlying().then((quoteResult) => {
-      setLiveAuctionPriceUnderlying(quoteResult?.quote || null);
+      setLiveAuctionPriceUnderlying(quoteResult.quote);
     });
   }, [calculateLiveAuctionPriceUnderlying]);
 
