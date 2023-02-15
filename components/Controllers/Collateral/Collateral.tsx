@@ -148,12 +148,24 @@ function Tile({ address, tokenId, vault }: TileProps) {
   const { centerNetwork } = useConfig();
 
   const result = useCollection({ network: centerNetwork as any, address });
-  const maxDebt = useMaxDebt(address, OraclePriceType.twap);
+  const maxDebtPerCollateral = useMaxDebt(address, OraclePriceType.twap);
   const debt = useMemo(() => ethers.BigNumber.from(vault.debt), [vault.debt]);
   const ltv = useMemo(() => {
-    if (!maxLTV || !maxDebt) return null;
-    return computeLTVFromDebts(debt, maxDebt, maxLTV, paprToken.decimals);
-  }, [maxLTV, maxDebt, debt, paprToken.decimals]);
+    if (!maxDebtPerCollateral) return null;
+    const maxDebtForVault = maxDebtPerCollateral.mul(vault.collateralCount);
+    return computeLTVFromDebts(
+      debt,
+      maxDebtForVault,
+      maxLTV,
+      paprToken.decimals,
+    );
+  }, [
+    maxLTV,
+    maxDebtPerCollateral,
+    debt,
+    paprToken.decimals,
+    vault.collateralCount,
+  ]);
 
   const tooltip = useTooltipState();
   return (
