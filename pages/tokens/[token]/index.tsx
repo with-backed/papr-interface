@@ -14,7 +14,7 @@ import {
   SubgraphPool,
 } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 type ServerSideProps = Omit<
   ControllerPageProps,
@@ -63,6 +63,7 @@ export default function ControllerPage({
   subgraphPool,
 }: ServerSideProps) {
   const config = useConfig();
+  useEffect(() => console.log({ subgraphController }), [subgraphController]);
 
   const collections = useMemo(
     () => subgraphController.allowedCollateral.map((c) => c.token.id),
