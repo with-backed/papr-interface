@@ -89,13 +89,15 @@ function ImpactProjectionLoaded({
   }, [targetValues]);
 
   useEffect(() => {
-    computeNewProjectedAPR(
-      paprPrice,
-      currentTarget,
-      600 /* 10 minutes */,
-      ethers.BigNumber.from(fundingPeriod),
-      tokenName as SupportedToken,
-    ).then(setProjectedData);
+    setProjectedData(
+      computeNewProjectedAPR(
+        paprPrice,
+        currentTarget,
+        600 /* 10 minutes */,
+        ethers.BigNumber.from(fundingPeriod),
+        tokenName as SupportedToken,
+      ),
+    );
   }, [currentTarget, paprPrice, fundingPeriod, tokenName]);
 
   const aprProjectionClassName = useMemo(() => {

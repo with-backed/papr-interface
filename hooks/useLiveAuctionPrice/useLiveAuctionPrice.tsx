@@ -78,8 +78,8 @@ export function useLiveAuctionPrice(
   }, [auction, priceRefreshTime]);
 
   useEffect(() => {
-    calculateLiveAuctionPriceUnderlying().then((price) => {
-      setLiveAuctionPriceUnderlying(price);
+    calculateLiveAuctionPriceUnderlying().then((quoteResult) => {
+      setLiveAuctionPriceUnderlying(quoteResult?.quote || null);
     });
   }, [calculateLiveAuctionPriceUnderlying]);
 
