@@ -88,6 +88,26 @@ export function usePoolStats() {
     return formatDollars(totalValueLockedUSD);
   }, [error, fetching, poolByIdData]);
 
+  const token0 = useMemo(() => {
+    if (fetching) {
+      return LOADING;
+    }
+    if (error || !poolByIdData?.pool) {
+      return NO_DATA;
+    }
+    return poolByIdData.pool.token0;
+  }, [error, fetching, poolByIdData]);
+
+  const token1 = useMemo(() => {
+    if (fetching) {
+      return LOADING;
+    }
+    if (error || !poolByIdData?.pool) {
+      return NO_DATA;
+    }
+    return poolByIdData.pool.token1;
+  }, [error, fetching, poolByIdData]);
+
   return {
     fees24h,
     volume24h,
@@ -95,5 +115,7 @@ export function usePoolStats() {
     feeTier,
     fetching,
     totalValueLocked,
+    token0,
+    token1,
   };
 }

@@ -1,4 +1,4 @@
-import { BigNumberish, ethers } from 'ethers';
+import { BigNumberish } from 'ethers';
 import { createGenericContext } from 'lib/createGenericContext';
 
 interface ERC20Token {
@@ -28,11 +28,12 @@ export interface PaprController {
   token0IsUnderlying: boolean;
   poolAddress: string;
   maxLTV: BigNumberish;
+  fundingPeriod: BigNumberish;
   vaults?:
     | {
         id: string;
         token: ERC721Token;
-        debt: ethers.BigNumberish;
+        debt: BigNumberish;
         collateralCount: number;
         account: string;
         collateral:
@@ -53,4 +54,4 @@ function useController(): PaprController {
   return controller;
 }
 
-export { useController, ControllerContextProvider };
+export { ControllerContextProvider, useController };

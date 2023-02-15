@@ -10,6 +10,7 @@ fragment allPaprControllerProperties on PaprController {
     ...allERC20Properties
   }
   maxLTV
+  fundingPeriod
   target
   allowedCollateral(where: { allowed: true }) {
     id
