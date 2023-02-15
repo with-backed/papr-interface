@@ -124,7 +124,7 @@ export function YourPositions() {
       paprController.underlying.id,
       tokenName as SupportedToken,
     );
-    return quoteResult?.quote || null;
+    return quoteResult.quote;
   }, [
     tokenName,
     paprController.paprToken.id,
@@ -248,7 +248,7 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
       paprToken.id,
       tokenName as SupportedToken,
     );
-    return quoteResult?.quote || null;
+    return quoteResult.quote;
   }, [vaultInfo.debt, tokenName, paprToken.id, underlying.id]);
 
   if (

@@ -219,7 +219,7 @@ export async function computeSlippageForSwap(
       await quoter.callStatic.quoteExactOutputSingle({
         tokenIn: tokenIn.id,
         tokenOut: tokenOut.id,
-        fee: ethers.BigNumber.from(10).pow(4),
+        fee: FEE_TIER,
         amount: withoutSlippageAmount,
         sqrtPriceLimitX96: 0,
       }));
