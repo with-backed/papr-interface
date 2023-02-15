@@ -1,5 +1,7 @@
 import { Fieldset } from 'components/Fieldset';
+import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
+import { useController } from 'hooks/useController';
 import { useControllerPricesData } from 'hooks/useControllerPricesData';
 import { SupportedToken } from 'lib/config';
 import { SECONDS_IN_A_YEAR } from 'lib/constants';
@@ -67,6 +69,7 @@ function ImpactProjectionLoaded({
   pricesData,
 }: ImpactProjectionLoadedProps) {
   const { tokenName } = useConfig();
+  const { fundingPeriod } = useController();
   const { targetValues, markValues } = pricesData;
   const currentTarget = targetValues[targetValues.length - 1].value;
   const currentMarket = markValues[markValues.length - 1].value;
@@ -86,13 +89,16 @@ function ImpactProjectionLoaded({
   }, [targetValues]);
 
   useEffect(() => {
-    computeNewProjectedAPR(
-      paprPrice,
-      currentTarget,
-      600 /* 10 minutes */,
-      tokenName as SupportedToken,
-    ).then(setProjectedData);
-  }, [currentTarget, paprPrice, tokenName]);
+    setProjectedData(
+      computeNewProjectedAPR(
+        paprPrice,
+        currentTarget,
+        600 /* 10 minutes */,
+        ethers.BigNumber.from(fundingPeriod),
+        tokenName as SupportedToken,
+      ),
+    );
+  }, [currentTarget, paprPrice, fundingPeriod, tokenName]);
 
   const aprProjectionClassName = useMemo(() => {
     if (projectedData) {

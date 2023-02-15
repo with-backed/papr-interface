@@ -67,7 +67,10 @@ describe('useLiveAuctionPrice', () => {
   const startTime = 1674086400;
   const startPrice = ethers.BigNumber.from('585578162375090237174');
   beforeAll(() => {
-    mockedGetQuoteForSwapOutput.mockResolvedValue(startPrice); // mock quote as 1:1
+    mockedGetQuoteForSwapOutput.mockResolvedValue({
+      quote: startPrice,
+      sqrtPriceX96After: ethers.BigNumber.from(0),
+    }); // mock quote as 1:1
   });
   it('starts at the current auction price and updates at the given interval', async () => {
     const { result, waitForNextUpdate } = renderHook(

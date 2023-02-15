@@ -1,3 +1,4 @@
+import { Price } from '@uniswap/sdk-core';
 import { Button } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
 import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
@@ -14,20 +15,25 @@ import { useConfig } from 'hooks/useConfig';
 import { PaprController, useController } from 'hooks/useController';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { useTarget } from 'hooks/useTarget';
 import { useTheme } from 'hooks/useTheme';
 import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
 import { SupportedToken } from 'lib/config';
+import { Q192 } from 'lib/constants';
 import {
+  computeNewProjectedAPR,
   computeSlippageForSwap,
   convertOneScaledValue,
+  emptyQuoteResult,
   getQuoteForSwap,
   getQuoteForSwapOutput,
   getUniqueNFTId,
+  QuoterResult,
 } from 'lib/controllers';
 import { calculateSwapFee } from 'lib/controllers/fees';
-import { formatBigNum } from 'lib/numberFormat';
+import { formatBigNum, formatPercent } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
+import { subgraphTokenToToken } from 'lib/uniswapSubgraph';
 import {
   Dispatch,
   SetStateAction,
@@ -65,8 +71,8 @@ export function VaultDebtPicker({
   // init hooks
   const paprController = useController();
   const { address } = useAccount();
-  const { tokenName } = useConfig();
-  const signerOrProvider = useSignerOrProvider();
+  const { tokenName, chainId } = useConfig();
+  const target = useTarget();
   const theme = useTheme();
 
   // nft variables
@@ -195,26 +201,26 @@ export function VaultDebtPicker({
     return currentVaultDebt.sub(chosenDebt);
   }, [chosenDebt, currentVaultDebt]);
 
-  const underlyingBorrowQuote: [ethers.BigNumber, number] | null =
+  const underlyingBorrowQuote: (QuoterResult & { slippage: number }) | null =
     useAsyncValue(async () => {
       if (debtToBorrowOrRepay.isZero() || !isBorrowing)
-        return [ethers.BigNumber.from(0), 0];
-      const quote = await getQuoteForSwap(
+        return { ...emptyQuoteResult, slippage: 0 };
+      const quoteResult = await getQuoteForSwap(
         debtToBorrowOrRepay,
         paprController.paprToken.id,
         paprController.underlying.id,
         tokenName as SupportedToken,
       );
-      if (!quote) return null;
+      if (!quoteResult.quote) return null;
       const slippage = await computeSlippageForSwap(
-        quote,
+        quoteResult.quote,
         paprController.paprToken,
         paprController.underlying,
         debtToBorrowOrRepay,
         true,
         tokenName as SupportedToken,
       );
-      return [quote, slippage];
+      return { ...quoteResult, slippage };
     }, [
       isBorrowing,
       debtToBorrowOrRepay,
@@ -224,38 +230,43 @@ export function VaultDebtPicker({
     ]);
   const underlyingToBorrow = useMemo(() => {
     if (!underlyingBorrowQuote) return ethers.BigNumber.from(0);
-    return underlyingBorrowQuote[0];
+    return underlyingBorrowQuote.quote;
   }, [underlyingBorrowQuote]);
   const underlyingBorrowFee = useMemo(() => {
-    if (!underlyingBorrowQuote || usingPerpetual) return null;
-    return calculateSwapFee(underlyingBorrowQuote[0]);
+    if (!underlyingBorrowQuote?.quote || usingPerpetual) return null;
+    return calculateSwapFee(underlyingBorrowQuote.quote);
   }, [underlyingBorrowQuote, usingPerpetual]);
 
   const slippageForBorrow = useMemo(() => {
     if (!underlyingBorrowQuote) return 0;
-    return underlyingBorrowQuote[1];
+    return underlyingBorrowQuote.slippage;
   }, [underlyingBorrowQuote]);
 
-  const underlyingRepayQuote: [ethers.BigNumber, number] | null =
+  const nextPriceForBorrow = useMemo(() => {
+    if (usingPerpetual || !underlyingBorrowQuote) return null;
+    return underlyingBorrowQuote.sqrtPriceX96After;
+  }, [usingPerpetual, underlyingBorrowQuote]);
+
+  const underlyingRepayQuote: (QuoterResult & { slippage: number }) | null =
     useAsyncValue(async () => {
       if (isBorrowing || debtToBorrowOrRepay.isZero())
-        return [ethers.BigNumber.from(0), 0];
-      const quote = await getQuoteForSwapOutput(
+        return { ...emptyQuoteResult, slippage: 0 };
+      const quoteResult = await getQuoteForSwapOutput(
         debtToBorrowOrRepay,
         paprController.underlying.id,
         paprController.paprToken.id,
         tokenName as SupportedToken,
       );
-      if (!quote) return null;
+      if (!quoteResult.quote) return null;
       const slippage = await computeSlippageForSwap(
-        quote,
+        quoteResult.quote,
         paprController.underlying,
         paprController.paprToken,
         debtToBorrowOrRepay,
         false,
         tokenName as SupportedToken,
       );
-      return [quote, slippage];
+      return { ...quoteResult, slippage };
     }, [
       isBorrowing,
       debtToBorrowOrRepay,
@@ -264,18 +275,22 @@ export function VaultDebtPicker({
       tokenName,
     ]);
   const underlyingToRepay = useMemo(() => {
-    if (!underlyingRepayQuote) return ethers.BigNumber.from(0);
-    return underlyingRepayQuote[0];
+    if (!underlyingRepayQuote?.quote) return ethers.BigNumber.from(0);
+    return underlyingRepayQuote.quote;
   }, [underlyingRepayQuote]);
   const underlyingRepayFee = useMemo(() => {
-    if (!underlyingRepayQuote || usingPerpetual) return null;
-    return calculateSwapFee(underlyingRepayQuote[0]);
+    if (!underlyingRepayQuote?.quote || usingPerpetual) return null;
+    return calculateSwapFee(underlyingRepayQuote.quote);
   }, [underlyingRepayQuote, usingPerpetual]);
 
   const slippageForRepay = useMemo(() => {
     if (!underlyingRepayQuote) return 0;
-    return underlyingRepayQuote[1];
+    return underlyingRepayQuote.slippage;
   }, [underlyingRepayQuote]);
+  const nextPriceForRepay = useMemo(() => {
+    if (usingPerpetual || !underlyingRepayQuote) return null;
+    return underlyingRepayQuote.sqrtPriceX96After;
+  }, [usingPerpetual, underlyingRepayQuote]);
 
   useEffect(() => {
     if (chosenDebt.lt(currentVaultDebt)) setIsBorrowing(false);
@@ -311,6 +326,63 @@ export function VaultDebtPicker({
         return [underlyingToRepay, debtToBorrowOrRepay];
     }
   }, [writeType, debtToBorrowOrRepay, underlyingToRepay, underlyingToBorrow]);
+
+  const projectedAPR = useMemo(() => {
+    const newSqrtPriceX96 = isBorrowing
+      ? nextPriceForBorrow
+      : nextPriceForRepay;
+    if (!newSqrtPriceX96 || !target || newSqrtPriceX96.isZero()) return null;
+
+    const token0 = paprController.token0IsUnderlying
+      ? paprController.underlying
+      : paprController.paprToken;
+    const token1 = paprController.token0IsUnderlying
+      ? paprController.paprToken
+      : paprController.underlying;
+    const underlying =
+      paprController.underlying.id === token0.id ? token0 : token1;
+    const paprToken =
+      paprController.underlying.id === token0.id ? token1 : token0;
+    const baseCurrency = isBorrowing ? paprToken : underlying;
+    const quoteCurrency = isBorrowing ? underlying : paprToken;
+    const newPrice = parseFloat(
+      new Price(
+        subgraphTokenToToken(baseCurrency, chainId),
+        subgraphTokenToToken(quoteCurrency, chainId),
+        token0.id !== quoteCurrency.id
+          ? Q192.toString()
+          : ethers.BigNumber.from(newSqrtPriceX96)
+              .mul(newSqrtPriceX96)
+              .toString(),
+        token0.id === quoteCurrency.id
+          ? Q192.toString()
+          : ethers.BigNumber.from(newSqrtPriceX96)
+              .mul(newSqrtPriceX96)
+              .toString(),
+      ).toFixed(),
+    );
+    const projectedAPRResult = computeNewProjectedAPR(
+      newPrice,
+      parseFloat(
+        ethers.utils.formatUnits(
+          ethers.BigNumber.from(target),
+          paprController.underlying.decimals,
+        ),
+      ),
+      600,
+      ethers.BigNumber.from(paprController.fundingPeriod),
+      tokenName as SupportedToken,
+    );
+    return projectedAPRResult.newApr;
+  }, [
+    isBorrowing,
+    nextPriceForBorrow,
+    nextPriceForRepay,
+    paprController,
+    tokenName,
+    target,
+    chainId,
+  ]);
 
   const nftSymbol = useMemo(
     () =>
@@ -473,6 +545,7 @@ export function VaultDebtPicker({
               usingPerpetual={usingPerpetual}
               setUsingPerpetual={setUsingPerpetual}
               slippage={isBorrowing ? slippageForBorrow : slippageForRepay}
+              projectedAPR={projectedAPR}
               errorMessage={errorMessage}
             />
             <VaultWriteButton
@@ -693,6 +766,7 @@ type LoanActionSummaryProps = {
   quote: ethers.BigNumber | null;
   fee: ethers.BigNumber | null;
   slippage: number | null;
+  projectedAPR: number | null;
   setUsingPerpetual: (val: boolean) => void;
   errorMessage: string;
 };
@@ -705,6 +779,7 @@ function LoanActionSummary({
   quote,
   fee,
   slippage,
+  projectedAPR,
   setUsingPerpetual,
   errorMessage,
 }: LoanActionSummaryProps) {
@@ -776,6 +851,18 @@ function LoanActionSummary({
             {!fee && <p>-</p>}
           </div>
         </div>
+        <div
+          className={`${
+            usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
+          }`}>
+          <div>
+            <p>Projected Contract Rate</p>
+          </div>
+          <div>
+            {projectedAPR && <p>{formatPercent(projectedAPR)}</p>}
+            {!projectedAPR && <p>-</p>}
+          </div>
+        </div>
         <div>
           <div>
             <p>
@@ -820,12 +907,13 @@ function CostToCloseOrMaximumLoan({
 
   const costToClose = useAsyncValue(async () => {
     if (!vaultHasDebt) return null;
-    return getQuoteForSwapOutput(
+    const quoteResult = await getQuoteForSwapOutput(
       vaultDebt,
       controller.underlying.id,
       controller.paprToken.id,
       tokenName as SupportedToken,
     );
+    return quoteResult.quote;
   }, [
     vaultHasDebt,
     vaultDebt,
@@ -837,12 +925,13 @@ function CostToCloseOrMaximumLoan({
   const maxDebtUnderlying = useAsyncValue(async () => {
     if (!maxLoanPerNFT || vaultHasDebt) return null;
     const maxDebtForAllNFTs = maxLoanPerNFT.mul(numberOfNFTs);
-    return getQuoteForSwap(
+    const quoteResult = await getQuoteForSwap(
       maxDebtForAllNFTs,
       controller.paprToken.id,
       controller.underlying.id,
       tokenName as SupportedToken,
     );
+    return quoteResult.quote;
   }, [
     vaultHasDebt,
     maxLoanPerNFT,

@@ -19,6 +19,7 @@ export const subgraphController = {
     decimals: 18,
   },
   maxLTV: '500000000000000000',
+  fundingPeriod: '7776000',
   vaults: [],
   allowedCollateral: [
     {

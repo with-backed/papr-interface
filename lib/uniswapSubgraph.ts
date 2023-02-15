@@ -1,3 +1,4 @@
+import { Token } from '@uniswap/sdk-core';
 import {
   PoolByIdDocument,
   PoolByIdQuery,
@@ -7,6 +8,7 @@ import {
   SwapsByPoolQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
 
+import { ERC20Token } from './controllers';
 import { clientFromUrl } from './urql';
 
 export async function subgraphUniswapPriceByPool(
@@ -58,4 +60,8 @@ export async function subgraphUniswapPoolById(
   }
 
   return data || null;
+}
+
+export function subgraphTokenToToken(token: ERC20Token, chainId: number) {
+  return new Token(chainId, token.id, token.decimals, token.symbol, token.name);
 }
