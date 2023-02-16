@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 
 const buttonLookup: { [key in SupportedToken]: ButtonTheme } = {
   paprMeme: 'meme',
-  paprTrash: 'trash',
   paprHero: 'hero',
 };
 

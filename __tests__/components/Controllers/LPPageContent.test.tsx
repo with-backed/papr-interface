@@ -4,7 +4,7 @@ import { configs } from 'lib/config';
 
 jest.mock('hooks/useConfig', () => ({
   ...jest.requireActual('hooks/useConfig'),
-  useConfig: jest.fn(() => configs.paprTrash),
+  useConfig: jest.fn(() => configs.paprHero),
 }));
 
 jest.mock('hooks/useController', () => ({
@@ -30,7 +30,7 @@ jest.mock('components/Controllers/LPPageContent/Chart', () => ({
 
 jest.mock('hooks/useTheme', () => ({
   ...jest.requireActual('hooks/useTheme'),
-  useTheme: () => 'paprTrash',
+  useTheme: () => 'paprHero',
 }));
 
 describe('LPPageContent', () => {

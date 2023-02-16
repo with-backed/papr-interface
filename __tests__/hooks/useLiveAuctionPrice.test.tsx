@@ -28,8 +28,8 @@ const auction = {
   endPrice: null,
   paymentAsset: {
     id: '0x103da64f4366dc82ed0393716376a89dfee4b536',
-    name: 'papr trash',
-    symbol: 'paprTRASH',
+    name: 'papr hero',
+    symbol: 'paprHERO',
     decimals: 18,
     __typename: 'ERC20Token' as const,
   },

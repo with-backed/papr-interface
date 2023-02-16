@@ -12,7 +12,7 @@ describe('computeNewProjectedAPR', () => {
       target,
       600,
       fundingPeriod,
-      'paprTrash',
+      'paprHero',
     );
     expect(result).toEqual(expect.objectContaining({ newApr: 0 }));
   });
@@ -24,7 +24,7 @@ describe('computeNewProjectedAPR', () => {
       target,
       600,
       fundingPeriod,
-      'paprTrash',
+      'paprHero',
     );
     expect(result).toEqual(
       expect.objectContaining({ newApr: -2.8110217265187742 }),
@@ -36,7 +36,7 @@ describe('computeNewProjectedAPR', () => {
       target,
       600,
       fundingPeriod,
-      'paprTrash',
+      'paprHero',
     );
     expect(result).toEqual(
       expect.objectContaining({ newApr: -2.8110217265187742 }),
@@ -50,7 +50,7 @@ describe('computeNewProjectedAPR', () => {
       target,
       600,
       fundingPeriod,
-      'paprTrash',
+      'paprHero',
     );
     expect(result).toEqual(
       expect.objectContaining({ newApr: 4.4556720205165234 }),
@@ -62,7 +62,7 @@ describe('computeNewProjectedAPR', () => {
       target,
       600,
       fundingPeriod,
-      'paprTrash',
+      'paprHero',
     );
     expect(result).toEqual(
       expect.objectContaining({ newApr: 4.4556720205165234 }),

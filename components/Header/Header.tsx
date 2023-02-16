@@ -10,7 +10,6 @@ import { useRouter } from 'next/router';
 import paprTitle from 'public/logos/papr-title.png';
 import paprHeroTitle from 'public/logos/paprHERO-title.png';
 import paprMemeTitle from 'public/logos/paprMEME-title.png';
-import paprTrashTitle from 'public/logos/paprTRASH-title.png';
 import React, { ComponentProps, useCallback, useMemo } from 'react';
 import {
   Disclosure,
@@ -126,7 +125,6 @@ function NavLinks({ activeRoute, isHomePage }: NavLinksProps) {
 const imageLookup: { [key in SupportedToken]: StaticImageData } = {
   paprMeme: paprMemeTitle,
   paprHero: paprHeroTitle,
-  paprTrash: paprTrashTitle,
 };
 
 function LogoLink({ isHomePage }: { isHomePage: boolean }) {

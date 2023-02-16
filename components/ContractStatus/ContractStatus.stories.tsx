@@ -5,7 +5,7 @@ import { RatesPositive } from './RatesPositive';
 
 export const Rates = () => {
   return (
-    <ConfigProvider token="paprTrash">
+    <ConfigProvider token="paprHero">
       <div
         style={{
           maxWidth: 640,
