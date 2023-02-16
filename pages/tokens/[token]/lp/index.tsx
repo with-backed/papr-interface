@@ -1,21 +1,15 @@
-import { captureException } from '@sentry/nextjs';
 import { LPPageContent } from 'components/Controllers/LPPageContent';
 import { OpenGraph } from 'components/OpenGraph';
+import { PageLevelStatusFieldsets } from 'components/StatusFieldset/PageLevelStatusFieldsets';
 import { useConfig } from 'hooks/useConfig';
 import { ControllerContextProvider } from 'hooks/useController';
-import { configs, getConfig, SupportedToken } from 'lib/config';
-import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
+import { useSubgraphData } from 'hooks/useSubgraphData';
+import { getConfig, SupportedToken } from 'lib/config';
 import capitalize from 'lodash/capitalize';
 import { GetServerSideProps } from 'next';
 import React from 'react';
 
-type ServerSideProps = {
-  subgraphController: SubgraphController;
-};
-
-export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
-  context,
-) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const token = context.params?.token as SupportedToken;
   const address: string | undefined =
     getConfig(token)?.controllerAddress?.toLocaleLowerCase();
@@ -25,31 +19,21 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     };
   }
 
-  const controllerSubgraphData = await fetchSubgraphData(
-    address,
-    configs[token].uniswapSubgraph,
-    token,
-  );
-
-  if (!controllerSubgraphData) {
-    const e = new Error(`subgraph data for controller ${address} not found`);
-    captureException(e);
-    throw e;
-  }
-
-  const { paprController } = controllerSubgraphData;
-
   return {
-    props: {
-      subgraphController: paprController,
-    },
+    props: {},
   };
 };
 
-export default function LP({ subgraphController }: ServerSideProps) {
+export default function LP() {
   const { network } = useConfig();
+  const subgraphData = useSubgraphData();
+
+  if (!subgraphData.subgraphController) {
+    return <PageLevelStatusFieldsets {...subgraphData} />;
+  }
+
   return (
-    <ControllerContextProvider value={subgraphController}>
+    <ControllerContextProvider value={subgraphData.subgraphController}>
       <OpenGraph title={`Backed | ${capitalize(network)} | LP`} />
       <LPPageContent />
     </ControllerContextProvider>

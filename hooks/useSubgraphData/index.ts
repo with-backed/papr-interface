@@ -1,0 +1,1 @@
+export { useSubgraphData } from './useSubgraphData';
