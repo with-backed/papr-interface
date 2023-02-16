@@ -14,7 +14,7 @@ const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_KEY as string;
 
 const goerliJsonRpcProvider = `https://eth-goerli.alchemyapi.io/v2/${alchemyId}`;
 const goerliSubgraph =
-  'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.92/gn';
+  'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.95/gn';
 
 const paprTrash: Config = {
   ...baseConfig,
@@ -45,9 +45,9 @@ const paprHero: Config = {
   alchemyId,
   etherscanUrl: 'https://goerli.etherscan.io',
   network: 'goerli',
-  controllerAddress: '0xd0a830278773282bbf635fd8e47b2447f1e9fe86',
+  controllerAddress: '0x092018ff54df5bfa53e1c6e75ad0e2d8991a8b1e',
   underlyingAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
-  paprTokenAddress: '0x047067ad8b5bf37bb93bb61af73f73fd9f8ca5af',
+  paprTokenAddress: '0x6f32f58cd64d0ba76a16f5e8ff11498d965a82dc',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprSubgraph: goerliSubgraph,
