@@ -365,7 +365,7 @@ export function VaultDebtPicker({
       newPrice,
       parseFloat(
         ethers.utils.formatUnits(
-          ethers.BigNumber.from(target.newTarget),
+          ethers.BigNumber.from(target),
           paprController.underlying.decimals,
         ),
       ),
