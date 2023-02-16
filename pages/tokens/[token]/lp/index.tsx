@@ -5,7 +5,6 @@ import { useConfig } from 'hooks/useConfig';
 import { ControllerContextProvider } from 'hooks/useController';
 import { useSubgraphData } from 'hooks/useSubgraphData';
 import { getConfig, SupportedToken } from 'lib/config';
-import { subgraphController } from 'lib/mockData/mockPaprController';
 import capitalize from 'lodash/capitalize';
 import { GetServerSideProps } from 'next';
 import React from 'react';
@@ -34,7 +33,7 @@ export default function LP() {
   }
 
   return (
-    <ControllerContextProvider value={subgraphController}>
+    <ControllerContextProvider value={subgraphData.subgraphController}>
       <OpenGraph title={`Backed | ${capitalize(network)} | LP`} />
       <LPPageContent />
     </ControllerContextProvider>
