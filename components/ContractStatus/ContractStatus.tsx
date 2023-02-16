@@ -15,7 +15,7 @@ export function ContractStatus() {
     error: pricesDataError,
   } = useControllerPricesData();
   const contractAPR = useMemo(() => {
-    if (!pricesData || pricesData.targetValues.length < 2) {
+    if (!pricesData) {
       return null;
     }
     const l = pricesData.targetValues.length;

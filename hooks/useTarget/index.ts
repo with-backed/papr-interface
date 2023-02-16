@@ -1,2 +1,1 @@
-export type { TargetUpdate } from './useTarget';
-export { TargetProvider, useTarget } from './useTarget';
+export { useTarget, TargetProvider } from './useTarget';

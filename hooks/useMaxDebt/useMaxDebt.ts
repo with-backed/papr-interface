@@ -40,13 +40,10 @@ export function useMaxDebt(
     }
 
     if (typeof collateral === 'string') {
-      if (!oracleInfo[collateral]?.price) {
-        return null;
-      }
       return maxDebt(
         parseUnits(oracleInfo[collateral].price.toString(), decimals),
         maxLTV,
-        target.newTarget,
+        target,
       );
     }
 
@@ -54,7 +51,7 @@ export function useMaxDebt(
       maxDebt(
         parseUnits(oracleInfo[asset].price.toString(), decimals),
         maxLTV,
-        target.newTarget,
+        target,
       ),
     );
 

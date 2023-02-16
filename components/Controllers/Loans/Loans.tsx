@@ -38,12 +38,7 @@ export function Loans() {
   });
 
   const computedAvg = useMemo(() => {
-    if (
-      !totalSupply ||
-      !NFTValue ||
-      !pricesData ||
-      pricesData.targetValues.length === 0
-    ) {
+    if (!totalSupply || !NFTValue || !pricesData) {
       return 0;
     }
     if (!ethers.BigNumber.isBigNumber(totalSupply)) {
