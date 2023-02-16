@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 
 jest.mock('hooks/useConfig', () => ({
   ...jest.requireActual('hooks/useConfig'),
-  useConfig: () => configs.paprTrash,
+  useConfig: () => configs.paprHero,
 }));
 
 jest.mock('next/router', () => ({
@@ -18,11 +18,11 @@ const mockedUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 describe('useTheme', () => {
   it('returns the token name in the current config', () => {
     mockedUseRouter.mockReturnValue({
-      asPath: '/tokens/paprTrash/whatever',
+      asPath: '/tokens/paprHero/whatever',
     } as any);
     const { result } = renderHook(() => useTheme());
 
-    expect(result.current).toEqual('trash');
+    expect(result.current).toEqual('hero');
   });
 
   it('returns the default (papr) on the homepage', () => {

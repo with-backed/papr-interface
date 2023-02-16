@@ -51,7 +51,7 @@ jest.mock('wagmi', () => ({
 }));
 jest.mock('hooks/useConfig', () => ({
   ...jest.requireActual('hooks/useConfig'),
-  useConfig: jest.fn(() => configs.paprTrash),
+  useConfig: jest.fn(() => configs.paprHero),
 }));
 
 const mockedUseContractWrite = useContractWrite as jest.MockedFunction<

@@ -1,5 +1,4 @@
 import { configs, SupportedToken, validateToken } from 'lib/config';
-import { generateDummyOracleMessage } from 'lib/oracle/fakeMessages';
 import {
   getSignedOracleFloorPriceMessage,
   OraclePriceType,
@@ -19,21 +18,15 @@ async function handler(
       kind: OraclePriceType;
     };
 
-    if (token === 'paprTrash') {
-      return res
-        .status(200)
-        .json(await generateDummyOracleMessage(collection, kind));
-    } else {
-      return res
-        .status(200)
-        .json(
-          await getSignedOracleFloorPriceMessage(
-            collection,
-            configs[token],
-            kind,
-          ),
-        );
-    }
+    return res
+      .status(200)
+      .json(
+        await getSignedOracleFloorPriceMessage(
+          collection,
+          configs[token],
+          kind,
+        ),
+      );
   } catch (e) {
     return res.status(400).json(null);
   }

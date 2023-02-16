@@ -16,26 +16,6 @@ const goerliJsonRpcProvider = `https://eth-goerli.alchemyapi.io/v2/${alchemyId}`
 const goerliSubgraph =
   'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr-goerli/0.1.95/gn';
 
-const paprTrash: Config = {
-  ...baseConfig,
-  tokenName: 'paprTrash',
-  centerNetwork: 'ethereum-goerli',
-  chainId: 5,
-  jsonRpcProvider: goerliJsonRpcProvider,
-  alchemyId,
-  etherscanUrl: 'https://goerli.etherscan.io',
-  network: 'goerli',
-  controllerAddress: '0x9de959beb8c84710e929b2182c97007f3c372d73',
-  underlyingAddress: '0xf5f4619764b3bcba95aba3b25212365fc6166862',
-  paprTokenAddress: '0x1f1552f82ff0331d223bf9a9c9ae68c5cc8a2026',
-  uniswapSubgraph:
-    'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
-  paprSubgraph: goerliSubgraph,
-  reservoirAPI: 'https://api-goerli.reservoir.tools',
-  erc721Subgraph:
-    'https://api.thegraph.com/subgraphs/name/adamgobes/erc721-goerli',
-};
-
 const paprHero: Config = {
   ...baseConfig,
   tokenName: 'paprHero',
@@ -78,7 +58,6 @@ const paprMeme = {
 
 export function getConfig(configName: string) {
   const c: { [name: string]: any } = {
-    paprtrash: paprTrash,
     paprhero: paprHero,
     paprmeme: paprMeme,
   };
@@ -87,14 +66,13 @@ export function getConfig(configName: string) {
 
 // DEPRECATE IN FAVOR OF getConfig
 export const configs = {
-  paprTrash,
   paprHero,
   paprMeme,
 };
 
 export const prodConfigs = [paprMeme];
 
-export const devConfigs = [paprTrash, paprHero];
+export const devConfigs = [paprHero];
 
 const SUPPORTED_TOKENS = new Set(Object.keys(configs));
 
