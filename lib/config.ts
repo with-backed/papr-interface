@@ -34,6 +34,8 @@ const paprHero: Config = {
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   erc721Subgraph:
     'https://api.thegraph.com/subgraphs/name/adamgobes/erc721-goerli',
+  // TODO: fill this out when goerli works with latest subgraph
+  uniswapPoolAddress: '',
 };
 
 const paprMeme = {
@@ -54,6 +56,7 @@ const paprMeme = {
   reservoirAPI: 'https://api.reservoir.tools',
   erc721Subgraph:
     'https://api.thegraph.com/subgraphs/name/sunguru98/mainnet-erc721-subgraph',
+  uniswapPoolAddress: '0x238cdffc9097591d12f5c00136514fbe563f87bf',
 };
 
 export function getConfig(configName: string) {
