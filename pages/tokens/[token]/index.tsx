@@ -31,8 +31,7 @@ export default function ControllerPage() {
   const [{ data: poolData, fetching: poolFetching, error: poolError }] =
     useQuery<PoolByIdQuery>({
       query: PoolByIdDocument,
-      variables: { id: controllerQueryData?.paprController?.poolAddress },
-      pause: !controllerQueryData?.paprController,
+      variables: { id: config.uniswapPoolAddress },
       context: useMemo(
         () => ({
           url: config.uniswapSubgraph,
@@ -67,6 +66,7 @@ export default function ControllerPage() {
     return ':c';
   }
 
+  console.log(controllerQueryData.paprController.poolAddress);
   return (
     <OracleInfoProvider collections={collections}>
       <ControllerContextProvider value={controllerQueryData.paprController}>
