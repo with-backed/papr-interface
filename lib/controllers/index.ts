@@ -7,7 +7,7 @@ import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { lambertW0 } from 'lambert-w-function';
 import { configs, SupportedToken } from 'lib/config';
 import { SECONDS_IN_A_DAY, SECONDS_IN_A_YEAR } from 'lib/constants';
-import { Quoter } from 'lib/contracts';
+import { jsonRpcControllerContract, Quoter } from 'lib/contracts';
 import { formatBigNum } from 'lib/numberFormat';
 import { OraclePriceType, ReservoirResponseData } from 'lib/oracle/reservoir';
 import { SubgraphController } from 'lib/PaprController';
@@ -97,39 +97,24 @@ export function secondsForRatePeriod(period: RatePeriod): number {
   }
 }
 
-export type QuoterResult = {
-  quote: ethers.BigNumber | null;
-  sqrtPriceX96After: ethers.BigNumber | null;
-};
-
-export const emptyQuoteResult: QuoterResult = {
-  quote: ethers.BigNumber.from(0),
-  sqrtPriceX96After: ethers.BigNumber.from(0),
-};
-
-export const nullQuoteResult: QuoterResult = {
-  quote: null,
-  sqrtPriceX96After: null,
-};
-
 export async function getQuoteForSwap(
   amount: ethers.BigNumber,
   tokenIn: string,
   tokenOut: string,
   tokenName: SupportedToken,
-): Promise<QuoterResult> {
+) {
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   try {
-    const q = await quoter.callStatic.quoteExactInputSingle({
+    const q = await quoter.callStatic.quoteExactInputSingle(
       tokenIn,
       tokenOut,
-      fee: FEE_TIER,
-      amountIn: amount,
-      sqrtPriceLimitX96: 0,
-    });
-    return { quote: q.amountOut, sqrtPriceX96After: q.sqrtPriceX96After };
+      FEE_TIER,
+      amount,
+      0,
+    );
+    return q;
   } catch (_e) {
-    return nullQuoteResult;
+    return null;
   }
 }
 
@@ -138,19 +123,19 @@ export async function getQuoteForSwapOutput(
   tokenIn: string,
   tokenOut: string,
   tokenName: SupportedToken,
-): Promise<QuoterResult> {
+) {
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   try {
-    const q = await quoter.callStatic.quoteExactOutputSingle({
+    const q = await quoter.callStatic.quoteExactOutputSingle(
       tokenIn,
       tokenOut,
-      fee: FEE_TIER,
+      FEE_TIER,
       amount,
-      sqrtPriceLimitX96: 0,
-    });
-    return { quote: q.amountIn, sqrtPriceX96After: q.sqrtPriceX96After };
+      0,
+    );
+    return q;
   } catch (_e) {
-    return nullQuoteResult;
+    return null;
   }
 }
 
@@ -206,23 +191,21 @@ export async function computeSlippageForSwap(
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   let quoteWithoutSlippage: ethers.BigNumber;
   if (useExactInput) {
-    ({ amountOut: quoteWithoutSlippage } =
-      await quoter.callStatic.quoteExactInputSingle({
-        tokenIn: tokenIn.id,
-        tokenOut: tokenOut.id,
-        fee: FEE_TIER,
-        amountIn: withoutSlippageAmount,
-        sqrtPriceLimitX96: 0,
-      }));
+    quoteWithoutSlippage = await quoter.callStatic.quoteExactInputSingle(
+      tokenIn.id,
+      tokenOut.id,
+      ethers.BigNumber.from(10).pow(4),
+      withoutSlippageAmount,
+      0,
+    );
   } else {
-    ({ amountIn: quoteWithoutSlippage } =
-      await quoter.callStatic.quoteExactOutputSingle({
-        tokenIn: tokenIn.id,
-        tokenOut: tokenOut.id,
-        fee: FEE_TIER,
-        amount: withoutSlippageAmount,
-        sqrtPriceLimitX96: 0,
-      }));
+    quoteWithoutSlippage = await quoter.callStatic.quoteExactOutputSingle(
+      tokenIn.id,
+      tokenOut.id,
+      ethers.BigNumber.from(10).pow(4),
+      withoutSlippageAmount,
+      0,
+    );
   }
 
   const quoteWithSlippageFloat = parseFloat(
@@ -348,18 +331,23 @@ export function controllerNFTValue(
   return value;
 }
 
-export function computeNewProjectedAPR(
+export async function computeNewProjectedAPR(
   newMark: number,
   target: number,
   secondsHeld: number,
-  fundingPeriod: ethers.BigNumber,
   token: SupportedToken,
-): { newApr: number; newTarget: number } {
+): Promise<{ newApr: number; newTarget: number }> {
+  const controller = jsonRpcControllerContract(
+    configs[token].controllerAddress,
+    configs[token].jsonRpcProvider,
+    token,
+  );
+
   const targetMarkRatioMax = 3.0;
   const targetMarkRatioMin = 0.5;
-  const fundingPeriodNumber = fundingPeriod.toNumber();
+  const fundingPeriod = (await controller.fundingPeriod()).toNumber();
 
-  const periodRatio = secondsHeld / fundingPeriodNumber;
+  const periodRatio = secondsHeld / fundingPeriod;
   let targetMarkRatio: number;
   if (newMark === 0) {
     targetMarkRatio = targetMarkRatioMax;

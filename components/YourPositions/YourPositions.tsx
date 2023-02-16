@@ -118,13 +118,12 @@ export function YourPositions() {
 
   const totalPaprMemeDebtInUnderlying = useAsyncValue(async () => {
     if (totalPaprMemeDebt.isZero()) return null;
-    const quoteResult = await getQuoteForSwap(
+    return getQuoteForSwap(
       totalPaprMemeDebt,
       paprController.paprToken.id,
       paprController.underlying.id,
       tokenName as SupportedToken,
     );
-    return quoteResult.quote;
   }, [
     tokenName,
     paprController.paprToken.id,
@@ -242,13 +241,12 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
   const nftSymbol = vaultInfo.token.symbol;
   const costToClose = useAsyncValue(async () => {
     if (BigNumber.from(vaultInfo.debt).isZero()) return BigNumber.from(0);
-    const quoteResult = await getQuoteForSwapOutput(
+    return getQuoteForSwapOutput(
       BigNumber.from(vaultInfo.debt),
       underlying.id,
       paprToken.id,
       tokenName as SupportedToken,
     );
-    return quoteResult.quote;
   }, [vaultInfo.debt, tokenName, paprToken.id, underlying.id]);
 
   if (
