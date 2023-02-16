@@ -9,7 +9,7 @@ import { useConfig } from 'hooks/useConfig';
 import { GlobalMessagingProvider } from 'hooks/useGlobalMessages';
 import { PaprBalanceProvider } from 'hooks/usePaprBalance';
 import { TargetProvider } from 'hooks/useTarget';
-import { TimestampProvider } from 'hooks/useTimestamp';
+import { TimestampProvider } from 'hooks/useTimestamp/useTimestamp';
 import { FunctionComponent, useMemo } from 'react';
 import {
   createClient as createUrqlClient,
@@ -48,7 +48,7 @@ export const ApplicationProviders: FunctionComponent = ({ children }) => {
     return [thisChain, ...CHAINS];
   }, [network]);
 
-  const { provider, chains, webSocketProvider } = useMemo(
+  const { provider, chains } = useMemo(
     () =>
       configureChains(orderedChains, [
         alchemyProvider({ apiKey: alchemyId }),
@@ -72,9 +72,8 @@ export const ApplicationProviders: FunctionComponent = ({ children }) => {
       autoConnect: true,
       connectors,
       provider,
-      webSocketProvider,
     });
-  }, [connectors, provider, webSocketProvider]);
+  }, [connectors, provider]);
 
   const inKindClient = useMemo(() => {
     return createUrqlClient({
@@ -96,13 +95,13 @@ export const ApplicationProviders: FunctionComponent = ({ children }) => {
           <CenterProvider
             network={centerNetwork as any}
             apiKey={process.env.NEXT_PUBLIC_CENTER_KEY ?? ''}>
-            <TimestampProvider>
-              <TargetProvider>
-                <PaprBalanceProvider>
+            <TargetProvider>
+              <PaprBalanceProvider>
+                <TimestampProvider>
                   <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-                </PaprBalanceProvider>
-              </TargetProvider>
-            </TimestampProvider>
+                </TimestampProvider>
+              </PaprBalanceProvider>
+            </TargetProvider>
           </CenterProvider>
         </RainbowKitProvider>
       </WagmiConfig>

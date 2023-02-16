@@ -1,8 +1,8 @@
 import { getAddress } from '@ethersproject/address';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController/useController';
-import { TargetUpdate, useTarget } from 'hooks/useTarget';
+import { useTarget } from 'hooks/useTarget';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import { price } from 'lib/controllers/charts/mark';
@@ -116,7 +116,7 @@ export function useControllerPricesData(): ControllerPricesDataReturn {
 
   const index = useMemo(() => parseFloat(ethers.utils.formatEther(1)), []);
 
-  if (poolFetching || swapsFetching || targetUpdatesFetching || !newTarget) {
+  if (poolFetching || swapsFetching || targetUpdatesFetching) {
     return {
       pricesData: null,
       fetching: true,
@@ -141,20 +141,20 @@ export function useControllerPricesData(): ControllerPricesDataReturn {
 
 function targets(
   targetUpdates: TargetUpdatesByControllerQuery['targetUpdates'],
-  targetUpdate: TargetUpdate,
+  newTarget: BigNumber,
   underlyingDecimals: ethers.BigNumberish,
 ) {
+  const now = Math.floor(Date.now() / 1000);
   const sortedTargets = [...targetUpdates].sort(
     (a, b) => a.timestamp - b.timestamp,
   );
 
   // get what target would be if updated at this moment and add to array
   if (sortedTargets.length > 0) {
-    const { newTarget, timestamp } = targetUpdate;
     sortedTargets.push({
       id: 'filler',
       newTarget,
-      timestamp,
+      timestamp: now,
     });
   }
 

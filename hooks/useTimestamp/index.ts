@@ -1,1 +1,1 @@
-export { TimestampProvider, useTimestamp } from './useTimestamp';
+export { useTimestamp } from './useTimestamp';
