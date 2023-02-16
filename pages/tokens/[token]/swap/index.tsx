@@ -1,8 +1,8 @@
-import { captureException } from '@sentry/nextjs';
 import { OpenGraph } from 'components/OpenGraph';
+import { PageLevelStatusFieldsets } from 'components/StatusFieldset/PageLevelStatusFieldsets';
 import { ControllerContextProvider } from 'hooks/useController';
-import { configs, getConfig, SupportedToken } from 'lib/config';
-import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
+import { useSubgraphData } from 'hooks/useSubgraphData';
+import { getConfig, SupportedToken } from 'lib/config';
 import capitalize from 'lodash/capitalize';
 import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
@@ -25,23 +25,8 @@ export const getServerSideProps: GetServerSideProps<SwapProps> = async (
     };
   }
 
-  const controllerSubgraphData = await fetchSubgraphData(
-    address,
-    configs[token].uniswapSubgraph,
-    token,
-  );
-
-  if (!controllerSubgraphData) {
-    const e = new Error(`subgraph data for controller ${address} not found`);
-    captureException(e);
-    throw e;
-  }
-
-  const { paprController } = controllerSubgraphData;
-
   return {
     props: {
-      subgraphController: paprController,
       token,
     },
   };
@@ -49,11 +34,16 @@ export const getServerSideProps: GetServerSideProps<SwapProps> = async (
 
 type SwapProps = {
   token: SupportedToken;
-  subgraphController: SubgraphController;
 };
-export default function Swap({ subgraphController, token }: SwapProps) {
+
+export default function Swap({ token }: SwapProps) {
+  const subgraphData = useSubgraphData();
+
+  if (!subgraphData.subgraphController || !subgraphData.subgraphPool) {
+    return <PageLevelStatusFieldsets {...subgraphData} />;
+  }
   return (
-    <ControllerContextProvider value={subgraphController}>
+    <ControllerContextProvider value={subgraphData.subgraphController}>
       <OpenGraph title={`Backed | ${capitalize(token)} | Swap`} />
       <SwapPageContent />
     </ControllerContextProvider>
