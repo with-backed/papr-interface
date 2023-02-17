@@ -1,0 +1,5 @@
+query poolByIdByBlock($id: ID!, $blockHeight: Int!) {
+  pool(id: $id, block: { number: $blockHeight }) {
+    ...allPoolProperties
+  }
+}
