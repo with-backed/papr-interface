@@ -2,6 +2,7 @@ import { TransactionButton } from 'components/Button';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useController } from 'hooks/useController';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { pirsch } from 'lib/pirsch';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ERC721__factory } from 'types/generated/abis';
 import {
@@ -59,7 +60,13 @@ export function ApproveNFTButton({
   const { data, write, error } = useContractWrite({
     ...config,
     onSuccess: (data: any) => {
-      data.wait().then(() => setApproved(true));
+      data.wait().then(() => {
+        pirsch(`NFT ${symbol} approved`, {});
+        setApproved(true);
+      });
+    },
+    onError: () => {
+      pirsch(`NFT ${symbol} approval failed`, {});
     },
   });
 

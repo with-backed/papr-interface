@@ -1,5 +1,6 @@
 import { ButtonTheme } from 'components/Button/Button';
-import { useMemo } from 'react';
+import { pirsch } from 'lib/pirsch';
+import { useCallback, useMemo } from 'react';
 import ReactSlider from 'react-slider';
 
 import styles from './Slider.module.css';
@@ -40,6 +41,17 @@ export function Slider({
     if (divisibleSteps < 1) return divisibleSteps;
     return 1;
   }, [max, min]);
+
+  const handleAfterChange: typeof onAfterChange = useCallback(
+    (value, index) => {
+      pirsch('Slider dragged', {});
+      if (onAfterChange) {
+        onAfterChange(value, index);
+      }
+    },
+    [onAfterChange],
+  );
+
   return (
     <>
       <div
@@ -63,7 +75,7 @@ export function Slider({
         step={step}
         pearling
         onChange={onChange}
-        onAfterChange={onAfterChange}
+        onAfterChange={handleAfterChange}
         value={value}
       />
     </>

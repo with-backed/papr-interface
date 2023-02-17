@@ -2,6 +2,7 @@ import useResizeObserver from '@react-hook/resize-observer';
 import { TextButton } from 'components/Button';
 import { Fieldset as BaseFieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
+import { pirsch } from 'lib/pirsch';
 import {
   FunctionComponent,
   useCallback,
@@ -41,6 +42,15 @@ export function Summary({
     () => contractRate.replace(/(\d+\.\d)(\d)(%)/, '$1$3'),
     [contractRate],
   );
+
+  const toggle = useCallback(() => {
+    const message = disclosureState.visible
+      ? 'Contract status details collapsed'
+      : 'Contract status details expanded';
+    pirsch(message, {});
+    disclosureState.toggle();
+  }, [disclosureState]);
+
   return (
     <Table>
       <thead>
@@ -61,7 +71,7 @@ export function Summary({
               : 'Contract is acting to lower Market Price'}
           </td>
           <td className={styles.details}>
-            <Disclosure as={TextButton} {...disclosureState}>
+            <Disclosure as={TextButton} {...disclosureState} toggle={toggle}>
               {disclosureState.visible ? 'Collapse' : 'Expand'}
             </Disclosure>
           </td>
