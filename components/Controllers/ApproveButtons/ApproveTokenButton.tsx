@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { ERC20Token } from 'lib/controllers';
+import { pirsch } from 'lib/pirsch';
 import { useCallback, useEffect, useState } from 'react';
 import { ERC20__factory } from 'types/generated/abis';
 import {
@@ -59,7 +60,13 @@ export function ApproveTokenButton({
   const { data, write, error } = useContractWrite({
     ...config,
     onSuccess: (data: any) => {
-      data.wait().then(() => setTokenApproved(true));
+      data.wait().then(() => {
+        pirsch(`ERC20 ${token.symbol} approved`, {});
+        setTokenApproved(true);
+      });
+    },
+    onError: () => {
+      pirsch(`ERC20 ${token.symbol} approval failed`, {});
     },
   });
 
