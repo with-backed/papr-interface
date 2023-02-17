@@ -5,8 +5,7 @@ import { usePoolStats } from 'hooks/usePoolStats';
 import styles from './PoolStats.module.css';
 
 export function PoolStats() {
-  const { fees24h, volume24h, totalVolume, feeTier, totalValueLocked } =
-    usePoolStats();
+  const { fees24h, volume24h, totalVolume, totalValueLocked } = usePoolStats();
   return (
     <Fieldset legend="🦄 Pool Stats">
       <Table>
@@ -15,8 +14,7 @@ export function PoolStats() {
             <th>TVL</th>
             <th>Total Volume</th>
             <th>24H Volume</th>
-            <th>24H Fees</th>
-            <th>LPs Earn</th>
+            <th>24H LP Fees</th>
           </tr>
         </thead>
         <tbody>
@@ -25,7 +23,6 @@ export function PoolStats() {
             <td>{totalVolume}</td>
             <td>{volume24h}</td>
             <td>{fees24h}</td>
-            <td>{feeTier}</td>
           </tr>
         </tbody>
       </Table>
