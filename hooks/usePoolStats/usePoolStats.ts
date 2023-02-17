@@ -1,21 +1,30 @@
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { usePoolDayDatas } from 'hooks/usePoolDayDatas';
 import { formatDollars, formatPercent } from 'lib/numberFormat';
 import { useMemo } from 'react';
 import {
+  PoolByIdByBlockDocument,
+  PoolByIdByBlockQuery,
   PoolByIdDocument,
   PoolByIdQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
 import { useQuery } from 'urql';
+import { useBlockNumber } from 'wagmi';
 
 const LOADING = 'Loading...';
 const NO_DATA = '---';
 
+// We don't want to refresh the pool data on every block number
+const BLOCK_NUMBER_CACHE_TIME = 1000 * 60 * 60;
+
+// Assuming 12s per block, one day ago is current block number
+// minus 7200.
+const BLOCKS_IN_A_DAY = 7200;
+
 export function usePoolStats() {
+  const blockNumber = useBlockNumber({ cacheTime: BLOCK_NUMBER_CACHE_TIME });
   const { uniswapSubgraph } = useConfig();
   const { poolAddress } = useController();
-  const { data: poolDayDatas, allFound } = usePoolDayDatas();
 
   const [{ data: poolByIdData, fetching, error }] = useQuery<PoolByIdQuery>({
     query: PoolByIdDocument,
@@ -28,7 +37,82 @@ export function usePoolStats() {
     ),
   });
 
+  const [
+    {
+      data: poolByIdYesterdayData,
+      fetching: poolByIdYesterdayFetching,
+      error: poolByIdYesterdayError,
+    },
+  ] = useQuery<PoolByIdByBlockQuery>({
+    query: PoolByIdByBlockDocument,
+    variables: {
+      id: poolAddress,
+      blockHeight: blockNumber?.data ? blockNumber.data - BLOCKS_IN_A_DAY : 0,
+    },
+    pause: !blockNumber,
+    context: useMemo(
+      () => ({
+        url: uniswapSubgraph,
+      }),
+      [uniswapSubgraph],
+    ),
+  });
+
   const volume24h = useMemo(() => {
+    if (fetching || poolByIdYesterdayFetching) {
+      return LOADING;
+    }
+    if (
+      error ||
+      !poolByIdData?.pool ||
+      poolByIdYesterdayError ||
+      !poolByIdYesterdayData?.pool
+    ) {
+      return NO_DATA;
+    }
+
+    const { volumeUSD } = poolByIdData.pool;
+    const { volumeUSD: volumeUSDYesterday } = poolByIdYesterdayData.pool;
+
+    return formatDollars(
+      parseFloat(volumeUSD) - parseFloat(volumeUSDYesterday),
+    );
+  }, [
+    error,
+    fetching,
+    poolByIdData,
+    poolByIdYesterdayData,
+    poolByIdYesterdayError,
+    poolByIdYesterdayFetching,
+  ]);
+
+  const fees24h = useMemo(() => {
+    if (fetching || poolByIdYesterdayFetching) {
+      return LOADING;
+    }
+    if (
+      error ||
+      !poolByIdData?.pool ||
+      poolByIdYesterdayError ||
+      !poolByIdYesterdayData?.pool
+    ) {
+      return NO_DATA;
+    }
+
+    const { feesUSD } = poolByIdData.pool;
+    const { feesUSD: feesUSDYesterday } = poolByIdYesterdayData.pool;
+
+    return formatDollars(parseFloat(feesUSD) - parseFloat(feesUSDYesterday));
+  }, [
+    error,
+    fetching,
+    poolByIdData,
+    poolByIdYesterdayData,
+    poolByIdYesterdayError,
+    poolByIdYesterdayFetching,
+  ]);
+
+  const totalVolume = useMemo(() => {
     if (fetching) {
       return LOADING;
     }
@@ -37,33 +121,7 @@ export function usePoolStats() {
     }
 
     return formatDollars(poolByIdData.pool.volumeUSD);
-  }, [poolByIdData, error, fetching]);
-
-  const fees24h = useMemo(() => {
-    if (fetching) {
-      return LOADING;
-    }
-    if (error || !poolByIdData?.pool) {
-      return NO_DATA;
-    }
-    const { feeTier, volumeUSD } = poolByIdData.pool;
-    const volumeNum = parseFloat(volumeUSD);
-    const feeTierNum = parseInt(feeTier);
-    return formatDollars(volumeNum * (feeTierNum / 1000000));
-  }, [poolByIdData, error, fetching]);
-
-  const totalVolume = useMemo(() => {
-    if (!allFound) {
-      return LOADING;
-    }
-
-    return formatDollars(
-      poolDayDatas.reduce(
-        (acc, { volumeUSD }) => acc + parseFloat(volumeUSD),
-        0,
-      ),
-    );
-  }, [allFound, poolDayDatas]);
+  }, [error, fetching, poolByIdData]);
 
   const feeTier = useMemo(() => {
     if (fetching) {

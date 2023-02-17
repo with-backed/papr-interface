@@ -1,21 +1,5 @@
 query poolById($id: ID!) {
   pool(id: $id) {
-    feeTier
-    liquidity
-    volumeUSD
-    totalValueLockedUSD
-    tick
-    token0 {
-      id
-      decimals
-      symbol
-      name
-    }
-    token1 {
-      id
-      decimals
-      symbol
-      name
-    }
+    ...allPoolProperties
   }
 }

@@ -1,0 +1,20 @@
+fragment allPoolProperties on Pool {
+  feeTier
+  liquidity
+  volumeUSD
+  feesUSD
+  totalValueLockedUSD
+  tick
+  token0 {
+    id
+    decimals
+    symbol
+    name
+  }
+  token1 {
+    id
+    decimals
+    symbol
+    name
+  }
+}
