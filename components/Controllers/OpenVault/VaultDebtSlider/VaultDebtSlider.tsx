@@ -32,6 +32,7 @@ export function VaultDebtSlider({
     '',
     maxDebtNumber,
   ]);
+  const [defaultInitialized, setDefaultInitialized] = useState<boolean>(false);
 
   const initBlackTrackWidth = useCallback(
     (val: string) => {
@@ -42,15 +43,21 @@ export function VaultDebtSlider({
   );
 
   useEffect(() => {
-    if (maxDebtNumber > 0 && currentVaultDebtNumber === 0) {
+    if (
+      maxDebtNumber > 0 &&
+      currentVaultDebtNumber === 0 &&
+      !defaultInitialized
+    ) {
       setControlledSliderValue(maxDebtNumber / 2);
       handleChosenDebtChanged((maxDebtNumber / 2).toString());
+      setDefaultInitialized(true);
     }
   }, [
     maxDebtNumber,
     currentVaultDebtNumber,
     handleChosenDebtChanged,
     setControlledSliderValue,
+    defaultInitialized,
   ]);
 
   useEffect(() => {
