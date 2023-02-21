@@ -145,27 +145,20 @@ export function VaultWriteButton({
 
   const buttonText = useMemo(() => {
     if (!oracleInfoSynced) return 'Waiting for oracle...';
-    const updateOrBorrowText =
-      vaultHasDebt || vaultCollateralCount > 0 ? 'Update Loan' : 'Borrow';
-    if (amount.isZero()) {
-      if (depositNFTs.length > 0 && withdrawNFTs.length === 0) {
-        return depositNFTs.length === 1 ? 'Add NFT' : 'Add NFTs';
-      } else if (withdrawNFTs.length > 0 && depositNFTs.length === 0) {
-        return withdrawNFTs.length === 1 ? 'Withdraw NFT' : 'Withdraw NFTs';
-      } else {
-        return updateOrBorrowText;
-      }
-    } else {
-      return updateOrBorrowText;
-    }
-  }, [
-    oracleInfoSynced,
-    vaultHasDebt,
-    vaultCollateralCount,
-    depositNFTs.length,
-    withdrawNFTs.length,
-    amount,
-  ]);
+    let actions: string[] = [];
+    if (depositNFTs.length > 0) actions = [...actions, 'Deposit'];
+    if (withdrawNFTs.length > 0) actions = [...actions, 'Withdraw'];
+    actions = [
+      ...actions,
+      writeType === VaultWriteType.Repay ||
+      writeType === VaultWriteType.RepayWithSwap
+        ? 'Repay'
+        : 'Borrow',
+    ];
+    if (actions.length > 2) return 'Update Loan';
+    else if (actions.length > 1) return actions.join(' & ');
+    else return actions[0];
+  }, [oracleInfoSynced, depositNFTs.length, withdrawNFTs.length, writeType]);
 
   return (
     <>
