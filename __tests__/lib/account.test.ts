@@ -2,17 +2,6 @@ import { ethers } from 'ethers';
 import { resolveEns } from 'lib/account';
 import { configs } from 'lib/config';
 
-jest.mock('lib/contracts', () => ({
-  ...jest.requireActual('lib/contracts'),
-  jsonRpcERC20Contract: jest.fn().mockReturnValue({
-    balanceOf: jest.fn().mockResolvedValue(10000000000),
-    allowance: jest.fn().mockResolvedValue(10000000000),
-  }),
-  web3Erc20Contract: jest.fn().mockReturnValue({
-    approve: jest.fn().mockResolvedValue({ hash: '0xhash' }),
-  }),
-}));
-
 const providerSpy = jest.spyOn(ethers.providers, 'JsonRpcProvider');
 providerSpy.mockImplementation(
   () =>
