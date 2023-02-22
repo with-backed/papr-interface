@@ -1,11 +1,17 @@
+import { captureException } from '@sentry/nextjs';
 import { TestPageContent } from 'components/Controllers/TestPageContent';
-import { PageLevelStatusFieldsets } from 'components/StatusFieldset/PageLevelStatusFieldsets';
-import { ControllerContextProvider } from 'hooks/useController';
-import { useSubgraphData } from 'hooks/useSubgraphData';
-import { getConfig, SupportedToken } from 'lib/config';
+import { ControllerContextProvider, PaprController } from 'hooks/useController';
+import { configs, getConfig, SupportedToken } from 'lib/config';
+import { fetchSubgraphData } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export type TestProps = {
+  subgraphController: PaprController;
+};
+
+export const getServerSideProps: GetServerSideProps<TestProps> = async (
+  context,
+) => {
   const token = context.params?.token as SupportedToken;
   const address: string | undefined =
     getConfig(token)?.controllerAddress?.toLocaleLowerCase();
@@ -15,20 +21,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
+  const controllerSubgraphData = await fetchSubgraphData(
+    address,
+    configs[token].uniswapSubgraph,
+    token,
+  );
+
+  if (!controllerSubgraphData) {
+    const e = new Error(`subgraph data for controller ${address} not found`);
+    captureException(e);
+    throw e;
+  }
+
+  const { paprController } = controllerSubgraphData;
+
   return {
-    props: {},
+    props: {
+      subgraphController: paprController,
+    },
   };
 };
 
-export default function InKindTest() {
-  const subgraphData = useSubgraphData();
-
-  if (!subgraphData.subgraphController) {
-    return <PageLevelStatusFieldsets {...subgraphData} />;
-  }
-
+export default function InKindTest({ subgraphController }: TestProps) {
   return (
-    <ControllerContextProvider value={subgraphData.subgraphController}>
+    <ControllerContextProvider value={subgraphController}>
       <TestPageContent />
     </ControllerContextProvider>
   );

@@ -1,9 +1,0 @@
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  max-width: 640px;
-  gap: 2rem;
-  margin-top: 70px;
-  margin-bottom: 140px;
-  width: 100%;
-}

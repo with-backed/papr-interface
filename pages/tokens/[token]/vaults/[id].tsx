@@ -1,16 +1,22 @@
+import { captureException } from '@sentry/nextjs';
 import { VaultPageContent } from 'components/Controllers/VaultPageContent';
 import { OpenGraph } from 'components/OpenGraph';
-import { PageLevelStatusFieldsets } from 'components/StatusFieldset/PageLevelStatusFieldsets';
 import { useConfig } from 'hooks/useConfig';
 import { ControllerContextProvider } from 'hooks/useController';
-import { useSubgraphData } from 'hooks/useSubgraphData';
-import { getConfig, SupportedToken } from 'lib/config';
+import { configs, getConfig, SupportedToken } from 'lib/config';
+import {
+  fetchSubgraphData,
+  SubgraphController,
+  SubgraphPool,
+} from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 
 import styles from '../controller.module.css';
 
 type ServerSideProps = {
   vaultId: string;
+  subgraphController: SubgraphController;
+  subgraphPool: SubgraphPool;
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
@@ -26,30 +32,43 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     };
   }
 
+  const controllerSubgraphData = await fetchSubgraphData(
+    address,
+    configs[token].uniswapSubgraph,
+    token,
+  );
+
+  if (!controllerSubgraphData) {
+    const e = new Error(`subgraph data for controller ${address} not found`);
+    captureException(e);
+    throw e;
+  }
+
+  const { pool, paprController } = controllerSubgraphData;
+
   return {
     props: {
       vaultId: id,
+      subgraphController: paprController,
+      subgraphPool: pool,
     },
   };
 };
 
-export default function VaultPage({ vaultId }: ServerSideProps) {
+export default function VaultPage({
+  vaultId,
+  subgraphPool,
+  subgraphController,
+}: ServerSideProps) {
   const { tokenName } = useConfig();
-  const subgraphData = useSubgraphData();
 
-  if (!subgraphData.subgraphController || !subgraphData.subgraphPool) {
-    return <PageLevelStatusFieldsets {...subgraphData} />;
-  }
   return (
     <>
       <OpenGraph title={`${tokenName} | Vault`} />
       <div className={styles.column}>
         <a href={`/tokens/${tokenName}`}>⬅ controller</a>
-        <ControllerContextProvider value={subgraphData.subgraphController}>
-          <VaultPageContent
-            vaultId={vaultId}
-            subgraphPool={subgraphData.subgraphPool}
-          />
+        <ControllerContextProvider value={subgraphController}>
+          <VaultPageContent vaultId={vaultId} subgraphPool={subgraphPool} />
         </ControllerContextProvider>
       </div>
     </>

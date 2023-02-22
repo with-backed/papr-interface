@@ -1,15 +1,32 @@
-import { ControllerOverviewContent } from 'components/Controllers/ControllerOverviewContent';
+import { captureException } from '@sentry/nextjs';
+import {
+  ControllerOverviewContent,
+  ControllerPageProps,
+} from 'components/Controllers/ControllerOverviewContent';
 import { OpenGraph } from 'components/OpenGraph';
-import { PageLevelStatusFieldsets } from 'components/StatusFieldset/PageLevelStatusFieldsets';
 import { useConfig } from 'hooks/useConfig';
 import { ControllerContextProvider } from 'hooks/useController';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
-import { useSubgraphData } from 'hooks/useSubgraphData';
-import { getConfig, SupportedToken } from 'lib/config';
+import { configs, getConfig, SupportedToken } from 'lib/config';
+import {
+  fetchSubgraphData,
+  SubgraphController,
+  SubgraphPool,
+} from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 import { useMemo } from 'react';
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+type ServerSideProps = Omit<
+  ControllerPageProps,
+  'paprController' | 'pricesData'
+> & {
+  subgraphController: SubgraphController;
+  subgraphPool: SubgraphPool;
+};
+
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
+  context,
+) => {
   const token = context.params?.token as SupportedToken;
   const address: string | undefined =
     getConfig(token)?.controllerAddress?.toLocaleLowerCase();
@@ -19,34 +36,44 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
+  const controllerSubgraphData = await fetchSubgraphData(
+    address,
+    configs[token].uniswapSubgraph,
+    token,
+  );
+
+  if (!controllerSubgraphData) {
+    const e = new Error(`subgraph data for controller ${address} not found`);
+    captureException(e);
+    throw e;
+  }
+
+  const { pool, paprController } = controllerSubgraphData;
+
   return {
-    props: {},
+    props: {
+      subgraphController: paprController,
+      subgraphPool: pool,
+    },
   };
 };
 
-export default function ControllerPage() {
+export default function ControllerPage({
+  subgraphController,
+  subgraphPool,
+}: ServerSideProps) {
   const config = useConfig();
-  const subgraphData = useSubgraphData();
 
   const collections = useMemo(
-    () =>
-      subgraphData.subgraphController
-        ? subgraphData.subgraphController.allowedCollateral.map(
-            (c) => c.token.id,
-          )
-        : [],
-    [subgraphData.subgraphController],
+    () => subgraphController.allowedCollateral.map((c) => c.token.id),
+    [subgraphController.allowedCollateral],
   );
-
-  if (!subgraphData.subgraphController || !subgraphData.subgraphPool) {
-    return <PageLevelStatusFieldsets {...subgraphData} />;
-  }
 
   return (
     <OracleInfoProvider collections={collections}>
-      <ControllerContextProvider value={subgraphData.subgraphController}>
+      <ControllerContextProvider value={subgraphController}>
         <OpenGraph title={`${config.tokenName} | Performance`} />
-        <ControllerOverviewContent subgraphPool={subgraphData.subgraphPool} />
+        <ControllerOverviewContent subgraphPool={subgraphPool} />
       </ControllerContextProvider>
     </OracleInfoProvider>
   );
