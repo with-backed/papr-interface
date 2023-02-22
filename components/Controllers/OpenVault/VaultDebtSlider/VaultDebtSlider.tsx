@@ -1,7 +1,8 @@
+import useResizeObserver from '@react-hook/resize-observer';
 import { Slider } from 'components/Slider';
 import { useTheme } from 'hooks/useTheme';
 import { formatPercent } from 'lib/numberFormat';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import styles from '../VaultDebtPicker/VaultDebtPicker.module.css';
 
@@ -26,6 +27,7 @@ export function VaultDebtSlider({
   setIsBorrowing,
   setHideLoanFormToggle,
 }: VaultDebtSliderProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const [hideMaxLTV, setHideMaxLTV] = useState<boolean>(false);
   const [blackTrackWidth, setBlackTrackWidth] = useState<[string, number]>([
@@ -60,20 +62,33 @@ export function VaultDebtSlider({
     defaultInitialized,
   ]);
 
-  useEffect(() => {
-    const newBlackTrackPosition =
-      Math.min(1, currentVaultDebtNumber / maxDebtNumber) * 100 * 5.7;
-    const newPositionPixels = `${newBlackTrackPosition}px`;
+  const resizeBlackTrack = useCallback(() => {
+    if (!containerRef.current) {
+      return;
+    }
+    const width = containerRef.current.clientWidth;
+    const ratio = Math.min(1, currentVaultDebtNumber / maxDebtNumber);
+    const newTrackWidth = Math.floor(ratio * width);
+    const newPositionPixels = `${newTrackWidth}px`;
     if (
       newPositionPixels !== blackTrackWidth[0] ||
       maxDebtNumber !== blackTrackWidth[1]
     ) {
-      setBlackTrackWidth([`${newBlackTrackPosition}px`, maxDebtNumber]);
+      setBlackTrackWidth([newPositionPixels, maxDebtNumber]);
     }
-  }, [maxDebtNumber, blackTrackWidth, currentVaultDebtNumber]);
+  }, [blackTrackWidth, currentVaultDebtNumber, maxDebtNumber]);
+
+  useEffect(() => {
+    resizeBlackTrack();
+  }, [resizeBlackTrack]);
+
+  useResizeObserver(
+    (containerRef.current || null) as HTMLElement | null,
+    resizeBlackTrack,
+  );
 
   return (
-    <div>
+    <div className={styles['slider-wrapper']} ref={containerRef}>
       <p
         className={`${styles.totalLTVLabel} ${
           hideMaxLTV ? styles.hidden : ''
