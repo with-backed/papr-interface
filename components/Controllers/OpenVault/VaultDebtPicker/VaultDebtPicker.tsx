@@ -459,6 +459,7 @@ export function VaultDebtPicker({
                 withdrawNFTs={withdrawNFTs}
                 setDepositNFTs={setDepositNFTs}
                 setWithdrawNFTs={setWithdrawNFTs}
+                setHideLoanFormToggle={setHideLoanFormToggle}
               />
             ))}
         </tbody>
@@ -662,6 +663,7 @@ type CollateralRowProps = {
   withdrawNFTs: string[];
   setDepositNFTs: Dispatch<SetStateAction<string[]>>;
   setWithdrawNFTs: Dispatch<SetStateAction<string[]>>;
+  setHideLoanFormToggle: Dispatch<SetStateAction<boolean>>;
 };
 
 function CollateralRow({
@@ -677,8 +679,8 @@ function CollateralRow({
   withdrawNFTs,
   setDepositNFTs,
   setWithdrawNFTs,
+  setHideLoanFormToggle,
 }: CollateralRowProps) {
-  const controller = useController();
   const uniqueNFTId = useMemo(
     () => getUniqueNFTId(contractAddress, tokenId),
     [contractAddress, tokenId],
@@ -703,8 +705,15 @@ function CollateralRow({
           setWithdrawNFTs((prev) => prev.filter((nfts) => nfts !== nftId));
         else setWithdrawNFTs((prev) => [...prev, nftId]);
       }
+      setHideLoanFormToggle(false);
     },
-    [depositNFTs, withdrawNFTs, setDepositNFTs, setWithdrawNFTs],
+    [
+      depositNFTs,
+      withdrawNFTs,
+      setDepositNFTs,
+      setWithdrawNFTs,
+      setHideLoanFormToggle,
+    ],
   );
 
   return (
