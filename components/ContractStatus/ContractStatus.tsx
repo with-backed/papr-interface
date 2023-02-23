@@ -22,11 +22,6 @@ export function ContractStatus() {
     const cur = pricesData.targetValues[l - 1];
     const prev = pricesData.targetValues[l - 2];
     const change = percentChange(prev.value, cur.value);
-    console.log({
-      cur: cur.value,
-      prev: prev.value,
-      change,
-    });
     // convert to APR
     return (change / (cur.time - prev.time)) * SECONDS_IN_A_YEAR;
   }, [pricesData]);
