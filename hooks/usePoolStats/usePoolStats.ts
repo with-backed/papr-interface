@@ -19,7 +19,7 @@ const BLOCK_NUMBER_CACHE_TIME = 1000 * 60 * 60;
 
 // Assuming 12s per block, one day ago is current block number
 // minus 7200.
-const BLOCKS_IN_A_DAY = 7200;
+export const BLOCKS_IN_A_DAY = 7200;
 
 export function usePoolStats() {
   const blockNumber = useBlockNumber({ cacheTime: BLOCK_NUMBER_CACHE_TIME });

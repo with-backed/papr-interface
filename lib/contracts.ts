@@ -3,6 +3,7 @@ import {
   ERC20__factory,
   ERC721__factory,
   IQuoter__factory,
+  PaprController__factory,
 } from 'types/generated/abis';
 
 import { configs, SupportedToken } from './config';
@@ -14,10 +15,8 @@ export function makeProvider(jsonRpcProvider: string, token: SupportedToken) {
   );
 }
 
-export function erc20Contract(
-  address: string,
-  provider: ethers.providers.Provider | ethers.Signer,
-) {
+export function erc20Contract(address: string, token: SupportedToken) {
+  const provider = makeProvider(configs[token].jsonRpcProvider, token);
   return ERC20__factory.connect(address, provider);
 }
 
@@ -29,6 +28,14 @@ export function erc721Contract(
 }
 
 ////// controller code /////
+export function jsonRpcControllerContract(
+  address: string,
+  token: SupportedToken,
+) {
+  const provider = makeProvider(configs[token].jsonRpcProvider, token);
+  return PaprController__factory.connect(address, provider);
+}
+
 export function Quoter(jsonRpcProvider: string, token: SupportedToken) {
   const provider = makeProvider(jsonRpcProvider, token);
   return IQuoter__factory.connect(
