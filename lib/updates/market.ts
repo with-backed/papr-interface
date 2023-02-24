@@ -15,10 +15,6 @@ import { marks } from 'lib/controllers/charts/mark';
 import { formatDollars, formatPercent } from 'lib/numberFormat';
 import { percentChange } from 'lib/tokenPerformance';
 import {
-  MostRecentTargetUpdateByControllerDocument,
-  MostRecentTargetUpdateByControllerQuery,
-} from 'types/generated/graphql/inKindSubgraph';
-import {
   PoolByIdByBlockDocument,
   PoolByIdByBlockQuery,
   PoolByIdDocument,
@@ -35,38 +31,23 @@ export async function getTargetsInfo(token: SupportedToken) {
   const blockAnHourAgo = await provider.getBlock(
     currentBlock.number - BLOCKS_IN_A_HOUR,
   );
+  const controllerContract = jsonRpcControllerContract(
+    configs[token].controllerAddress,
+    token,
+  );
 
   const underlyingDecimals = await erc20Contract(
     configs[token].underlyingAddress,
     token,
   ).decimals();
 
-  const graphQLClient = createClient({
-    url: configs[token].paprSubgraph,
-  });
-
-  const mostRecentTargetRes = await graphQLClient
-    .query<MostRecentTargetUpdateByControllerQuery>(
-      MostRecentTargetUpdateByControllerDocument,
-      {
-        controller: configs[token].controllerAddress,
-      },
-    )
-    .toPromise();
-  if (
-    mostRecentTargetRes.error ||
-    !mostRecentTargetRes.data?.targetUpdates[0]
-  ) {
-    throw new Error(mostRecentTargetRes.error?.message);
-  }
-
-  const currentTargetUpdate = mostRecentTargetRes.data.targetUpdates[0];
   const currentTarget = parseFloat(
     ethers.utils.formatUnits(
-      ethers.BigNumber.from(currentTargetUpdate.newTarget),
+      await controllerContract.target({ blockTag: currentBlock.number }),
       underlyingDecimals,
     ),
   );
+  const targetLastUpdated = (await controllerContract.lastUpdated()).toNumber();
 
   const newTarget = parseFloat(
     ethers.utils.formatUnits(
@@ -87,17 +68,17 @@ export async function getTargetsInfo(token: SupportedToken) {
     ),
   );
 
-  const change = percentChange(currentTarget, newTarget);
+  const targetChange = percentChange(currentTarget, newTarget);
   const apr =
-    (change / (currentBlock.timestamp - currentTargetUpdate.timestamp)) *
+    (targetChange / (currentBlock.timestamp - targetLastUpdated)) *
     SECONDS_IN_A_YEAR;
 
-  const targetPercentChange = percentChange(targetHourAgo, newTarget);
-  const direction = targetPercentChange > 0 ? '+' : '-';
+  const hourlyTargetChange = percentChange(targetHourAgo, newTarget);
+
   return {
     target: newTarget,
     apr: formatPercent(apr),
-    targetPercentChange: `${direction}${formatPercent(targetPercentChange)}`,
+    targetPercentChange: formatPercent(hourlyTargetChange),
   };
 }
 
@@ -171,11 +152,10 @@ export async function getUniswapPoolInfo(token: SupportedToken) {
       : prev;
   });
   const markPercentChange = percentChange(markHourAgo.value, mark.value);
-  const direction = markPercentChange > 0 ? '+' : '-';
 
   return {
     mark: mark.value,
-    markPercentChange: `${direction}${formatPercent(markPercentChange)}`,
+    markPercentChange: formatPercent(markPercentChange),
     volume24h,
   };
 }
