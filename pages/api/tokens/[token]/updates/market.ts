@@ -25,9 +25,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 }
 
 function formatTweet(
-  target: number,
+  target: string,
   targetPercentChange: string,
-  mark: number,
+  mark: string,
   markPercentChange: string,
   volume24h: string,
   apr: string,
@@ -36,19 +36,19 @@ function formatTweet(
   let baseString = `Status update: #paprMeme \n24h Uniswap trading volume: ${volume24h}\nContract is acting to ${action} market price\n\n`;
   if (target > mark) {
     baseString += `
-    🍜  ←  Target price:  ${target} ETH (${targetPercentChange})
+    🍜  ←  Target price:  ${target} ETH (${targetPercentChange} 1hr)
     🔥
-    🔥     Contract Rate: ${apr}
+    🔥         Contract Rate: ${apr}
     🔥
-    🧊  ←  Market price:  ${mark} ETH (${markPercentChange})
+    🧊  ←  Market price:  ${mark} ETH (${markPercentChange} 1hr)
     `;
   } else {
     baseString += `
-    🔥  ←  Market price:  ${mark} ETH (${markPercentChange})
+    🔥  ←  Market price:  ${mark} ETH (${markPercentChange} 1hr)
     🧊
-    🧊     Contract Rate: ${apr}
+    🧊         Contract Rate: ${apr}
     🧊
-    🍜  ←  Target price:  ${target} ETH (${targetPercentChange})`;
+    🍜  ←  Target price:  ${target} ETH (${targetPercentChange} 1hr)`;
   }
   return baseString;
 }

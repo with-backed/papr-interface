@@ -76,7 +76,7 @@ export async function getTargetsInfo(token: SupportedToken) {
   const hourlyTargetChange = percentChange(targetHourAgo, newTarget);
 
   return {
-    target: newTarget,
+    target: newTarget.toFixed(4),
     apr: formatPercent(apr),
     targetPercentChange: formatPercent(hourlyTargetChange),
   };
@@ -154,7 +154,7 @@ export async function getUniswapPoolInfo(token: SupportedToken) {
   const markPercentChange = percentChange(markHourAgo.value, mark.value);
 
   return {
-    mark: mark.value,
+    mark: mark.value.toFixed(4),
     markPercentChange: formatPercent(markPercentChange),
     volume24h,
   };
