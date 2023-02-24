@@ -43,3 +43,8 @@ export const OPENGRAPH_DEFAULT_DESCRIPTION =
 // Fri Apr 23 2021 09:42:55 GMT+0000 (beginning of Uniswap V3, can probably make this beginning of papr)
 export const UNISWAP_SUBGRAPH_START = 1619170975;
 export const UNISWAP_SUBGRAPH_END = Date.now() / 1000;
+
+// Assuming 12s per block, one day ago is current block number
+// minus 7200.
+export const BLOCKS_IN_A_DAY = 7200;
+export const BLOCKS_IN_A_HOUR = 300;
