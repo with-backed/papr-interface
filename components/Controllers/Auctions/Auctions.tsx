@@ -9,7 +9,7 @@ import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 import { useShowMore } from 'hooks/useShowMore';
-import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
+import { SupportedToken } from 'lib/config';
 import { erc20Contract } from 'lib/contracts';
 import { getDaysHoursMinutesSeconds } from 'lib/duration';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
@@ -71,10 +71,10 @@ type ActiveAuctionsProps = {
 function ActiveAuctions({ auctions, fetching }: ActiveAuctionsProps) {
   const controller = useController();
   const { address } = useAccount();
-  const signerOrProvider = useSignerOrProvider();
+  const { tokenName } = useConfig();
   const tokenContract = useMemo(
-    () => erc20Contract(controller.paprToken.id, signerOrProvider),
-    [controller.paprToken.id, signerOrProvider],
+    () => erc20Contract(controller.paprToken.id, tokenName as SupportedToken),
+    [controller.paprToken.id, tokenName],
   );
   const paprApproved = useAsyncValue(async () => {
     if (!address) return null;
