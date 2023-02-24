@@ -2,11 +2,11 @@ import { Fieldset } from 'components/Fieldset';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+import { TargetUpdate, useTarget } from 'hooks/useTarget';
 import { SupportedToken } from 'lib/config';
 import { SECONDS_IN_A_YEAR } from 'lib/constants';
 import { computeNewProjectedAPR } from 'lib/controllers';
-import { ControllerPricesData } from 'lib/controllers/charts';
 import {
   formatPercent,
   formatPercentChange,
@@ -24,21 +24,22 @@ interface ImpactProjectionProps {
 }
 
 export function ImpactProjection({ paprPrice }: ImpactProjectionProps) {
-  const { pricesData, fetching, error } = useControllerPricesData();
+  const newTargetUpdate = useTarget();
+  const currentMarket = useLatestMarketPrice();
   if (paprPrice === null) {
     return <ImpactProjectionLoading />;
   }
 
-  if (fetching) {
+  if (!newTargetUpdate || !currentMarket) {
     return <ImpactProjectionPricesLoading />;
   }
 
-  if (error) {
-    return <ImpactProjectionPricesError />;
-  }
-
   return (
-    <ImpactProjectionLoaded paprPrice={paprPrice} pricesData={pricesData} />
+    <ImpactProjectionLoaded
+      paprPrice={paprPrice}
+      newTargetUpdate={newTargetUpdate}
+      currentMarket={currentMarket}
+    />
   );
 }
 
@@ -52,53 +53,59 @@ function ImpactProjectionLoading() {
 function ImpactProjectionPricesLoading() {
   return <Fieldset legend={LEGEND}>Waiting on protocol price data.</Fieldset>;
 }
-function ImpactProjectionPricesError() {
-  return (
-    <Fieldset legend={LEGEND}>
-      Error fetching protocol price data; cannot compute impact.
-    </Fieldset>
-  );
-}
 
 interface ImpactProjectionLoadedProps {
   paprPrice: number;
-  pricesData: ControllerPricesData;
+  newTargetUpdate: TargetUpdate;
+  currentMarket: number;
 }
 function ImpactProjectionLoaded({
   paprPrice,
-  pricesData,
+  newTargetUpdate,
+  currentMarket,
 }: ImpactProjectionLoadedProps) {
   const { tokenName } = useConfig();
-  const { fundingPeriod } = useController();
-  const { targetValues, markValues } = pricesData;
-  const currentTarget = targetValues[targetValues.length - 1].value;
-  const currentMarket = markValues[markValues.length - 1].value;
+  const { fundingPeriod, underlying, target, lastUpdated } = useController();
   const [projectedData, setProjectedData] = useState<{
     newApr: number;
     newTarget: number;
   } | null>(null);
 
+  const currentTargetNumber = useMemo(() => {
+    return parseFloat(ethers.utils.formatUnits(target, underlying.decimals));
+  }, [target, underlying.decimals]);
+
+  const newTargetNumber = useMemo(() => {
+    return parseFloat(
+      ethers.utils.formatUnits(newTargetUpdate.newTarget, underlying.decimals),
+    );
+  }, [newTargetUpdate, underlying.decimals]);
+
   const currentAPR = useMemo(() => {
-    const current = targetValues[targetValues.length - 1];
-    const previous = targetValues[targetValues.length - 2];
     return (
-      (percentChange(previous.value, current.value) /
-        (current.time - previous.time)) *
+      (percentChange(currentTargetNumber, newTargetNumber) /
+        (newTargetUpdate.timestamp - lastUpdated)) *
       SECONDS_IN_A_YEAR
     );
-  }, [targetValues]);
+  }, [
+    currentTargetNumber,
+    newTargetNumber,
+    lastUpdated,
+    newTargetUpdate.timestamp,
+  ]);
 
   useEffect(() => {
+    console.log({ paprPrice, newTargetNumber });
     setProjectedData(
       computeNewProjectedAPR(
         paprPrice,
-        currentTarget,
+        newTargetNumber,
         600 /* 10 minutes */,
         ethers.BigNumber.from(fundingPeriod),
         tokenName as SupportedToken,
       ),
     );
-  }, [currentTarget, paprPrice, fundingPeriod, tokenName]);
+  }, [newTargetNumber, paprPrice, fundingPeriod, tokenName]);
 
   const aprProjectionClassName = useMemo(() => {
     if (projectedData) {
@@ -144,7 +151,7 @@ function ImpactProjectionLoaded({
         <Separator />
         <div
           className={
-            currentMarket > currentTarget
+            currentMarket > currentTargetNumber
               ? styles['pointers']
               : styles['pointers-reverse']
           }>
@@ -155,7 +162,7 @@ function ImpactProjectionLoaded({
           />
           <PriceProjection
             kind="target"
-            currentPrice={currentTarget}
+            currentPrice={currentTargetNumber}
             newPrice={projectedData?.newTarget || null}
           />
         </div>

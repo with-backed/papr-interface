@@ -6,6 +6,7 @@ import {
   SqrtPricesByPoolQuery,
   SwapsByPoolDocument,
   SwapsByPoolQuery,
+  Token as UniSubgraphToken,
 } from 'types/generated/graphql/uniswapSubgraph';
 
 import { ERC20Token } from './controllers';
@@ -62,6 +63,19 @@ export async function subgraphUniswapPoolById(
   return data || null;
 }
 
-export function subgraphTokenToToken(token: ERC20Token, chainId: number) {
+export function uniSubgraphTokenToToken(
+  token: UniSubgraphToken,
+  chainId: number,
+): Token {
+  return new Token(
+    chainId,
+    token.id,
+    parseInt(token.decimals),
+    token.symbol,
+    token.name,
+  );
+}
+
+export function erc20TokenToToken(token: ERC20Token, chainId: number): Token {
   return new Token(chainId, token.id, token.decimals, token.symbol, token.name);
 }
