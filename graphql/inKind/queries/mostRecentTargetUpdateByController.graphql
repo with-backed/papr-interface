@@ -1,0 +1,12 @@
+query mostRecentTargetUpdateByController($controller: String) {
+  targetUpdates(
+    first: 1
+    orderBy: timestamp
+    orderDirection: desc
+    where: { controller: $controller }
+  ) {
+    id
+    timestamp
+    newTarget
+  }
+}

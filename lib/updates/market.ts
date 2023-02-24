@@ -15,6 +15,10 @@ import { marks } from 'lib/controllers/charts/mark';
 import { formatDollars, formatPercent } from 'lib/numberFormat';
 import { percentChange } from 'lib/tokenPerformance';
 import {
+  MostRecentTargetUpdateByControllerDocument,
+  MostRecentTargetUpdateByControllerQuery,
+} from 'types/generated/graphql/inKindSubgraph';
+import {
   PoolByIdByBlockDocument,
   PoolByIdByBlockQuery,
   PoolByIdDocument,
@@ -37,15 +41,33 @@ export async function getTargetsInfo(token: SupportedToken) {
     token,
   ).decimals();
 
+  const graphQLClient = createClient({
+    url: configs[token].paprSubgraph,
+  });
+
+  const mostRecentTargetRes = await graphQLClient
+    .query<MostRecentTargetUpdateByControllerQuery>(
+      MostRecentTargetUpdateByControllerDocument,
+      {
+        controller: configs[token].controllerAddress,
+      },
+    )
+    .toPromise();
+  if (
+    mostRecentTargetRes.error ||
+    !mostRecentTargetRes.data?.targetUpdates[0]
+  ) {
+    throw new Error(mostRecentTargetRes.error?.message);
+  }
+
+  const currentTargetUpdate = mostRecentTargetRes.data.targetUpdates[0];
   const currentTarget = parseFloat(
     ethers.utils.formatUnits(
-      await jsonRpcControllerContract(
-        configs[token].controllerAddress,
-        token,
-      ).target({ blockTag: currentBlock.number }),
+      ethers.BigNumber.from(currentTargetUpdate.newTarget),
       underlyingDecimals,
     ),
   );
+
   const newTarget = parseFloat(
     ethers.utils.formatUnits(
       await jsonRpcControllerContract(
@@ -67,7 +89,7 @@ export async function getTargetsInfo(token: SupportedToken) {
 
   const change = percentChange(currentTarget, newTarget);
   const apr =
-    (change / (currentBlock.timestamp - blockAnHourAgo.timestamp)) *
+    (change / (currentBlock.timestamp - currentTargetUpdate.timestamp)) *
     SECONDS_IN_A_YEAR;
 
   const targetPercentChange = percentChange(targetHourAgo, newTarget);
@@ -76,7 +98,6 @@ export async function getTargetsInfo(token: SupportedToken) {
     target: newTarget,
     apr: formatPercent(apr),
     targetPercentChange: `${direction}${formatPercent(targetPercentChange)}`,
-    targetHourAgo,
   };
 }
 
@@ -155,7 +176,6 @@ export async function getUniswapPoolInfo(token: SupportedToken) {
   return {
     mark: mark.value,
     markPercentChange: `${direction}${formatPercent(markPercentChange)}`,
-    markHourAgo,
     volume24h,
   };
 }

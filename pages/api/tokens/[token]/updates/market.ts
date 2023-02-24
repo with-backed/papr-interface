@@ -5,8 +5,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   const { token } = req.query;
-  const { target, targetHourAgo, targetPercentChange, apr } =
-    await getTargetsInfo(token as SupportedToken);
+  const { target, targetPercentChange, apr } = await getTargetsInfo(
+    token as SupportedToken,
+  );
   const { mark, markPercentChange, volume24h } = await getUniswapPoolInfo(
     token as SupportedToken,
   );
