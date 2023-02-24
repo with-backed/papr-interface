@@ -95,7 +95,6 @@ function ImpactProjectionLoaded({
   ]);
 
   useEffect(() => {
-    console.log({ paprPrice, newTargetNumber });
     setProjectedData(
       computeNewProjectedAPR(
         paprPrice,
