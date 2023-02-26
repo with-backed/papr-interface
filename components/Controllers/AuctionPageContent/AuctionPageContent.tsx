@@ -35,7 +35,7 @@ export function AuctionPageContent({
 }: AuctionPageContentProps) {
   const { tokenName } = useConfig();
   const controller = useController();
-  const oracleInfo = useOracleInfo(OraclePriceType.lower);
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
   const latestUniswapPrice = useLatestMarketPrice();
 
   const {
@@ -197,7 +197,7 @@ function SummaryTable({
   priceUpdated,
   timeElapsed,
 }: SummaryTableProps) {
-  const oracleInfo = useOracleInfo(OraclePriceType.lower);
+  const oracleInfo = useOracleInfo(OraclePriceType.spot);
   const controller = useController();
 
   const percentFloor = useMemo(() => {
