@@ -52,15 +52,22 @@ export function AuctionPageContent({
 
   const ethPrice = useAsyncValue(() => {
     return getUnitPriceForEth(
-      controller.underlying.id,
+      'usd',
       configs[tokenName as SupportedToken].network as SupportedNetwork,
     );
-  }, [controller.underlying.id, tokenName]);
+  }, [tokenName]);
 
   const liveAuctionPriceUSD = useMemo(() => {
     if (!liveAuctionPriceUnderlying || !ethPrice) return null;
-    return liveAuctionPriceUnderlying.mul(ethers.BigNumber.from(ethPrice));
-  }, [liveAuctionPriceUnderlying, ethPrice]);
+    return (
+      parseFloat(
+        ethers.utils.formatUnits(
+          liveAuctionPriceUnderlying,
+          controller.underlying.decimals,
+        ),
+      ) * ethPrice
+    );
+  }, [liveAuctionPriceUnderlying, controller.underlying.decimals, ethPrice]);
 
   const floorUSDPrice = useMemo(() => {
     if (!oracleInfo || !ethPrice) return 0;
@@ -136,15 +143,7 @@ export function AuctionPageContent({
                 {tokenName}
               </p>
               <p>
-                {liveAuctionPriceUSD && (
-                  <>
-                    $
-                    {formatBigNum(
-                      liveAuctionPriceUSD,
-                      controller.underlying.decimals,
-                    )}{' '}
-                  </>
-                )}
+                {liveAuctionPriceUSD && <>${liveAuctionPriceUSD.toFixed(4)}</>}
                 {!liveAuctionPriceUSD && <>...</>}
               </p>
             </div>
@@ -197,7 +196,7 @@ function SummaryTable({
   priceUpdated,
   timeElapsed,
 }: SummaryTableProps) {
-  const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const oracleInfo = useOracleInfo(OraclePriceType.spot);
   const controller = useController();
 
   const percentFloor = useMemo(() => {

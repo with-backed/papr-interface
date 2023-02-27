@@ -201,10 +201,10 @@ export function AuctionGraph({
         : 'Buy now: ......';
     else {
       return auctionUnderlyingPrice
-        ? `SOLD: $${formatBigNum(
+        ? `SOLD: ${formatBigNum(
             auctionUnderlyingPrice,
             controller.underlying.decimals,
-          )}`
+          )} WETH`
         : 'SOLD: ......';
     }
   }, [auctionUnderlyingPrice, controller.underlying, auctionCompleted]);
