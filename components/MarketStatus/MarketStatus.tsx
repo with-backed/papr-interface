@@ -32,11 +32,11 @@ export function MarketStatus() {
     [pricesData],
   );
 
-  const { change7Days, change30Days } = useMemo(() => {
+  const { change24h, change30Days } = useMemo(() => {
     return {
-      change7Days: pricesData
+      change24h: pricesData
         ? formatPercentChange(
-            percentChangeOverDuration(pricesData.markValues, 7),
+            percentChangeOverDuration(pricesData.markValues, 1),
           )
         : '???',
       change30Days: pricesData
@@ -79,9 +79,9 @@ export function MarketStatus() {
                   Price
                 </th>
                 <th>
-                  7
+                  24
                   <br />
-                  Day
+                  Hour
                 </th>
                 <th>
                   30
@@ -98,7 +98,7 @@ export function MarketStatus() {
             <tbody>
               <tr>
                 <td>{marketPrice}</td>
-                <td data-change={change7Days}>{change7Days}</td>
+                <td data-change={change24h}>{change24h}</td>
                 <td data-change={change30Days}>{change30Days}</td>
                 <td>{realizedAPR30Day}</td>
               </tr>
