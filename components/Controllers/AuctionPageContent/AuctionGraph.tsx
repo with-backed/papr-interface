@@ -185,10 +185,7 @@ export function AuctionGraph({
     const paddingForTimeAgo = Array(startingString.length - timeAgo.length)
       .fill('\t')
       .join('');
-    console.log({
-      startingString,
-      startPriceUnderlyingString,
-    });
+
     const paddingForTopBidPrice = Array(
       startingString.length - (startPriceUnderlyingString.length + 5),
     )
