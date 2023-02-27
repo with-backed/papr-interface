@@ -56,7 +56,6 @@ export function AuctionPageContent({
       configs[tokenName as SupportedToken].network as SupportedNetwork,
     );
   }, [tokenName]);
-  console.log({ ethPrice });
 
   const liveAuctionPriceUSD = useMemo(() => {
     if (!liveAuctionPriceUnderlying || !ethPrice) return null;
