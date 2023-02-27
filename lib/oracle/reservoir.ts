@@ -108,3 +108,27 @@ export async function getNFTIsFlagged(
   if (!json.tokens || json.tokens.length === 0) return false;
   return json.tokens[0].token.isFlagged;
 }
+
+export async function getTopBidForCollectionAtTime(
+  collection: string,
+  timestamp: number,
+  config: Config,
+): Promise<number | null> {
+  const encodedQueryParams = new URLSearchParams({
+    collection,
+    endTimestamp: timestamp.toString(),
+  }).toString();
+
+  const reservoirCollectionBidRes = await fetch(
+    `${config.reservoirAPI}/events/collections/top-bid/v2?${encodedQueryParams}`,
+    {
+      headers: {
+        'x-api-key': process.env.RESERVOIR_KEY!,
+      },
+    },
+  );
+  const json = await reservoirCollectionBidRes.json();
+
+  if (!json.events || json.events.length === 0) return null;
+  return json.events[0].topBid.price.amount.decimal;
+}
