@@ -198,7 +198,7 @@ function marks(
     return {
       value: parseFloat(
         price(
-          sqrtPriceX96,
+          ethers.BigNumber.from(sqrtPriceX96),
           uniSubgraphTokenToToken(baseCurrency, chainId),
           uniSubgraphTokenToToken(quoteCurrency, chainId),
           uniSubgraphTokenToToken(token0, chainId),

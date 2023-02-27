@@ -28,9 +28,11 @@ import {
   getUniqueNFTId,
   QuoterResult,
 } from 'lib/controllers';
+import { price } from 'lib/controllers/charts/mark';
 import { calculateSwapFee } from 'lib/controllers/fees';
 import { formatBigNum, formatPercent } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
+import { erc20TokenToToken } from 'lib/uniswapSubgraph';
 import {
   Dispatch,
   SetStateAction,
@@ -68,7 +70,7 @@ export function VaultDebtPicker({
   // init hooks
   const paprController = useController();
   const { address } = useAccount();
-  const { tokenName } = useConfig();
+  const { tokenName, chainId } = useConfig();
   const target = useTarget();
   const theme = useTheme();
 
@@ -239,6 +241,11 @@ export function VaultDebtPicker({
     return underlyingBorrowQuote.slippage;
   }, [underlyingBorrowQuote]);
 
+  const nextPriceForBorrow = useMemo(() => {
+    if (usingPerpetual || !underlyingBorrowQuote) return null;
+    return underlyingBorrowQuote.sqrtPriceX96After;
+  }, [usingPerpetual, underlyingBorrowQuote]);
+
   const underlyingRepayQuote: (QuoterResult & { slippage: number }) | null =
     useAsyncValue(async () => {
       if (isBorrowing || debtToBorrowOrRepay.isZero())
@@ -279,6 +286,10 @@ export function VaultDebtPicker({
     if (!underlyingRepayQuote) return 0;
     return underlyingRepayQuote.slippage;
   }, [underlyingRepayQuote]);
+  const nextPriceForRepay = useMemo(() => {
+    if (usingPerpetual || !underlyingRepayQuote) return null;
+    return underlyingRepayQuote.sqrtPriceX96After;
+  }, [usingPerpetual, underlyingRepayQuote]);
 
   useEffect(() => {
     if (chosenDebt.lt(currentVaultDebt)) setIsBorrowing(false);
@@ -315,37 +326,31 @@ export function VaultDebtPicker({
     }
   }, [writeType, debtToBorrowOrRepay, underlyingToRepay, underlyingToBorrow]);
 
-  const newPrice = useMemo(() => {
-    if (usingPerpetual || !quote) return null;
-    if (isBorrowing) {
-      const paprAmount = parseFloat(
-        ethers.utils.formatUnits(amount, paprController.paprToken.decimals),
-      );
-      const underlyingAmount = parseFloat(
-        ethers.utils.formatUnits(quote, paprController.underlying.decimals),
-      );
-      return underlyingAmount / paprAmount;
-    } else {
-      const paprAmount = parseFloat(
-        ethers.utils.formatUnits(quote, paprController.paprToken.decimals),
-      );
-      const underlyingAmount = parseFloat(
-        ethers.utils.formatUnits(amount, paprController.underlying.decimals),
-      );
-      return underlyingAmount / paprAmount;
-    }
-  }, [
-    isBorrowing,
-    amount,
-    quote,
-    paprController.paprToken,
-    paprController.underlying,
-    usingPerpetual,
-  ]);
-
   const projectedAPR = useMemo(() => {
-    if (!target || !newPrice) return null;
+    const newSqrtPriceX96 = isBorrowing
+      ? nextPriceForBorrow
+      : nextPriceForRepay;
+    if (
+      !newSqrtPriceX96 ||
+      !target ||
+      newSqrtPriceX96.isZero() ||
+      usingPerpetual
+    )
+      return null;
 
+    const token0 = paprController.token0IsUnderlying
+      ? paprController.underlying
+      : paprController.paprToken;
+    const baseCurrency = paprController.paprToken;
+    const quoteCurrency = paprController.underlying;
+    const newPrice = parseFloat(
+      price(
+        newSqrtPriceX96,
+        erc20TokenToToken(baseCurrency, chainId),
+        erc20TokenToToken(quoteCurrency, chainId),
+        erc20TokenToToken(token0, chainId),
+      ).toFixed(),
+    );
     const projectedAPRResult = computeNewProjectedAPR(
       newPrice,
       parseFloat(
@@ -359,7 +364,16 @@ export function VaultDebtPicker({
       tokenName as SupportedToken,
     );
     return projectedAPRResult.newApr;
-  }, [paprController, tokenName, target, newPrice]);
+  }, [
+    isBorrowing,
+    usingPerpetual,
+    nextPriceForBorrow,
+    nextPriceForRepay,
+    paprController,
+    tokenName,
+    target,
+    chainId,
+  ]);
 
   const nftSymbol = useMemo(
     () =>

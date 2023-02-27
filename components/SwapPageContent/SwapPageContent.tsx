@@ -1,6 +1,7 @@
 import '@uniswap/widgets/fonts.css';
 
 import { JsonRpcSigner } from '@ethersproject/providers';
+import { CurrencyAmount, Token } from '@uniswap/sdk-core';
 import {
   Currency,
   Field,
@@ -8,12 +9,19 @@ import {
   OnSwapPriceUpdateAck,
   SwapWidget,
   Theme,
+  TradeType,
 } from '@uniswap/widgets';
 import { Fieldset } from 'components/Fieldset';
 import { Tooltip } from 'components/Tooltip';
+import { ethers } from 'ethers';
+import { getAddress } from 'ethers/lib/utils.js';
+import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useTheme } from 'hooks/useTheme';
+import { SupportedToken } from 'lib/config';
+import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
+import { price } from 'lib/controllers/charts/mark';
 import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
@@ -36,7 +44,7 @@ const BASE_THEME: Theme = {
 };
 
 export function SwapPageContent() {
-  const { paprToken, underlying } = useController();
+  const { paprToken, underlying, token0IsUnderlying } = useController();
   const { chainId, jsonRpcProvider, tokenName } = useConfig();
   const paprTheme = useTheme();
   const feeTooltip = useTooltipState();
@@ -44,7 +52,11 @@ export function SwapPageContent() {
   const [paprTokenField, setPaprTokenField] = useState<Field | null>(
     Field.OUTPUT,
   );
-  const [executionPrice, setExecutionPrice] = useState<number | null>(null);
+  const [amounts, setAmounts] = useState<{
+    input: CurrencyAmount<Currency>;
+    output: CurrencyAmount<Currency>;
+    tradeType: TradeType;
+  } | null>(null);
   const [paprPrice, setPaprPrice] = useState<number | null>(null);
 
   const jsonRpcUrlMap = useMemo(
@@ -99,19 +111,71 @@ export function SwapPageContent() {
     }
   }, [paprTheme]);
 
+  const sqrtPriceAfter = useAsyncValue(async () => {
+    if (!amounts) return null;
+    if (amounts.tradeType === TradeType.EXACT_INPUT) {
+      const quoteResult = await getQuoteForSwap(
+        ethers.utils.parseUnits(
+          amounts.input.toExact(),
+          amounts.input.currency.decimals,
+        ),
+        amounts.input.currency.wrapped.address,
+        amounts.output.currency.wrapped.address,
+        tokenName as SupportedToken,
+      );
+      return quoteResult.sqrtPriceX96After;
+    } else {
+      const quoteResult = await getQuoteForSwapOutput(
+        ethers.utils.parseUnits(
+          amounts.output.toExact(),
+          amounts.output.currency.decimals,
+        ),
+        amounts.input.currency.wrapped.address,
+        amounts.output.currency.wrapped.address,
+        tokenName as SupportedToken,
+      );
+      return quoteResult.sqrtPriceX96After;
+    }
+  }, [amounts, tokenName]);
+
   useEffect(() => {
-    if (!executionPrice) return;
+    if (!sqrtPriceAfter || !amounts) return;
     if (!paprTokenField) {
       setPaprPrice(null);
       return;
     }
 
-    let p = executionPrice;
-    if (paprTokenField == Field.OUTPUT) {
-      p = 1 / executionPrice;
+    const baseCurrency =
+      amounts.tradeType === TradeType.EXACT_INPUT
+        ? amounts.input.currency.wrapped
+        : amounts.output.currency.wrapped;
+    const quoteCurrency =
+      amounts.tradeType === TradeType.EXACT_INPUT
+        ? amounts.output.currency.wrapped
+        : amounts.input.currency.wrapped;
+    let token0: Token;
+    if (token0IsUnderlying) {
+      if (getAddress(baseCurrency.address) === getAddress(underlying.id)) {
+        token0 = baseCurrency;
+      } else {
+        token0 = quoteCurrency;
+      }
+    } else {
+      if (getAddress(baseCurrency.address) === getAddress(underlying.id)) {
+        token0 = quoteCurrency;
+      } else {
+        token0 = baseCurrency;
+      }
     }
-    setPaprPrice(p);
-  }, [executionPrice, paprTokenField]);
+
+    const p = price(
+      sqrtPriceAfter,
+      baseCurrency,
+      quoteCurrency,
+      token0,
+    ).toFixed();
+    setPaprPrice(parseFloat(p));
+  }, [sqrtPriceAfter, paprTokenField, amounts, token0IsUnderlying, underlying]);
 
   const OnSwitchTokens = useCallback(() => {
     if (!paprTokenField) return;
@@ -148,15 +212,23 @@ export function SwapPageContent() {
   );
 
   const onInitialSwapQuote: OnInitialSwapQuote = useCallback(
-    ({ executionPrice }) => {
-      setExecutionPrice(parseFloat(executionPrice.toFixed(6)));
+    ({ inputAmount, outputAmount, tradeType }) => {
+      setAmounts({
+        input: inputAmount,
+        output: outputAmount,
+        tradeType,
+      });
     },
     [],
   );
 
   const onSwapPriceUpdateAck: OnSwapPriceUpdateAck = useCallback(
-    (_stale, update) => {
-      setExecutionPrice(parseFloat(update.executionPrice.toFixed(6)));
+    (_stale, { inputAmount, outputAmount, tradeType }) => {
+      setAmounts({
+        input: inputAmount,
+        output: outputAmount,
+        tradeType,
+      });
     },
     [],
   );
