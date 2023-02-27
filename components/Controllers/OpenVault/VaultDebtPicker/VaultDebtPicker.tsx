@@ -102,13 +102,15 @@ export function VaultDebtPicker({
         isLiquidated: false,
       }))
       .concat(
-        (auctionsByNftOwner?.auctions || []).map((a) => ({
-          address: a.auctionAssetContract.id,
-          tokenId: a.auctionAssetID,
-          inVault: false,
-          isLiquidating: !a.endPrice,
-          isLiquidated: !!a.endPrice,
-        })),
+        (auctionsByNftOwner?.auctions || [])
+          .map((a) => ({
+            address: a.auctionAssetContract.id,
+            tokenId: a.auctionAssetID,
+            inVault: false,
+            isLiquidating: !a.endPrice,
+            isLiquidated: !!a.endPrice,
+          }))
+          .filter((item) => item.address === collateralContractAddress),
       )
       .concat(
         userNFTsForVault
@@ -129,7 +131,12 @@ export function VaultDebtPicker({
             isLiquidated: false,
           })),
       );
-  }, [userNFTsForVault, vault, auctionsByNftOwner?.auctions]);
+  }, [
+    userNFTsForVault,
+    vault,
+    collateralContractAddress,
+    auctionsByNftOwner?.auctions,
+  ]);
 
   // debt variables
   const maxDebtPerNFTInPerpetual = useMaxDebt(
