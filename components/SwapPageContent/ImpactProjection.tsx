@@ -161,7 +161,7 @@ function ImpactProjectionLoaded({
           />
           <PriceProjection
             kind="target"
-            currentPrice={currentTargetNumber}
+            currentPrice={newTargetNumber}
             newPrice={projectedData?.newTarget || null}
           />
         </div>
