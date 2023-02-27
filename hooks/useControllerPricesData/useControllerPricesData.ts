@@ -6,6 +6,7 @@ import { TargetUpdate, useTarget } from 'hooks/useTarget';
 import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { ControllerPricesData } from 'lib/controllers/charts';
 import { price } from 'lib/controllers/charts/mark';
+import { uniSubgraphTokenToToken } from 'lib/uniswapSubgraph';
 import { UTCTimestamp } from 'lightweight-charts';
 import { useMemo } from 'react';
 import {
@@ -26,7 +27,7 @@ type ControllerPricesDataReturn =
   | { pricesData: null; fetching: false; error: CombinedError };
 
 export function useControllerPricesData(): ControllerPricesDataReturn {
-  const { uniswapSubgraph } = useConfig();
+  const { uniswapSubgraph, chainId } = useConfig();
   const { id, poolAddress, underlying } = useController();
   const newTarget = useTarget();
 
@@ -100,8 +101,9 @@ export function useControllerPricesData(): ControllerPricesDataReturn {
       baseCurrency,
       quoteCurrency,
       poolData?.pool?.token0 as Token,
+      chainId,
     );
-  }, [baseCurrency, poolData, quoteCurrency, swapsQuery]);
+  }, [baseCurrency, poolData, quoteCurrency, swapsQuery, chainId]);
 
   const targetValues = useMemo(() => {
     if (!targetUpdatesData?.targetUpdates || !newTarget) {
@@ -184,6 +186,7 @@ function marks(
   baseCurrency: Token,
   quoteCurrency: Token,
   token0: Token,
+  chainId: number,
 ) {
   const now = Math.floor(Date.now() / 1000);
 
@@ -194,7 +197,12 @@ function marks(
   const formattedSwaps = sortedSwaps.map(({ sqrtPriceX96, timestamp }) => {
     return {
       value: parseFloat(
-        price(sqrtPriceX96, baseCurrency, quoteCurrency, token0).toFixed(),
+        price(
+          ethers.BigNumber.from(sqrtPriceX96),
+          uniSubgraphTokenToToken(baseCurrency, chainId),
+          uniSubgraphTokenToToken(quoteCurrency, chainId),
+          uniSubgraphTokenToToken(token0, chainId),
+        ).toFixed(),
       ),
       time: parseInt(timestamp) as UTCTimestamp,
     };

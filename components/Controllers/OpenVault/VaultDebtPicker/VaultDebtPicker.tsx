@@ -1,4 +1,3 @@
-import { Price } from '@uniswap/sdk-core';
 import { Button } from 'components/Button';
 import { CenterAsset } from 'components/CenterAsset';
 import { VaultDebtSlider } from 'components/Controllers/OpenVault/VaultDebtSlider/VaultDebtSlider';
@@ -19,7 +18,6 @@ import { useTarget } from 'hooks/useTarget';
 import { useTheme } from 'hooks/useTheme';
 import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
 import { SupportedToken } from 'lib/config';
-import { Q192 } from 'lib/constants';
 import {
   computeNewProjectedAPR,
   computeSlippageForSwap,
@@ -30,10 +28,11 @@ import {
   getUniqueNFTId,
   QuoterResult,
 } from 'lib/controllers';
+import { price } from 'lib/controllers/charts/mark';
 import { calculateSwapFee } from 'lib/controllers/fees';
 import { formatBigNum, formatPercent } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
-import { subgraphTokenToToken } from 'lib/uniswapSubgraph';
+import { erc20TokenToToken } from 'lib/uniswapSubgraph';
 import {
   Dispatch,
   SetStateAction,
@@ -331,34 +330,25 @@ export function VaultDebtPicker({
     const newSqrtPriceX96 = isBorrowing
       ? nextPriceForBorrow
       : nextPriceForRepay;
-    if (!newSqrtPriceX96 || !target || newSqrtPriceX96.isZero()) return null;
+    if (
+      !newSqrtPriceX96 ||
+      !target ||
+      newSqrtPriceX96.isZero() ||
+      usingPerpetual
+    )
+      return null;
 
     const token0 = paprController.token0IsUnderlying
       ? paprController.underlying
       : paprController.paprToken;
-    const token1 = paprController.token0IsUnderlying
-      ? paprController.paprToken
-      : paprController.underlying;
-    const underlying =
-      paprController.underlying.id === token0.id ? token0 : token1;
-    const paprToken =
-      paprController.underlying.id === token0.id ? token1 : token0;
-    const baseCurrency = isBorrowing ? paprToken : underlying;
-    const quoteCurrency = isBorrowing ? underlying : paprToken;
+    const baseCurrency = paprController.paprToken;
+    const quoteCurrency = paprController.underlying;
     const newPrice = parseFloat(
-      new Price(
-        subgraphTokenToToken(baseCurrency, chainId),
-        subgraphTokenToToken(quoteCurrency, chainId),
-        token0.id !== quoteCurrency.id
-          ? Q192.toString()
-          : ethers.BigNumber.from(newSqrtPriceX96)
-              .mul(newSqrtPriceX96)
-              .toString(),
-        token0.id === quoteCurrency.id
-          ? Q192.toString()
-          : ethers.BigNumber.from(newSqrtPriceX96)
-              .mul(newSqrtPriceX96)
-              .toString(),
+      price(
+        newSqrtPriceX96,
+        erc20TokenToToken(baseCurrency, chainId),
+        erc20TokenToToken(quoteCurrency, chainId),
+        erc20TokenToToken(token0, chainId),
       ).toFixed(),
     );
     const projectedAPRResult = computeNewProjectedAPR(
@@ -376,6 +366,7 @@ export function VaultDebtPicker({
     return projectedAPRResult.newApr;
   }, [
     isBorrowing,
+    usingPerpetual,
     nextPriceForBorrow,
     nextPriceForRepay,
     paprController,

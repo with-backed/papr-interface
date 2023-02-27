@@ -12,6 +12,7 @@ fragment allPaprControllerProperties on PaprController {
   maxLTV
   fundingPeriod
   target
+  lastUpdated
   allowedCollateral(where: { allowed: true }) {
     id
     token {
