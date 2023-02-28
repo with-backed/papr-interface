@@ -20,6 +20,10 @@
   text-align: center;
 }
 
+.collateralTable tbody tr td input[type='checkbox'] {
+  vertical-align: middle;
+}
+
 .collateralTable thead tr th:nth-of-type(1) {
   text-align: left;
 }
@@ -30,10 +34,6 @@
 
 .collateralTable tbody tr td:last-of-type {
   padding: 0;
-}
-
-.collateralTable tbody tr td:last-of-type input {
-  margin-top: 4px;
 }
 
 .collateralTable thead tr th:nth-of-type(2) {
