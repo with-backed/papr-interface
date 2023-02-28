@@ -5,16 +5,15 @@ import { Table } from 'components/Table';
 import dayjs from 'dayjs';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useAuctionTopBid } from 'hooks/useAuctionTopBid';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 import { useNFTFlagged } from 'hooks/useNFTFlagged';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { usePaprPriceForAuction } from 'hooks/usePaprPriceForAuction';
 import { getUnitPriceForEth } from 'lib/coingecko';
-import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
+import { SupportedNetwork } from 'lib/config';
 import { formatBigNum } from 'lib/numberFormat';
-import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useEffect, useMemo, useState } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
@@ -33,10 +32,9 @@ export function AuctionPageContent({
   auction,
   refresh,
 }: AuctionPageContentProps) {
-  const { tokenName } = useConfig();
+  const config = useConfig();
   const controller = useController();
-  const oracleInfo = useOracleInfo(OraclePriceType.twap);
-  const latestUniswapPrice = useLatestMarketPrice();
+  const { paprPrice } = usePaprPriceForAuction(auction);
 
   const {
     liveAuctionPrice,
@@ -45,38 +43,67 @@ export function AuctionPageContent({
     hourlyPriceChange,
     priceUpdated,
   } = useLiveAuctionPrice(auction, 8000);
+  const topBid = useAuctionTopBid(auction);
 
   const [timeElapsed, setTimeElapsed] = useState<number>(
     currentTimeInSeconds() - auction.start.timestamp,
   );
 
-  const ethPrice = useAsyncValue(() => {
-    return getUnitPriceForEth(
-      'usd',
-      configs[tokenName as SupportedToken].network as SupportedNetwork,
-    );
-  }, [tokenName]);
+  const auctionCompleted = useMemo(() => {
+    return !!auction.end;
+  }, [auction.end]);
+
+  const auctionUnderlyingDisplayPrice = useMemo(() => {
+    if (!auctionCompleted) {
+      if (!liveAuctionPriceUnderlying) return null;
+      else
+        return formatBigNum(
+          liveAuctionPriceUnderlying,
+          controller.underlying.decimals,
+        );
+    } else {
+      if (!paprPrice) return null;
+      const auctionPriceNumber = parseFloat(
+        ethers.utils.formatUnits(
+          liveAuctionPrice,
+          controller.paprToken.decimals,
+        ),
+      );
+      return (auctionPriceNumber * paprPrice).toFixed(4);
+    }
+  }, [
+    auctionCompleted,
+    liveAuctionPriceUnderlying,
+    liveAuctionPrice,
+    paprPrice,
+    controller.underlying.decimals,
+    controller.paprToken.decimals,
+  ]);
+
+  const ethToUSDPrice = useAsyncValue(() => {
+    return getUnitPriceForEth('usd', config.network as SupportedNetwork);
+  }, [config.network]);
 
   const liveAuctionPriceUSD = useMemo(() => {
-    if (!liveAuctionPriceUnderlying || !ethPrice) return null;
+    if (!liveAuctionPriceUnderlying || !ethToUSDPrice) return null;
     return (
       parseFloat(
         ethers.utils.formatUnits(
           liveAuctionPriceUnderlying,
           controller.underlying.decimals,
         ),
-      ) * ethPrice
+      ) * ethToUSDPrice
     );
-  }, [liveAuctionPriceUnderlying, controller.underlying.decimals, ethPrice]);
+  }, [
+    liveAuctionPriceUnderlying,
+    controller.underlying.decimals,
+    ethToUSDPrice,
+  ]);
 
-  const floorUSDPrice = useMemo(() => {
-    if (!oracleInfo || !ethPrice) return 0;
-    return oracleInfo[auction.auctionAssetContract.id].price * ethPrice;
-  }, [oracleInfo, ethPrice, auction.auctionAssetContract.id]);
-
-  const auctionCompleted = useMemo(() => {
-    return !!auction.endPrice;
-  }, [auction.endPrice]);
+  const topBidUSDPrice = useMemo(() => {
+    if (!topBid || !ethToUSDPrice) return 0;
+    return topBid * ethToUSDPrice;
+  }, [topBid, ethToUSDPrice]);
 
   useEffect(() => {
     if (!auctionCompleted) {
@@ -89,7 +116,7 @@ export function AuctionPageContent({
     }
   }, [auctionCompleted, auction.start.timestamp, auction.end]);
 
-  if (!oracleInfo || !latestUniswapPrice) return <></>;
+  if (!topBid || !paprPrice) return <></>;
 
   return (
     <Fieldset
@@ -127,25 +154,26 @@ export function AuctionPageContent({
                 priceUpdated ? styles.updated : ''
               }`}>
               <p>
-                {liveAuctionPriceUnderlying && (
+                {formatBigNum(liveAuctionPrice, auction.paymentAsset.decimals)}{' '}
+                {controller.paprToken.symbol}
+              </p>
+              <p>
+                {auctionUnderlyingDisplayPrice && (
                   <>
-                    {formatBigNum(
-                      liveAuctionPriceUnderlying,
-                      controller.underlying.decimals,
-                    )}{' '}
+                    {auctionUnderlyingDisplayPrice}{' '}
                     {controller.underlying.symbol}
                   </>
                 )}
+                {!auctionUnderlyingDisplayPrice && <>...</>}
               </p>
-              {!liveAuctionPriceUnderlying && <>...</>}
-              <p>
-                {formatBigNum(liveAuctionPrice, auction.paymentAsset.decimals)}{' '}
-                {tokenName}
-              </p>
-              <p>
-                {liveAuctionPriceUSD && <>${liveAuctionPriceUSD.toFixed(4)}</>}
-                {!liveAuctionPriceUSD && <>...</>}
-              </p>
+              {!auctionCompleted && (
+                <p>
+                  {liveAuctionPriceUSD && (
+                    <>${liveAuctionPriceUSD.toFixed(4)}</>
+                  )}
+                  {!liveAuctionPriceUSD && <>...</>}
+                </p>
+              )}
             </div>
           </div>
           <div className={styles.summary}>
@@ -155,18 +183,18 @@ export function AuctionPageContent({
               auctionUnderlyingPrice={liveAuctionPriceUnderlying}
               priceUpdated={priceUpdated}
               timeElapsed={timeElapsed}
+              topBid={topBid}
             />
           </div>
         </div>
       </div>
       <AuctionGraph
         auction={auction}
-        auctionUnderlyingPrice={liveAuctionPriceUnderlying}
+        auctionPaprPrice={liveAuctionPrice}
         liveTimestamp={liveTimestamp}
         timeElapsed={timeElapsed}
-        oracleInfo={oracleInfo}
-        latestUniswapPrice={latestUniswapPrice}
-        floorUSDPrice={floorUSDPrice}
+        topBid={topBid}
+        paprPrice={paprPrice}
       />
       {!auctionCompleted && (
         <AuctionApproveAndBuy
@@ -187,6 +215,7 @@ type SummaryTableProps = {
   auctionUnderlyingPrice: ethers.BigNumber | null;
   priceUpdated: boolean;
   timeElapsed: number;
+  topBid: number;
 };
 
 function SummaryTable({
@@ -195,26 +224,20 @@ function SummaryTable({
   auctionUnderlyingPrice,
   priceUpdated,
   timeElapsed,
+  topBid,
 }: SummaryTableProps) {
-  const oracleInfo = useOracleInfo(OraclePriceType.spot);
   const controller = useController();
 
-  const percentFloor = useMemo(() => {
-    if (!oracleInfo || !auctionUnderlyingPrice) return '0.000';
-    const floor = oracleInfo[auction.auctionAssetContract.id].price;
+  const percentTopBid = useMemo(() => {
+    if (!auctionUnderlyingPrice) return '...';
     const percent =
       (parseFloat(
         formatBigNum(auctionUnderlyingPrice, controller.underlying.decimals),
       ) /
-        floor) *
+        topBid) *
       100;
     return percent.toFixed(3);
-  }, [
-    oracleInfo,
-    auctionUnderlyingPrice,
-    auction.auctionAssetContract.id,
-    controller.underlying.decimals,
-  ]);
+  }, [topBid, auctionUnderlyingPrice, controller.underlying.decimals]);
 
   const formattedTimeElapsed = useMemo(() => {
     return dayjs.duration(timeElapsed, 'seconds').format('D[d] HH:mm:ss');
@@ -236,7 +259,7 @@ function SummaryTable({
             className={`${styles.updatable} ${
               priceUpdated ? styles.updated : ''
             }`}>
-            {percentFloor}%
+            {percentTopBid}%
           </td>
           {!auction.endPrice && (
             <td

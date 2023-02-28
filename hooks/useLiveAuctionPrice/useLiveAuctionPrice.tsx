@@ -65,7 +65,7 @@ export function useLiveAuctionPrice(
   }, [liveAuctionPrice, auction]);
 
   useEffect(() => {
-    if (!auction.endPrice) {
+    if (!auction.end) {
       const interval = setInterval(() => {
         setLiveTimestamp(currentTimeInSeconds());
         setPriceUpdated(true);
@@ -74,6 +74,8 @@ export function useLiveAuctionPrice(
         }, 1000);
       }, priceRefreshTime);
       return () => clearInterval(interval);
+    } else {
+      setLiveTimestamp(auction.end.timestamp);
     }
   }, [auction, priceRefreshTime]);
 
