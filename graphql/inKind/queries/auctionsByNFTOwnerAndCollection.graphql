@@ -1,0 +1,9 @@
+query auctionsByNFTOwnerAndCollection($nftOwner: Bytes, $collection: String) {
+  auctions(
+    where: { nftOwner: $nftOwner, auctionAssetContract: $collection }
+    orderBy: endPrice
+    orderDirection: desc
+  ) {
+    ...allAuctionProperties
+  }
+}

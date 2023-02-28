@@ -44,8 +44,8 @@ import {
 import { Input, TooltipReference, useTooltipState } from 'reakit';
 import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import {
-  AuctionsByNftOwnerDocument,
-  AuctionsByNftOwnerQuery,
+  AuctionsByNftOwnerAndCollectionDocument,
+  AuctionsByNftOwnerAndCollectionQuery,
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
@@ -84,11 +84,12 @@ export function VaultDebtPicker({
     );
   }, [vault?.collateral.length, depositNFTs, withdrawNFTs]);
 
-  const [{ data: auctionsByNftOwner, fetching, error }] =
-    useQuery<AuctionsByNftOwnerQuery>({
-      query: AuctionsByNftOwnerDocument,
+  const [{ data: auctionsByNftOwnerAndCollection, fetching, error }] =
+    useQuery<AuctionsByNftOwnerAndCollectionQuery>({
+      query: AuctionsByNftOwnerAndCollectionDocument,
       variables: {
         nftOwner: address!,
+        collection: collateralContractAddress,
       },
     });
 
@@ -102,19 +103,13 @@ export function VaultDebtPicker({
         isLiquidated: false,
       }))
       .concat(
-        (auctionsByNftOwner?.auctions || [])
-          .map((a) => ({
-            address: a.auctionAssetContract.id,
-            tokenId: a.auctionAssetID,
-            inVault: false,
-            isLiquidating: !a.endPrice,
-            isLiquidated: !!a.endPrice,
-          }))
-          .filter(
-            (item) =>
-              getAddress(item.address) ===
-              getAddress(collateralContractAddress),
-          ),
+        (auctionsByNftOwnerAndCollection?.auctions || []).map((a) => ({
+          address: a.auctionAssetContract.id,
+          tokenId: a.auctionAssetID,
+          inVault: false,
+          isLiquidating: !a.endPrice,
+          isLiquidated: !!a.endPrice,
+        })),
       )
       .concat(
         userNFTsForVault
@@ -135,12 +130,7 @@ export function VaultDebtPicker({
             isLiquidated: false,
           })),
       );
-  }, [
-    userNFTsForVault,
-    vault,
-    collateralContractAddress,
-    auctionsByNftOwner?.auctions,
-  ]);
+  }, [userNFTsForVault, vault, auctionsByNftOwnerAndCollection?.auctions]);
 
   // debt variables
   const maxDebtPerNFTInPerpetual = useMaxDebt(
