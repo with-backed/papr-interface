@@ -13,6 +13,10 @@ type NFTMarqueeProps = {
   collateral: VaultCollateral[];
 };
 
+// images are 50px wide
+const IMAGE_WIDTH = 50;
+const SCROLL_DURATION = 7; // seconds
+
 export function NFTMarquee({ collateral }: NFTMarqueeProps) {
   const { centerNetwork } = useConfig();
   const result = useCollection({
@@ -21,9 +25,7 @@ export function NFTMarquee({ collateral }: NFTMarqueeProps) {
   });
   const tooltip = useTooltipState({ placement: 'right' });
   const pxPerSecond = useMemo(() => {
-    // each image is 50px wide
-    // scroll lasts for 7 seconds
-    return Math.floor((collateral.length * 50) / 7);
+    return Math.floor((collateral.length * IMAGE_WIDTH) / SCROLL_DURATION);
   }, [collateral]);
 
   return (
