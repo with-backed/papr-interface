@@ -89,7 +89,7 @@ export function VaultDebtPicker({
       query: AuctionsByNftOwnerAndCollectionDocument,
       variables: {
         nftOwner: address!,
-        collection: collateralContractAddress,
+        collection: collateralContractAddress.toLowerCase(),
       },
     });
 
