@@ -12,7 +12,7 @@ export function useAuctionTopBid(
 ) {
   const config = useConfig();
   const oracleInfo = useOracleInfo(OraclePriceType.spot);
-  const [topBidAtEnd, setTopBidAtEnd] = useState<number | null>(0);
+  const [topBidAtEnd, setTopBidAtEnd] = useState<number | null>(null);
   const [topBidAtEndFetching, setTopBidAtEndFetching] = useState<boolean>(true);
 
   useEffect(() => {

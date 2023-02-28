@@ -12,7 +12,7 @@ import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 import { useNFTFlagged } from 'hooks/useNFTFlagged';
 import { usePaprPriceForAuction } from 'hooks/usePaprPriceForAuction';
 import { getUnitPriceForEth } from 'lib/coingecko';
-import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
+import { SupportedNetwork } from 'lib/config';
 import { formatBigNum } from 'lib/numberFormat';
 import { useEffect, useMemo, useState } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
@@ -81,11 +81,8 @@ export function AuctionPageContent({
   ]);
 
   const ethToUSDPrice = useAsyncValue(() => {
-    return getUnitPriceForEth(
-      'usd',
-      configs[config.tokenName as SupportedToken].network as SupportedNetwork,
-    );
-  }, [config.tokenName]);
+    return getUnitPriceForEth('usd', config.network as SupportedNetwork);
+  }, [config.network]);
 
   const liveAuctionPriceUSD = useMemo(() => {
     if (!liveAuctionPriceUnderlying || !ethToUSDPrice) return null;
