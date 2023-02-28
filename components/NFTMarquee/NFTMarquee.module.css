@@ -1,0 +1,19 @@
+.wrapper img,
+.collateral-row img,
+.collateral-row div {
+  height: 50px !important;
+  width: 50px !important;
+}
+
+.collateral-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.collateral-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
