@@ -12,7 +12,7 @@ import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { currentPrice } from 'lib/auctions';
 import { convertOneScaledValue } from 'lib/controllers';
-import { formatBigNum, formatDollars } from 'lib/numberFormat';
+import { formatBigNum } from 'lib/numberFormat';
 import { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
@@ -215,16 +215,8 @@ export function AuctionGraph({
 
   const topBidLabel = useMemo(() => {
     const topBidString = topBid.toFixed(4);
-    const topBidUSDPriceString = formatDollars(topBidUSDPrice);
-    const topBidPricePadding = Array(
-      topBidString.toString().length +
-        5 -
-        topBidUSDPriceString.toString().length,
-    )
-      .fill('\t')
-      .join('');
-    return `\n\n\n\n${topBidString} WETH\n${topBidPricePadding}${topBidUSDPriceString}`;
-  }, [topBid, topBidUSDPrice]);
+    return `\n\n\n${topBidString} WETH`;
+  }, [topBid]);
 
   const chartOptions: ChartOptions = useMemo(
     () => ({
@@ -280,9 +272,9 @@ export function AuctionGraph({
               topBidDataPoint,
               -160,
               20,
-              -206,
-              -130,
-              -230,
+              -296,
+              -110,
+              -214,
               10,
               0,
             );
@@ -300,7 +292,7 @@ export function AuctionGraph({
               context.datasetIndex === 1 &&
               context.dataIndex === topBidDataPoint
             ) {
-              return 'Top Bid';
+              return 'Highest Collection Bid';
             } else if (
               context.datasetIndex === 1 &&
               context.dataIndex === topBidDataPoint - 1

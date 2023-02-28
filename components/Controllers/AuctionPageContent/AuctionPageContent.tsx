@@ -8,9 +8,9 @@ import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useAuctionTopBid } from 'hooks/useAuctionTopBid';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 import { useNFTFlagged } from 'hooks/useNFTFlagged';
+import { usePaprPriceForAuction } from 'hooks/usePaprPriceForAuction';
 import { getUnitPriceForEth } from 'lib/coingecko';
 import { configs, SupportedNetwork, SupportedToken } from 'lib/config';
 import { formatBigNum } from 'lib/numberFormat';
@@ -34,7 +34,7 @@ export function AuctionPageContent({
 }: AuctionPageContentProps) {
   const config = useConfig();
   const controller = useController();
-  const latestUniswapPrice = useLatestMarketPrice();
+  const { paprPrice } = usePaprPriceForAuction(auction);
 
   const {
     liveAuctionPrice,
@@ -49,7 +49,38 @@ export function AuctionPageContent({
     currentTimeInSeconds() - auction.start.timestamp,
   );
 
-  const ethPrice = useAsyncValue(() => {
+  const auctionCompleted = useMemo(() => {
+    return !!auction.end;
+  }, [auction.end]);
+
+  const auctionUnderlyingDisplayPrice = useMemo(() => {
+    if (!auctionCompleted) {
+      if (!liveAuctionPriceUnderlying) return null;
+      else
+        return formatBigNum(
+          liveAuctionPriceUnderlying,
+          controller.underlying.decimals,
+        );
+    } else {
+      if (!paprPrice) return null;
+      const auctionPriceNumber = parseFloat(
+        ethers.utils.formatUnits(
+          liveAuctionPrice,
+          controller.paprToken.decimals,
+        ),
+      );
+      return (auctionPriceNumber * paprPrice).toFixed(4);
+    }
+  }, [
+    auctionCompleted,
+    liveAuctionPriceUnderlying,
+    liveAuctionPrice,
+    paprPrice,
+    controller.underlying.decimals,
+    controller.paprToken.decimals,
+  ]);
+
+  const ethToUSDPrice = useAsyncValue(() => {
     return getUnitPriceForEth(
       'usd',
       configs[config.tokenName as SupportedToken].network as SupportedNetwork,
@@ -57,25 +88,25 @@ export function AuctionPageContent({
   }, [config.tokenName]);
 
   const liveAuctionPriceUSD = useMemo(() => {
-    if (!liveAuctionPriceUnderlying || !ethPrice) return null;
+    if (!liveAuctionPriceUnderlying || !ethToUSDPrice) return null;
     return (
       parseFloat(
         ethers.utils.formatUnits(
           liveAuctionPriceUnderlying,
           controller.underlying.decimals,
         ),
-      ) * ethPrice
+      ) * ethToUSDPrice
     );
-  }, [liveAuctionPriceUnderlying, controller.underlying.decimals, ethPrice]);
+  }, [
+    liveAuctionPriceUnderlying,
+    controller.underlying.decimals,
+    ethToUSDPrice,
+  ]);
 
   const topBidUSDPrice = useMemo(() => {
-    if (!topBid || !ethPrice) return 0;
-    return topBid * ethPrice;
-  }, [topBid, ethPrice]);
-
-  const auctionCompleted = useMemo(() => {
-    return !!auction.end;
-  }, [auction.end]);
+    if (!topBid || !ethToUSDPrice) return 0;
+    return topBid * ethToUSDPrice;
+  }, [topBid, ethToUSDPrice]);
 
   useEffect(() => {
     if (!auctionCompleted) {
@@ -88,7 +119,7 @@ export function AuctionPageContent({
     }
   }, [auctionCompleted, auction.start.timestamp, auction.end]);
 
-  if (!topBid || !latestUniswapPrice) return <></>;
+  if (!topBid || !paprPrice) return <></>;
 
   return (
     <Fieldset
@@ -126,25 +157,26 @@ export function AuctionPageContent({
                 priceUpdated ? styles.updated : ''
               }`}>
               <p>
-                {liveAuctionPriceUnderlying && (
+                {formatBigNum(liveAuctionPrice, auction.paymentAsset.decimals)}{' '}
+                {controller.paprToken.symbol}
+              </p>
+              <p>
+                {auctionUnderlyingDisplayPrice && (
                   <>
-                    {formatBigNum(
-                      liveAuctionPriceUnderlying,
-                      controller.underlying.decimals,
-                    )}{' '}
+                    {auctionUnderlyingDisplayPrice}{' '}
                     {controller.underlying.symbol}
                   </>
                 )}
+                {!auctionUnderlyingDisplayPrice && <>...</>}
               </p>
-              {!liveAuctionPriceUnderlying && <>...</>}
-              <p>
-                {formatBigNum(liveAuctionPrice, auction.paymentAsset.decimals)}{' '}
-                {config.tokenName}
-              </p>
-              <p>
-                {liveAuctionPriceUSD && <>${liveAuctionPriceUSD.toFixed(4)}</>}
-                {!liveAuctionPriceUSD && <>...</>}
-              </p>
+              {!auctionCompleted && (
+                <p>
+                  {liveAuctionPriceUSD && (
+                    <>${liveAuctionPriceUSD.toFixed(4)}</>
+                  )}
+                  {!liveAuctionPriceUSD && <>...</>}
+                </p>
+              )}
             </div>
           </div>
           <div className={styles.summary}>
@@ -165,7 +197,7 @@ export function AuctionPageContent({
         liveTimestamp={liveTimestamp}
         timeElapsed={timeElapsed}
         topBid={topBid}
-        latestUniswapPrice={latestUniswapPrice}
+        latestUniswapPrice={paprPrice}
         topBidUSDPrice={topBidUSDPrice}
       />
       {!auctionCompleted && (
