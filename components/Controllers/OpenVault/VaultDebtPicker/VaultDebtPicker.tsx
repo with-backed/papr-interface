@@ -110,7 +110,11 @@ export function VaultDebtPicker({
             isLiquidating: !a.endPrice,
             isLiquidated: !!a.endPrice,
           }))
-          .filter((item) => item.address === collateralContractAddress),
+          .filter(
+            (item) =>
+              getAddress(item.address) ===
+              getAddress(collateralContractAddress),
+          ),
       )
       .concat(
         userNFTsForVault
