@@ -197,8 +197,7 @@ export function AuctionPageContent({
         liveTimestamp={liveTimestamp}
         timeElapsed={timeElapsed}
         topBid={topBid}
-        latestUniswapPrice={paprPrice}
-        topBidUSDPrice={topBidUSDPrice}
+        paprPrice={paprPrice}
       />
       {!auctionCompleted && (
         <AuctionApproveAndBuy

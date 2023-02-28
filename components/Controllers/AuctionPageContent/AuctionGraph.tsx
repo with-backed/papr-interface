@@ -119,8 +119,7 @@ type AuctionGraphProps = {
   liveTimestamp: number;
   timeElapsed: number;
   topBid: number;
-  latestUniswapPrice: number;
-  topBidUSDPrice: number;
+  paprPrice: number;
 };
 
 export function AuctionGraph({
@@ -129,20 +128,15 @@ export function AuctionGraph({
   liveTimestamp,
   timeElapsed,
   topBid,
-  latestUniswapPrice,
-  topBidUSDPrice,
+  paprPrice,
 }: AuctionGraphProps) {
   const controller = useController();
   const timestampAndPricesAllTime = useMemo(() => {
-    return generateTimestampsAndPrices(auction, latestUniswapPrice);
-  }, [auction, latestUniswapPrice]);
+    return generateTimestampsAndPrices(auction, paprPrice);
+  }, [auction, paprPrice]);
   const timestampAndPricesCurrent = useMemo(() => {
-    return generateTimestampsAndPrices(
-      auction,
-      latestUniswapPrice,
-      liveTimestamp,
-    );
-  }, [auction, latestUniswapPrice, liveTimestamp]);
+    return generateTimestampsAndPrices(auction, paprPrice, liveTimestamp);
+  }, [auction, paprPrice, liveTimestamp]);
 
   const auctionCompleted = useMemo(
     () => !!auction.endPrice,
@@ -156,9 +150,9 @@ export function AuctionGraph({
           auction.startPrice,
           controller.paprToken.decimals,
         ),
-      ) * latestUniswapPrice
+      ) * paprPrice
     );
-  }, [auction.startPrice, controller.paprToken.decimals, latestUniswapPrice]);
+  }, [auction.startPrice, controller.paprToken.decimals, paprPrice]);
 
   const timeAgo = useMemo(() => {
     return Math.floor(timeElapsed / 60 / 60) > 24
@@ -170,14 +164,14 @@ export function AuctionGraph({
     const prices = timestampAndPricesAllTime[1];
     const closestPoint = Array.from(Array(prices.length).keys()).reduce(
       (prev, curr) => {
-        return Math.abs(prices[curr] - topBid / latestUniswapPrice) <
-          Math.abs(prices[prev] - topBid / latestUniswapPrice)
+        return Math.abs(prices[curr] - topBid / paprPrice) <
+          Math.abs(prices[prev] - topBid / paprPrice)
           ? curr
           : prev;
       },
     );
     return closestPoint;
-  }, [topBid, latestUniswapPrice, timestampAndPricesAllTime]);
+  }, [topBid, paprPrice, timestampAndPricesAllTime]);
 
   const startLabel = useMemo(() => {
     const startPriceUnderlyingString = startPriceUnderlying.toFixed(4);
