@@ -106,7 +106,7 @@ export function usePaprPriceForAuction(
     if (auctionCompleted) {
       if (!poolData) return;
       const ethPriceFromSlot0 = price(
-        poolData?.sqrtPriceX96,
+        poolData.sqrtPriceX96,
         baseToken,
         quoteToken,
         baseToken,
