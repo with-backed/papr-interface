@@ -7,7 +7,6 @@ import {
 } from '@rainbow-me/rainbowkit';
 import { useConfig } from 'hooks/useConfig';
 import { GlobalMessagingProvider } from 'hooks/useGlobalMessages';
-import { MarketPriceProvider } from 'hooks/useLatestMarketPrice';
 import { PaprBalanceProvider } from 'hooks/usePaprBalance';
 import { TargetProvider } from 'hooks/useTarget';
 import { TimestampProvider } from 'hooks/useTimestamp';
@@ -97,15 +96,13 @@ export const ApplicationProviders: FunctionComponent = ({ children }) => {
           <CenterProvider
             network={centerNetwork as any}
             apiKey={process.env.NEXT_PUBLIC_CENTER_KEY ?? ''}>
-            <MarketPriceProvider>
-              <TimestampProvider>
-                <TargetProvider>
-                  <PaprBalanceProvider>
-                    <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
-                  </PaprBalanceProvider>
-                </TargetProvider>
-              </TimestampProvider>
-            </MarketPriceProvider>
+            <TimestampProvider>
+              <TargetProvider>
+                <PaprBalanceProvider>
+                  <UrqlProvider value={inKindClient}>{children}</UrqlProvider>
+                </PaprBalanceProvider>
+              </TargetProvider>
+            </TimestampProvider>
           </CenterProvider>
         </RainbowKitProvider>
       </WagmiConfig>

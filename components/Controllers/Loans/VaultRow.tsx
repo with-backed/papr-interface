@@ -1,13 +1,15 @@
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { DisplayAddress } from 'components/DisplayAddress';
 import { NFTMarquee } from 'components/NFTMarquee';
+import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { useLTV } from 'hooks/useLTV';
+import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { formatTokenAmount } from 'lib/numberFormat';
 import Link from 'next/link';
 import React, { useMemo } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
 import { SubgraphVault } from 'types/SubgraphVault';
 
 import styles from './Loans.module.css';
@@ -24,6 +26,9 @@ export function VaultRow({ account, vault }: VaultRowProps) {
     );
     return `${formatTokenAmount(debt)}`;
   }, [paprToken.decimals, vault]);
+  const marketPrice = useLatestMarketPrice();
+
+  const debtTooltip = useTooltipState();
 
   const { tokenName } = useConfig();
 
@@ -37,7 +42,17 @@ export function VaultRow({ account, vault }: VaultRowProps) {
           <DisplayAddress address={account} />
         </Link>
       </td>
-      <td>{formattedDebt}</td>
+      <td>
+        <TooltipReference {...debtTooltip}>{formattedDebt}</TooltipReference>
+        <Tooltip {...debtTooltip}>
+          {!!marketPrice && (
+            <span>
+              {formatTokenAmount(marketPrice * parseFloat(formattedDebt))} ETH
+            </span>
+          )}
+          {!marketPrice && '...'}
+        </Tooltip>
+      </td>
       <td>
         <VaultHealth vault={vault} />
       </td>
