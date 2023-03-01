@@ -8,7 +8,7 @@ import { useControllerPricesData } from 'hooks/useControllerPricesData';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { useShowMore } from 'hooks/useShowMore';
 import { controllerNFTValue, convertOneScaledValue } from 'lib/controllers';
-import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
+import { formatTokenAmount } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import React, { useMemo } from 'react';
 import { erc20ABI, useContractRead } from 'wagmi';
@@ -36,6 +36,17 @@ export function Loans() {
     functionName: 'totalSupply',
   });
 
+  const totalNumberOfNFTsInVaults = useMemo(
+    () =>
+      currentVaults?.reduce((acc, v) => acc + v.collateralCount, 0) || '...',
+    [currentVaults],
+  );
+
+  const totalNumberOfBorrowers = useMemo(() => {
+    const borrowers = new Set(currentVaults?.map((v) => v.account));
+    return borrowers.size;
+  }, [currentVaults]);
+
   const computedAvg = useMemo(() => {
     if (
       !totalSupply ||
@@ -52,11 +63,6 @@ export function Loans() {
     const totalSupplyNum = parseFloat(ethers.utils.formatEther(totalSupply));
     return totalSupplyNum / nftValueInPapr;
   }, [NFTValue, pricesData, totalSupply]);
-
-  const formattedAvgLtv = useMemo(
-    () => formatPercent(computedAvg),
-    [computedAvg],
-  );
 
   const aggregateLTVMaxRatio = useMemo(() => {
     const formattedMaxLTV = convertOneScaledValue(
@@ -83,23 +89,28 @@ export function Loans() {
   return (
     <Fieldset legend="💸 Loans">
       <Table className={styles.table} fixed>
+        <col className={styles['first-column']} />
         <thead>
           <tr>
-            <th>Total</th>
+            <th className={styles.nfts}>NFTs</th>
+            <th>Borrowers</th>
             <th>
-              Amount
+              Borrowed
               <br />
-              (PAPR)
+              <span className={styles.lowercase}>(paprmeme)</span>
             </th>
-            <th>Avg.LTV</th>
-            <th>Health</th>
+            <th>
+              Health
+              <br />
+              <span className={styles.lowercase}>(up to max LTV)</span>
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr className={styles.row}>
-            <td>{currentVaults?.length} Loans</td>
+            <td className={styles.nfts}>{totalNumberOfNFTsInVaults}</td>
+            <td>{totalNumberOfBorrowers}</td>
             <td>{formattedTotalDebt}</td>
-            <td>{formattedAvgLtv}</td>
             <td>
               <HealthBar ratio={aggregateLTVMaxRatio} />
             </td>
@@ -107,16 +118,13 @@ export function Loans() {
         </tbody>
       </Table>
       <Table className={styles.table} fixed>
+        <col className={styles['first-column']} />
         <thead>
           <tr>
-            <th>Loan</th>
-            <th>
-              Amount
-              <br />
-              (PAPR)
-            </th>
-            <th>LTV</th>
-            <th>Health</th>
+            <th />
+            <th>Borrower</th>
+            <th />
+            <th />
           </tr>
         </thead>
         <tbody>
