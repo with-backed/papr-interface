@@ -157,19 +157,29 @@ export function SwapPageContent() {
 
     let baseCurrency: Token;
     let quoteCurrency: Token;
+
+    // inputting papr, with exact input of how much papr
     if (paprIn && amounts.tradeType === TradeType.EXACT_INPUT) {
       baseCurrency = paprUniswapToken;
       quoteCurrency = underlyingUniswapToken;
+
+      // inputting papr, with exact output of how much of outgoing token
     } else if (paprIn && amounts.tradeType === TradeType.EXACT_OUTPUT) {
       baseCurrency = underlyingUniswapToken;
       quoteCurrency = paprUniswapToken;
+
+      // outputting papr, with exact input of how much of incoming token
     } else if (paprOut && amounts.tradeType === TradeType.EXACT_INPUT) {
       baseCurrency = underlyingUniswapToken;
       quoteCurrency = paprUniswapToken;
+
+      // outputting papr, with exact output of how much papr
     } else if (paprOut && amounts.tradeType === TradeType.EXACT_OUTPUT) {
       baseCurrency = paprUniswapToken;
       quoteCurrency = underlyingUniswapToken;
     } else {
+      // should never happen, since if paprTokenField is not set, we will return on L151, and if it is set
+      // amounts.tradeType will always be either EXACT_INPUT or EXACT_OUTPUT
       throw new Error('Invalid trade type');
     }
 
