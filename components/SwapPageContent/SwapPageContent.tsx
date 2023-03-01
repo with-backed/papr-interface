@@ -1,7 +1,7 @@
 import '@uniswap/widgets/fonts.css';
 
 import { JsonRpcSigner } from '@ethersproject/providers';
-import { CurrencyAmount, Token } from '@uniswap/sdk-core';
+import { CurrencyAmount } from '@uniswap/sdk-core';
 import {
   Currency,
   Field,
@@ -14,7 +14,6 @@ import {
 import { Fieldset } from 'components/Fieldset';
 import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils.js';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
@@ -150,62 +149,17 @@ export function SwapPageContent() {
       setPaprPrice(null);
       return;
     }
-    const paprIn = paprTokenField === Field.INPUT;
-    const paprOut = paprTokenField === Field.OUTPUT;
+
     const paprUniswapToken = erc20TokenToToken(paprToken, chainId);
     const underlyingUniswapToken = erc20TokenToToken(underlying, chainId);
-
-    let baseCurrency: Token;
-    let quoteCurrency: Token;
-
-    // inputting papr, with exact input of how much papr
-    // base currency is thus papr, quote currency is underlying
-    if (paprIn && amounts.tradeType === TradeType.EXACT_INPUT) {
-      baseCurrency = paprUniswapToken;
-      quoteCurrency = underlyingUniswapToken;
-
-      // inputting papr, with exact output of how much of outgoing token
-      // base currency is thus underlying, quote currency is papr
-    } else if (paprIn && amounts.tradeType === TradeType.EXACT_OUTPUT) {
-      baseCurrency = underlyingUniswapToken;
-      quoteCurrency = paprUniswapToken;
-
-      // outputting papr, with exact input of how much of incoming token
-      // base currency is thus underlying, quote currency is papr
-    } else if (paprOut && amounts.tradeType === TradeType.EXACT_INPUT) {
-      baseCurrency = underlyingUniswapToken;
-      quoteCurrency = paprUniswapToken;
-
-      // outputting papr, with exact output of how much papr
-      // base currency is thus papr, quote currency is underlying
-    } else if (paprOut && amounts.tradeType === TradeType.EXACT_OUTPUT) {
-      baseCurrency = paprUniswapToken;
-      quoteCurrency = underlyingUniswapToken;
-    } else {
-      // should never happen, since if paprTokenField is not set, we will return on L151, and if it is set
-      // amounts.tradeType will always be either EXACT_INPUT or EXACT_OUTPUT
-      throw new Error('Invalid trade type');
-    }
-
-    let token0: Token;
-    if (token0IsUnderlying) {
-      if (getAddress(baseCurrency.address) === getAddress(underlying.id)) {
-        token0 = baseCurrency;
-      } else {
-        token0 = quoteCurrency;
-      }
-    } else {
-      if (getAddress(baseCurrency.address) === getAddress(underlying.id)) {
-        token0 = quoteCurrency;
-      } else {
-        token0 = baseCurrency;
-      }
-    }
+    const token0 = token0IsUnderlying
+      ? underlyingUniswapToken
+      : paprUniswapToken;
 
     const p = price(
       sqrtPriceAfter,
-      baseCurrency,
-      quoteCurrency,
+      paprUniswapToken,
+      underlyingUniswapToken,
       token0,
     ).toFixed();
     setPaprPrice(parseFloat(p));
