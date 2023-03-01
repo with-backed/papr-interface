@@ -29,9 +29,7 @@ export function VaultRow({ account, vault }: VaultRowProps) {
   return (
     <tr>
       <td className={styles['marquee-column']}>
-        <div className={styles.marquee}>
-          <NFTMarquee collateral={vault.collateral} />
-        </div>
+        <NFTMarquee collateral={vault.collateral} />
       </td>
       <td>
         <Link href={`/tokens/${tokenName}/vaults/${vault.id}`} legacyBehavior>
