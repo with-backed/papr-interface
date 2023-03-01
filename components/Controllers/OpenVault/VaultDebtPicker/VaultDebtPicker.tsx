@@ -405,6 +405,17 @@ export function VaultDebtPicker({
 
   const nftValueTooltip = useTooltipState({ placement: 'bottom-start' });
 
+  const hideVault = useMemo(() => {
+    if (!vault) return userNFTsForVault.length === 0;
+    return (
+      userNFTsForVault.length === 0 &&
+      vault.collateralCount === 0 &&
+      !vaultHasDebt
+    );
+  }, [vault, userNFTsForVault, vaultHasDebt]);
+
+  if (hideVault) return <></>;
+
   return (
     <Fieldset legend={`💸 ${nftSymbol}`}>
       <Table className={styles.collateralTable}>
