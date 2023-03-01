@@ -23,6 +23,7 @@ import { SupportedToken } from 'lib/config';
 import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
 import { price } from 'lib/controllers/charts/mark';
 import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
+import { erc20TokenToToken } from 'lib/uniswapSubgraph';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
 import { useSigner } from 'wagmi';
@@ -113,30 +114,35 @@ export function SwapPageContent() {
 
   const sqrtPriceAfter = useAsyncValue(async () => {
     if (!amounts) return null;
-    if (amounts.tradeType === TradeType.EXACT_INPUT) {
+    const paprIn = paprTokenField === Field.INPUT;
+    const paprOut = paprTokenField === Field.OUTPUT;
+
+    if (paprIn) {
       const quoteResult = await getQuoteForSwap(
         ethers.utils.parseUnits(
           amounts.input.toExact(),
           amounts.input.currency.decimals,
         ),
         amounts.input.currency.wrapped.address,
-        amounts.output.currency.wrapped.address,
+        underlying.id,
         tokenName as SupportedToken,
       );
       return quoteResult.sqrtPriceX96After;
-    } else {
+    } else if (paprOut) {
       const quoteResult = await getQuoteForSwapOutput(
         ethers.utils.parseUnits(
           amounts.output.toExact(),
           amounts.output.currency.decimals,
         ),
-        amounts.input.currency.wrapped.address,
+        underlying.id,
         amounts.output.currency.wrapped.address,
         tokenName as SupportedToken,
       );
       return quoteResult.sqrtPriceX96After;
+    } else {
+      return null;
     }
-  }, [amounts, tokenName]);
+  }, [amounts, tokenName, paprTokenField, underlying.id]);
 
   useEffect(() => {
     if (!sqrtPriceAfter || !amounts) return;
@@ -144,15 +150,29 @@ export function SwapPageContent() {
       setPaprPrice(null);
       return;
     }
+    const paprIn = paprTokenField === Field.INPUT;
+    const paprOut = paprTokenField === Field.OUTPUT;
+    const paprUniswapToken = erc20TokenToToken(paprToken, chainId);
+    const underlyingUniswapToken = erc20TokenToToken(underlying, chainId);
 
-    const baseCurrency =
-      amounts.tradeType === TradeType.EXACT_INPUT
-        ? amounts.input.currency.wrapped
-        : amounts.output.currency.wrapped;
-    const quoteCurrency =
-      amounts.tradeType === TradeType.EXACT_INPUT
-        ? amounts.output.currency.wrapped
-        : amounts.input.currency.wrapped;
+    let baseCurrency: Token;
+    let quoteCurrency: Token;
+    if (paprIn && amounts.tradeType === TradeType.EXACT_INPUT) {
+      baseCurrency = paprUniswapToken;
+      quoteCurrency = underlyingUniswapToken;
+    } else if (paprIn && amounts.tradeType === TradeType.EXACT_OUTPUT) {
+      baseCurrency = underlyingUniswapToken;
+      quoteCurrency = paprUniswapToken;
+    } else if (paprOut && amounts.tradeType === TradeType.EXACT_INPUT) {
+      baseCurrency = underlyingUniswapToken;
+      quoteCurrency = paprUniswapToken;
+    } else if (paprOut && amounts.tradeType === TradeType.EXACT_OUTPUT) {
+      baseCurrency = paprUniswapToken;
+      quoteCurrency = underlyingUniswapToken;
+    } else {
+      throw new Error('Invalid trade type');
+    }
+
     let token0: Token;
     if (token0IsUnderlying) {
       if (getAddress(baseCurrency.address) === getAddress(underlying.id)) {
@@ -175,7 +195,15 @@ export function SwapPageContent() {
       token0,
     ).toFixed();
     setPaprPrice(parseFloat(p));
-  }, [sqrtPriceAfter, paprTokenField, amounts, token0IsUnderlying, underlying]);
+  }, [
+    sqrtPriceAfter,
+    paprTokenField,
+    amounts,
+    token0IsUnderlying,
+    underlying,
+    paprToken,
+    chainId,
+  ]);
 
   const OnSwitchTokens = useCallback(() => {
     if (!paprTokenField) return;
