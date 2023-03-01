@@ -24,7 +24,7 @@ export function NFTMarquee({ collateral }: NFTMarqueeProps) {
     <div className={styles.wrapper}>
       <TooltipReference {...tooltip}>
         <Marquee
-          style={{ width: '50px', height: '50px', overflow: 'hidden' }}
+          className={styles.marquee}
           play={collateral.length > 1}
           pauseOnHover
           speed={10}

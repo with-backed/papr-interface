@@ -17,3 +17,9 @@
   align-items: center;
   justify-content: center;
 }
+
+.marquee {
+  height: 50px;
+  width: 50px;
+  overflow: hidden;
+}
