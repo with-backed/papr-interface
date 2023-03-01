@@ -2,15 +2,18 @@ import { TextButton } from 'components/Button';
 import { Fieldset } from 'components/Fieldset';
 import { HealthBar } from 'components/HealthBar';
 import { Table } from 'components/Table';
+import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { useShowMore } from 'hooks/useShowMore';
 import { controllerNFTValue, convertOneScaledValue } from 'lib/controllers';
 import { formatTokenAmount } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import React, { useMemo } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
 import { erc20ABI, useContractRead } from 'wagmi';
 
 import styles from './Loans.module.css';
@@ -41,6 +44,9 @@ export function Loans() {
       currentVaults?.reduce((acc, v) => acc + v.collateralCount, 0) || '...',
     [currentVaults],
   );
+
+  const borrowedTooltip = useTooltipState();
+  const marketPrice = useLatestMarketPrice();
 
   const totalNumberOfBorrowers = useMemo(() => {
     const borrowers = new Set(currentVaults?.map((v) => v.account));
@@ -110,7 +116,22 @@ export function Loans() {
           <tr className={styles.row}>
             <td className={styles.nfts}>{totalNumberOfNFTsInVaults}</td>
             <td>{totalNumberOfBorrowers}</td>
-            <td>{formattedTotalDebt}</td>
+            <td>
+              <TooltipReference {...borrowedTooltip}>
+                {formattedTotalDebt}
+              </TooltipReference>
+              <Tooltip {...borrowedTooltip}>
+                {!!marketPrice && (
+                  <span>
+                    {formatTokenAmount(
+                      marketPrice * parseFloat(formattedTotalDebt),
+                    )}{' '}
+                    ETH
+                  </span>
+                )}
+                {!marketPrice && '...'}
+              </Tooltip>
+            </td>
             <td>
               <HealthBar ratio={aggregateLTVMaxRatio} />
             </td>
