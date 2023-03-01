@@ -159,21 +159,25 @@ export function SwapPageContent() {
     let quoteCurrency: Token;
 
     // inputting papr, with exact input of how much papr
+    // base currency is thus papr, quote currency is underlying
     if (paprIn && amounts.tradeType === TradeType.EXACT_INPUT) {
       baseCurrency = paprUniswapToken;
       quoteCurrency = underlyingUniswapToken;
 
       // inputting papr, with exact output of how much of outgoing token
+      // base currency is thus underlying, quote currency is papr
     } else if (paprIn && amounts.tradeType === TradeType.EXACT_OUTPUT) {
       baseCurrency = underlyingUniswapToken;
       quoteCurrency = paprUniswapToken;
 
       // outputting papr, with exact input of how much of incoming token
+      // base currency is thus underlying, quote currency is papr
     } else if (paprOut && amounts.tradeType === TradeType.EXACT_INPUT) {
       baseCurrency = underlyingUniswapToken;
       quoteCurrency = paprUniswapToken;
 
       // outputting papr, with exact output of how much papr
+      // base currency is thus papr, quote currency is underlying
     } else if (paprOut && amounts.tradeType === TradeType.EXACT_OUTPUT) {
       baseCurrency = paprUniswapToken;
       quoteCurrency = underlyingUniswapToken;
