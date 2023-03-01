@@ -27,6 +27,10 @@
   margin-top: 1.5rem;
 }
 
+.lowercase {
+  text-transform: lowercase;
+}
+
 .marquee-column {
   padding: 0 !important;
 }
