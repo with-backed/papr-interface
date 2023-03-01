@@ -1,4 +1,5 @@
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
+import { DisplayAddress } from 'components/DisplayAddress';
 import { NFTMarquee } from 'components/NFTMarquee';
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
@@ -32,8 +33,8 @@ export function VaultRow({ account, vault }: VaultRowProps) {
         <NFTMarquee collateral={vault.collateral} />
       </td>
       <td>
-        <Link href={`/tokens/${tokenName}/vaults/${vault.id}`} legacyBehavior>
-          {account.substring(0, 7)}
+        <Link href={`/tokens/${tokenName}/vaults/${vault.id}`}>
+          <DisplayAddress address={account} />
         </Link>
       </td>
       <td>{formattedDebt}</td>
