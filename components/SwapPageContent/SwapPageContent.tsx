@@ -1,7 +1,7 @@
 import '@uniswap/widgets/fonts.css';
 
 import { JsonRpcSigner } from '@ethersproject/providers';
-import { CurrencyAmount, Token } from '@uniswap/sdk-core';
+import { CurrencyAmount } from '@uniswap/sdk-core';
 import {
   Currency,
   Field,
@@ -14,7 +14,6 @@ import {
 import { Fieldset } from 'components/Fieldset';
 import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils.js';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
@@ -23,6 +22,7 @@ import { SupportedToken } from 'lib/config';
 import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
 import { price } from 'lib/controllers/charts/mark';
 import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
+import { erc20TokenToToken } from 'lib/uniswapSubgraph';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
 import { useSigner } from 'wagmi';
@@ -113,30 +113,35 @@ export function SwapPageContent() {
 
   const sqrtPriceAfter = useAsyncValue(async () => {
     if (!amounts) return null;
-    if (amounts.tradeType === TradeType.EXACT_INPUT) {
+    const paprIn = paprTokenField === Field.INPUT;
+    const paprOut = paprTokenField === Field.OUTPUT;
+
+    if (paprIn) {
       const quoteResult = await getQuoteForSwap(
         ethers.utils.parseUnits(
           amounts.input.toExact(),
           amounts.input.currency.decimals,
         ),
         amounts.input.currency.wrapped.address,
-        amounts.output.currency.wrapped.address,
+        underlying.id,
         tokenName as SupportedToken,
       );
       return quoteResult.sqrtPriceX96After;
-    } else {
+    } else if (paprOut) {
       const quoteResult = await getQuoteForSwapOutput(
         ethers.utils.parseUnits(
           amounts.output.toExact(),
           amounts.output.currency.decimals,
         ),
-        amounts.input.currency.wrapped.address,
+        underlying.id,
         amounts.output.currency.wrapped.address,
         tokenName as SupportedToken,
       );
       return quoteResult.sqrtPriceX96After;
+    } else {
+      return null;
     }
-  }, [amounts, tokenName]);
+  }, [amounts, tokenName, paprTokenField, underlying.id]);
 
   useEffect(() => {
     if (!sqrtPriceAfter || !amounts) return;
@@ -145,37 +150,28 @@ export function SwapPageContent() {
       return;
     }
 
-    const baseCurrency =
-      amounts.tradeType === TradeType.EXACT_INPUT
-        ? amounts.input.currency.wrapped
-        : amounts.output.currency.wrapped;
-    const quoteCurrency =
-      amounts.tradeType === TradeType.EXACT_INPUT
-        ? amounts.output.currency.wrapped
-        : amounts.input.currency.wrapped;
-    let token0: Token;
-    if (token0IsUnderlying) {
-      if (getAddress(baseCurrency.address) === getAddress(underlying.id)) {
-        token0 = baseCurrency;
-      } else {
-        token0 = quoteCurrency;
-      }
-    } else {
-      if (getAddress(baseCurrency.address) === getAddress(underlying.id)) {
-        token0 = quoteCurrency;
-      } else {
-        token0 = baseCurrency;
-      }
-    }
+    const paprUniswapToken = erc20TokenToToken(paprToken, chainId);
+    const underlyingUniswapToken = erc20TokenToToken(underlying, chainId);
+    const token0 = token0IsUnderlying
+      ? underlyingUniswapToken
+      : paprUniswapToken;
 
     const p = price(
       sqrtPriceAfter,
-      baseCurrency,
-      quoteCurrency,
+      paprUniswapToken,
+      underlyingUniswapToken,
       token0,
     ).toFixed();
     setPaprPrice(parseFloat(p));
-  }, [sqrtPriceAfter, paprTokenField, amounts, token0IsUnderlying, underlying]);
+  }, [
+    sqrtPriceAfter,
+    paprTokenField,
+    amounts,
+    token0IsUnderlying,
+    underlying,
+    paprToken,
+    chainId,
+  ]);
 
   const OnSwitchTokens = useCallback(() => {
     if (!paprTokenField) return;
