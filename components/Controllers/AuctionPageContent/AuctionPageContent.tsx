@@ -44,14 +44,17 @@ export function AuctionPageContent({
   const controller = useController();
   const { paprPrice } = usePaprPriceForAuction(auction);
 
+  const topBid = useAuctionTopBid(auction);
+  const auctionPageLoading = useMemo(() => {
+    return !topBid || !paprPrice;
+  }, [topBid, paprPrice]);
   const {
     liveAuctionPrice,
     liveAuctionPriceUnderlying,
     liveTimestamp,
     hourlyPriceChange,
     priceUpdated,
-  } = useLiveAuctionPrice(auction, 8000);
-  const topBid = useAuctionTopBid(auction);
+  } = useLiveAuctionPrice(auction, 8000, auctionPageLoading);
 
   const [timeElapsed, setTimeElapsed] = useState<number>(
     currentTimeInSeconds() - auction.start.timestamp,
@@ -108,11 +111,6 @@ export function AuctionPageContent({
     ethToUSDPrice,
   ]);
 
-  const topBidUSDPrice = useMemo(() => {
-    if (!topBid || !ethToUSDPrice) return 0;
-    return topBid * ethToUSDPrice;
-  }, [topBid, ethToUSDPrice]);
-
   useEffect(() => {
     if (!auctionCompleted) {
       const interval = setInterval(() => {
@@ -124,7 +122,7 @@ export function AuctionPageContent({
     }
   }, [auctionCompleted, auction.start.timestamp, auction.end]);
 
-  if (!topBid || !paprPrice) return <></>;
+  if (auctionPageLoading) return <></>;
 
   return (
     <Fieldset
