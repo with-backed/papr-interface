@@ -1,4 +1,7 @@
-import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import { ethers } from 'ethers';
+import { useController } from 'hooks/useController';
+import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+import { useTarget } from 'hooks/useTarget';
 import { SECONDS_IN_A_YEAR } from 'lib/constants';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { percentChange } from 'lib/tokenPerformance';
@@ -9,49 +12,37 @@ import { RatesNegative } from './RatesNegative';
 import { RatesPositive } from './RatesPositive';
 
 export function ContractStatus() {
-  const {
-    pricesData,
-    fetching: pricesDataFetching,
-    error: pricesDataError,
-  } = useControllerPricesData();
-  const contractAPR = useMemo(() => {
-    if (!pricesData || pricesData.targetValues.length < 2) {
+  const { target: currentTarget, lastUpdated, underlying } = useController();
+  const newTargetResult = useTarget();
+  const mark = useLatestMarketPrice();
+
+  const currentTargetNumber = useMemo(() => {
+    return parseFloat(
+      ethers.utils.formatUnits(currentTarget, underlying.decimals),
+    );
+  }, [currentTarget, underlying.decimals]);
+  const newTargetNumber = useMemo(() => {
+    if (!newTargetResult) {
       return null;
     }
-    const l = pricesData.targetValues.length;
-    const cur = pricesData.targetValues[l - 1];
-    const prev = pricesData.targetValues[l - 2];
-    const change = percentChange(prev.value, cur.value);
+    return parseFloat(
+      ethers.utils.formatUnits(newTargetResult.newTarget, underlying.decimals),
+    );
+  }, [newTargetResult, underlying.decimals]);
+
+  const contractAPR = useMemo(() => {
+    if (!newTargetResult || !newTargetNumber) {
+      return null;
+    }
+    const change = percentChange(currentTargetNumber, newTargetNumber);
     // convert to APR
-    return (change / (cur.time - prev.time)) * SECONDS_IN_A_YEAR;
-  }, [pricesData]);
+    return (
+      (change / (newTargetResult.timestamp - lastUpdated)) * SECONDS_IN_A_YEAR
+    );
+  }, [newTargetNumber, lastUpdated, currentTargetNumber, newTargetResult]);
 
-  const { mark, target } = useMemo(() => {
-    if (!pricesData) {
-      return {
-        mark: 0,
-        target: 0,
-      };
-    }
-    const { markValues, targetValues } = pricesData;
-    // This happens on a brand new controller that doesn't have data yet.
-    if (markValues.length === 0 || targetValues.length === 0) {
-      return {
-        mark: 0,
-        target: 0,
-      };
-    }
-    const mark = markValues[markValues.length - 1].value;
-    const target = targetValues[targetValues.length - 1].value;
-    return { mark, target };
-  }, [pricesData]);
-
-  if (pricesDataFetching) {
+  if (!contractAPR || !mark) {
     return <Fieldset>Loading price data...</Fieldset>;
-  }
-
-  if (pricesDataError || !contractAPR) {
-    return <Fieldset>Failed to load price data.</Fieldset>;
   }
 
   if (contractAPR < 0) {
@@ -59,7 +50,7 @@ export function ContractStatus() {
       <RatesNegative
         contractRate={formatPercent(contractAPR)}
         marketPrice={formatTokenAmount(mark)}
-        targetPrice={formatTokenAmount(target)}
+        targetPrice={formatTokenAmount(newTargetNumber!)}
       />
     );
   }
@@ -68,7 +59,7 @@ export function ContractStatus() {
     <RatesPositive
       contractRate={formatPercent(contractAPR)}
       marketPrice={formatTokenAmount(mark)}
-      targetPrice={formatTokenAmount(target)}
+      targetPrice={formatTokenAmount(newTargetNumber!)}
     />
   );
 }

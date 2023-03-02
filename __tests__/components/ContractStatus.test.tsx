@@ -1,8 +1,11 @@
 import { render } from '@testing-library/react';
 import { ContractStatus } from 'components/ContractStatus';
-import { useControllerPricesData } from 'hooks/useControllerPricesData';
+import { ethers } from 'ethers';
+import { useController } from 'hooks/useController';
+import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+import { useTarget } from 'hooks/useTarget/useTarget';
+import { subgraphController } from 'lib/mockData/mockPaprController';
 import { UTCTimestamp } from 'lightweight-charts';
-import { CombinedError } from 'urql';
 
 const basePricesData = {
   index: 1e-18,
@@ -28,9 +31,16 @@ const pricesDataNegative = {
   markValues: [{ value: 1.052329, time: 1674461832 as UTCTimestamp }],
 };
 
-jest.mock('hooks/useControllerPricesData', () => ({
-  ...jest.requireActual('hooks/useControllerPricesData'),
-  useControllerPricesData: jest.fn(),
+jest.mock('hooks/useTarget/useTarget', () => ({
+  useTarget: jest.fn(),
+}));
+
+jest.mock('hooks/useLatestMarketPrice', () => ({
+  useLatestMarketPrice: jest.fn(),
+}));
+
+jest.mock('hooks/useController', () => ({
+  useController: jest.fn(),
 }));
 
 jest.mock('hooks/useTheme', () => ({
@@ -38,44 +48,64 @@ jest.mock('hooks/useTheme', () => ({
   useTheme: () => 'trash',
 }));
 
-const mockedUseControllerPricesData =
-  useControllerPricesData as jest.MockedFunction<
-    typeof useControllerPricesData
-  >;
+const mockedUseTarget = useTarget as jest.MockedFunction<typeof useTarget>;
+
+const mockedUseController = useController as jest.MockedFunction<
+  typeof useController
+>;
+
+const mockedUseLatestMarketPrice = useLatestMarketPrice as jest.MockedFunction<
+  typeof useLatestMarketPrice
+>;
 
 describe('ContractStatus', () => {
-  it('renders an error message when there is no price data', () => {
-    mockedUseControllerPricesData.mockReturnValue({
-      fetching: false,
-      pricesData: null,
-      error: new CombinedError({}),
-    });
-    const { getByText } = render(<ContractStatus />);
-    getByText('Failed to load price data.');
+  beforeAll(() => {
+    mockedUseController.mockReturnValue(subgraphController);
   });
   it('renders a loading message while the hook is fetching', () => {
-    mockedUseControllerPricesData.mockReturnValue({
-      fetching: true,
-      pricesData: null,
-      error: null,
-    });
+    mockedUseTarget.mockReturnValue(undefined);
+    mockedUseLatestMarketPrice.mockReturnValue(null);
     const { getByText } = render(<ContractStatus />);
     getByText('Loading price data...');
   });
   it('renders RatesPositive when rates are positive', () => {
-    mockedUseControllerPricesData.mockReturnValue({
-      fetching: false,
-      pricesData: pricesDataPositive,
-      error: null,
+    mockedUseController.mockReturnValue({
+      ...subgraphController,
+      target: ethers.utils.parseUnits(
+        pricesDataPositive.targetValues[0].value.toString(),
+        18,
+      ),
+    });
+    mockedUseLatestMarketPrice.mockReturnValue(
+      pricesDataPositive.markValues[0].value,
+    );
+    mockedUseTarget.mockReturnValue({
+      newTarget: ethers.utils.parseUnits(
+        pricesDataPositive.targetValues[1].value.toString(),
+        18,
+      ),
+      timestamp: pricesDataPositive.targetValues[1].time,
     });
     const { getByTestId } = render(<ContractStatus />);
     getByTestId('rates-positive');
   });
   it('renders RatesNegative when rates are negative', () => {
-    mockedUseControllerPricesData.mockReturnValue({
-      fetching: false,
-      pricesData: pricesDataNegative,
-      error: null,
+    mockedUseController.mockReturnValue({
+      ...subgraphController,
+      target: ethers.utils.parseUnits(
+        pricesDataNegative.targetValues[0].value.toString(),
+        18,
+      ),
+    });
+    mockedUseLatestMarketPrice.mockReturnValue(
+      pricesDataNegative.markValues[0].value,
+    );
+    mockedUseTarget.mockReturnValue({
+      newTarget: ethers.utils.parseUnits(
+        pricesDataNegative.targetValues[1].value.toString(),
+        18,
+      ),
+      timestamp: pricesDataNegative.targetValues[1].time,
     });
     const { getByTestId } = render(<ContractStatus />);
     getByTestId('rates-negative');
