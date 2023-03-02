@@ -266,9 +266,9 @@ export function AuctionGraph({
               topBidDataPoint,
               -160,
               20,
-              -296,
+              -286,
               -110,
-              -214,
+              -204,
               10,
               0,
             );
