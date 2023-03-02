@@ -37,6 +37,7 @@ export function formatDollars(amount: number) {
 const PERCENT_FORMATTER = new Intl.NumberFormat(LOCALE, {
   style: 'percent',
   maximumFractionDigits: 2,
+  minimumFractionDigits: 2,
 });
 /**
  * Formats a number representing a percentage consistent with our design.

@@ -16,10 +16,10 @@
   text-align: center;
 }
 
-.tooltip div {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
+.tooltip {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px;
+  column-gap: 0.5rem;
 }
 
 .button-container {
@@ -37,4 +37,8 @@
 
 .first-column {
   width: 50px;
+}
+
+.right {
+  text-align: center;
 }

@@ -33,21 +33,52 @@ export function VaultHealth({ vault }: VaultHealthProps) {
         <HealthBar ratio={ratio} />
       </TooltipReference>
       <Tooltip {...healthTooltip}>
-        <div className={styles.tooltip}>
-          <div>
-            <span>Current LTV</span>
-            <span>{ltv ? formatPercent(ltv) : '...'}</span>
-          </div>
-          <div>
-            <span>Max LTV</span>
-            <span>{formatPercent(formattedMaxLTV)}</span>
-          </div>
-          <div>
-            <span>Current/Max LTV</span>
-            <span>{formatPercent(ratio)}</span>
-          </div>
-        </div>
+        <VaultHealthTooltipContent ltv={ltv} maxLtv={formattedMaxLTV} />
       </Tooltip>
     </>
+  );
+}
+
+type VaultHealthTooltipContentProps = {
+  ltv: number | null;
+  maxLtv: number;
+};
+
+function VaultHealthTooltipContent({
+  ltv,
+  maxLtv,
+}: VaultHealthTooltipContentProps) {
+  return (
+    <div className={styles.tooltip}>
+      <span>LTV calculation:</span>
+      <span></span>
+      <span className={styles.right}>Δ 24hr</span>
+
+      <span>Debt (papr borrowed x Target)</span>
+      <span>0.144 ETH</span>
+      <span>(+0.12%)</span>
+
+      <span>Collateral (7-day avg. top bid)</span>
+      <span>0.327 ETH</span>
+      <span>(-1.34%)</span>
+
+      {/* Blank space */}
+      <span>
+        <br />
+      </span>
+      <span>
+        <br />
+      </span>
+      <span>
+        <br />
+      </span>
+
+      <span>This loan&apos;s current LTV is:</span>
+      <span>{ltv ? formatPercent(ltv) : '...'}</span>
+      <span>(+0.54%)</span>
+
+      <span>Liquidation occurs at Max LTV of</span>
+      <span>{formatPercent(maxLtv)}</span>
+    </div>
   );
 }
