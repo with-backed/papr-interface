@@ -25,12 +25,15 @@ export function useAuctionTopBid(
         setTopBidAtEnd(topBid);
         setTopBidAtEndFetching(false);
       });
+    } else {
+      setTopBidAtEndFetching(false);
     }
   }, [auction.end, auction.auctionAssetContract.id, config]);
 
   const topBid = useMemo(() => {
     const topBidReady = !topBidAtEndFetching && oracleInfo;
     if (!topBidReady) return null;
+    console.log({ info: oracleInfo[auction.auctionAssetContract.id] });
     return topBidAtEnd
       ? topBidAtEnd
       : oracleInfo[auction.auctionAssetContract.id].price;
