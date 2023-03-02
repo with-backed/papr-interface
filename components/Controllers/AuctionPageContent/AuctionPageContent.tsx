@@ -193,7 +193,7 @@ export function AuctionPageContent({
               auctionUnderlyingPrice={liveAuctionPriceUnderlying}
               priceUpdated={priceUpdated}
               timeElapsed={timeElapsed}
-              topBid={topBid}
+              topBid={topBid!}
             />
           </div>
         </div>
@@ -203,8 +203,8 @@ export function AuctionPageContent({
         auctionPaprPrice={liveAuctionPrice}
         liveTimestamp={liveTimestamp}
         timeElapsed={timeElapsed}
-        topBid={topBid}
-        paprPrice={paprPrice}
+        topBid={topBid!}
+        paprPrice={paprPrice!}
       />
       {!auctionCompleted && (
         <AuctionApproveAndBuy
