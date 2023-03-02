@@ -25,6 +25,8 @@ export function useAuctionTopBid(
         setTopBidAtEnd(topBid);
         setTopBidAtEndFetching(false);
       });
+    } else {
+      setTopBidAtEndFetching(false);
     }
   }, [auction.end, auction.auctionAssetContract.id, config]);
 
