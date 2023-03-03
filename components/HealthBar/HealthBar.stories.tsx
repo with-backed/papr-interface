@@ -3,6 +3,7 @@ import { HealthBar } from './HealthBar';
 export const HealthBars = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <HealthBar ratio={-0.25} />
       <HealthBar ratio={0} />
       <HealthBar ratio={0.25} />
       <HealthBar ratio={0.5} />

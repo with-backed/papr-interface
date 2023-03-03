@@ -17,8 +17,11 @@ export function HealthBar({
   threshold = DEFAULT_UNHEALTHY_THRESHOLD,
 }: HealthBarProps) {
   const segments = useMemo(() => {
+    // Ratio must be a number between zero and 1 (inclusive)
+    const clampedRatio = Math.min(1, Math.max(0, ratio));
+
     // Ratio, but as a number out of numSegments rather than a decimal out of 1
-    const numFilledSegments = Math.round(ratio * numSegments);
+    const numFilledSegments = Math.round(clampedRatio * numSegments);
 
     const empty = Array<string>(numSegments).fill('░');
     const filled = Array<string>(numFilledSegments).fill('▓');
