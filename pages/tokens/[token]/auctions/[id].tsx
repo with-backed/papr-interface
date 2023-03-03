@@ -4,8 +4,9 @@ import { AuctionPageContent } from 'components/Controllers/AuctionPageContent/Au
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { Custom404 } from 'components/Custom404';
 import { ControllerContextProvider, PaprController } from 'hooks/useController';
+import { MarketPriceProvider } from 'hooks/useLatestMarketPrice';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
-import { configs, getConfig, SupportedToken } from 'lib/config';
+import { configProxy, SupportedToken } from 'lib/config';
 import { generateVaultId } from 'lib/controllers/vaults';
 import { fetchSubgraphData } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
@@ -26,23 +27,24 @@ type AuctionProps = {
 export const getServerSideProps: GetServerSideProps<AuctionProps> = async (
   context,
 ) => {
-  const token = context.params?.token as SupportedToken;
-  const address: string | undefined =
-    getConfig(token)?.controllerAddress?.toLocaleLowerCase();
-  if (!address) {
+  const token = context.params?.token as string;
+  const config = configProxy[token];
+  if (!config) {
     return {
       notFound: true,
     };
   }
 
   const controllerSubgraphData = await fetchSubgraphData(
-    address,
-    configs[token].uniswapSubgraph,
-    token,
+    config.controllerAddress.toLocaleLowerCase(),
+    config.uniswapSubgraph,
+    config.tokenName as SupportedToken,
   );
 
   if (!controllerSubgraphData) {
-    const e = new Error(`subgraph data for controller ${address} not found`);
+    const e = new Error(
+      `subgraph data for controller ${config.controllerAddress} not found`,
+    );
     captureException(e);
     throw e;
   }
@@ -102,14 +104,16 @@ export default function Auction({
   return (
     <OracleInfoProvider collections={collections}>
       <ControllerContextProvider value={subgraphController}>
-        <div className={controllerStyles.wrapper}>
-          <AuctionPageContent auction={auction} refresh={refresh} />
-          <Activity
-            subgraphPool={subgraphPool}
-            vault={auctionVaultId}
-            showSwaps={false}
-          />
-        </div>
+        <MarketPriceProvider>
+          <div className={controllerStyles.wrapper}>
+            <AuctionPageContent auction={auction} refresh={refresh} />
+            <Activity
+              subgraphPool={subgraphPool}
+              vault={auctionVaultId}
+              showSwaps={false}
+            />
+          </div>
+        </MarketPriceProvider>
       </ControllerContextProvider>
     </OracleInfoProvider>
   );

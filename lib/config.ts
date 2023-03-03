@@ -56,19 +56,27 @@ const paprMeme = {
     'https://api.thegraph.com/subgraphs/name/sunguru98/mainnet-erc721-subgraph',
 };
 
-export function getConfig(configName: string) {
-  const c: { [name: string]: any } = {
-    paprhero: paprHero,
-    paprmeme: paprMeme,
-  };
-  return c[configName.toLowerCase()];
-}
-
-// DEPRECATE IN FAVOR OF getConfig
 export const configs = {
   paprHero,
   paprMeme,
 };
+
+const caseInsensitiveConfigs: { [key: string]: Config | undefined } = {
+  paprhero: paprHero,
+  paprmeme: paprMeme,
+};
+
+export const configProxy = new Proxy(caseInsensitiveConfigs, {
+  get(target, prop) {
+    try {
+      return target[
+        (prop as string).toLowerCase() as keyof typeof caseInsensitiveConfigs
+      ];
+    } catch (e) {
+      return undefined;
+    }
+  },
+});
 
 export const prodConfigs = [paprMeme];
 

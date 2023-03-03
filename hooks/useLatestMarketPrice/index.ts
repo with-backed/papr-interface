@@ -1,1 +1,4 @@
-export { useLatestMarketPrice } from './useLatestMarketPrice';
+export {
+  MarketPriceProvider,
+  useLatestMarketPrice,
+} from './useLatestMarketPrice';

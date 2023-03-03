@@ -1,7 +1,8 @@
 import { captureException } from '@sentry/nextjs';
 import { OpenGraph } from 'components/OpenGraph';
 import { ControllerContextProvider } from 'hooks/useController';
-import { configs, getConfig, SupportedToken } from 'lib/config';
+import { MarketPriceProvider } from 'hooks/useLatestMarketPrice';
+import { configProxy, SupportedToken } from 'lib/config';
 import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
 import capitalize from 'lodash/capitalize';
 import { GetServerSideProps } from 'next';
@@ -16,23 +17,24 @@ const SwapPageContent = dynamic(
 export const getServerSideProps: GetServerSideProps<SwapProps> = async (
   context,
 ) => {
-  const token = context.params?.token as SupportedToken;
-  const address: string | undefined =
-    getConfig(token)?.controllerAddress?.toLocaleLowerCase();
-  if (!address) {
+  const token = context.params?.token as string;
+  const config = configProxy[token];
+  if (!config) {
     return {
       notFound: true,
     };
   }
 
   const controllerSubgraphData = await fetchSubgraphData(
-    address,
-    configs[token].uniswapSubgraph,
-    token,
+    config.controllerAddress.toLocaleLowerCase(),
+    config.uniswapSubgraph,
+    config.tokenName as SupportedToken,
   );
 
   if (!controllerSubgraphData) {
-    const e = new Error(`subgraph data for controller ${address} not found`);
+    const e = new Error(
+      `subgraph data for controller ${config.controllerAddress} not found`,
+    );
     captureException(e);
     throw e;
   }
@@ -42,7 +44,7 @@ export const getServerSideProps: GetServerSideProps<SwapProps> = async (
   return {
     props: {
       subgraphController: paprController,
-      token,
+      token: config.tokenName as SupportedToken,
     },
   };
 };
@@ -54,8 +56,10 @@ type SwapProps = {
 export default function Swap({ subgraphController, token }: SwapProps) {
   return (
     <ControllerContextProvider value={subgraphController}>
-      <OpenGraph title={`Backed | ${capitalize(token)} | Swap`} />
-      <SwapPageContent />
+      <MarketPriceProvider>
+        <OpenGraph title={`Backed | ${capitalize(token)} | Swap`} />
+        <SwapPageContent />
+      </MarketPriceProvider>
     </ControllerContextProvider>
   );
 }

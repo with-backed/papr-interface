@@ -2,17 +2,19 @@ import { Token } from '@uniswap/sdk-core';
 import { tickToPrice } from '@uniswap/v3-sdk';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 import {
   PoolByIdDocument,
   PoolByIdQuery,
 } from 'types/generated/graphql/uniswapSubgraph';
 import { useQuery } from 'urql';
 
-export function useLatestMarketPrice() {
+const MarketPriceContext = createContext<number | null>(null);
+
+export const MarketPriceProvider: React.FunctionComponent = ({ children }) => {
   const { chainId, uniswapSubgraph } = useConfig();
   const { poolAddress, token0IsUnderlying } = useController();
-  const [{ data }] = useQuery<PoolByIdQuery>({
+  const [{ data }, reExecuteQuery] = useQuery<PoolByIdQuery>({
     query: PoolByIdDocument,
     variables: { id: poolAddress },
     context: useMemo(
@@ -22,6 +24,14 @@ export function useLatestMarketPrice() {
       [uniswapSubgraph],
     ),
   });
+
+  useEffect(() => {
+    const id = setInterval(
+      () => reExecuteQuery({ requestPolicy: 'network-only' }),
+      100 * 60 * 2,
+    );
+    return () => clearInterval(id);
+  }, [reExecuteQuery]);
 
   const token0 = useMemo(() => {
     if (!data || !data.pool) {
@@ -62,5 +72,14 @@ export function useLatestMarketPrice() {
     return parseFloat(uniswapPrice.toFixed(4));
   }, [data, token0, token0IsUnderlying, token1]);
 
-  return price;
+  return (
+    <MarketPriceContext.Provider value={price}>
+      {children}
+    </MarketPriceContext.Provider>
+  );
+};
+
+export function useLatestMarketPrice() {
+  const value = useContext(MarketPriceContext);
+  return value;
 }
