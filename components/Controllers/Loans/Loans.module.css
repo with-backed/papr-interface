@@ -11,19 +11,6 @@
   white-space: nowrap;
 }
 
-div.indicator {
-  font-size: 12px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  font-family: 'Arial';
-}
-
-.indicator-danger {
-  composes: indicator;
-  color: var(--highlight-alert-100);
-}
-
 .table td {
   white-space: pre;
   text-align: center;

@@ -1,5 +1,5 @@
 overwrite: true
-schema: 'https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-rinkeby'
+schema: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3'
 documents: './graphql/uniswap/**/*.graphql'
 generates:
   types/generated/graphql/uniswapSubgraph.ts:
