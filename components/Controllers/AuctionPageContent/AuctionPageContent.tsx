@@ -303,10 +303,10 @@ function AuctionPageLoading({ auction }: AuctionPageContentProps) {
             <SummaryTable
               auction={auction}
               hourlyPriceChange={ethers.BigNumber.from(0)}
-              auctionUnderlyingPrice={ethers.BigNumber.from(0)}
+              auctionUnderlyingPrice={null}
               priceUpdated={false}
               timeElapsed={0}
-              topBid={1}
+              topBid={0}
             />
           </div>
         </div>
