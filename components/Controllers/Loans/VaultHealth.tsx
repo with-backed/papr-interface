@@ -1,9 +1,10 @@
+import { HealthBar } from 'components/HealthBar';
 import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { convertOneScaledValue } from 'lib/controllers';
 import { formatPercent } from 'lib/numberFormat';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
 
 import styles from './Loans.module.css';
@@ -20,26 +21,10 @@ export function VaultHealth({ ltv }: VaultHealthProps) {
   );
   const ratio = ltv / formattedMaxLTV;
 
-  const indicator = useMemo(() => {
-    const totalElements = 16;
-    // Ratio, but as a number out of totalElements rather than a decimal out of 1
-    const numHashes = Math.round(ratio * totalElements);
-    const empty = Array(totalElements).fill('░');
-    const filled = Array(numHashes).fill('▓');
-    return filled.concat(empty).slice(0, totalElements);
-  }, [ratio]);
-
   return (
     <>
       <TooltipReference {...healthTooltip}>
-        <div
-          className={
-            ratio > 0.85 ? styles['indicator-danger'] : styles.indicator
-          }>
-          {indicator.map((char, i) => (
-            <p key={i}>{char}</p>
-          ))}
-        </div>
+        <HealthBar ratio={ratio} />
       </TooltipReference>
       <Tooltip {...healthTooltip}>
         <div className={styles.tooltip}>
