@@ -26,6 +26,12 @@
   cursor: pointer;
 }
 
+.nftPlaceholder {
+  width: 160px;
+  height: 160px;
+  background-color: #f9f9f9;
+}
+
 .headerInfo {
   width: 70%;
 }

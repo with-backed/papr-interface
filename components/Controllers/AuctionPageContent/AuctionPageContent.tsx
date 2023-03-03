@@ -44,14 +44,17 @@ export function AuctionPageContent({
   const controller = useController();
   const { paprPrice } = usePaprPriceForAuction(auction);
 
+  const topBid = useAuctionTopBid(auction);
+  const auctionPageLoading = useMemo(() => {
+    return !topBid || !paprPrice;
+  }, [topBid, paprPrice]);
   const {
     liveAuctionPrice,
     liveAuctionPriceUnderlying,
     liveTimestamp,
     hourlyPriceChange,
     priceUpdated,
-  } = useLiveAuctionPrice(auction, 8000);
-  const topBid = useAuctionTopBid(auction);
+  } = useLiveAuctionPrice(auction, 8000, auctionPageLoading);
 
   const [timeElapsed, setTimeElapsed] = useState<number>(
     currentTimeInSeconds() - auction.start.timestamp,
@@ -108,11 +111,6 @@ export function AuctionPageContent({
     ethToUSDPrice,
   ]);
 
-  const topBidUSDPrice = useMemo(() => {
-    if (!topBid || !ethToUSDPrice) return 0;
-    return topBid * ethToUSDPrice;
-  }, [topBid, ethToUSDPrice]);
-
   useEffect(() => {
     if (!auctionCompleted) {
       const interval = setInterval(() => {
@@ -124,7 +122,8 @@ export function AuctionPageContent({
     }
   }, [auctionCompleted, auction.start.timestamp, auction.end]);
 
-  if (!topBid || !paprPrice) return <></>;
+  if (auctionPageLoading)
+    return <AuctionPageLoading auction={auction} refresh={() => null} />;
 
   return (
     <Fieldset
@@ -195,7 +194,7 @@ export function AuctionPageContent({
               auctionUnderlyingPrice={liveAuctionPriceUnderlying}
               priceUpdated={priceUpdated}
               timeElapsed={timeElapsed}
-              topBid={topBid}
+              topBid={topBid!}
             />
           </div>
         </div>
@@ -205,8 +204,8 @@ export function AuctionPageContent({
         auctionPaprPrice={liveAuctionPrice}
         liveTimestamp={liveTimestamp}
         timeElapsed={timeElapsed}
-        topBid={topBid}
-        paprPrice={paprPrice}
+        topBid={topBid!}
+        paprPrice={paprPrice!}
       />
       {!auctionCompleted && (
         <AuctionApproveAndBuy
@@ -284,6 +283,47 @@ function SummaryTable({
         </tr>
       </tbody>
     </Table>
+  );
+}
+
+function AuctionPageLoading({ auction }: AuctionPageContentProps) {
+  return (
+    <Fieldset
+      legend={
+        <FieldsetHeader
+          contractAddress={auction.auctionAssetContract.id}
+          tokenId={auction.auctionAssetID}
+          symbol={auction.auctionAssetContract.symbol}
+        />
+      }>
+      <div className={styles.headerWrapper}>
+        <div className={styles.nft}>
+          <div className={styles.nftPlaceholder}></div>
+        </div>
+        <div className={styles.headerInfo}>
+          <div className={styles.livePrice}>
+            <div className={styles.countdown}>
+              <AuctionCountdown animate={false} />
+            </div>
+            <div className={`${styles.prices} ${styles.updatable}`}>
+              <p>...</p>
+              <p>...</p>
+              <p>...</p>
+            </div>
+          </div>
+          <div className={styles.summary}>
+            <SummaryTable
+              auction={auction}
+              hourlyPriceChange={ethers.BigNumber.from(0)}
+              auctionUnderlyingPrice={null}
+              priceUpdated={false}
+              timeElapsed={0}
+              topBid={0}
+            />
+          </div>
+        </div>
+      </div>
+    </Fieldset>
   );
 }
 

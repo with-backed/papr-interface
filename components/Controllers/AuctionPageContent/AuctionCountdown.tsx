@@ -1,6 +1,10 @@
 import styles from './AuctionCountdown.module.css';
 
-export function AuctionCountdown() {
+type AuctionCountdownProps = {
+  animate?: boolean;
+};
+
+export function AuctionCountdown({ animate = true }: AuctionCountdownProps) {
   return (
     <svg
       className={styles.mainSvg}
@@ -10,7 +14,7 @@ export function AuctionCountdown() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg">
       <circle
-        className={`${styles.dot} ${styles.d1}`}
+        className={`${styles.dot} ${animate ? styles.d1 : ''}`}
         fill="#EEEEEE"
         cx="18.0451"
         cy="6.56455"
@@ -19,7 +23,7 @@ export function AuctionCountdown() {
       />
 
       <circle
-        className={`${styles.dot} ${styles.d2}`}
+        className={`${styles.dot} ${animate ? styles.d2 : ''}`}
         fill="#EEEEEE"
         cx="6.56418"
         cy="18.0449"
@@ -28,7 +32,7 @@ export function AuctionCountdown() {
       />
 
       <circle
-        className={`${styles.dot} ${styles.d7}`}
+        className={`${styles.dot} ${animate ? styles.d7 : ''}`}
         fill="#EEEEEE"
         cx="45.7614"
         cy="18.045"
@@ -37,7 +41,7 @@ export function AuctionCountdown() {
       />
 
       <circle
-        className={`${styles.dot} ${styles.d5}`}
+        className={`${styles.dot} ${animate ? styles.d5 : ''}`}
         fill="#EEEEEE"
         cx="34.2809"
         cy="45.7614"
@@ -46,7 +50,7 @@ export function AuctionCountdown() {
       />
 
       <circle
-        className={`${styles.dot} ${styles.d3}`}
+        className={`${styles.dot} ${animate ? styles.d3 : ''}`}
         fill="#EEEEEE"
         cx="6.5646"
         cy="34.2809"
@@ -55,7 +59,7 @@ export function AuctionCountdown() {
       />
 
       <circle
-        className={`${styles.dot} ${styles.d8}`}
+        className={`${styles.dot} ${animate ? styles.d8 : ''}`}
         fill="#EEEEEE"
         cx="34.281"
         cy="6.56447"
@@ -64,7 +68,7 @@ export function AuctionCountdown() {
       />
 
       <circle
-        className={`${styles.dot} ${styles.d6}`}
+        className={`${styles.dot} ${animate ? styles.d6 : ''}`}
         fill="#EEEEEE"
         cx="45.7614"
         cy="34.281"
@@ -73,7 +77,7 @@ export function AuctionCountdown() {
       />
 
       <circle
-        className={`${styles.dot} ${styles.d4}`}
+        className={`${styles.dot} ${animate ? styles.d4 : ''}`}
         fill="#EEEEEE"
         cx="18.0451"
         cy="45.7615"

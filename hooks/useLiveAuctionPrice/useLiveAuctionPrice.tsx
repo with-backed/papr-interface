@@ -13,6 +13,7 @@ const ONE_HOUR_IN_SECONDS = 60 * 60;
 export function useLiveAuctionPrice(
   auction: NonNullable<AuctionQuery['auction']>,
   priceRefreshTime = 14000,
+  pause = false,
 ) {
   const { tokenName } = useConfig();
   const controller = useController();
@@ -66,18 +67,20 @@ export function useLiveAuctionPrice(
 
   useEffect(() => {
     if (!auction.end) {
-      const interval = setInterval(() => {
-        setLiveTimestamp(currentTimeInSeconds());
-        setPriceUpdated(true);
-        setTimeout(() => {
-          setPriceUpdated(false);
-        }, 1000);
-      }, priceRefreshTime);
-      return () => clearInterval(interval);
+      if (!pause) {
+        const interval = setInterval(() => {
+          setLiveTimestamp(currentTimeInSeconds());
+          setPriceUpdated(true);
+          setTimeout(() => {
+            setPriceUpdated(false);
+          }, 1000);
+        }, priceRefreshTime);
+        return () => clearInterval(interval);
+      }
     } else {
       setLiveTimestamp(auction.end.timestamp);
     }
-  }, [auction, priceRefreshTime]);
+  }, [auction, priceRefreshTime, pause]);
 
   useEffect(() => {
     calculateLiveAuctionPriceUnderlying().then((quoteResult) => {
