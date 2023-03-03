@@ -1,5 +1,6 @@
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
+import { BLOCKS_IN_A_DAY } from 'lib/constants';
 import { formatDollars, formatPercent } from 'lib/numberFormat';
 import { useMemo } from 'react';
 import {
@@ -16,10 +17,6 @@ const NO_DATA = '---';
 
 // We don't want to refresh the pool data on every block number
 const BLOCK_NUMBER_CACHE_TIME = 1000 * 60 * 60;
-
-// Assuming 12s per block, one day ago is current block number
-// minus 7200.
-const BLOCKS_IN_A_DAY = 7200;
 
 export function usePoolStats() {
   const blockNumber = useBlockNumber({ cacheTime: BLOCK_NUMBER_CACHE_TIME });
