@@ -42,11 +42,15 @@ export function VaultHealth({ vault }: VaultHealthProps) {
 type VaultHealthTooltipContentProps = {
   ltv: number | null;
   maxLtv: number;
+  debt: string;
+  debtPercentChange: string;
 };
 
 function VaultHealthTooltipContent({
   ltv,
   maxLtv,
+  debt,
+  debtPercentChange,
 }: VaultHealthTooltipContentProps) {
   return (
     <div className={styles.tooltip}>
@@ -55,12 +59,13 @@ function VaultHealthTooltipContent({
       <span className={styles.right}>Δ 24hr</span>
 
       <span>Debt (papr borrowed x Target)</span>
-      <span>0.144 ETH</span>
-      <span>(+0.12%)</span>
+      <span>{debt}</span>
+      <span>({debtPercentChange})</span>
 
       <span>Collateral (7-day avg. top bid)</span>
       <span>0.327 ETH</span>
-      <span>(-1.34%)</span>
+      {/* We don't yet have data to compute percent change for this */}
+      <span></span>
 
       {/* Blank space */}
       <span>
