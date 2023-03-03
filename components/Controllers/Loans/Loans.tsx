@@ -1,20 +1,19 @@
-import { captureException } from '@sentry/nextjs';
 import { TextButton } from 'components/Button';
 import { Fieldset } from 'components/Fieldset';
+import { HealthBar } from 'components/HealthBar';
 import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useControllerPricesData } from 'hooks/useControllerPricesData';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { useShowMore } from 'hooks/useShowMore';
-import { controllerNFTValue } from 'lib/controllers';
+import { controllerNFTValue, convertOneScaledValue } from 'lib/controllers';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import React, { useMemo } from 'react';
 import { erc20ABI, useContractRead } from 'wagmi';
 
 import styles from './Loans.module.css';
-import { VaultHealth } from './VaultHealth';
 import { VaultRow } from './VaultRow';
 
 export function Loans() {
@@ -46,14 +45,6 @@ export function Loans() {
     ) {
       return 0;
     }
-    if (!ethers.BigNumber.isBigNumber(totalSupply)) {
-      captureException(
-        new Error(
-          `did not receive BigNumber value for totalSupply: ${totalSupply}`,
-        ),
-      );
-      return 0;
-    }
     const { targetValues } = pricesData;
     const target = targetValues[targetValues.length - 1].value;
     const nftValueInPapr = NFTValue / target;
@@ -66,6 +57,14 @@ export function Loans() {
     () => formatPercent(computedAvg),
     [computedAvg],
   );
+
+  const aggregateLTVMaxRatio = useMemo(() => {
+    const formattedMaxLTV = convertOneScaledValue(
+      ethers.BigNumber.from(paprController.maxLTV),
+      4,
+    );
+    return computedAvg / formattedMaxLTV;
+  }, [computedAvg, paprController]);
 
   const formattedTotalDebt = useMemo(() => {
     const debtBigNum = (currentVaults || []).reduce(
@@ -102,7 +101,7 @@ export function Loans() {
             <td>{formattedTotalDebt}</td>
             <td>{formattedAvgLtv}</td>
             <td>
-              <VaultHealth ltv={computedAvg} />
+              <HealthBar ratio={aggregateLTVMaxRatio} />
             </td>
           </tr>
         </tbody>
