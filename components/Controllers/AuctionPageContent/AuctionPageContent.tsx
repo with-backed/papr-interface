@@ -13,15 +13,7 @@ import { useNFTFlagged } from 'hooks/useNFTFlagged';
 import { usePaprPriceForAuction } from 'hooks/usePaprPriceForAuction';
 import { getUnitPriceForEth } from 'lib/coingecko';
 import { SupportedNetwork } from 'lib/config';
-import {
-  allExchanges,
-  Exchange,
-  exchangeImages,
-  exchangeUrlGenerators,
-} from 'lib/exchanges';
 import { formatBigNum } from 'lib/numberFormat';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
@@ -122,7 +114,8 @@ export function AuctionPageContent({
     }
   }, [auctionCompleted, auction.start.timestamp, auction.end]);
 
-  if (auctionPageLoading) return <></>;
+  if (auctionPageLoading)
+    return <AuctionPageLoading auction={auction} refresh={() => null} />;
 
   return (
     <Fieldset
@@ -137,10 +130,6 @@ export function AuctionPageContent({
         <div className={styles.nft}>
           <CenterAsset
             address={auction.auctionAssetContract.id}
-            tokenId={auction.auctionAssetID}
-          />
-          <ExchangeLinks
-            contractAddress={auction.auctionAssetContract.id}
             tokenId={auction.auctionAssetID}
           />
         </div>
@@ -285,6 +274,47 @@ function SummaryTable({
   );
 }
 
+function AuctionPageLoading({ auction }: AuctionPageContentProps) {
+  return (
+    <Fieldset
+      legend={
+        <FieldsetHeader
+          contractAddress={auction.auctionAssetContract.id}
+          tokenId={auction.auctionAssetID}
+          symbol={auction.auctionAssetContract.symbol}
+        />
+      }>
+      <div className={styles.headerWrapper}>
+        <div className={styles.nft}>
+          <div className={styles.nftPlaceholder}></div>
+        </div>
+        <div className={styles.headerInfo}>
+          <div className={styles.livePrice}>
+            <div className={styles.countdown}>
+              <AuctionCountdown animate={false} />
+            </div>
+            <div className={`${styles.prices} ${styles.updatable}`}>
+              <p>...</p>
+              <p>...</p>
+              <p>...</p>
+            </div>
+          </div>
+          <div className={styles.summary}>
+            <SummaryTable
+              auction={auction}
+              hourlyPriceChange={ethers.BigNumber.from(0)}
+              auctionUnderlyingPrice={ethers.BigNumber.from(0)}
+              priceUpdated={false}
+              timeElapsed={0}
+              topBid={1}
+            />
+          </div>
+        </div>
+      </div>
+    </Fieldset>
+  );
+}
+
 type FieldsetHeaderProps = {
   contractAddress: string;
   tokenId: string;
@@ -320,6 +350,7 @@ function FieldsetHeader({
     );
   }
 }
+<<<<<<< HEAD
 
 type ExchangeLinksProps = {
   contractAddress: string;
@@ -374,3 +405,5 @@ function ExchangeLinks({ contractAddress, tokenId }: ExchangeLinksProps) {
     </div>
   );
 }
+=======
+>>>>>>> 7379f502 (loading state)
