@@ -6,8 +6,9 @@ import {
 import { OpenGraph } from 'components/OpenGraph';
 import { useConfig } from 'hooks/useConfig';
 import { ControllerContextProvider } from 'hooks/useController';
+import { MarketPriceProvider } from 'hooks/useLatestMarketPrice';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
-import { configs, getConfig, SupportedToken } from 'lib/config';
+import { configProxy, SupportedToken } from 'lib/config';
 import {
   fetchSubgraphData,
   SubgraphController,
@@ -27,23 +28,24 @@ type ServerSideProps = Omit<
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
   context,
 ) => {
-  const token = context.params?.token as SupportedToken;
-  const address: string | undefined =
-    getConfig(token)?.controllerAddress?.toLocaleLowerCase();
-  if (!address) {
+  const token = context.params?.token as string;
+  const config = configProxy[token];
+  if (!config) {
     return {
       notFound: true,
     };
   }
 
   const controllerSubgraphData = await fetchSubgraphData(
-    address,
-    configs[token].uniswapSubgraph,
-    token,
+    config.controllerAddress.toLocaleLowerCase(),
+    config.uniswapSubgraph,
+    config.tokenName as SupportedToken,
   );
 
   if (!controllerSubgraphData) {
-    const e = new Error(`subgraph data for controller ${address} not found`);
+    const e = new Error(
+      `subgraph data for controller ${config.controllerAddress} not found`,
+    );
     captureException(e);
     throw e;
   }
@@ -72,8 +74,10 @@ export default function ControllerPage({
   return (
     <OracleInfoProvider collections={collections}>
       <ControllerContextProvider value={subgraphController}>
-        <OpenGraph title={`${config.tokenName} | Performance`} />
-        <ControllerOverviewContent subgraphPool={subgraphPool} />
+        <MarketPriceProvider>
+          <OpenGraph title={`${config.tokenName} | Performance`} />
+          <ControllerOverviewContent subgraphPool={subgraphPool} />
+        </MarketPriceProvider>
       </ControllerContextProvider>
     </OracleInfoProvider>
   );
