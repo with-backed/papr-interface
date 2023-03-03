@@ -13,7 +13,12 @@ import { useNFTFlagged } from 'hooks/useNFTFlagged';
 import { usePaprPriceForAuction } from 'hooks/usePaprPriceForAuction';
 import { getUnitPriceForEth } from 'lib/coingecko';
 import { SupportedNetwork } from 'lib/config';
-import { exchangeUrlGenerators } from 'lib/exchanges';
+import {
+  allExchanges,
+  Exchange,
+  exchangeImages,
+  exchangeUrlGenerators,
+} from 'lib/exchanges';
 import { formatBigNum } from 'lib/numberFormat';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -324,49 +329,50 @@ type ExchangeLinksProps = {
 };
 
 function ExchangeLinks({ contractAddress, tokenId }: ExchangeLinksProps) {
+  const [hover, setHover] = useState<{ [key in Exchange]: boolean }>({
+    blur: false,
+    opensea: false,
+    looksrare: false,
+    x2y2: false,
+    etherscan: false,
+  });
+
   return (
     <div className={styles.exchangeLinks}>
-      <div>
-        <Link
-          href={`${exchangeUrlGenerators['blur'](contractAddress, tokenId)}`}
-          target="_blank">
-          <Image src="/blur-gray.svg" alt="" width={24} height={24} />
-        </Link>
-      </div>
-      <div>
-        <Link
-          href={`${exchangeUrlGenerators['opensea'](contractAddress, tokenId)}`}
-          target="_blank">
-          <Image src="/opensea-gray.svg" alt="" width={24} height={24} />
-        </Link>
-      </div>
-      <div>
-        <Link
-          href={`${exchangeUrlGenerators['looksrare'](
-            contractAddress,
-            tokenId,
-          )}`}
-          target="_blank">
-          <Image src="/looksrare-gray.svg" alt="" width={24} height={24} />
-        </Link>
-      </div>
-      <div>
-        <Link
-          href={`${exchangeUrlGenerators['x2y2'](contractAddress, tokenId)}`}
-          target="_blank">
-          <Image src="/x2y2-gray.svg" alt="" width={24} height={24} />
-        </Link>
-      </div>
-      <div>
-        <Link
-          href={`${exchangeUrlGenerators['etherscan'](
-            contractAddress,
-            tokenId,
-          )}`}
-          target="_blank">
-          <Image src="/etherscan-gray.svg" alt="" width={24} height={24} />
-        </Link>
-      </div>
+      {allExchanges.map((exchange) => (
+        <div key={exchange}>
+          <Link
+            className={styles[exchange]}
+            href={`${exchangeUrlGenerators[exchange](
+              contractAddress,
+              tokenId,
+            )}`}
+            target="_blank">
+            <Image
+              src={
+                hover[exchange]
+                  ? exchangeImages[exchange].color
+                  : exchangeImages[exchange].gray
+              }
+              alt=""
+              width={24}
+              height={24}
+              onMouseEnter={() =>
+                setHover((prev) => ({
+                  ...prev,
+                  [exchange]: true,
+                }))
+              }
+              onMouseLeave={() =>
+                setHover((prev) => ({
+                  ...prev,
+                  [exchange]: false,
+                }))
+              }
+            />
+          </Link>
+        </div>
+      ))}
     </div>
   );
 }
