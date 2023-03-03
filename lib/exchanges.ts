@@ -7,7 +7,7 @@ import looksrareGray from 'public/looksrare-gray.svg';
 import opensea from 'public/opensea.svg';
 import openseaGray from 'public/opensea-gray.svg';
 import x2y2 from 'public/x2y2.svg';
-import x2y2Gray from 'public/x2y2-Gray.svg';
+import x2y2Gray from 'public/x2y2-gray.svg';
 
 export const allExchanges = [
   'blur',
