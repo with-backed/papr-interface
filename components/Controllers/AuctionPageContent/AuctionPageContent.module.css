@@ -15,6 +15,17 @@
   max-width: 100%;
 }
 
+.exchangeLinks {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.exchangeLinks div {
+  cursor: pointer;
+}
+
 .nftPlaceholder {
   width: 160px;
   height: 160px;
