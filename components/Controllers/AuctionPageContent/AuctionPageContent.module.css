@@ -15,6 +15,37 @@
   max-width: 100%;
 }
 
+.exchangeLinks {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.exchangeLinks div {
+  cursor: pointer;
+}
+
+.exchangeLinks div:first-child img:hover {
+  content: url('/blur.svg');
+}
+
+.exchangeLinks div:nth-child(2) img:hover {
+  content: url('/opensea.svg');
+}
+
+.exchangeLinks div:nth-child(3) img:hover {
+  content: url('/looksrare.svg');
+}
+
+.exchangeLinks div:nth-child(4) img:hover {
+  content: url('/x2y2.svg');
+}
+
+.exchangeLinks div:nth-child(5) img:hover {
+  content: url('/etherscan.svg');
+}
+
 .headerInfo {
   width: 70%;
 }

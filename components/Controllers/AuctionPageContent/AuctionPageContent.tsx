@@ -13,7 +13,10 @@ import { useNFTFlagged } from 'hooks/useNFTFlagged';
 import { usePaprPriceForAuction } from 'hooks/usePaprPriceForAuction';
 import { getUnitPriceForEth } from 'lib/coingecko';
 import { SupportedNetwork } from 'lib/config';
+import { Exchange, exchangeUrlGenerators } from 'lib/exchanges';
 import { formatBigNum } from 'lib/numberFormat';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
@@ -131,6 +134,10 @@ export function AuctionPageContent({
         <div className={styles.nft}>
           <CenterAsset
             address={auction.auctionAssetContract.id}
+            tokenId={auction.auctionAssetID}
+          />
+          <ExchangeLinks
+            contractAddress={auction.auctionAssetContract.id}
             tokenId={auction.auctionAssetID}
           />
         </div>
@@ -309,4 +316,66 @@ function FieldsetHeader({
       </p>
     );
   }
+}
+
+type ExchangeLinksProps = {
+  contractAddress: string;
+  tokenId: string;
+};
+
+function ExchangeLinks({ contractAddress, tokenId }: ExchangeLinksProps) {
+  return (
+    <div className={styles.exchangeLinks}>
+      <div>
+        <Link
+          href={`${exchangeUrlGenerators[Exchange.blur](
+            contractAddress,
+            tokenId,
+          )}`}
+          target="_blank">
+          <Image src="/blur-gray.svg" alt="" width={24} height={24} />
+        </Link>
+      </div>
+      <div>
+        <Link
+          href={`${exchangeUrlGenerators[Exchange.opensea](
+            contractAddress,
+            tokenId,
+          )}`}
+          target="_blank">
+          <Image src="/opensea-gray.svg" alt="" width={24} height={24} />
+        </Link>
+      </div>
+      <div>
+        <Link
+          href={`${exchangeUrlGenerators[Exchange.looksrare](
+            contractAddress,
+            tokenId,
+          )}`}
+          target="_blank">
+          <Image src="/looksrare-gray.svg" alt="" width={24} height={24} />
+        </Link>
+      </div>
+      <div>
+        <Link
+          href={`${exchangeUrlGenerators[Exchange.x2y2](
+            contractAddress,
+            tokenId,
+          )}`}
+          target="_blank">
+          <Image src="/x2y2-gray.svg" alt="" width={24} height={24} />
+        </Link>
+      </div>
+      <div>
+        <Link
+          href={`${exchangeUrlGenerators[Exchange.etherscan](
+            contractAddress,
+            tokenId,
+          )}`}
+          target="_blank">
+          <Image src="/etherscan-gray.svg" alt="" width={24} height={24} />
+        </Link>
+      </div>
+    </div>
+  );
 }
