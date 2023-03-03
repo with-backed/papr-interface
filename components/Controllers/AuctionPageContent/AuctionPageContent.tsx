@@ -13,7 +13,15 @@ import { useNFTFlagged } from 'hooks/useNFTFlagged';
 import { usePaprPriceForAuction } from 'hooks/usePaprPriceForAuction';
 import { getUnitPriceForEth } from 'lib/coingecko';
 import { SupportedNetwork } from 'lib/config';
+import {
+  allExchanges,
+  Exchange,
+  exchangeImages,
+  exchangeUrlGenerators,
+} from 'lib/exchanges';
 import { formatBigNum } from 'lib/numberFormat';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
@@ -130,6 +138,10 @@ export function AuctionPageContent({
         <div className={styles.nft}>
           <CenterAsset
             address={auction.auctionAssetContract.id}
+            tokenId={auction.auctionAssetID}
+          />
+          <ExchangeLinks
+            contractAddress={auction.auctionAssetContract.id}
             tokenId={auction.auctionAssetID}
           />
         </div>
@@ -349,4 +361,58 @@ function FieldsetHeader({
       </p>
     );
   }
+}
+
+type ExchangeLinksProps = {
+  contractAddress: string;
+  tokenId: string;
+};
+
+function ExchangeLinks({ contractAddress, tokenId }: ExchangeLinksProps) {
+  const [hover, setHover] = useState<{ [key in Exchange]: boolean }>({
+    blur: false,
+    opensea: false,
+    looksrare: false,
+    x2y2: false,
+    etherscan: false,
+  });
+
+  return (
+    <div className={styles.exchangeLinks}>
+      {allExchanges.map((exchange) => (
+        <div key={exchange}>
+          <Link
+            className={styles[exchange]}
+            href={`${exchangeUrlGenerators[exchange](
+              contractAddress,
+              tokenId,
+            )}`}
+            target="_blank">
+            <Image
+              src={
+                hover[exchange]
+                  ? exchangeImages[exchange].color
+                  : exchangeImages[exchange].gray
+              }
+              alt=""
+              width={24}
+              height={24}
+              onMouseEnter={() =>
+                setHover((prev) => ({
+                  ...prev,
+                  [exchange]: true,
+                }))
+              }
+              onMouseLeave={() =>
+                setHover((prev) => ({
+                  ...prev,
+                  [exchange]: false,
+                }))
+              }
+            />
+          </Link>
+        </div>
+      ))}
+    </div>
+  );
 }
