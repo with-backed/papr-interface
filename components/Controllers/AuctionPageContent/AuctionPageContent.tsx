@@ -13,7 +13,7 @@ import { useNFTFlagged } from 'hooks/useNFTFlagged';
 import { usePaprPriceForAuction } from 'hooks/usePaprPriceForAuction';
 import { getUnitPriceForEth } from 'lib/coingecko';
 import { SupportedNetwork } from 'lib/config';
-import { Exchange, exchangeUrlGenerators } from 'lib/exchanges';
+import { exchangeUrlGenerators } from 'lib/exchanges';
 import { formatBigNum } from 'lib/numberFormat';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -328,27 +328,21 @@ function ExchangeLinks({ contractAddress, tokenId }: ExchangeLinksProps) {
     <div className={styles.exchangeLinks}>
       <div>
         <Link
-          href={`${exchangeUrlGenerators[Exchange.blur](
-            contractAddress,
-            tokenId,
-          )}`}
+          href={`${exchangeUrlGenerators['blur'](contractAddress, tokenId)}`}
           target="_blank">
           <Image src="/blur-gray.svg" alt="" width={24} height={24} />
         </Link>
       </div>
       <div>
         <Link
-          href={`${exchangeUrlGenerators[Exchange.opensea](
-            contractAddress,
-            tokenId,
-          )}`}
+          href={`${exchangeUrlGenerators['opensea'](contractAddress, tokenId)}`}
           target="_blank">
           <Image src="/opensea-gray.svg" alt="" width={24} height={24} />
         </Link>
       </div>
       <div>
         <Link
-          href={`${exchangeUrlGenerators[Exchange.looksrare](
+          href={`${exchangeUrlGenerators['looksrare'](
             contractAddress,
             tokenId,
           )}`}
@@ -358,17 +352,14 @@ function ExchangeLinks({ contractAddress, tokenId }: ExchangeLinksProps) {
       </div>
       <div>
         <Link
-          href={`${exchangeUrlGenerators[Exchange.x2y2](
-            contractAddress,
-            tokenId,
-          )}`}
+          href={`${exchangeUrlGenerators['x2y2'](contractAddress, tokenId)}`}
           target="_blank">
           <Image src="/x2y2-gray.svg" alt="" width={24} height={24} />
         </Link>
       </div>
       <div>
         <Link
-          href={`${exchangeUrlGenerators[Exchange.etherscan](
+          href={`${exchangeUrlGenerators['etherscan'](
             contractAddress,
             tokenId,
           )}`}
