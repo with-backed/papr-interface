@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { ContractStatus } from 'components/ContractStatus';
 import { ethers } from 'ethers';
-import { useController } from 'hooks/useController';
+import { useControllerPricesData } from 'hooks/useControllerPricesData';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useTarget } from 'hooks/useTarget/useTarget';
 import { subgraphController } from 'lib/mockData/mockPaprController';
@@ -39,8 +39,8 @@ jest.mock('hooks/useLatestMarketPrice', () => ({
   useLatestMarketPrice: jest.fn(),
 }));
 
-jest.mock('hooks/useController', () => ({
-  useController: jest.fn(),
+jest.mock('hooks/useControllerPricesData', () => ({
+  useControllerPricesData: jest.fn(),
 }));
 
 jest.mock('hooks/useTheme', () => ({
@@ -50,31 +50,32 @@ jest.mock('hooks/useTheme', () => ({
 
 const mockedUseTarget = useTarget as jest.MockedFunction<typeof useTarget>;
 
-const mockedUseController = useController as jest.MockedFunction<
-  typeof useController
->;
+const mockedUseControllerPricesData =
+  useControllerPricesData as jest.MockedFunction<
+    typeof useControllerPricesData
+  >;
 
 const mockedUseLatestMarketPrice = useLatestMarketPrice as jest.MockedFunction<
   typeof useLatestMarketPrice
 >;
 
 describe('ContractStatus', () => {
-  beforeAll(() => {
-    mockedUseController.mockReturnValue(subgraphController);
-  });
   it('renders a loading message while the hook is fetching', () => {
+    mockedUseControllerPricesData.mockReturnValue({
+      pricesData: null,
+      fetching: true,
+      error: null,
+    });
     mockedUseTarget.mockReturnValue(undefined);
     mockedUseLatestMarketPrice.mockReturnValue(null);
     const { getByText } = render(<ContractStatus />);
     getByText('Loading price data...');
   });
   it('renders RatesPositive when rates are positive', () => {
-    mockedUseController.mockReturnValue({
-      ...subgraphController,
-      target: ethers.utils.parseUnits(
-        pricesDataPositive.targetValues[0].value.toString(),
-        18,
-      ),
+    mockedUseControllerPricesData.mockReturnValue({
+      pricesData: pricesDataPositive,
+      fetching: false,
+      error: null,
     });
     mockedUseLatestMarketPrice.mockReturnValue(
       pricesDataPositive.markValues[0].value,
@@ -90,12 +91,10 @@ describe('ContractStatus', () => {
     getByTestId('rates-positive');
   });
   it('renders RatesNegative when rates are negative', () => {
-    mockedUseController.mockReturnValue({
-      ...subgraphController,
-      target: ethers.utils.parseUnits(
-        pricesDataNegative.targetValues[0].value.toString(),
-        18,
-      ),
+    mockedUseControllerPricesData.mockReturnValue({
+      pricesData: pricesDataNegative,
+      fetching: false,
+      error: null,
     });
     mockedUseLatestMarketPrice.mockReturnValue(
       pricesDataNegative.markValues[0].value,
