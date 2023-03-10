@@ -1,7 +1,5 @@
-import { ethers } from 'ethers';
-import { useController } from 'hooks/useController';
+import { useControllerPricesData } from 'hooks/useControllerPricesData';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
-import { useTarget } from 'hooks/useTarget';
 import { SECONDS_IN_A_YEAR } from 'lib/constants';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import { percentChange } from 'lib/tokenPerformance';
@@ -12,34 +10,26 @@ import { RatesNegative } from './RatesNegative';
 import { RatesPositive } from './RatesPositive';
 
 export function ContractStatus() {
-  const { target: currentTarget, lastUpdated, underlying } = useController();
-  const newTargetResult = useTarget();
+  const { pricesData } = useControllerPricesData();
   const mark = useLatestMarketPrice();
 
-  const currentTargetNumber = useMemo(() => {
-    return parseFloat(
-      ethers.utils.formatUnits(currentTarget, underlying.decimals),
-    );
-  }, [currentTarget, underlying.decimals]);
-  const newTargetNumber = useMemo(() => {
-    if (!newTargetResult) {
-      return null;
+  const [currentTarget, newTarget] = useMemo(() => {
+    if (pricesData) {
+      return pricesData.targetValues.slice(-2);
     }
-    return parseFloat(
-      ethers.utils.formatUnits(newTargetResult.newTarget, underlying.decimals),
-    );
-  }, [newTargetResult, underlying.decimals]);
+    return [null, null];
+  }, [pricesData]);
 
   const contractAPR = useMemo(() => {
-    if (!newTargetResult || !newTargetNumber) {
+    if (!currentTarget || !newTarget) {
       return null;
     }
-    const change = percentChange(currentTargetNumber, newTargetNumber);
-    // convert to APR
-    return (
-      (change / (newTargetResult.timestamp - lastUpdated)) * SECONDS_IN_A_YEAR
-    );
-  }, [newTargetNumber, lastUpdated, currentTargetNumber, newTargetResult]);
+    const change =
+      (percentChange(currentTarget.value, newTarget.value) /
+        (newTarget.time - currentTarget.time)) *
+      SECONDS_IN_A_YEAR;
+    return change;
+  }, [currentTarget, newTarget]);
 
   if (!contractAPR || !mark) {
     return <Fieldset>Loading price data...</Fieldset>;
@@ -50,7 +40,7 @@ export function ContractStatus() {
       <RatesNegative
         contractRate={formatPercent(contractAPR)}
         marketPrice={formatTokenAmount(mark)}
-        targetPrice={formatTokenAmount(newTargetNumber!)}
+        targetPrice={formatTokenAmount(newTarget!.value)}
       />
     );
   }
@@ -59,7 +49,7 @@ export function ContractStatus() {
     <RatesPositive
       contractRate={formatPercent(contractAPR)}
       marketPrice={formatTokenAmount(mark)}
-      targetPrice={formatTokenAmount(newTargetNumber!)}
+      targetPrice={formatTokenAmount(newTarget!.value)}
     />
   );
 }
