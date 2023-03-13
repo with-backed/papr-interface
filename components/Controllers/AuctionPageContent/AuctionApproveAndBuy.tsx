@@ -4,6 +4,7 @@ import { ApproveTokenButton } from 'components/Controllers/ApproveButtons/Approv
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useOracleSynced } from 'hooks/useOracleSynced';
 import { formatBigNum } from 'lib/numberFormat';
 import {
   getOraclePayloadFromReservoirObject,
@@ -82,6 +83,10 @@ function BuyButton({
   const { address } = useAccount();
   const controller = useController();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const oracleSynced = useOracleSynced(
+    auction.auctionAssetContract.id,
+    OraclePriceType.twap,
+  );
   const purchaseArgs = useMemo(() => {
     if (!oracleInfo || !address) return null;
     const auctionArg: INFTEDA.AuctionStruct = {
@@ -119,15 +124,24 @@ function BuyButton({
     },
   } as any);
 
+  const buttonText = useMemo(() => {
+    if (!oracleSynced) return 'Waiting for oracle...';
+    return 'Purchase';
+  }, [oracleSynced]);
+
+  const buttonDisabled = useMemo(() => {
+    return !tokenApproved || !oracleSynced;
+  }, [tokenApproved, oracleSynced]);
+
   return (
     <TransactionButton
       kind="regular"
       size="small"
       theme="papr"
-      disabled={!tokenApproved}
+      disabled={buttonDisabled}
       onClick={write!}
       transactionData={data}
-      text="Purchase"
+      text={buttonText}
       error={error?.message}
     />
   );
