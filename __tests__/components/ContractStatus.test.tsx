@@ -71,7 +71,7 @@ describe('ContractStatus', () => {
   it('renders RatesPositive when rates are positive', () => {
     mockedUseController.mockReturnValue({
       ...subgraphController,
-      target: ethers.utils.parseUnits(
+      currentTarget: ethers.utils.parseUnits(
         pricesDataPositive.targetValues[0].value.toString(),
         18,
       ),
@@ -92,7 +92,7 @@ describe('ContractStatus', () => {
   it('renders RatesNegative when rates are negative', () => {
     mockedUseController.mockReturnValue({
       ...subgraphController,
-      target: ethers.utils.parseUnits(
+      currentTarget: ethers.utils.parseUnits(
         pricesDataNegative.targetValues[0].value.toString(),
         18,
       ),

@@ -109,6 +109,9 @@ function RateOfGrowth({
         .filter((a) => Math.abs(a.value) < 10000),
     [targetValues],
   );
+  console.log({
+    apr: contractAPRs[contractAPRs.length - 1],
+  });
 
   useEffect(() => {
     if (chartRef.current) {

@@ -65,15 +65,18 @@ function ImpactProjectionLoaded({
   currentMarket,
 }: ImpactProjectionLoadedProps) {
   const { tokenName } = useConfig();
-  const { fundingPeriod, underlying, target, lastUpdated } = useController();
+  const { fundingPeriod, underlying, currentTarget, currentTargetUpdated } =
+    useController();
   const [projectedData, setProjectedData] = useState<{
     newApr: number;
     newTarget: number;
   } | null>(null);
 
   const currentTargetNumber = useMemo(() => {
-    return parseFloat(ethers.utils.formatUnits(target, underlying.decimals));
-  }, [target, underlying.decimals]);
+    return parseFloat(
+      ethers.utils.formatUnits(currentTarget, underlying.decimals),
+    );
+  }, [currentTarget, underlying.decimals]);
 
   const newTargetNumber = useMemo(() => {
     return parseFloat(
@@ -84,13 +87,13 @@ function ImpactProjectionLoaded({
   const currentAPR = useMemo(() => {
     return (
       (percentChange(currentTargetNumber, newTargetNumber) /
-        (newTargetUpdate.timestamp - lastUpdated)) *
+        (newTargetUpdate.timestamp - currentTargetUpdated)) *
       SECONDS_IN_A_YEAR
     );
   }, [
     currentTargetNumber,
     newTargetNumber,
-    lastUpdated,
+    currentTargetUpdated,
     newTargetUpdate.timestamp,
   ]);
 
