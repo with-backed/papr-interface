@@ -11,8 +11,8 @@ export const subgraphController = {
     decimals: 6,
   },
   token0IsUnderlying: false,
-  target: '1000000000000000000',
-  lastUpdated: 1674461832,
+  currentTarget: '1000000000000000000',
+  currentTargetUpdated: 1674461832,
   paprToken: {
     id: '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
     name: 'test',

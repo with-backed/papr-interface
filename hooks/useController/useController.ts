@@ -29,8 +29,8 @@ export interface PaprController {
   poolAddress: string;
   maxLTV: BigNumberish;
   fundingPeriod: BigNumberish;
-  target: BigNumberish;
-  lastUpdated: number;
+  currentTarget: BigNumberish;
+  currentTargetUpdated: number;
   vaults?:
     | {
         id: string;

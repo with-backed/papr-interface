@@ -12,7 +12,7 @@ import { RatesNegative } from './RatesNegative';
 import { RatesPositive } from './RatesPositive';
 
 export function ContractStatus() {
-  const { target: currentTarget, lastUpdated, underlying } = useController();
+  const { currentTarget, currentTargetUpdated, underlying } = useController();
   const newTargetResult = useTarget();
   const mark = useLatestMarketPrice();
 
@@ -37,9 +37,15 @@ export function ContractStatus() {
     const change = percentChange(currentTargetNumber, newTargetNumber);
     // convert to APR
     return (
-      (change / (newTargetResult.timestamp - lastUpdated)) * SECONDS_IN_A_YEAR
+      (change / (newTargetResult.timestamp - currentTargetUpdated)) *
+      SECONDS_IN_A_YEAR
     );
-  }, [newTargetNumber, lastUpdated, currentTargetNumber, newTargetResult]);
+  }, [
+    newTargetNumber,
+    currentTargetUpdated,
+    currentTargetNumber,
+    newTargetResult,
+  ]);
 
   if (!contractAPR || !mark) {
     return <Fieldset>Loading price data...</Fieldset>;
