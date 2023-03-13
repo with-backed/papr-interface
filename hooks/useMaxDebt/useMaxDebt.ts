@@ -27,7 +27,7 @@ export function useMaxDebt(
   collateral: string | string[],
   oraclePriceType: OraclePriceType,
 ): BigNumber | null {
-  const target = useTarget();
+  const targetResult = useTarget();
   const oracleInfo = useOracleInfo(oraclePriceType);
   const {
     underlying: { decimals },
@@ -35,7 +35,7 @@ export function useMaxDebt(
   } = useController();
 
   const result = useMemo(() => {
-    if (!oracleInfo || !target) {
+    if (!oracleInfo || !targetResult) {
       return null;
     }
 
@@ -46,7 +46,7 @@ export function useMaxDebt(
       return maxDebt(
         parseUnits(oracleInfo[collateral].price.toString(), decimals),
         maxLTV,
-        target.newTarget,
+        targetResult.target,
       );
     }
 
@@ -54,12 +54,12 @@ export function useMaxDebt(
       maxDebt(
         parseUnits(oracleInfo[asset].price.toString(), decimals),
         maxLTV,
-        target.newTarget,
+        targetResult.target,
       ),
     );
 
     return totalDebtPerCollateral.reduce((a, b) => a.add(b), BigNumber.from(0));
-  }, [collateral, decimals, maxLTV, oracleInfo, target]);
+  }, [collateral, decimals, maxLTV, oracleInfo, targetResult]);
 
   return result;
 }

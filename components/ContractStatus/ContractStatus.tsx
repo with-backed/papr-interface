@@ -26,7 +26,7 @@ export function ContractStatus() {
       return null;
     }
     return parseFloat(
-      ethers.utils.formatUnits(newTargetResult.newTarget, underlying.decimals),
+      ethers.utils.formatUnits(newTargetResult.target, underlying.decimals),
     );
   }, [newTargetResult, underlying.decimals]);
 

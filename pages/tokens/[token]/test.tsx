@@ -1,7 +1,7 @@
 import { captureException } from '@sentry/nextjs';
 import { TestPageContent } from 'components/Controllers/TestPageContent';
 import { ControllerContextProvider, PaprController } from 'hooks/useController';
-import { configs, getConfig, SupportedToken } from 'lib/config';
+import { configProxy, SupportedToken } from 'lib/config';
 import { fetchSubgraphData } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 
@@ -12,19 +12,19 @@ export type TestProps = {
 export const getServerSideProps: GetServerSideProps<TestProps> = async (
   context,
 ) => {
-  const token = context.params?.token as SupportedToken;
-  const address: string | undefined =
-    getConfig(token)?.controllerAddress?.toLocaleLowerCase();
-  if (!address) {
+  const token = context.params?.token as string;
+  const config = configProxy[token];
+  if (!config) {
     return {
       notFound: true,
     };
   }
+  const address = config.controllerAddress.toLocaleLowerCase();
 
   const controllerSubgraphData = await fetchSubgraphData(
     address,
-    configs[token].uniswapSubgraph,
-    token,
+    config.uniswapSubgraph,
+    token as SupportedToken,
   );
 
   if (!controllerSubgraphData) {

@@ -152,7 +152,7 @@ function targets(
 
   // get what target would be if updated at this moment and add to array
   if (sortedTargets.length > 0) {
-    const { newTarget, timestamp } = targetUpdate;
+    const { target: newTarget, timestamp } = targetUpdate;
     sortedTargets.push({
       id: 'filler',
       newTarget,
