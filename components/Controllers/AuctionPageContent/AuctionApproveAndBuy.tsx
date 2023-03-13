@@ -4,6 +4,7 @@ import { ApproveTokenButton } from 'components/Controllers/ApproveButtons/Approv
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { useOracleSynced } from 'hooks/useOracleSynced';
 import { formatBigNum } from 'lib/numberFormat';
 import {
   getOraclePayloadFromReservoirObject,
@@ -27,6 +28,10 @@ export default function AuctionApproveAndBuy({
   liveAuctionPrice,
   refresh,
 }: AuctionApproveAndBuyProps) {
+  const oracleSynced = useOracleSynced(
+    auction.auctionAssetContract.id,
+    OraclePriceType.twap,
+  );
   const controller = useController();
   const [paprTokenApproved, setPaprTokenApproved] = useState<boolean>(false);
 
@@ -58,6 +63,7 @@ export default function AuctionApproveAndBuy({
             auction={auction}
             liveAuctionPrice={liveAuctionPrice}
             tokenApproved={paprTokenApproved}
+            buttonText={oracleSynced ? 'Purchase' : 'Waiting for oracle...'}
             refresh={refresh}
           />
         </div>
@@ -70,6 +76,7 @@ type BuyButtonProps = {
   auction: NonNullable<AuctionQuery['auction']>;
   liveAuctionPrice: ethers.BigNumber;
   tokenApproved: boolean;
+  buttonText: string;
   refresh: () => void;
 };
 
@@ -77,6 +84,7 @@ function BuyButton({
   auction,
   liveAuctionPrice,
   tokenApproved,
+  buttonText,
   refresh,
 }: BuyButtonProps) {
   const { address } = useAccount();
@@ -127,7 +135,7 @@ function BuyButton({
       disabled={!tokenApproved}
       onClick={write!}
       transactionData={data}
-      text="Purchase"
+      text={buttonText}
       error={error?.message}
     />
   );
