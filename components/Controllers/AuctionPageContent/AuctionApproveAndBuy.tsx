@@ -28,10 +28,6 @@ export default function AuctionApproveAndBuy({
   liveAuctionPrice,
   refresh,
 }: AuctionApproveAndBuyProps) {
-  const oracleSynced = useOracleSynced(
-    auction.auctionAssetContract.id,
-    OraclePriceType.twap,
-  );
   const controller = useController();
   const [paprTokenApproved, setPaprTokenApproved] = useState<boolean>(false);
 
@@ -63,7 +59,6 @@ export default function AuctionApproveAndBuy({
             auction={auction}
             liveAuctionPrice={liveAuctionPrice}
             tokenApproved={paprTokenApproved}
-            buttonText={oracleSynced ? 'Purchase' : 'Waiting for oracle...'}
             refresh={refresh}
           />
         </div>
@@ -76,7 +71,6 @@ type BuyButtonProps = {
   auction: NonNullable<AuctionQuery['auction']>;
   liveAuctionPrice: ethers.BigNumber;
   tokenApproved: boolean;
-  buttonText: string;
   refresh: () => void;
 };
 
@@ -84,12 +78,15 @@ function BuyButton({
   auction,
   liveAuctionPrice,
   tokenApproved,
-  buttonText,
   refresh,
 }: BuyButtonProps) {
   const { address } = useAccount();
   const controller = useController();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const oracleSynced = useOracleSynced(
+    auction.auctionAssetContract.id,
+    OraclePriceType.twap,
+  );
   const purchaseArgs = useMemo(() => {
     if (!oracleInfo || !address) return null;
     const auctionArg: INFTEDA.AuctionStruct = {
@@ -127,12 +124,21 @@ function BuyButton({
     },
   } as any);
 
+  const buttonText = useMemo(() => {
+    if (!oracleSynced) return 'Waiting for oracle...';
+    return 'Purchase';
+  }, [oracleSynced]);
+
+  const buttonDisabled = useMemo(() => {
+    return !tokenApproved || !oracleSynced;
+  }, [tokenApproved, oracleSynced]);
+
   return (
     <TransactionButton
       kind="regular"
       size="small"
       theme="papr"
-      disabled={!tokenApproved}
+      disabled={buttonDisabled}
       onClick={write!}
       transactionData={data}
       text={buttonText}
