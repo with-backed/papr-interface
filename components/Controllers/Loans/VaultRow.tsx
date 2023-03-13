@@ -6,11 +6,11 @@ import { useLTV } from 'hooks/useLTV';
 import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
 import Link from 'next/link';
 import React, { useMemo } from 'react';
-import { Vault } from 'types/generated/graphql/inKindSubgraph';
+import { SubgraphVault } from 'types/SubgraphVault';
 
 type VaultRowProps = {
   account: string;
-  vault: Pick<Vault, 'debt' | 'token' | 'collateralCount' | 'id'>;
+  vault: SubgraphVault;
 };
 export function VaultRow({ account, vault }: VaultRowProps) {
   const { paprToken } = useController();
@@ -44,7 +44,9 @@ export function VaultRow({ account, vault }: VaultRowProps) {
       </td>
       <td>{formattedDebt}</td>
       <td>{formattedLTV}</td>
-      <td>{ltv ? <VaultHealth ltv={ltv} /> : '...'}</td>
+      <td>
+        <VaultHealth vault={vault} />
+      </td>
     </tr>
   );
 }
