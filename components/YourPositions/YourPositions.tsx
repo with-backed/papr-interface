@@ -9,7 +9,6 @@ import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
-import { useLTV } from 'hooks/useLTV';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePaprBalance } from 'hooks/usePaprBalance';
@@ -18,7 +17,7 @@ import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useMemo } from 'react';
-import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
+import { SubgraphVault } from 'types/SubgraphVault';
 import { useAccount, useNetwork } from 'wagmi';
 
 import styles from './YourPositions.module.css';
@@ -228,16 +227,11 @@ export function YourPositions() {
 
 type VaultOverviewProps = {
   oracleInfo: OracleInfo;
-  vaultInfo: VaultsByOwnerForControllerQuery['vaults']['0'];
+  vaultInfo: SubgraphVault;
 };
 
 export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
   const { tokenName } = useConfig();
-  const ltv = useLTV(
-    vaultInfo.token.id,
-    vaultInfo.collateralCount,
-    vaultInfo.debt,
-  );
   const { paprToken, underlying } = useController();
   const nftSymbol = vaultInfo.token.symbol;
   const costToClose = useAsyncValue(async () => {
@@ -277,7 +271,7 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
         </p>
       </td>
       <td>
-        <VaultHealth ltv={ltv || 0} />
+        <VaultHealth vault={vaultInfo} />
       </td>
     </tr>
   );
