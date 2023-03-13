@@ -46,9 +46,6 @@ export function ContractStatus() {
     currentTargetNumber,
     newTargetResult,
   ]);
-  console.log({
-    contractAPR,
-  });
 
   if (!contractAPR || !mark) {
     return <Fieldset>Loading price data...</Fieldset>;
