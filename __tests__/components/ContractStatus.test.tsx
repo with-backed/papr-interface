@@ -80,7 +80,7 @@ describe('ContractStatus', () => {
       pricesDataPositive.markValues[0].value,
     );
     mockedUseTarget.mockReturnValue({
-      newTarget: ethers.utils.parseUnits(
+      target: ethers.utils.parseUnits(
         pricesDataPositive.targetValues[1].value.toString(),
         18,
       ),
@@ -101,7 +101,7 @@ describe('ContractStatus', () => {
       pricesDataNegative.markValues[0].value,
     );
     mockedUseTarget.mockReturnValue({
-      newTarget: ethers.utils.parseUnits(
+      target: ethers.utils.parseUnits(
         pricesDataNegative.targetValues[1].value.toString(),
         18,
       ),

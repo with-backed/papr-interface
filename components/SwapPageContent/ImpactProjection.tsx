@@ -80,7 +80,7 @@ function ImpactProjectionLoaded({
 
   const newTargetNumber = useMemo(() => {
     return parseFloat(
-      ethers.utils.formatUnits(newTargetUpdate.newTarget, underlying.decimals),
+      ethers.utils.formatUnits(newTargetUpdate.target, underlying.decimals),
     );
   }, [newTargetUpdate, underlying.decimals]);
 
