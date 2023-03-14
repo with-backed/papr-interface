@@ -3,6 +3,7 @@ import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useLTV } from 'hooks/useLTV';
+import { useOracleInfo } from 'hooks/useOracleInfo';
 import { useTarget } from 'hooks/useTarget';
 import { convertOneScaledValue } from 'lib/controllers';
 import {
@@ -10,6 +11,7 @@ import {
   formatPercentChange,
   formatTokenAmount,
 } from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
 import { percentChange } from 'lib/tokenPerformance';
 import React, { useMemo } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
@@ -22,7 +24,7 @@ type VaultHealthProps = {
 };
 export function VaultHealth({ vault }: VaultHealthProps) {
   const healthTooltip = useTooltipState();
-  const { maxLTV, paprToken } = useController();
+  const { maxLTV, paprToken, underlying } = useController();
   const ltv = useLTV(vault?.token.id, vault?.collateralCount, vault.debt);
   const formattedMaxLTV = useMemo(
     () => convertOneScaledValue(ethers.BigNumber.from(maxLTV), 4),
@@ -39,6 +41,18 @@ export function VaultHealth({ vault }: VaultHealthProps) {
     [paprToken, vault.debt],
   );
 
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
+
+  const collateralValue = useMemo(() => {
+    if (oracleInfo) {
+      const { price } = oracleInfo[vault.token.id];
+      return `${formatTokenAmount(price * vault.collateralCount)} ${
+        underlying.symbol
+      }`;
+    }
+    return '...';
+  }, [oracleInfo, underlying, vault]);
+
   return (
     <>
       <TooltipReference {...healthTooltip}>
@@ -49,6 +63,7 @@ export function VaultHealth({ vault }: VaultHealthProps) {
           ltv={ltv}
           maxLtv={formattedMaxLTV}
           debt={debtNumber}
+          collateralValue={collateralValue}
         />
       </Tooltip>
     </>
@@ -59,12 +74,14 @@ type VaultHealthTooltipContentProps = {
   ltv: number | null;
   maxLtv: number;
   debt: number;
+  collateralValue: string;
 };
 
 function VaultHealthTooltipContent({
   ltv,
   maxLtv,
   debt,
+  collateralValue,
 }: VaultHealthTooltipContentProps) {
   const { paprToken } = useController();
   const targetNow = useTarget();
@@ -108,7 +125,7 @@ function VaultHealthTooltipContent({
       <span>({debtPercentChange})</span>
 
       <span>Collateral (7-day avg. top bid)</span>
-      <span>0.327 ETH</span>
+      <span>{collateralValue}</span>
       {/* We don't yet have data to compute percent change for this */}
       <span></span>
 
@@ -125,7 +142,8 @@ function VaultHealthTooltipContent({
 
       <span>This loan&apos;s current LTV is:</span>
       <span>{ltv ? formatPercent(ltv) : '...'}</span>
-      <span>(+0.54%)</span>
+      {/* We don't yet have data to compute percent change for this */}
+      <span></span>
 
       <span>Liquidation occurs at Max LTV of</span>
       <span>{formatPercent(maxLtv)}</span>
