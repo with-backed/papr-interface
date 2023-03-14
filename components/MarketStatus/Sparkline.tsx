@@ -1,10 +1,3 @@
-import {
-  CategoryScale,
-  Chart,
-  LinearScale,
-  LineElement,
-  PointElement,
-} from 'chart.js';
 import { TextButton } from 'components/Button';
 import { TimeSeriesValue } from 'lib/controllers/charts';
 import { getTimestampNDaysAgo } from 'lib/duration';
@@ -12,8 +5,6 @@ import { ComponentProps, useCallback, useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
 import styles from './MarketStatus.module.css';
-
-Chart.register(CategoryScale, LinearScale, LineElement, PointElement);
 
 const BASE_CHART_OPTIONS = {
   events: [],
@@ -25,6 +16,9 @@ const BASE_CHART_OPTIONS = {
       display: false,
     },
     tooltips: {
+      enabled: false,
+    },
+    datalabels: {
       display: false,
     },
   },
