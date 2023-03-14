@@ -16,13 +16,33 @@
   text-align: center;
 }
 
-.tooltip div {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
+.tooltip {
+  display: grid;
+  grid-template-columns: 1fr 90px 90px;
+  column-gap: 0.5rem;
+}
+
+.tooltip > span:nth-child(3n) {
+  text-align: center;
 }
 
 .button-container {
   text-align: center;
   margin-top: 1.5rem;
+}
+
+.lowercase {
+  text-transform: lowercase;
+}
+
+.marquee-column {
+  padding: 0 !important;
+}
+
+.first-column {
+  width: 50px;
+}
+
+.right {
+  text-align: center;
 }

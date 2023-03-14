@@ -1,6 +1,7 @@
 import { captureException } from '@sentry/nextjs';
 import { TestPageContent } from 'components/Controllers/TestPageContent';
 import { ControllerContextProvider, PaprController } from 'hooks/useController';
+import { MarketPriceProvider } from 'hooks/useLatestMarketPrice';
 import { configProxy, SupportedToken } from 'lib/config';
 import { fetchSubgraphData } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
@@ -45,7 +46,9 @@ export const getServerSideProps: GetServerSideProps<TestProps> = async (
 export default function InKindTest({ subgraphController }: TestProps) {
   return (
     <ControllerContextProvider value={subgraphController}>
-      <TestPageContent />
+      <MarketPriceProvider>
+        <TestPageContent />
+      </MarketPriceProvider>
     </ControllerContextProvider>
   );
 }
