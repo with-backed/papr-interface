@@ -84,7 +84,9 @@ export const TargetProvider: FunctionComponent = ({ children }) => {
         timestamp: timestampResult.timestamp - BLOCKS_IN_A_DAY * 12,
       };
     }
-    setResult(newValue);
+    if (newValue.now && newValue.yesterday) {
+      setResult(newValue);
+    }
   }, [newTarget, timestampResult, yesterdayTarget]);
 
   return (
