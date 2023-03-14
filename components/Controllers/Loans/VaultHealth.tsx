@@ -41,17 +41,22 @@ export function VaultHealth({ vault }: VaultHealthProps) {
     [paprToken, vault.debt],
   );
 
+  const symbol = useMemo(() => {
+    if (underlying.symbol === 'WETH') {
+      return 'ETH';
+    }
+    return underlying.symbol;
+  }, [underlying]);
+
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
   const collateralValue = useMemo(() => {
     if (oracleInfo) {
       const { price } = oracleInfo[vault.token.id];
-      return `${formatTokenAmount(price * vault.collateralCount)} ${
-        underlying.symbol
-      }`;
+      return `${formatTokenAmount(price * vault.collateralCount)} ${symbol}`;
     }
     return '...';
-  }, [oracleInfo, underlying, vault]);
+  }, [oracleInfo, symbol, vault]);
 
   return (
     <>
@@ -64,6 +69,7 @@ export function VaultHealth({ vault }: VaultHealthProps) {
           maxLtv={formattedMaxLTV}
           debt={debtNumber}
           collateralValue={collateralValue}
+          symbol={symbol}
         />
       </Tooltip>
     </>
@@ -75,6 +81,7 @@ type VaultHealthTooltipContentProps = {
   maxLtv: number;
   debt: number;
   collateralValue: string;
+  symbol: string;
 };
 
 function VaultHealthTooltipContent({
@@ -82,8 +89,9 @@ function VaultHealthTooltipContent({
   maxLtv,
   debt,
   collateralValue,
+  symbol,
 }: VaultHealthTooltipContentProps) {
-  const { paprToken, underlying } = useController();
+  const { paprToken } = useController();
   const targetNow = useTarget();
   const debtNumberNow = useMemo(() => {
     if (targetNow) {
@@ -111,10 +119,8 @@ function VaultHealthTooltipContent({
 
   const formattedDebtNow = useMemo(
     () =>
-      debtNumberNow
-        ? `${formatTokenAmount(debtNumberNow)} ${underlying.symbol}`
-        : '...',
-    [debtNumberNow, underlying],
+      debtNumberNow ? `${formatTokenAmount(debtNumberNow)} ${symbol}` : '...',
+    [debtNumberNow, symbol],
   );
 
   return (
