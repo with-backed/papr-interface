@@ -119,15 +119,15 @@ function VaultHealthTooltipContent({
 
   return (
     <div className={styles.tooltip}>
-      <span>LTV calculation:</span>
+      <span>Loan to Value (LTV) calculation</span>
       <span></span>
       <span className={styles.right}>Δ 24hr</span>
 
-      <span>Debt (papr borrowed x Target)</span>
+      <span>L = (papr borrowed x Target Price)</span>
       <span>{formattedDebtNow}</span>
       <span>({debtPercentChange})</span>
 
-      <span>Collateral (7-day avg. top bid)</span>
+      <span>V = (7-day avg. top bid)</span>
       <span>{collateralValue}</span>
       {/* We don't yet have data to compute percent change for this */}
       <span></span>
@@ -143,7 +143,7 @@ function VaultHealthTooltipContent({
         <br />
       </span>
 
-      <span>This loan&apos;s current LTV is:</span>
+      <span>This loan&apos;s current LTV (L/V):</span>
       <span>{ltv ? formatPercent(ltv) : '...'}</span>
       {/* We don't yet have data to compute percent change for this */}
       <span></span>
