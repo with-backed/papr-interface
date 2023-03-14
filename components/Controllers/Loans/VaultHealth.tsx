@@ -83,7 +83,7 @@ function VaultHealthTooltipContent({
   debt,
   collateralValue,
 }: VaultHealthTooltipContentProps) {
-  const { paprToken } = useController();
+  const { paprToken, underlying } = useController();
   const targetNow = useTarget();
   const debtNumberNow = useMemo(() => {
     if (targetNow) {
@@ -110,8 +110,11 @@ function VaultHealthTooltipContent({
   }, [debt, debtNumberNow, paprToken, targetYesterday]);
 
   const formattedDebtNow = useMemo(
-    () => (debtNumberNow ? formatTokenAmount(debtNumberNow) + ' ETH' : '...'),
-    [debtNumberNow],
+    () =>
+      debtNumberNow
+        ? `${formatTokenAmount(debtNumberNow)} ${underlying.symbol}`
+        : '...',
+    [debtNumberNow, underlying],
   );
 
   return (

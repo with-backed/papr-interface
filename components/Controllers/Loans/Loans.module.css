@@ -18,8 +18,12 @@
 
 .tooltip {
   display: grid;
-  grid-template-columns: 1fr 80px 80px;
+  grid-template-columns: 1fr 90px 90px;
   column-gap: 0.5rem;
+}
+
+.tooltip > span:nth-child(3n) {
+  text-align: center;
 }
 
 .button-container {
