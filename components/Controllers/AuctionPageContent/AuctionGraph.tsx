@@ -1,13 +1,5 @@
-import {
-  CategoryScale,
-  Chart as ChartJS,
-  ChartOptions,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Tooltip,
-} from 'chart.js';
-import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
+import { ChartOptions } from 'chart.js';
+import { Context } from 'chartjs-plugin-datalabels';
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { currentPrice } from 'lib/auctions';
@@ -18,15 +10,6 @@ import { Line } from 'react-chartjs-2';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 
 import styles from './AuctionGraph.module.css';
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  ChartDataLabels,
-);
 
 export function generateTimestampsAndPrices(
   auction: NonNullable<AuctionQuery['auction']>,

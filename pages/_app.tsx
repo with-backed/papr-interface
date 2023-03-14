@@ -3,6 +3,15 @@ import 'normalize.css';
 import 'styles/fonts-maru.css';
 import 'styles/global.css';
 
+import {
+  CategoryScale,
+  Chart,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip,
+} from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ApplicationProviders } from 'components/ApplicationProviders';
 import { AppWrapper } from 'components/layouts/AppWrapper';
 import { ConfigProvider } from 'hooks/useConfig';
@@ -11,6 +20,15 @@ import { AppProps } from 'next/app';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip,
+  ChartDataLabels,
+);
 
 const TOKEN_FROM_PATH_REGEXP = /\/tokens\/([^/]+)/;
 function tokenFromPath(path: string): SupportedToken {

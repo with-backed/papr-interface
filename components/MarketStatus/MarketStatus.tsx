@@ -11,7 +11,7 @@ import { percentChangeOverDuration } from 'lib/tokenPerformance';
 import { useMemo } from 'react';
 
 import styles from './MarketStatus.module.css';
-// import { Sparkline } from './Sparkline';
+import { Sparkline } from './Sparkline';
 
 const CustomFieldset: React.FunctionComponent = ({ children, ...props }) => (
   <Fieldset legend="📈 Market Status" {...props}>
@@ -105,7 +105,7 @@ export function MarketStatus() {
             </tbody>
           </Table>
         </div>
-        {/* <Sparkline data={pricesData.markValues} /> */}
+        <Sparkline data={pricesData.markValues} />
       </div>
     </CustomFieldset>
   );
