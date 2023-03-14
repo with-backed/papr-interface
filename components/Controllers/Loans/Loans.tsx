@@ -23,7 +23,8 @@ export function Loans() {
   const { pricesData } = useControllerPricesData();
   const paprController = useController();
   const currentVaults = useMemo(
-    () => paprController.vaults?.filter((v) => v.debt > 0),
+    () =>
+      paprController.vaults?.filter((v) => v.debt > 0 && v.collateralCount > 0),
     [paprController],
   );
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
