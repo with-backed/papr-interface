@@ -1,14 +1,15 @@
-import PaprControllerABI from 'abis/PaprController.json';
-import { subgraphController } from 'lib/mockData/mockPaprController';
 import { renderHook } from '@testing-library/react';
+import PaprControllerABI from 'abis/PaprController.json';
+import { ethers } from 'ethers';
+import { useController } from 'hooks/useController';
 import { useVaultWrite } from 'hooks/useVaultWrite';
 import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
-import { ethers } from 'ethers';
 import { configs } from 'lib/config';
+import { subgraphController } from 'lib/mockData/mockPaprController';
 import { useContractWrite } from 'wagmi';
 
 jest.mock('hooks/useController', () => ({
-  useController: jest.fn().mockReturnValue(subgraphController),
+  useController: jest.fn(),
 }));
 jest.mock('hooks/useOracleInfo/useOracleInfo', () => ({
   useOracleInfo: jest.fn().mockReturnValue({
@@ -54,11 +55,18 @@ jest.mock('hooks/useConfig', () => ({
   useConfig: jest.fn(() => configs.paprHero),
 }));
 
+const mockedUseController = useController as jest.MockedFunction<
+  typeof useController
+>;
+
 const mockedUseContractWrite = useContractWrite as jest.MockedFunction<
   typeof useContractWrite
 >;
 
 describe('useVaultWrite', () => {
+  beforeAll(() => {
+    mockedUseController.mockReturnValue(subgraphController);
+  });
   const collateralContractAddress =
     subgraphController.allowedCollateral[0].token.id;
   const amount = ethers.utils.parseUnits(
@@ -110,11 +118,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            true,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(true);
       expect(result.current.data).toBe('0xsafetransferfromdata');
     });
 
@@ -132,11 +141,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -155,11 +165,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
   });
@@ -179,11 +190,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            true,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(true);
       expect(result.current.data).toBe('0xsafetransferfromdata');
     });
     it('should return the multicall transaction data when borrowing multiple NFTs', () => {
@@ -200,11 +212,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
     it('should return the multicall transaction data when depositing one NFT and withdrawing one NFT', () => {
@@ -222,11 +235,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
   });
@@ -246,11 +260,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -268,11 +283,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -291,11 +307,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
   });
@@ -315,11 +332,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -337,11 +355,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
 
@@ -360,11 +379,12 @@ describe('useVaultWrite', () => {
             withdrawNFTs,
             amount,
             quote,
+            false,
+            false,
             refresh,
           ),
         {},
       );
-      expect(result.current.usingSafeTransferFrom).toBe(false);
       expect(result.current.data).toBe('0xmulticalldata');
     });
   });

@@ -2,7 +2,6 @@ import { ethers } from 'ethers';
 import { useModifyCollateralCalldata } from 'hooks/useModifyCollateralCalldata/useModifyCollateralCalldata';
 import { useMulticallWrite } from 'hooks/useMulticallWrite/useMulticallWrite';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { useOracleSynced } from 'hooks/useOracleSynced';
 import { useSafeTransferFromWrite } from 'hooks/useSafeTransferFromWrite';
 import { useSwapParams } from 'hooks/useSwapParams';
 import { deconstructFromId } from 'lib/controllers';
@@ -25,14 +24,12 @@ export function useVaultWrite(
   withdrawNFTs: string[],
   amount: ethers.BigNumber,
   quote: ethers.BigNumber | null,
+  usingSafeTransferFrom: boolean,
+  disabled: boolean,
   refresh: () => void,
 ) {
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
-  const oracleInfoSynced = useOracleSynced(
-    collateralContractAddress,
-    OraclePriceType.lower,
-  );
   const swapParams = useSwapParams(amount, quote);
 
   const { addCollateralCalldata, removeCollateralCalldata } =
@@ -104,7 +101,7 @@ export function useVaultWrite(
     data: multicallData,
     write: multicallWrite,
     error: multicallError,
-  } = useMulticallWrite(calldata, !oracleInfoSynced, refresh);
+  } = useMulticallWrite(calldata, disabled, refresh);
 
   const [_, nftTokenId] = useMemo(() => {
     if (depositNFTs.length === 0) return [ethers.constants.AddressZero, '0'];
@@ -119,29 +116,22 @@ export function useVaultWrite(
     nftTokenId,
     amount,
     quote,
-    !oracleInfoSynced,
+    disabled,
     refresh,
   );
 
-  const { data, write, error, usingSafeTransferFrom } = useMemo(() => {
-    if (
-      depositNFTs.length === 1 &&
-      withdrawNFTs.length === 0 &&
-      (writeType === VaultWriteType.Borrow ||
-        writeType === VaultWriteType.BorrowWithSwap)
-    )
+  const { data, write, error } = useMemo(() => {
+    if (usingSafeTransferFrom)
       return {
         data: safeTransferFromData,
         write: safeTransferFromWrite,
         error: safeTransferFromError,
-        usingSafeTransferFrom: true,
       };
     else {
       return {
         data: multicallData,
         write: multicallWrite,
         error: multicallError,
-        usingSafeTransferFrom: false,
       };
     }
   }, [
@@ -151,10 +141,8 @@ export function useVaultWrite(
     multicallData,
     multicallWrite,
     multicallError,
-    depositNFTs.length,
-    withdrawNFTs.length,
-    writeType,
+    usingSafeTransferFrom,
   ]);
 
-  return { data, write, error, usingSafeTransferFrom, oracleInfoSynced };
+  return { data, write, error };
 }
