@@ -1,0 +1,5 @@
+query swapActivityByUser($user: Bytes) {
+  activities(where: { user: $user, amountIn_not: null }) {
+    ...allActivityProperties
+  }
+}
