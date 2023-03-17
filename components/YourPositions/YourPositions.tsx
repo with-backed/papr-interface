@@ -205,7 +205,7 @@ export function YourPositions() {
                 <p>CLOSING COST</p>
               </th>
               <th>
-                <p>HEALTH</p>
+                <p>UTILIZATION</p>
               </th>
             </tr>
           </thead>

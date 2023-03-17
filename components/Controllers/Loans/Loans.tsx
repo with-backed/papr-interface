@@ -107,7 +107,7 @@ export function Loans() {
               <span className={styles.lowercase}>(paprmeme)</span>
             </th>
             <th>
-              Health
+              Utilization
               <br />
               <span className={styles.lowercase}>(up to max LTV)</span>
             </th>
