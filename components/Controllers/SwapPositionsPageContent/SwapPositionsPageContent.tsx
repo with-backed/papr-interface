@@ -6,7 +6,7 @@ import { useController } from 'hooks/useController';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { price } from 'lib/controllers/charts/mark';
 import { erc20TokenToToken } from 'lib/uniswapSubgraph';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   SwapActivityByUserDocument,
   SwapActivityByUserQuery,
@@ -19,6 +19,12 @@ export function SwapPositionsPageContent() {
   const { chainId } = useConfig();
   const { paprToken, token0IsUnderlying, underlying } = useController();
   const price = useLatestMarketPrice();
+
+  const [addressToUse, setAddressToUse] = useState<string | undefined>(address);
+  const [timestamps, setTimestamps] = useState<{ start: number; end: number }>({
+    start: 0,
+    end: 1704067200,
+  });
 
   const { token0, token1 } = useMemo(() => {
     if (token0IsUnderlying)
@@ -37,31 +43,62 @@ export function SwapPositionsPageContent() {
     useQuery<SwapActivityByUserQuery>({
       query: SwapActivityByUserDocument,
       variables: {
-        user: address?.toLowerCase(),
+        user: addressToUse?.toLowerCase(),
+        startTimestamp: useMemo(() => timestamps.start, [timestamps.start]),
+        endTimestamp: useMemo(() => timestamps.end, [timestamps.end]),
       },
-      pause: !address,
+      pause: !addressToUse,
     });
+
+  const handleAddressToUseUpdated = useCallback(
+    (address: string) => {
+      setAddressToUse(address);
+    },
+    [setAddressToUse],
+  );
+  const handleStartTimestampUpdated = useCallback(
+    (start: number) => {
+      setTimestamps((t) => ({ ...t, start }));
+    },
+    [setTimestamps],
+  );
+  const handleEndTimestampUpdated = useCallback(
+    (end: number) => {
+      setTimestamps((t) => ({ ...t, end }));
+    },
+    [setTimestamps],
+  );
 
   const {
     amountPurchased,
     amountSold,
     averageSalePrice,
     averagePurchasePrice,
+    averagePurchased,
+    averageSold,
+    netPapr,
+    exitValue,
+    magicNumber,
   } = useMemo(() => {
-    if (!swapActivityForUserData)
+    if (
+      !swapActivityForUserData ||
+      swapActivityForUserData.activities.length === 0
+    )
       return {
         amountPurchased: 0,
         amountSold: 0,
         averageSalePrice: 0,
         averagePurchasePrice: 0,
+        averagePurchased: 0,
+        averageSold: 0,
+        netPapr: 0,
+        exitValue: 0,
+        magicNumber: 0,
       };
 
     const sales = swapActivityForUserData.activities.filter(
       (a) => getAddress(a.tokenIn!.id) === getAddress(paprToken.id),
     );
-    console.log({
-      sales,
-    });
     const amountSold = sales.reduce((a, b) => {
       return ethers.BigNumber.from(a).add(b.amountIn!);
     }, ethers.BigNumber.from(0));
@@ -81,9 +118,6 @@ export function SwapPositionsPageContent() {
     const purchases = swapActivityForUserData.activities.filter(
       (a) => getAddress(a.tokenOut!.id) === getAddress(paprToken.id),
     );
-    console.log({
-      purchases,
-    });
     const amountPurchased = purchases.reduce((a, b) => {
       return ethers.BigNumber.from(a).add(b.amountOut!);
     }, ethers.BigNumber.from(0));
@@ -99,31 +133,72 @@ export function SwapPositionsPageContent() {
       token1,
     );
 
+    const averagePurchased = amountPurchasedNum * averagePurchasePrice;
+    const averageSold = amountSoldNum * averageSalePrice;
+
+    const exitValue = (amountPurchasedNum - amountSoldNum) * (price || 0);
+
     return {
       amountPurchased: amountPurchasedNum,
       amountSold: amountSoldNum,
       averageSalePrice,
       averagePurchasePrice,
+      averagePurchased,
+      averageSold,
+      netPapr: amountPurchasedNum - amountSoldNum,
+      exitValue,
+      magicNumber: exitValue - averagePurchased,
     };
-  }, [swapActivityForUserData, paprToken, token0IsUnderlying, token0, token1]);
+  }, [
+    swapActivityForUserData,
+    paprToken,
+    token0IsUnderlying,
+    token0,
+    token1,
+    price,
+  ]);
 
   return (
     <>
+      <div>
+        <label>Address: </label>
+        <input
+          type="text"
+          value={addressToUse}
+          onChange={(e) => handleAddressToUseUpdated(e.target.value)}
+        />
+      </div>
+      <br />
+      <div>
+        <label>start timestamp: </label>
+        <input
+          type="number"
+          value={timestamps.start}
+          onChange={(e) =>
+            handleStartTimestampUpdated(parseInt(e.target.value))
+          }
+        />
+      </div>
+      <div>
+        <label>end timestamp: </label>
+        <input
+          type="number"
+          value={timestamps.end}
+          onChange={(e) => handleEndTimestampUpdated(parseInt(e.target.value))}
+        />
+      </div>
+      <br />
+
       <div>amount sold: {amountSold.toFixed(4)} papr</div>
       <div>average sale price: {averageSalePrice.toFixed(4)} ETH</div>
-      <div>average sold: {(amountSold * averageSalePrice).toFixed(4)} ETH</div>
+      <div>average sold: {averageSold.toFixed(4)} ETH</div>
       <div>amount purchased: {amountPurchased.toFixed(4)} papr</div>
       <div>average purchase price: {averagePurchasePrice.toFixed(4)} ETH</div>
-      <div>
-        average purchased: {(amountPurchased * averagePurchasePrice).toFixed(4)}{' '}
-        ETH
-      </div>
-      <div>net papr: {(amountPurchased - amountSold).toFixed(4)} papr</div>
+      <div>average purchased: {averagePurchased.toFixed(4)} ETH</div>
+      <div>net papr: {netPapr.toFixed(4)} papr</div>
       <div>current papr price: {price} ETH</div>
-      <div>
-        exit value: {((amountPurchased - amountSold) * (price || 0)).toFixed(4)}{' '}
-        ETH
-      </div>
+      <div>exit value: {exitValue.toFixed(4)} ETH</div>
+      <div>magic number: {magicNumber.toFixed(4)} ETH</div>
     </>
   );
 }
