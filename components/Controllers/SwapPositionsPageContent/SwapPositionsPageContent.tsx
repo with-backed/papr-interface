@@ -35,7 +35,7 @@ export function SwapPositionsPageContent() {
     else
       return {
         token0: erc20TokenToToken(paprToken, chainId),
-        token1: erc20TokenToToken(paprToken, chainId),
+        token1: erc20TokenToToken(underlying, chainId),
       };
   }, [token0IsUnderlying, underlying, paprToken, chainId]);
 
