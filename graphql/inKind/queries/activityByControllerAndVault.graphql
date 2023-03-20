@@ -1,20 +1,9 @@
 query activityByControllerAndVault($controllerId: String, $vault: String) {
-  addCollateralEvents(where: { controller: $controllerId, vault: $vault }) {
-    ...allAddCollateralEventProperties
-  }
-  removeCollateralEvents(where: { controller: $controllerId, vault: $vault }) {
-    ...allRemoveCollateralEventProperties
-  }
-  debtDecreasedEvents(where: { controller: $controllerId, vault: $vault }) {
-    ...allDebtDecreasedEventProperties
-  }
-  debtIncreasedEvents(where: { controller: $controllerId, vault: $vault }) {
-    ...allDebtIncreasedEventProperties
-  }
-  auctionStartEvents(where: { controller: $controllerId, vault: $vault }) {
-    ...allAuctionStartEventProperties
-  }
-  auctionEndEvents(where: { controller: $controllerId, vault: $vault }) {
-    ...allAuctionEndEventProperties
+  activities(
+    where: { controller: $controllerId, vault: $vault }
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    ...allActivityProperties
   }
 }

@@ -10,6 +10,8 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
+export type ActivityType = ActivityByControllerQuery['activities'][0];
+
 /**
  * hook to fetch activity from subgraph depending on if scoping to account or vault
  * @param controllerId - controller id the activity should be scoped to
