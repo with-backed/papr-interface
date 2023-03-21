@@ -1,3 +1,4 @@
+import { TextButton } from 'components/Button';
 import { DisplayAddress } from 'components/DisplayAddress';
 import { DisplayAddressType } from 'components/DisplayAddress/DisplayAddress';
 import {
@@ -14,7 +15,6 @@ import { humanizedTimestamp } from 'lib/duration';
 import { formatTokenAmount } from 'lib/numberFormat';
 import { formatBigNum } from 'lib/numberFormat';
 import React, { useMemo } from 'react';
-import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 
 import styles from './Activity.module.css';
 
@@ -24,19 +24,20 @@ type ActivityProps = {
   // If scoping activity view to just a specific vault
   vault?: string;
   showSwaps?: boolean;
-  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
+
+const LIMIT = 5;
 
 function activityIsSwap(activity: ActivityType) {
   return !!activity.amountIn && !!activity.amountOut;
 }
 
 function activityIsAddCollateral(activity: ActivityType) {
-  return activity.addedCollateral.length > 0;
+  return activity.addedCollateral.length > 0 || !!activity.amountBorrowed;
 }
 
 function activityIsRemoveCollateral(activity: ActivityType) {
-  return activity.removedCollateral.length > 0;
+  return activity.removedCollateral.length > 0 || !!activity.amountRepaid;
 }
 
 function activityIsAuctionStart(activity: ActivityType) {
@@ -47,29 +48,20 @@ function activityIsAuctionEnd(activity: ActivityType) {
   return !!activity.auctionTokenId && !!activity.auctionEndPrice;
 }
 
-export function Activity({
-  account,
-  vault,
-  showSwaps = true,
-  subgraphPool,
-}: ActivityProps) {
+export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
   const paprController = useController();
 
-  const { data: activityData, fetching: activityFetching } = useActivity(
-    paprController.id,
-    account,
-    vault,
-  );
+  const {
+    data: activityData,
+    fetching: activityFetching,
+    fetchMore,
+  } = useActivity(paprController.id, account, vault, LIMIT);
 
-  const allActivity = useMemo(() => {
-    return activityData?.activities || [];
-  }, [activityData]);
-
-  if (activityFetching) {
+  if (activityFetching && activityData.length === 0) {
     return <Fieldset legend="🐝 Activity">Loading...</Fieldset>;
   }
 
-  if (allActivity.length === 0) {
+  if (!activityFetching && activityData.length === 0) {
     return <Fieldset legend="🐝 Activity">No activity yet</Fieldset>;
   }
 
@@ -77,40 +69,46 @@ export function Activity({
     <Fieldset legend="🐝 Activity">
       <Table>
         <tbody className={styles.table}>
-          {allActivity.map((activity) => {
+          {activityData.map((activity) => {
             switch (true) {
+              case activityIsAuctionStart(activity):
+                return <AuctionStart key={activity.id} activity={activity} />;
+              case activityIsAuctionEnd(activity):
+                return (
+                  <AuctionEnd
+                    key={activity.id}
+                    activity={activity}
+                    paprController={paprController}
+                  />
+                );
               case activityIsAddCollateral(activity):
                 return (
                   <CollateralAdded
+                    key={activity.id}
                     activity={activity}
                     paprController={paprController}
-                    key={activity.id}
                   />
                 );
               case activityIsRemoveCollateral(activity):
                 return (
                   <CollateralRemoved
+                    key={activity.id}
                     activity={activity}
                     paprController={paprController}
-                    key={activity.id}
                   />
                 );
-              case activityIsSwap(activity):
+              case activityIsSwap(activity) && showSwaps:
                 return <Swap key={activity.id} activity={activity} />;
-              case activityIsAuctionStart(activity):
-                return <AuctionStart activity={activity} key={activity.id} />;
-              case activityIsAuctionEnd(activity):
-                return (
-                  <AuctionEnd
-                    activity={activity}
-                    key={activity.id}
-                    paprController={paprController}
-                  />
-                );
             }
           })}
         </tbody>
       </Table>
+      <div className={styles['button-container']}>
+        <TextButton kind="clickable" onClick={fetchMore}>
+          {!activityFetching && `Load ${LIMIT} more`}
+          {activityFetching && '...'}
+        </TextButton>
+      </div>
     </Fieldset>
   );
 }
@@ -122,10 +120,14 @@ function CollateralAdded({
   activity: ActivityType;
   paprController: PaprController;
 }) {
-  const vaultOwner = useMemo(() => {
-    const vaultId = activity.vault!.id;
-    return vaultId.split('-')[1];
+  const vault = useMemo(() => {
+    return activity.vault!;
   }, [activity.vault]);
+
+  const vaultOwner = useMemo(() => {
+    const vaultId = vault.id;
+    return vaultId.split('-')[1];
+  }, [vault.id]);
 
   const borrowedAmount = useMemo(() => {
     if (!activity.amountBorrowed) return null;
@@ -138,6 +140,43 @@ function CollateralAdded({
       ` ${paprController.paprToken.symbol}`
     );
   }, [activity.amountBorrowed, paprController.paprToken]);
+
+  const collateralDescription = useMemo(() => {
+    if (activity.addedCollateral.length === 0) return '';
+    const baseString = `deposited ${vault.token.symbol}`;
+    const tokenIds = activity.addedCollateral
+      .map((collateral) => {
+        return `#${collateral.tokenId}`;
+      })
+      .join(', ');
+    return `${baseString} ${tokenIds}`;
+  }, [activity.addedCollateral, vault.token.symbol]);
+
+  const mintedDescription = useMemo(() => {
+    if (!borrowedAmount) return '';
+    if (!collateralDescription) return ` minted ${borrowedAmount}`;
+    if (!activity.amountIn) return ` and minted ${borrowedAmount}`;
+
+    const amountOutFormatted = formatBigNum(
+      activity.amountOut,
+      activity.tokenOut!.decimals,
+      3,
+    );
+    return ` minted ${borrowedAmount} and traded it for ${amountOutFormatted} ${
+      activity.tokenOut!.symbol
+    }`;
+  }, [
+    collateralDescription,
+    activity.amountIn,
+    borrowedAmount,
+    activity.tokenOut,
+    activity.amountOut,
+  ]);
+
+  const fullDescription = useMemo(
+    () => `${collateralDescription}${mintedDescription}`,
+    [collateralDescription, mintedDescription],
+  );
 
   return (
     <tr>
@@ -154,9 +193,7 @@ function CollateralAdded({
               displayType={DisplayAddressType.TRUNCATED}
             />
           </EtherscanAddressLink>{' '}
-          deposited {activity.vault!.token.symbol} #
-          {activity.addedCollateral[0].tokenId} and minted{' '}
-          {borrowedAmount || 'nothing'}
+          {fullDescription}
         </span>
       </td>
     </tr>
@@ -170,15 +207,17 @@ function CollateralRemoved({
   activity: ActivityType;
   paprController: PaprController;
 }) {
-  const vaultOwner = useMemo(() => {
-    const vaultId = activity.vault!.id;
-    return vaultId.split('-')[1];
+  const vault = useMemo(() => {
+    return activity.vault!;
   }, [activity.vault]);
 
-  const returnedAmount = useMemo(() => {
-    if (!activity.amountRepaid) {
-      return '';
-    }
+  const vaultOwner = useMemo(() => {
+    const vaultId = vault.id;
+    return vaultId.split('-')[1];
+  }, [vault.id]);
+
+  const repaidAmount = useMemo(() => {
+    if (!activity.amountRepaid) return null;
     const bigNumAmount = ethers.utils.formatUnits(
       activity.amountRepaid,
       paprController.paprToken.decimals,
@@ -189,26 +228,39 @@ function CollateralRemoved({
     );
   }, [activity.amountRepaid, paprController.paprToken]);
 
-  if (!returnedAmount) {
-    return (
-      <tr>
-        <td>
-          <EtherscanTransactionLink transactionHash={activity.id}>
-            {humanizedTimestamp(activity.timestamp)}
-          </EtherscanTransactionLink>
-        </td>
-        <td>
-          <span>
-            {activity.vault!.token.symbol} #
-            {activity.removedCollateral[0].tokenId} transferred to{' '}
-            <EtherscanAddressLink address={vaultOwner}>
-              {vaultOwner.substring(0, 8)}
-            </EtherscanAddressLink>{' '}
-          </span>
-        </td>
-      </tr>
+  const collateralDescription = useMemo(() => {
+    if (activity.removedCollateral.length === 0) return '';
+
+    let baseString: string;
+    if (!repaidAmount) baseString = `withdrew ${vault.token.symbol}`;
+    else baseString = ` and withdrew ${vault.token.symbol}`;
+
+    const tokenIds = activity.removedCollateral
+      .map((collateral) => {
+        return `#${collateral.tokenId}`;
+      })
+      .join(', ');
+    return `${baseString} ${tokenIds}`;
+  }, [activity.removedCollateral, vault.token.symbol, repaidAmount]);
+
+  const repaidDescription = useMemo(() => {
+    if (!repaidAmount) return '';
+    if (!activity.amountIn) return ` repaid ${repaidAmount}`;
+
+    const amountInFormatted = formatBigNum(
+      activity.amountIn,
+      activity.amountIn.decimals,
+      3,
     );
-  }
+    return ` swapped ${amountInFormatted} ${
+      activity.tokenIn!.symbol
+    } to repay ${repaidAmount}`;
+  }, [activity.amountIn, repaidAmount, activity.tokenIn]);
+
+  const fullDescription = useMemo(
+    () => `${repaidDescription}${collateralDescription}`,
+    [collateralDescription, repaidDescription],
+  );
 
   return (
     <tr>
@@ -222,8 +274,7 @@ function CollateralRemoved({
           <EtherscanAddressLink address={vaultOwner}>
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
-          repaid {returnedAmount} and withdrew {activity.vault!.token.symbol} #
-          {activity.removedCollateral[0].tokenId}
+          {fullDescription}
         </span>
       </td>
     </tr>
@@ -235,10 +286,12 @@ function Swap({ activity }: { activity: ActivityType }) {
     const amountInFormatted = formatBigNum(
       ethers.BigNumber.from(activity.amountIn),
       activity.tokenIn!.decimals,
+      3,
     );
     const amountOutFormatted = formatBigNum(
       ethers.BigNumber.from(activity.amountOut),
       activity.tokenOut!.decimals,
+      3,
     );
 
     return `${amountInFormatted} ${

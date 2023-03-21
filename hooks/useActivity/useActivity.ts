@@ -1,5 +1,5 @@
 import { useConfig } from 'hooks/useConfig';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityByControllerAndAccountDocument,
   ActivityByControllerAndAccountQuery,
@@ -22,6 +22,7 @@ export function useActivity(
   controllerId: string,
   account?: string,
   vault?: string,
+  limit = 5,
 ) {
   const { paprSubgraph } = useConfig();
   const byAccount = useMemo(() => !!account && !vault, [account, vault]);
@@ -30,12 +31,17 @@ export function useActivity(
     () => (!account && !vault) || (!byAccount && !byVault),
     [account, vault, byAccount, byVault],
   );
+  const [page, setPage] = useState<number>(1);
+
+  const [byAccountData, setByAccountData] = useState<ActivityType[]>([]);
+  const [byVaultData, setByVaultData] = useState<ActivityType[]>([]);
+  const [byControllerData, setByControllerData] = useState<ActivityType[]>([]);
 
   const [
     { data: activityByControllerData, fetching: activityByControllerFetching },
   ] = useQuery<ActivityByControllerQuery>({
     query: ActivityByControllerDocument,
-    variables: { controllerId },
+    variables: { controllerId, limit, skip: limit * (page - 1) },
     context: useMemo(
       () => ({
         url: paprSubgraph,
@@ -48,7 +54,7 @@ export function useActivity(
   const [{ data: activityByAccountData, fetching: activityByAccountFetching }] =
     useQuery<ActivityByControllerAndAccountQuery>({
       query: ActivityByControllerAndAccountDocument,
-      variables: { controllerId, account },
+      variables: { controllerId, account, limit, skip: limit * (page - 1) },
       context: useMemo(
         () => ({
           url: paprSubgraph,
@@ -61,7 +67,7 @@ export function useActivity(
   const [{ data: activityByVaultData, fetching: activityByVaultFetching }] =
     useQuery<ActivityByControllerAndVaultQuery>({
       query: ActivityByControllerAndVaultDocument,
-      variables: { controllerId, vault },
+      variables: { controllerId, vault, limit, skip: limit * (page - 1) },
       context: useMemo(
         () => ({
           url: paprSubgraph,
@@ -71,36 +77,75 @@ export function useActivity(
       pause: !byVault,
     });
 
+  useEffect(() => {
+    if (byAccount) {
+      setByAccountData((prev) => {
+        if (activityByAccountData?.activities) {
+          return [...prev, ...activityByAccountData.activities];
+        } else {
+          return prev;
+        }
+      });
+    } else if (byVault) {
+      setByVaultData((prev) => {
+        if (activityByVaultData?.activities) {
+          return [...prev, ...activityByVaultData.activities];
+        } else {
+          return prev;
+        }
+      });
+    } else if (byController) {
+      setByControllerData((prev) => {
+        if (activityByControllerData?.activities) {
+          return [...prev, ...activityByControllerData.activities];
+        } else {
+          return prev;
+        }
+      });
+    }
+  }, [
+    activityByControllerData,
+    activityByAccountData,
+    activityByVaultData,
+    byAccount,
+    byController,
+    byVault,
+  ]);
+
   const { data, fetching } = useMemo(() => {
     if (byController)
       return {
-        data: activityByControllerData,
+        data: byControllerData,
         fetching: activityByControllerFetching,
       };
     else if (byAccount) {
       return {
-        data: activityByAccountData,
+        data: byAccountData,
         fetching: activityByAccountFetching,
       };
     } else if (byVault) {
       return {
-        data: activityByVaultData,
+        data: byVaultData,
         fetching: activityByVaultFetching,
       };
     } else {
-      return { data: undefined, fetching: true };
+      return { data: [], fetching: true };
     }
   }, [
     byController,
-    activityByControllerData,
+    byControllerData,
     activityByControllerFetching,
     byAccount,
-    activityByAccountData,
+    byAccountData,
     activityByAccountFetching,
     byVault,
-    activityByVaultData,
+    byVaultData,
     activityByVaultFetching,
   ]);
 
-  return { data, fetching };
+  const fetchMore = useCallback(() => {
+    setPage((prev) => prev + 1);
+  }, [setPage]);
+
+  return { data, fetchMore, fetching };
 }

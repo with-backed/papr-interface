@@ -1,8 +1,10 @@
-query activityByController($controllerId: String) {
+query activityByController($controllerId: String, $limit: Int, $skip: Int) {
   activities(
     where: { controller: $controllerId }
     orderBy: timestamp
     orderDirection: desc
+    first: $limit
+    skip: $skip
   ) {
     ...allActivityProperties
   }

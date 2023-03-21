@@ -1,8 +1,15 @@
-query activityByControllerAndVault($controllerId: String, $vault: String) {
+query activityByControllerAndVault(
+  $controllerId: String
+  $vault: String
+  $limit: Int
+  $skip: Int
+) {
   activities(
     where: { controller: $controllerId, vault: $vault }
     orderBy: timestamp
     orderDirection: desc
+    first: $limit
+    skip: $skip
   ) {
     ...allActivityProperties
   }

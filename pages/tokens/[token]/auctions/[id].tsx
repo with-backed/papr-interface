@@ -15,12 +15,10 @@ import {
   AuctionDocument,
   AuctionQuery,
 } from 'types/generated/graphql/inKindSubgraph';
-import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 import { useQuery } from 'urql';
 
 type AuctionProps = {
   subgraphController: PaprController;
-  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
   auctionId: string;
 };
 
@@ -49,12 +47,11 @@ export const getServerSideProps: GetServerSideProps<AuctionProps> = async (
     throw e;
   }
 
-  const { paprController, pool } = controllerSubgraphData;
+  const { paprController } = controllerSubgraphData;
 
   return {
     props: {
       subgraphController: paprController,
-      subgraphPool: pool,
       auctionId: context.params?.id as string,
     },
   };
@@ -62,7 +59,6 @@ export const getServerSideProps: GetServerSideProps<AuctionProps> = async (
 
 export default function Auction({
   subgraphController,
-  subgraphPool,
   auctionId,
 }: AuctionProps) {
   const collections = useMemo(
@@ -107,11 +103,7 @@ export default function Auction({
         <MarketPriceProvider>
           <div className={controllerStyles.wrapper}>
             <AuctionPageContent auction={auction} refresh={refresh} />
-            <Activity
-              subgraphPool={subgraphPool}
-              vault={auctionVaultId}
-              showSwaps={false}
-            />
+            <Activity vault={auctionVaultId} showSwaps={false} />
           </div>
         </MarketPriceProvider>
       </ControllerContextProvider>

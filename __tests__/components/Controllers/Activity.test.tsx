@@ -1,21 +1,14 @@
-import React from 'react';
 import { render } from '@testing-library/react';
-import { Activity } from 'components/Controllers/Activity';
-import {
-  subgraphController,
-  mockUniswapPool,
-} from 'lib/mockData/mockPaprController';
-import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
-import { useActivity } from 'hooks/useActivity';
-import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 import userEvent from '@testing-library/user-event';
+import { Activity } from 'components/Controllers/Activity';
+import { useActivity } from 'hooks/useActivity';
 import { useController } from 'hooks/useController';
+import { subgraphController } from 'lib/mockData/mockPaprController';
+import React from 'react';
+import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 
 jest.mock('hooks/useController', () => ({
   useController: jest.fn(),
-}));
-jest.mock('hooks/useUniswapSwapsByPool', () => ({
-  useUniswapSwapsByPool: jest.fn(),
 }));
 jest.mock('hooks/useActivity', () => ({
   useActivity: jest.fn(),
@@ -27,8 +20,6 @@ jest.mock('hooks/useTheme', () => ({
 const mockedUseController = useController as jest.MockedFunction<
   typeof useController
 >;
-const mockedUseUniswapSwapsByPool =
-  useUniswapSwapsByPool as jest.MockedFunction<typeof useUniswapSwapsByPool>;
 const mockedUseActivity = useActivity as jest.MockedFunction<
   typeof useActivity
 >;
@@ -60,49 +51,33 @@ describe('Activity', () => {
     mockedUseController.mockReturnValue(subgraphController);
   });
   it('renders a loading state when swaps are loading', () => {
-    mockedUseUniswapSwapsByPool.mockReturnValue({
-      fetching: true,
-      data: undefined,
-    });
     mockedUseActivity.mockReturnValue({
       fetching: false,
-      data: undefined,
+      data: [],
     });
-    const { getByText } = render(<Activity subgraphPool={mockUniswapPool} />);
+    const { getByText } = render(<Activity />);
     getByText('Loading...');
   });
 
   it('renders a loading state when activity is loading', () => {
-    mockedUseUniswapSwapsByPool.mockReturnValue({
-      fetching: false,
-      data: undefined,
-    });
     mockedUseActivity.mockReturnValue({
       fetching: true,
       data: undefined,
     });
-    const { getByText } = render(<Activity subgraphPool={mockUniswapPool} />);
+    const { getByText } = render(<Activity />);
     getByText('Loading...');
   });
 
   it('handles when there are no events', () => {
-    mockedUseUniswapSwapsByPool.mockReturnValue({
-      fetching: false,
-      data: undefined,
-    });
     mockedUseActivity.mockReturnValue({
       fetching: false,
-      data: undefined,
+      data: [],
     });
-    const { getByText } = render(<Activity subgraphPool={mockUniswapPool} />);
+    const { getByText } = render(<Activity />);
     getByText('No activity yet');
   });
 
   it('renders a single event, with no load more button', () => {
-    mockedUseUniswapSwapsByPool.mockReturnValue({
-      fetching: false,
-      data: undefined,
-    });
     mockedUseActivity.mockReturnValue({
       fetching: false,
       data: {
@@ -116,16 +91,12 @@ describe('Activity', () => {
         auctionStartEvents: [],
       },
     });
-    const { container } = render(<Activity subgraphPool={mockUniswapPool} />);
+    const { container } = render(<Activity />);
     expect(container.querySelectorAll('tr')).toHaveLength(1);
     expect(container.querySelector('button')).toBeNull();
   });
 
   it('renders multiple events, with a load more button', () => {
-    mockedUseUniswapSwapsByPool.mockReturnValue({
-      fetching: false,
-      data: undefined,
-    });
     mockedUseActivity.mockReturnValue({
       fetching: false,
       data: {
@@ -139,9 +110,7 @@ describe('Activity', () => {
         auctionStartEvents: [],
       },
     });
-    const { container, getByText } = render(
-      <Activity subgraphPool={mockUniswapPool} />,
-    );
+    const { container, getByText } = render(<Activity />);
     expect(container.querySelectorAll('tr')).toHaveLength(5);
 
     const button = getByText('Load 1 more (of 1)');
