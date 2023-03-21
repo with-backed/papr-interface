@@ -36,6 +36,7 @@ describe('Activity', () => {
       fetching: true,
       data: [],
       fetchMore,
+      remaining: true,
     });
     const { getByText } = render(<Activity />);
     getByText('Loading...');
@@ -46,9 +47,22 @@ describe('Activity', () => {
       fetching: false,
       data: [],
       fetchMore,
+      remaining: true,
     });
     const { getByText } = render(<Activity />);
     getByText('No activity yet');
+  });
+
+  it('renders a single event, without the load more button', () => {
+    mockedUseActivity.mockReturnValue({
+      fetching: false,
+      data: [mockActivity[0]] as ActivityType[],
+      fetchMore,
+      remaining: false,
+    });
+    const { container } = render(<Activity />);
+    expect(container.querySelectorAll('tr')).toHaveLength(1);
+    expect(container.querySelector('button')).toBeNull();
   });
 
   it('renders events, with a load more button', () => {
@@ -56,6 +70,7 @@ describe('Activity', () => {
       fetching: false,
       data: mockActivity as ActivityType[],
       fetchMore,
+      remaining: true,
     });
     const { container, getByText } = render(<Activity />);
     expect(container.querySelectorAll('tr')).toHaveLength(5);

@@ -55,6 +55,7 @@ export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
     data: activityData,
     fetching: activityFetching,
     fetchMore,
+    remaining,
   } = useActivity(paprController.id, account, vault, LIMIT);
 
   if (activityFetching && activityData.length === 0) {
@@ -103,12 +104,14 @@ export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
           })}
         </tbody>
       </Table>
-      <div className={styles['button-container']}>
-        <TextButton kind="clickable" onClick={fetchMore}>
-          {!activityFetching && `Load ${LIMIT} more`}
-          {activityFetching && '...'}
-        </TextButton>
-      </div>
+      {remaining && (
+        <div className={styles['button-container']}>
+          <TextButton kind="clickable" onClick={fetchMore}>
+            {!activityFetching && `Load ${LIMIT} more`}
+            {activityFetching && '...'}
+          </TextButton>
+        </div>
+      )}
     </Fieldset>
   );
 }

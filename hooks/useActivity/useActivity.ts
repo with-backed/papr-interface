@@ -32,6 +32,7 @@ export function useActivity(
     [account, vault, byAccount, byVault],
   );
   const [page, setPage] = useState<number>(1);
+  const [remaining, setRemaining] = useState<boolean>(true);
 
   const [byAccountData, setByAccountData] = useState<ActivityType[]>([]);
   const [byVaultData, setByVaultData] = useState<ActivityType[]>([]);
@@ -78,30 +79,31 @@ export function useActivity(
     });
 
   useEffect(() => {
-    if (byAccount) {
-      setByAccountData((prev) => {
-        if (activityByAccountData?.activities) {
-          return [...prev, ...activityByAccountData.activities];
-        } else {
-          return prev;
-        }
-      });
-    } else if (byVault) {
-      setByVaultData((prev) => {
-        if (activityByVaultData?.activities) {
-          return [...prev, ...activityByVaultData.activities];
-        } else {
-          return prev;
-        }
-      });
-    } else if (byController) {
-      setByControllerData((prev) => {
-        if (activityByControllerData?.activities) {
-          return [...prev, ...activityByControllerData.activities];
-        } else {
-          return prev;
-        }
-      });
+    console.log({
+      byController,
+      activityByControllerData,
+    });
+    if (byAccount && activityByAccountData?.activities) {
+      if (activityByAccountData.activities.length === 0) setRemaining(false);
+      else {
+        setByAccountData((prev) => [
+          ...prev,
+          ...activityByAccountData.activities,
+        ]);
+      }
+    } else if (byVault && activityByVaultData?.activities) {
+      if (activityByVaultData.activities.length === 0) setRemaining(false);
+      else {
+        setByVaultData((prev) => [...prev, ...activityByVaultData.activities]);
+      }
+    } else if (byController && activityByControllerData?.activities) {
+      if (activityByControllerData.activities.length === 0) setRemaining(false);
+      else {
+        setByControllerData((prev) => [
+          ...prev,
+          ...activityByControllerData.activities,
+        ]);
+      }
     }
   }, [
     activityByControllerData,
@@ -147,5 +149,5 @@ export function useActivity(
     setPage((prev) => prev + 1);
   }, [setPage]);
 
-  return { data, fetchMore, fetching };
+  return { data, fetchMore, fetching, remaining };
 }
