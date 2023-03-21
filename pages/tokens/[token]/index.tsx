@@ -39,7 +39,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     throw e;
   }
 
-  const { pool, paprController } = controllerSubgraphData;
+  const { paprController } = controllerSubgraphData;
 
   return {
     props: {

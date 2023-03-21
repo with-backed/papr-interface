@@ -71,35 +71,34 @@ export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
       <Table>
         <tbody className={styles.table}>
           {activityData.map((activity) => {
-            switch (true) {
-              case activityIsAuctionStart(activity):
-                return <AuctionStart key={activity.id} activity={activity} />;
-              case activityIsAuctionEnd(activity):
-                return (
-                  <AuctionEnd
-                    key={activity.id}
-                    activity={activity}
-                    paprController={paprController}
-                  />
-                );
-              case activityIsAddCollateral(activity):
-                return (
-                  <CollateralAdded
-                    key={activity.id}
-                    activity={activity}
-                    paprController={paprController}
-                  />
-                );
-              case activityIsRemoveCollateral(activity):
-                return (
-                  <CollateralRemoved
-                    key={activity.id}
-                    activity={activity}
-                    paprController={paprController}
-                  />
-                );
-              case activityIsSwap(activity) && showSwaps:
-                return <Swap key={activity.id} activity={activity} />;
+            if (activityIsAuctionStart(activity)) {
+              return <AuctionStart key={activity.id} activity={activity} />;
+            } else if (activityIsAuctionEnd(activity)) {
+              return (
+                <AuctionEnd
+                  key={activity.id}
+                  activity={activity}
+                  paprController={paprController}
+                />
+              );
+            } else if (activityIsAddCollateral(activity)) {
+              return (
+                <CollateralAdded
+                  key={activity.id}
+                  activity={activity}
+                  paprController={paprController}
+                />
+              );
+            } else if (activityIsRemoveCollateral(activity)) {
+              return (
+                <CollateralRemoved
+                  key={activity.id}
+                  activity={activity}
+                  paprController={paprController}
+                />
+              );
+            } else if (activityIsSwap(activity) && showSwaps) {
+              return <Swap key={activity.id} activity={activity} />;
             }
           })}
         </tbody>
@@ -234,9 +233,9 @@ function CollateralRemoved({
   const collateralDescription = useMemo(() => {
     if (activity.removedCollateral.length === 0) return '';
 
-    let baseString: string;
-    if (!repaidAmount) baseString = `withdrew ${vault.token.symbol}`;
-    else baseString = ` and withdrew ${vault.token.symbol}`;
+    const baseString = repaidAmount
+      ? ` and withdrew ${vault.token.symbol}`
+      : `withdrew ${vault.token.symbol}`;
 
     const tokenIds = activity.removedCollateral
       .map((collateral) => {
