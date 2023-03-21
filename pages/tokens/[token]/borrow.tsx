@@ -1,8 +1,5 @@
 import { captureException } from '@sentry/nextjs';
-import {
-  BorrowPageContent,
-  BorrowPageProps,
-} from 'components/Controllers/BorrowPageContent';
+import { BorrowPageContent } from 'components/Controllers/BorrowPageContent';
 import { OpenGraph } from 'components/OpenGraph';
 import { useConfig } from 'hooks/useConfig';
 import { ControllerContextProvider } from 'hooks/useController';
@@ -13,10 +10,7 @@ import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 import { useMemo } from 'react';
 
-type ServerSideProps = Omit<
-  BorrowPageProps,
-  'paprController' | 'pricesData'
-> & {
+type ServerSideProps = {
   subgraphController: SubgraphController;
 };
 

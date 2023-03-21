@@ -5,11 +5,7 @@ import { useConfig } from 'hooks/useConfig';
 import { ControllerContextProvider } from 'hooks/useController';
 import { MarketPriceProvider } from 'hooks/useLatestMarketPrice';
 import { configProxy, SupportedToken } from 'lib/config';
-import {
-  fetchSubgraphData,
-  SubgraphController,
-  SubgraphPool,
-} from 'lib/PaprController';
+import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 
 import styles from '../controller.module.css';
@@ -17,7 +13,6 @@ import styles from '../controller.module.css';
 type ServerSideProps = {
   vaultId: string;
   subgraphController: SubgraphController;
-  subgraphPool: SubgraphPool;
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
@@ -46,20 +41,18 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     throw e;
   }
 
-  const { pool, paprController } = controllerSubgraphData;
+  const { paprController } = controllerSubgraphData;
 
   return {
     props: {
       vaultId: id,
       subgraphController: paprController,
-      subgraphPool: pool,
     },
   };
 };
 
 export default function VaultPage({
   vaultId,
-  subgraphPool,
   subgraphController,
 }: ServerSideProps) {
   const { tokenName } = useConfig();
@@ -71,7 +64,7 @@ export default function VaultPage({
         <a href={`/tokens/${tokenName}`}>⬅ controller</a>
         <ControllerContextProvider value={subgraphController}>
           <MarketPriceProvider>
-            <VaultPageContent vaultId={vaultId} subgraphPool={subgraphPool} />
+            <VaultPageContent vaultId={vaultId} />
           </MarketPriceProvider>
         </ControllerContextProvider>
       </div>

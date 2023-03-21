@@ -79,10 +79,6 @@ export function useActivity(
     });
 
   useEffect(() => {
-    console.log({
-      byController,
-      activityByControllerData,
-    });
     if (byAccount && activityByAccountData?.activities) {
       if (activityByAccountData.activities.length === 0) setRemaining(false);
       else {
