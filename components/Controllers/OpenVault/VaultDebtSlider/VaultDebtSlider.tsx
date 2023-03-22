@@ -162,6 +162,7 @@ function VaultDebtExplainer({
   currentLTV,
   daysToLiquidation,
   maxLTV,
+  liquidationTriggerPrice,
 }: VaultDebtExplainerProps) {
   const currentLTVTooltip = useTooltipState();
   const accruingInterestTooltip = useTooltipState();
@@ -181,7 +182,11 @@ function VaultDebtExplainer({
           ? 'The current interest rate is negative, and is not currently moving this loan closer to liquidation.'
           : `Assuming today's interest rate and NFT price, interest charges will result in liquidation after ${daysToLiquidation} days.`}
       </Tooltip>
-      <Tooltip {...nftValueTooltip}>TODO</Tooltip>
+      <Tooltip {...nftValueTooltip}>
+        If contract&apos;s valuation of the collateral drops below{' '}
+        {liquidationTriggerPrice}, this loan will be liquidated at auction to
+        cover the debt.
+      </Tooltip>
     </>
   );
 }
