@@ -189,21 +189,30 @@ export function SwapPositionsPageContent() {
       </div>
       <br />
 
-      <div>(as) amount sold: {amountSold.toFixed(4)} papr</div>
-      <div>(sp) average sale price: {averageSalePrice.toFixed(4)} ETH</div>
-      <div>(as * sp = avgsold) average sold: {averageSold.toFixed(4)} ETH</div>
-      <div>(ap) amount purchased: {amountPurchased.toFixed(4)} papr</div>
+      <div>(s) total papr sold: {amountSold.toFixed(4)} papr</div>
+      <div>(s_p) average sale price: {averageSalePrice.toFixed(4)} ETH</div>
+      <div> (s_v) total ETH from sales: {averageSold.toFixed(4)} ETH</div>
+      <div>(p) total papr purchased: {amountPurchased.toFixed(4)} papr</div>
       <div>
-        (avgpp) average purchase price: {averagePurchasePrice.toFixed(4)} ETH
+        (p_p) average purchase price: {averagePurchasePrice.toFixed(4)} ETH
       </div>
       <div>
-        (ap * avgpp = avgpur) average purchased: {averagePurchased.toFixed(4)}{' '}
+        (p_v) total ETH spent on purchases: {averagePurchased.toFixed(4)} ETH
+      </div>
+      <div>(np = p - s) net papr: {netPapr.toFixed(4)} papr</div>
+      <div>
+        (n_v = p_v - s_v) net ETH: {(averagePurchased - averageSold).toFixed(4)}{' '}
         ETH
       </div>
-      <div>(ap - as = np) net papr: {netPapr.toFixed(4)} papr</div>
-      <div>(p) current papr price: {price} ETH</div>
-      <div>(p * np = ev) exit value: {exitValue.toFixed(4)} ETH</div>
-      <div>(ev - avgpur = mn) magic number: {magicNumber.toFixed(4)} ETH</div>
+      <div>($p) current papr price: {price} ETH</div>
+      <div>
+        ($np = np * $p) market value of net papr: {exitValue.toFixed(4)} ETH
+      </div>
+      <div>($np - p_v) (old) magic number: {magicNumber.toFixed(4)} ETH</div>
+      <div>
+        (n_v + $np) unrealized gain/loss:{' '}
+        {(exitValue - (averagePurchased - averageSold)).toFixed(4)} ETH
+      </div>
     </>
   );
 }
