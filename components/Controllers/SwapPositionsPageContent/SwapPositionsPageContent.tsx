@@ -208,7 +208,7 @@ export function SwapPositionsPageContent() {
       <div>
         ($np = np * $p) market value of net papr: {exitValue.toFixed(4)} ETH
       </div>
-      <div>($np - p_v) (old) magic number: {magicNumber.toFixed(4)} ETH</div>
+      {/* <div>($np - p_v) (old) magic number: {magicNumber.toFixed(4)} ETH</div> */}
       <div>
         ($np - n_v) unrealized gain/loss:{' '}
         {(exitValue - (averagePurchased - averageSold)).toFixed(4)} ETH
