@@ -191,6 +191,12 @@ span.debtAmountInputWrapper:before {
   justify-content: space-between;
 }
 
+.loanActionSummary > div:nth-child(3),
+.loanActionSummary > div:nth-child(4),
+.loanActionSummary > div:nth-child(5) {
+  padding-left: 20px;
+}
+
 .loanActionSummary > div > div:first-of-type {
   margin-left: 10px;
 }
@@ -241,6 +247,7 @@ span.debtAmountInputWrapper:before {
 }
 
 .error {
+  background-color: white !important;
   margin-top: 12px;
   width: 100%;
   font-style: italic;
