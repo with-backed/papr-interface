@@ -155,16 +155,23 @@ export function VaultDebtSlider({
 type VaultDebtExplainerProps = {
   daysToLiquidation: number;
   liquidationTriggerPrice: string;
+  maxLTV: number;
+  currentLTV: number;
 };
-function VaultDebtExplainer({ daysToLiquidation }: VaultDebtExplainerProps) {
+function VaultDebtExplainer({
+  currentLTV,
+  daysToLiquidation,
+  maxLTV,
+}: VaultDebtExplainerProps) {
   const currentLTVTooltip = useTooltipState();
   const accruingInterestTooltip = useTooltipState();
   const nftValueTooltip = useTooltipState();
   return (
     <>
       <p>
-        Loan liquidates when <TTR {...currentLTVTooltip}>Current LTV</TTR>{' '}
-        (41.3%) reaches Max LTV (50%). This can happen by{' '}
+        Loan liquidates when <TTR {...currentLTVTooltip}>Current LTV</TTR> (
+        {formatPercent(currentLTV)}) reaches Max LTV ({formatPercent(maxLTV)}).
+        This can happen by{' '}
         <TTR {...accruingInterestTooltip}>accruing interest</TTR> or by a drop
         in <TTR {...nftValueTooltip}>NFT value</TTR>.
       </p>
