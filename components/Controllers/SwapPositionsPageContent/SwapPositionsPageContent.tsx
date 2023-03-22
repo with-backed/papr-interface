@@ -210,7 +210,7 @@ export function SwapPositionsPageContent() {
       </div>
       <div>($np - p_v) (old) magic number: {magicNumber.toFixed(4)} ETH</div>
       <div>
-        (n_v + $np) unrealized gain/loss:{' '}
+        ($np - n_v) unrealized gain/loss:{' '}
         {(exitValue - (averagePurchased - averageSold)).toFixed(4)} ETH
       </div>
     </>
