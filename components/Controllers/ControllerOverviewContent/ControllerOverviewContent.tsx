@@ -3,7 +3,6 @@ import { Auctions } from 'components/Controllers/Auctions';
 import styles from 'components/Controllers/Controller.module.css';
 import dynamic from 'next/dynamic';
 import React from 'react';
-import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 
 /* lightweight-charts uses canvas and cannot be SSRed */
 const Charts = dynamic(() => import('components/Controllers/Charts/Charts'), {
@@ -37,13 +36,7 @@ const PoolStats = dynamic(
   import('components/PoolStats').then((mod) => mod.PoolStats),
 );
 
-export type ControllerPageProps = {
-  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
-};
-
-export function ControllerOverviewContent({
-  subgraphPool,
-}: ControllerPageProps) {
+export function ControllerOverviewContent() {
   return (
     <div className={styles.wrapper}>
       <YourPositions />
@@ -51,7 +44,7 @@ export function ControllerOverviewContent({
       <MarketStatus />
       <PoolStats />
       <Collateral />
-      <Activity subgraphPool={subgraphPool} />
+      <Activity />
       <Charts />
       <Loans />
       <Auctions />

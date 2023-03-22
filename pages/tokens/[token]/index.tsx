@@ -1,28 +1,17 @@
 import { captureException } from '@sentry/nextjs';
-import {
-  ControllerOverviewContent,
-  ControllerPageProps,
-} from 'components/Controllers/ControllerOverviewContent';
+import { ControllerOverviewContent } from 'components/Controllers/ControllerOverviewContent';
 import { OpenGraph } from 'components/OpenGraph';
 import { useConfig } from 'hooks/useConfig';
 import { ControllerContextProvider } from 'hooks/useController';
 import { MarketPriceProvider } from 'hooks/useLatestMarketPrice';
 import { OracleInfoProvider } from 'hooks/useOracleInfo/useOracleInfo';
 import { configProxy, SupportedToken } from 'lib/config';
-import {
-  fetchSubgraphData,
-  SubgraphController,
-  SubgraphPool,
-} from 'lib/PaprController';
+import { fetchSubgraphData, SubgraphController } from 'lib/PaprController';
 import { GetServerSideProps } from 'next';
 import { useMemo } from 'react';
 
-type ServerSideProps = Omit<
-  ControllerPageProps,
-  'paprController' | 'pricesData'
-> & {
+type ServerSideProps = {
   subgraphController: SubgraphController;
-  subgraphPool: SubgraphPool;
 };
 
 export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
@@ -50,19 +39,17 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
     throw e;
   }
 
-  const { pool, paprController } = controllerSubgraphData;
+  const { paprController } = controllerSubgraphData;
 
   return {
     props: {
       subgraphController: paprController,
-      subgraphPool: pool,
     },
   };
 };
 
 export default function ControllerPage({
   subgraphController,
-  subgraphPool,
 }: ServerSideProps) {
   const config = useConfig();
 
@@ -76,7 +63,7 @@ export default function ControllerPage({
       <ControllerContextProvider value={subgraphController}>
         <MarketPriceProvider>
           <OpenGraph title={`${config.tokenName} | Performance`} />
-          <ControllerOverviewContent subgraphPool={subgraphPool} />
+          <ControllerOverviewContent />
         </MarketPriceProvider>
       </ControllerContextProvider>
     </OracleInfoProvider>

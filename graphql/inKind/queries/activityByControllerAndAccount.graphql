@@ -1,22 +1,16 @@
-query activityByControllerAndAccount($controllerId: String, $account: Bytes) {
-  addCollateralEvents(where: { controller: $controllerId, account: $account }) {
-    ...allAddCollateralEventProperties
-  }
-  removeCollateralEvents(
-    where: { controller: $controllerId, account: $account }
+query activityByControllerAndAccount(
+  $controllerId: String
+  $account: Bytes
+  $limit: Int
+  $skip: Int
+) {
+  activities(
+    where: { controller: $controllerId, user: $account }
+    orderBy: timestamp
+    orderDirection: desc
+    first: $limit
+    skip: $skip
   ) {
-    ...allRemoveCollateralEventProperties
-  }
-  debtDecreasedEvents(where: { controller: $controllerId, account: $account }) {
-    ...allDebtDecreasedEventProperties
-  }
-  debtIncreasedEvents(where: { controller: $controllerId, account: $account }) {
-    ...allDebtIncreasedEventProperties
-  }
-  auctionStartEvents(where: { controller: $controllerId, account: $account }) {
-    ...allAuctionStartEventProperties
-  }
-  auctionEndEvents(where: { controller: $controllerId, account: $account }) {
-    ...allAuctionEndEventProperties
+    ...allActivityProperties
   }
 }

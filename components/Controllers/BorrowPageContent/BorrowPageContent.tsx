@@ -8,7 +8,6 @@ import { usePaprBalance } from 'hooks/usePaprBalance';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import dynamic from 'next/dynamic';
 import React, { useCallback, useMemo } from 'react';
-import { PoolByIdQuery } from 'types/generated/graphql/uniswapSubgraph';
 import { useAccount } from 'wagmi';
 
 const YourPositions = dynamic(() =>
@@ -23,11 +22,7 @@ const VaultDebtPicker = dynamic(() =>
   ).then((mod) => mod.VaultDebtPicker),
 );
 
-export type BorrowPageProps = {
-  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
-};
-
-export function BorrowPageContent({ subgraphPool }: BorrowPageProps) {
+export function BorrowPageContent() {
   const paprController = useController();
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
@@ -88,7 +83,7 @@ export function BorrowPageContent({ subgraphPool }: BorrowPageProps) {
             refresh={refresh}
           />
         ))}
-      {!!address && <Activity account={address} subgraphPool={subgraphPool} />}
+      {!!address && <Activity account={address} />}
     </div>
   );
 }

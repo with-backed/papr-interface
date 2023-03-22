@@ -9,22 +9,14 @@ import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import { ethers } from 'ethers';
 import { useActivity } from 'hooks/useActivity';
+import { ActivityType } from 'hooks/useActivity/useActivity';
 import { PaprController, useController } from 'hooks/useController';
-import { useShowMore } from 'hooks/useShowMore';
-import { useUniswapSwapsByPool } from 'hooks/useUniswapSwapsByPool';
 import { humanizedTimestamp } from 'lib/duration';
 import { formatTokenAmount } from 'lib/numberFormat';
+import { formatBigNum } from 'lib/numberFormat';
 import React, { useMemo } from 'react';
-import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
-import {
-  PoolByIdQuery,
-  SwapsByPoolQuery,
-} from 'types/generated/graphql/uniswapSubgraph';
 
 import styles from './Activity.module.css';
-
-type ArrayElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
 type ActivityProps = {
   // If scoping activity view to just a specific account
@@ -32,52 +24,45 @@ type ActivityProps = {
   // If scoping activity view to just a specific vault
   vault?: string;
   showSwaps?: boolean;
-  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 };
 
-const EVENT_INCREMENT = 5;
+const LIMIT = 5;
 
-export function Activity({
-  account,
-  vault,
-  showSwaps = true,
-  subgraphPool,
-}: ActivityProps) {
+function activityIsSwap(activity: ActivityType) {
+  return !!activity.amountIn && !!activity.amountOut;
+}
+
+function activityIsAddCollateral(activity: ActivityType) {
+  return activity.addedCollateral.length > 0 || !!activity.amountBorrowed;
+}
+
+function activityIsRemoveCollateral(activity: ActivityType) {
+  return activity.removedCollateral.length > 0 || !!activity.amountRepaid;
+}
+
+function activityIsAuctionStart(activity: ActivityType) {
+  return !!activity.auctionTokenId && !activity.auctionEndPrice;
+}
+
+function activityIsAuctionEnd(activity: ActivityType) {
+  return !!activity.auctionTokenId && !!activity.auctionEndPrice;
+}
+
+export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
   const paprController = useController();
-  const { data: swapsData, fetching: swapsFetching } = useUniswapSwapsByPool(
-    paprController.poolAddress,
-    account,
-  );
 
-  const { data: activityData, fetching: activityFetching } = useActivity(
-    paprController.id,
-    account,
-    vault,
-  );
+  const {
+    data: activityData,
+    fetching: activityFetching,
+    fetchMore,
+    remaining,
+  } = useActivity(paprController.id, account, vault, LIMIT);
 
-  const allEvents = useMemo(() => {
-    const unsortedEvents = [
-      ...(activityData?.addCollateralEvents || []),
-      ...(activityData?.removeCollateralEvents || []),
-      ...(swapsData?.swaps && showSwaps ? swapsData.swaps : []),
-      ...(activityData?.auctionStartEvents.filter(
-        (e) => e.auction.vault.controller.id === paprController.id,
-      ) || []),
-      ...(activityData?.auctionEndEvents.filter(
-        (e) => e.auction.vault.controller.id === paprController.id,
-      ) || []),
-    ];
-    return unsortedEvents.sort((a, b) => b.timestamp - a.timestamp);
-  }, [activityData, paprController.id, showSwaps, swapsData]);
-
-  const { feed, amountThatWillShowNext, remainingLength, showMore } =
-    useShowMore(allEvents, EVENT_INCREMENT);
-
-  if (swapsFetching || activityFetching) {
+  if (activityFetching && activityData.length === 0) {
     return <Fieldset legend="🐝 Activity">Loading...</Fieldset>;
   }
 
-  if (allEvents.length === 0) {
+  if (!activityFetching && activityData.length === 0) {
     return <Fieldset legend="🐝 Activity">No activity yet</Fieldset>;
   }
 
@@ -85,62 +70,44 @@ export function Activity({
     <Fieldset legend="🐝 Activity">
       <Table>
         <tbody className={styles.table}>
-          {feed.map((event) => {
-            switch (event.__typename) {
-              case 'AddCollateralEvent':
-                return (
-                  <CollateralAdded
-                    event={event}
-                    debtIncreasedEvents={
-                      activityData?.debtIncreasedEvents || []
-                    }
-                    paprController={paprController}
-                    key={event.id + event.__typename}
-                  />
-                );
-              case 'RemoveCollateralEvent':
-                return (
-                  <CollateralRemoved
-                    subgraphPool={subgraphPool}
-                    event={event}
-                    debtDecreasedEvents={
-                      activityData?.debtDecreasedEvents || []
-                    }
-                    paprController={paprController}
-                    key={event.id + event.__typename}
-                  />
-                );
-              case 'Swap':
-                return (
-                  <Swap
-                    key={event.id + event.__typename}
-                    event={event}
-                    subgraphPool={subgraphPool}
-                  />
-                );
-              case 'AuctionStartEvent':
-                return (
-                  <AuctionStart
-                    event={event}
-                    key={event.id + event.__typename}
-                  />
-                );
-              case 'AuctionEndEvent':
-                return (
-                  <AuctionEnd
-                    event={event}
-                    key={event.id + event.__typename}
-                    paprController={paprController}
-                  />
-                );
+          {activityData.map((activity) => {
+            if (activityIsAuctionStart(activity)) {
+              return <AuctionStart key={activity.id} activity={activity} />;
+            } else if (activityIsAuctionEnd(activity)) {
+              return (
+                <AuctionEnd
+                  key={activity.id}
+                  activity={activity}
+                  paprController={paprController}
+                />
+              );
+            } else if (activityIsAddCollateral(activity)) {
+              return (
+                <CollateralAdded
+                  key={activity.id}
+                  activity={activity}
+                  paprController={paprController}
+                />
+              );
+            } else if (activityIsRemoveCollateral(activity)) {
+              return (
+                <CollateralRemoved
+                  key={activity.id}
+                  activity={activity}
+                  paprController={paprController}
+                />
+              );
+            } else if (activityIsSwap(activity) && showSwaps) {
+              return <Swap key={activity.id} activity={activity} />;
             }
           })}
         </tbody>
       </Table>
-      {remainingLength > 0 && (
+      {remaining && (
         <div className={styles['button-container']}>
-          <TextButton kind="clickable" onClick={showMore}>
-            Load {amountThatWillShowNext} more (of {remainingLength})
+          <TextButton kind="clickable" onClick={fetchMore}>
+            {!activityFetching && `Load ${LIMIT} more`}
+            {activityFetching && '...'}
           </TextButton>
         </div>
       )}
@@ -149,40 +116,75 @@ export function Activity({
 }
 
 function CollateralAdded({
-  event,
-  debtIncreasedEvents,
+  activity,
   paprController,
 }: {
-  event: ArrayElement<ActivityByControllerQuery['addCollateralEvents']>;
-  debtIncreasedEvents: ActivityByControllerQuery['debtIncreasedEvents'];
+  activity: ActivityType;
   paprController: PaprController;
 }) {
-  const vaultOwner = useMemo(() => {
-    const vaultId = event.vault.id;
-    return vaultId.split('-')[1];
-  }, [event]);
+  const vault = useMemo(() => {
+    return activity.vault!;
+  }, [activity.vault]);
 
-  const debtIncreasedEvent = useMemo(() => {
-    return debtIncreasedEvents.find((e) => e.id === event.id);
-  }, [debtIncreasedEvents, event]);
+  const vaultOwner = useMemo(() => {
+    const vaultId = vault.id;
+    return vaultId.split('-')[1];
+  }, [vault.id]);
 
   const borrowedAmount = useMemo(() => {
-    if (!debtIncreasedEvent) return null;
+    if (!activity.amountBorrowed) return null;
     const bigNumAmount = ethers.utils.formatUnits(
-      debtIncreasedEvent?.amount,
+      activity.amountBorrowed,
       paprController.paprToken.decimals,
     );
     return (
       formatTokenAmount(parseFloat(bigNumAmount)) +
       ` ${paprController.paprToken.symbol}`
     );
-  }, [debtIncreasedEvent, paprController]);
+  }, [activity.amountBorrowed, paprController.paprToken]);
+
+  const collateralDescription = useMemo(() => {
+    if (activity.addedCollateral.length === 0) return '';
+    const baseString = `deposited ${vault.token.symbol}`;
+    const tokenIds = activity.addedCollateral
+      .map((collateral) => {
+        return `#${collateral.tokenId}`;
+      })
+      .join(', ');
+    return `${baseString} ${tokenIds}`;
+  }, [activity.addedCollateral, vault.token.symbol]);
+
+  const mintedDescription = useMemo(() => {
+    if (!borrowedAmount) return '';
+    if (!collateralDescription) return ` minted ${borrowedAmount}`;
+    if (!activity.amountIn) return ` and minted ${borrowedAmount}`;
+
+    const amountOutFormatted = formatBigNum(
+      activity.amountOut,
+      activity.tokenOut!.decimals,
+      3,
+    );
+    return ` minted ${borrowedAmount} and traded it for ${amountOutFormatted} ${
+      activity.tokenOut!.symbol
+    }`;
+  }, [
+    collateralDescription,
+    activity.amountIn,
+    borrowedAmount,
+    activity.tokenOut,
+    activity.amountOut,
+  ]);
+
+  const fullDescription = useMemo(
+    () => `${collateralDescription}${mintedDescription}`,
+    [collateralDescription, mintedDescription],
+  );
 
   return (
     <tr>
       <td>
-        <EtherscanTransactionLink transactionHash={event.id}>
-          {humanizedTimestamp(event.timestamp)}
+        <EtherscanTransactionLink transactionHash={activity.id}>
+          {humanizedTimestamp(activity.timestamp)}
         </EtherscanTransactionLink>
       </td>
       <td>
@@ -193,8 +195,7 @@ function CollateralAdded({
               displayType={DisplayAddressType.TRUNCATED}
             />
           </EtherscanAddressLink>{' '}
-          deposited {event.vault.token.symbol} #{event.collateral.tokenId} and
-          minted {borrowedAmount || 'nothing'}
+          {fullDescription}
         </span>
       </td>
     </tr>
@@ -202,67 +203,72 @@ function CollateralAdded({
 }
 
 function CollateralRemoved({
-  event,
+  activity,
   paprController,
-  debtDecreasedEvents,
-  subgraphPool,
 }: {
-  event: ArrayElement<ActivityByControllerQuery['removeCollateralEvents']>;
-  debtDecreasedEvents: ActivityByControllerQuery['debtDecreasedEvents'];
+  activity: ActivityType;
   paprController: PaprController;
-  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
 }) {
+  const vault = useMemo(() => {
+    return activity.vault!;
+  }, [activity.vault]);
+
   const vaultOwner = useMemo(() => {
-    const vaultId = event.vault.id;
+    const vaultId = vault.id;
     return vaultId.split('-')[1];
-  }, [event]);
+  }, [vault.id]);
 
-  const debtDecreasedEvent = useMemo(() => {
-    return debtDecreasedEvents.find((e) => e.id === event.id);
-  }, [debtDecreasedEvents, event]);
-
-  const returnedAmount = useMemo(() => {
-    if (!debtDecreasedEvent) {
-      return '';
-    }
+  const repaidAmount = useMemo(() => {
+    if (!activity.amountRepaid) return null;
     const bigNumAmount = ethers.utils.formatUnits(
-      debtDecreasedEvent?.amount,
-      paprController.token0IsUnderlying
-        ? subgraphPool.token0.decimals
-        : subgraphPool.token1.decimals,
+      activity.amountRepaid,
+      paprController.paprToken.decimals,
     );
     return (
       formatTokenAmount(parseFloat(bigNumAmount)) +
       ` ${paprController.paprToken.symbol}`
     );
-  }, [debtDecreasedEvent, paprController, subgraphPool]);
+  }, [activity.amountRepaid, paprController.paprToken]);
 
-  if (!debtDecreasedEvent) {
-    return (
-      <tr>
-        <td>
-          <EtherscanTransactionLink transactionHash={event.id}>
-            {humanizedTimestamp(event.timestamp)}
-          </EtherscanTransactionLink>
-        </td>
-        <td>
-          <span>
-            {event.vault.token.symbol} #{event.collateral.tokenId} transferred
-            to{' '}
-            <EtherscanAddressLink address={vaultOwner}>
-              {vaultOwner.substring(0, 8)}
-            </EtherscanAddressLink>{' '}
-          </span>
-        </td>
-      </tr>
+  const collateralDescription = useMemo(() => {
+    if (activity.removedCollateral.length === 0) return '';
+
+    const baseString = repaidAmount
+      ? ` and withdrew ${vault.token.symbol}`
+      : `withdrew ${vault.token.symbol}`;
+
+    const tokenIds = activity.removedCollateral
+      .map((collateral) => {
+        return `#${collateral.tokenId}`;
+      })
+      .join(', ');
+    return `${baseString} ${tokenIds}`;
+  }, [activity.removedCollateral, vault.token.symbol, repaidAmount]);
+
+  const repaidDescription = useMemo(() => {
+    if (!repaidAmount) return '';
+    if (!activity.amountIn) return ` repaid ${repaidAmount}`;
+
+    const amountInFormatted = formatBigNum(
+      activity.amountIn,
+      activity.amountIn.decimals,
+      3,
     );
-  }
+    return ` swapped ${amountInFormatted} ${
+      activity.tokenIn!.symbol
+    } to repay ${repaidAmount}`;
+  }, [activity.amountIn, repaidAmount, activity.tokenIn]);
+
+  const fullDescription = useMemo(
+    () => `${repaidDescription}${collateralDescription}`,
+    [collateralDescription, repaidDescription],
+  );
 
   return (
     <tr>
       <td>
-        <EtherscanTransactionLink transactionHash={event.id}>
-          {humanizedTimestamp(event.timestamp)}
+        <EtherscanTransactionLink transactionHash={activity.id}>
+          {humanizedTimestamp(activity.timestamp)}
         </EtherscanTransactionLink>
       </td>
       <td>
@@ -270,37 +276,35 @@ function CollateralRemoved({
           <EtherscanAddressLink address={vaultOwner}>
             {vaultOwner.substring(0, 8)}
           </EtherscanAddressLink>{' '}
-          repaid {returnedAmount} and withdrew {event.vault.token.symbol} #
-          {event.collateral.tokenId}
+          {fullDescription}
         </span>
       </td>
     </tr>
   );
 }
 
-function Swap({
-  event,
-  subgraphPool,
-}: {
-  event: ArrayElement<SwapsByPoolQuery['swaps']>;
-  subgraphPool: NonNullable<PoolByIdQuery['pool']>;
-}) {
+function Swap({ activity }: { activity: ActivityType }) {
   const description = useMemo(() => {
-    const amount0 = formatTokenAmount(Math.abs(event.amount0));
-    const amount1 = formatTokenAmount(Math.abs(event.amount1));
-    const token0Symbol = subgraphPool.token0.symbol;
-    const token1Symbol = subgraphPool.token1.symbol;
+    const amountInFormatted = formatBigNum(
+      ethers.BigNumber.from(activity.amountIn),
+      activity.tokenIn!.decimals,
+      3,
+    );
+    const amountOutFormatted = formatBigNum(
+      ethers.BigNumber.from(activity.amountOut),
+      activity.tokenOut!.decimals,
+      3,
+    );
 
-    if (event.amount0 < 0) {
-      return `${amount1} ${token1Symbol} traded for ${amount0} ${token0Symbol}`;
-    }
-    return `${amount0} ${token0Symbol} traded for ${amount1} ${token1Symbol}`;
-  }, [event, subgraphPool]);
+    return `${amountInFormatted} ${
+      activity.tokenIn!.symbol
+    } traded for ${amountOutFormatted} ${activity.tokenOut!.symbol}`;
+  }, [activity]);
   return (
     <tr>
       <td>
-        <EtherscanTransactionLink transactionHash={event.transaction.id}>
-          {humanizedTimestamp(event.timestamp)}
+        <EtherscanTransactionLink transactionHash={activity.id}>
+          {humanizedTimestamp(activity.timestamp)}
         </EtherscanTransactionLink>
       </td>
       <td>
@@ -310,52 +314,54 @@ function Swap({
   );
 }
 
-function AuctionStart({
-  event,
-}: {
-  event: ArrayElement<ActivityByControllerQuery['auctionStartEvents']>;
-}) {
-  const symbol = event.auction.auctionAssetContract.symbol;
+function AuctionStart({ activity }: { activity: ActivityType }) {
+  const symbol = useMemo(
+    () => activity.auctionCollateral!.symbol,
+    [activity.auctionCollateral],
+  );
 
   return (
     <tr>
       <td>
-        <EtherscanTransactionLink transactionHash={event.id}>
-          {humanizedTimestamp(event.timestamp)}
+        <EtherscanTransactionLink transactionHash={activity.id}>
+          {humanizedTimestamp(activity.timestamp)}
         </EtherscanTransactionLink>
       </td>
       <td>
-        Auction: {symbol} #{event.auction.auctionAssetID}
+        Auction: {symbol} #{activity.auctionTokenId}
       </td>
     </tr>
   );
 }
 
 function AuctionEnd({
-  event,
+  activity,
   paprController,
 }: {
-  event: ArrayElement<ActivityByControllerQuery['auctionEndEvents']>;
+  activity: ActivityType;
   paprController: PaprController;
 }) {
-  const symbol = event.auction.auctionAssetContract.symbol;
+  const symbol = useMemo(
+    () => activity.auctionCollateral!.symbol,
+    [activity.auctionCollateral],
+  );
   const formattedEndPrice = useMemo(() => {
     const endPrice = ethers.utils.formatUnits(
-      event.auction.endPrice,
+      ethers.BigNumber.from(activity.auctionEndPrice),
       paprController.paprToken.decimals,
     );
     return formatTokenAmount(parseFloat(endPrice));
-  }, [event, paprController]);
+  }, [activity, paprController.paprToken]);
 
   return (
     <tr>
       <td>
-        <EtherscanTransactionLink transactionHash={event.id}>
-          {humanizedTimestamp(event.timestamp)}
+        <EtherscanTransactionLink transactionHash={activity.id}>
+          {humanizedTimestamp(activity.timestamp)}
         </EtherscanTransactionLink>
       </td>
       <td>
-        Auction completed: {symbol} #{event.auction.auctionAssetID} for{' '}
+        Auction completed: {symbol} #{activity.auctionTokenId} for{' '}
         {formattedEndPrice} papr.
       </td>
     </tr>

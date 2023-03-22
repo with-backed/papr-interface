@@ -1,0 +1,39 @@
+fragment allActivityProperties on Activity {
+  id
+  timestamp
+  user
+  sqrtPricePool
+  amountBorrowed
+  amountRepaid
+  amountIn
+  amountOut
+  clientFeeBips
+  vault {
+    ...allVaultProperties
+  }
+  tokenIn {
+    ...allERC20Properties
+  }
+  tokenOut {
+    ...allERC20Properties
+  }
+  addedCollateral {
+    id
+    collateral {
+      id
+    }
+    tokenId
+  }
+  removedCollateral {
+    id
+    collateral {
+      id
+    }
+    tokenId
+  }
+  auctionCollateral {
+    ...allERC721Properties
+  }
+  auctionTokenId
+  auctionEndPrice
+}
