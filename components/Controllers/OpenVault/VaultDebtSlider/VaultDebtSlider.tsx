@@ -1,8 +1,10 @@
 import useResizeObserver from '@react-hook/resize-observer';
 import { Slider } from 'components/Slider';
+import { Tooltip, TooltipReference as TTR } from 'components/Tooltip';
 import { useTheme } from 'hooks/useTheme';
 import { formatPercent } from 'lib/numberFormat';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTooltipState } from 'reakit/Tooltip';
 
 import styles from '../VaultDebtPicker/VaultDebtPicker.module.css';
 
@@ -98,12 +100,12 @@ export function VaultDebtSlider({
       <Slider
         min={0}
         max={maxDebtNumber}
-        onChange={(val: number, _index: number) => {
+        onChange={(val: number) => {
           setHideLoanFormToggle(false);
           setControlledSliderValue(val);
           setIsBorrowing(val >= currentVaultDebtNumber);
         }}
-        onAfterChange={(val: number, _index: number) => {
+        onAfterChange={(val: number) => {
           if (typeof val === 'number') {
             handleChosenDebtChanged(val.toString());
           }
@@ -138,7 +140,7 @@ export function VaultDebtSlider({
             </>
           );
         }}
-        renderTrack={(props, _state) => {
+        renderTrack={(props) => {
           initBlackTrackWidth(`${props.style.left}px`);
           return <div {...props}></div>;
         }}
@@ -147,5 +149,32 @@ export function VaultDebtSlider({
         theme={theme}
       />
     </div>
+  );
+}
+
+type VaultDebtExplainerProps = {
+  daysToLiquidation: number;
+  liquidationTriggerPrice: string;
+};
+function VaultDebtExplainer({ daysToLiquidation }: VaultDebtExplainerProps) {
+  const currentLTVTooltip = useTooltipState();
+  const accruingInterestTooltip = useTooltipState();
+  const nftValueTooltip = useTooltipState();
+  return (
+    <>
+      <p>
+        Loan liquidates when <TTR {...currentLTVTooltip}>Current LTV</TTR>{' '}
+        (41.3%) reaches Max LTV (50%). This can happen by{' '}
+        <TTR {...accruingInterestTooltip}>accruing interest</TTR> or by a drop
+        in <TTR {...nftValueTooltip}>NFT value</TTR>.
+      </p>
+      <Tooltip {...currentLTVTooltip}>TODO</Tooltip>
+      <Tooltip {...accruingInterestTooltip}>
+        {daysToLiquidation === 0
+          ? 'The current interest rate is negative, and is not currently moving this loan closer to liquidation.'
+          : `Assuming today's interest rate and NFT price, interest charges will result in liquidation after ${daysToLiquidation} days.`}
+      </Tooltip>
+      <Tooltip {...nftValueTooltip}>TODO</Tooltip>
+    </>
   );
 }
