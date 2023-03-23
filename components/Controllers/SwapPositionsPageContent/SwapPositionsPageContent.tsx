@@ -213,6 +213,10 @@ export function SwapPositionsPageContent() {
         ($np - n_v) unrealized gain/loss:{' '}
         {(exitValue - (averagePurchased - averageSold)).toFixed(4)} ETH
       </div>
+      <div>
+        (($np/n_v) - 1) %:{' '}
+        {(exitValue / (averagePurchased - averageSold) - 1).toFixed(4)} ETH
+      </div>
     </>
   );
 }
