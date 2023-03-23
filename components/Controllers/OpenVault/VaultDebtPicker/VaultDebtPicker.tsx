@@ -50,7 +50,7 @@ import {
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
 
-import { VaultDebtExplainer } from './VaultDebtExplainer';
+import { VaultDebtExplainer } from '../VaultDebtExplainer';
 import styles from './VaultDebtPicker.module.css';
 
 type VaultDebtPickerProps = {
