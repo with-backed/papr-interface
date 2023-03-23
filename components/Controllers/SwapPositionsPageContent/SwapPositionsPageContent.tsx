@@ -206,7 +206,17 @@ export function SwapPositionsPageContent() {
             {exitValue.toFixed(4)} ETH gain/loss to close papr position
           </div>
         </div>
-        <div className={`col2 ${styles.column}`}>
+        <div className={`col2 ${styles.column} `}>
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+
+          <p> - </p>
+        </div>
+        <div className={`col3 ${styles.column}`}>
           <div>
             <div className={styles.green}>
               {/* <div>
@@ -233,10 +243,22 @@ export function SwapPositionsPageContent() {
             </div>
           </div>
         </div>
-        <div className={`col3 ${styles.column} `}>
-          <p>.</p>
-          <p>.</p>
-          <p>.</p>
+        <div className={`col4 ${styles.column} `}>
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <p> = </p>
+        </div>
+        <div className={`col5 ${styles.column} `}>
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
           <br />
           <div className={styles.yellow}>
             total unrealized gain/loss:{' '}

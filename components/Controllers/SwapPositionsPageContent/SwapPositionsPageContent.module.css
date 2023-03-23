@@ -1,6 +1,9 @@
 .netContent {
     display: inline-flex;
-    padding-right: 5%;
+}
+
+.column {
+    padding-right: 10px;
 }
 
 .blue {
