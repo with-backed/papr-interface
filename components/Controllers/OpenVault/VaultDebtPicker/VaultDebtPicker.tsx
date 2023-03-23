@@ -50,6 +50,7 @@ import {
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
 
+import { VaultDebtExplainer } from './VaultDebtExplainer';
 import styles from './VaultDebtPicker.module.css';
 
 type VaultDebtPickerProps = {
@@ -469,16 +470,19 @@ export function VaultDebtPicker({
       </Table>
       <div className={styles.slider}>
         {!!maxDebtPerNFTInPerpetual && maxDebt && (
-          <VaultDebtSlider
-            currentVaultDebtNumber={currentVaultDebtNumber}
-            maxDebtNumber={maxDebtNumber!}
-            controlledSliderValue={controlledSliderValue}
-            setControlledSliderValue={setControlledSliderValue}
-            handleChosenDebtChanged={handleChosenDebtChanged}
-            maxLTV={maxLTV}
-            setIsBorrowing={setIsBorrowing}
-            setHideLoanFormToggle={setHideLoanFormToggle}
-          />
+          <>
+            <VaultDebtSlider
+              currentVaultDebtNumber={currentVaultDebtNumber}
+              maxDebtNumber={maxDebtNumber!}
+              controlledSliderValue={controlledSliderValue}
+              setControlledSliderValue={setControlledSliderValue}
+              handleChosenDebtChanged={handleChosenDebtChanged}
+              maxLTV={maxLTV}
+              setIsBorrowing={setIsBorrowing}
+              setHideLoanFormToggle={setHideLoanFormToggle}
+            />
+            <VaultDebtExplainer />
+          </>
         )}
       </div>
       <div className={styles.editLoanPreviewWrapper}>
