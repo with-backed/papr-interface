@@ -1,0 +1,25 @@
+.netContent {
+    display: inline-flex;
+    padding-right: 5%;
+}
+
+.blue {
+    background-color: lightblue;
+}
+
+.green {
+    background-color: limegreen;
+}
+
+.orange {
+    background-color: lightcoral;
+}
+
+.pink {
+    background-color: lightpink;
+}
+
+.yellow {
+    background-color: lightyellow;
+    vertical-align: bottom;
+}

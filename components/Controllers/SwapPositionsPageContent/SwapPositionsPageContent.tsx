@@ -14,6 +14,8 @@ import {
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
 
+import styles from './SwapPositionsPageContent.module.css';
+
 export function SwapPositionsPageContent() {
   const { address } = useAccount();
   const { chainId } = useConfig();
@@ -189,33 +191,59 @@ export function SwapPositionsPageContent() {
       </div>
       <br />
 
-      <div>(s) total papr sold: {amountSold.toFixed(4)} papr</div>
-      <div>(s_p) average sale price: {averageSalePrice.toFixed(4)} ETH</div>
-      <div> (s_v) total ETH from sales: {averageSold.toFixed(4)} ETH</div>
-      <div>(p) total papr purchased: {amountPurchased.toFixed(4)} papr</div>
-      <div>
-        (p_p) average purchase price: {averagePurchasePrice.toFixed(4)} ETH
-      </div>
-      <div>
-        (p_v) total ETH spent on purchases: {averagePurchased.toFixed(4)} ETH
-      </div>
-      <div>(np = p - s) net papr: {netPapr.toFixed(4)} papr</div>
-      <div>
-        (n_v = p_v - s_v) net ETH: {(averagePurchased - averageSold).toFixed(4)}{' '}
-        ETH
-      </div>
-      <div>($p) current papr price: {price} ETH</div>
-      <div>
-        ($np = np * $p) market value of net papr: {exitValue.toFixed(4)} ETH
-      </div>
-      {/* <div>($np - p_v) (old) magic number: {magicNumber.toFixed(4)} ETH</div> */}
-      <div>
-        ($np - n_v) unrealized gain/loss:{' '}
-        {(exitValue - (averagePurchased - averageSold)).toFixed(4)} ETH
-      </div>
-      <div>
-        (($np/n_v) - 1) %:{' '}
-        {(exitValue / (averagePurchased - averageSold) - 1).toFixed(4)} ETH
+      <div className={styles.netContent}>
+        <div className={`${styles.col1} ${styles.column}`}>
+          <div className={styles.blue}>
+            <div>papr bought - papr sold: {netPapr.toFixed(4)} papr</div>
+          </div>
+          <p>*</p>
+          <div className={styles.blue}>
+            <div>current papr price: {price} ETH</div>
+          </div>
+
+          <p>=</p>
+          <div className={styles.blue}>
+            {exitValue.toFixed(4)} ETH gain/loss to close papr position
+          </div>
+        </div>
+        <div className={`col2 ${styles.column}`}>
+          <div>
+            <div className={styles.green}>
+              {/* <div>
+                {' '}
+                {amountPurchased.toFixed(4)} papr purchased *{' '}
+                {averagePurchasePrice.toFixed(4)} ETH weighted avg. price
+              </div> */}
+              <div> {averagePurchased.toFixed(4)} ETH spent on papr</div>
+            </div>
+            <p>-</p>
+            <div className={styles.orange}>
+              {/* <div>
+                {' '}
+                {amountSold.toFixed(4)} papr sold *{' '}
+                {averageSalePrice.toFixed(4)} ETH weighted avg. price
+              </div> */}
+              <div>{averageSold.toFixed(4)} ETH gained from papr sales</div>
+            </div>
+            <p>=</p>
+            <div className={styles.pink}>
+              <div>
+                {(averagePurchased - averageSold).toFixed(4)} net ETH realized
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={`col3 ${styles.column} `}>
+          <p>.</p>
+          <p>.</p>
+          <p>.</p>
+          <br />
+          <div className={styles.yellow}>
+            total unrealized gain/loss:{' '}
+            {(exitValue - (averagePurchased - averageSold)).toFixed(4)} ETH (
+            {(exitValue / (averagePurchased - averageSold) - 1).toFixed(4)} %)
+          </div>
+        </div>
       </div>
     </>
   );
