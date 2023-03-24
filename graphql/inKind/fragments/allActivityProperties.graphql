@@ -36,4 +36,9 @@ fragment allActivityProperties on Activity {
   }
   auctionTokenId
   auctionEndPrice
+  totalLiquidityAdded
+  liquidityAdded0
+  liquidityAdded1
+  positionTickUpper
+  positionTickLower
 }
