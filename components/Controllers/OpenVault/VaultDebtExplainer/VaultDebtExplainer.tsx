@@ -1,17 +1,26 @@
 import { Tooltip, TooltipReference as TTR } from 'components/Tooltip';
+import { ethers } from 'ethers';
 import { formatPercent } from 'lib/numberFormat';
 import { useTooltipState } from 'reakit/Tooltip';
 
 import styles from './VaultDebtExplainer.module.css';
 
-export function VaultDebtExplainer() {
+type VaultDebtExplainerProps = {
+  maxLTV: number;
+  chosenLTV: number;
+  chosenDebt: ethers.BigNumber;
+};
+
+export function VaultDebtExplainer({
+  chosenDebt,
+  chosenLTV,
+  maxLTV,
+}: VaultDebtExplainerProps) {
   const currentLTVTooltip = useTooltipState();
   const accruingInterestTooltip = useTooltipState();
   const nftValueTooltip = useTooltipState();
 
   // placeholder variables (will become props/calculations)
-  const currentLTV = 0.25;
-  const maxLTV = 0.5;
   const daysToLiquidation = 199;
   const liquidationTriggerPrice = '0.455 ETH';
   const formattedDebtNow = '0.144 ETH';
@@ -22,7 +31,7 @@ export function VaultDebtExplainer() {
     <>
       <p>
         Loan liquidates when <TTR {...currentLTVTooltip}>Current LTV</TTR> (
-        {formatPercent(currentLTV)}) reaches Max LTV ({formatPercent(maxLTV)}).
+        {formatPercent(chosenLTV)}) reaches Max LTV ({formatPercent(maxLTV)}).
         This can happen by{' '}
         <TTR {...accruingInterestTooltip}>accruing interest</TTR> or by a drop
         in <TTR {...nftValueTooltip}>NFT value</TTR>.
