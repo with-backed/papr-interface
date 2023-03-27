@@ -3,6 +3,7 @@ fragment allActivityProperties on Activity {
   timestamp
   user
   sqrtPricePool
+  tickCurrent
   amountBorrowed
   amountRepaid
   amountIn
@@ -37,6 +38,9 @@ fragment allActivityProperties on Activity {
   auctionTokenId
   auctionEndPrice
   totalLiquidityAdded
+  totalLiquidity0
+  totalLiquidity1
+  liquidityAdded
   liquidityAdded0
   liquidityAdded1
   positionTickUpper

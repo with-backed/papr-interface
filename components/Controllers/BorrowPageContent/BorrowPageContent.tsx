@@ -1,13 +1,16 @@
 import controllerStyles from 'components/Controllers/Controller.module.css';
 import { getAddress } from 'ethers/lib/utils';
 import { useAccountNFTs } from 'hooks/useAccountNFTs';
+import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePaprBalance } from 'hooks/usePaprBalance';
+import { SupportedToken } from 'lib/config';
 import { OraclePriceType } from 'lib/oracle/reservoir';
+import { lpActivityForUser } from 'lib/pAPRSubgraph';
 import dynamic from 'next/dynamic';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useAccount } from 'wagmi';
 
 const YourPositions = dynamic(() =>
@@ -23,9 +26,18 @@ const VaultDebtPicker = dynamic(() =>
 );
 
 export function BorrowPageContent() {
+  const config = useConfig();
   const paprController = useController();
   const { address } = useAccount();
   const oracleInfo = useOracleInfo(OraclePriceType.lower);
+
+  useEffect(() => {
+    lpActivityForUser(
+      paprController,
+      '0x82c1B61dA09b5FDce098a212Bb8070210AB91049'.toLowerCase(),
+      config.tokenName as SupportedToken,
+    );
+  });
 
   const collateralContractAddresses = useMemo(() => {
     return paprController.allowedCollateral.map((ac) => ac.token.id);

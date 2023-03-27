@@ -49,7 +49,7 @@ function activityIsAuctionEnd(activity: ActivityType) {
 }
 
 function activityIsLPModified(activity: ActivityType) {
-  return !!activity.totalLiquidityAdded;
+  return !!activity.liquidityAdded;
 }
 
 export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
@@ -388,8 +388,8 @@ function LPModified({
   paprController: PaprController;
 }) {
   const isLiquidityRemoved = useMemo(() => {
-    return ethers.BigNumber.from(activity.totalLiquidityAdded!).lt(0);
-  }, [activity.totalLiquidityAdded]);
+    return ethers.BigNumber.from(activity.liquidityAdded!).lt(0);
+  }, [activity.liquidityAdded]);
 
   const formattedPaprAdded = useMemo(() => {
     if (paprController.token0IsUnderlying) {

@@ -1,0 +1,13 @@
+query lpActivityByControllerAndAccount($controllerId: String, $account: Bytes) {
+  activities(
+    where: {
+      controller: $controllerId
+      user: $account
+      totalLiquidityAdded_not: null
+    }
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    ...allActivityProperties
+  }
+}
