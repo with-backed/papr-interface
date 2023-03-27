@@ -50,6 +50,7 @@ import {
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
 
+import { VaultDebtExplainer } from '../VaultDebtExplainer';
 import styles from './VaultDebtPicker.module.css';
 
 type VaultDebtPickerProps = {
@@ -468,17 +469,26 @@ export function VaultDebtPicker({
         </tbody>
       </Table>
       <div className={styles.slider}>
-        {!!maxDebtPerNFTInPerpetual && maxDebt && (
-          <VaultDebtSlider
-            currentVaultDebtNumber={currentVaultDebtNumber}
-            maxDebtNumber={maxDebtNumber!}
-            controlledSliderValue={controlledSliderValue}
-            setControlledSliderValue={setControlledSliderValue}
-            handleChosenDebtChanged={handleChosenDebtChanged}
-            maxLTV={maxLTV}
-            setIsBorrowing={setIsBorrowing}
-            setHideLoanFormToggle={setHideLoanFormToggle}
-          />
+        {!!maxDebtPerNFTInPerpetual && maxDebtNumber && (
+          <>
+            <VaultDebtSlider
+              currentVaultDebtNumber={currentVaultDebtNumber}
+              maxDebtNumber={maxDebtNumber}
+              controlledSliderValue={controlledSliderValue}
+              setControlledSliderValue={setControlledSliderValue}
+              handleChosenDebtChanged={handleChosenDebtChanged}
+              maxLTV={maxLTV}
+              setIsBorrowing={setIsBorrowing}
+              setHideLoanFormToggle={setHideLoanFormToggle}
+            />
+            <VaultDebtExplainer
+              maxLTV={maxLTV}
+              chosenDebt={controlledSliderValue}
+              maxDebt={maxDebtNumber}
+              collateralCount={numCollateralForMaxDebt}
+              collateralContractAddress={collateralContractAddress}
+            />
+          </>
         )}
       </div>
       <div className={styles.editLoanPreviewWrapper}>

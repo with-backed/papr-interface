@@ -98,12 +98,12 @@ export function VaultDebtSlider({
       <Slider
         min={0}
         max={maxDebtNumber}
-        onChange={(val: number, _index: number) => {
+        onChange={(val: number) => {
           setHideLoanFormToggle(false);
           setControlledSliderValue(val);
           setIsBorrowing(val >= currentVaultDebtNumber);
         }}
-        onAfterChange={(val: number, _index: number) => {
+        onAfterChange={(val: number) => {
           if (typeof val === 'number') {
             handleChosenDebtChanged(val.toString());
           }
@@ -138,7 +138,7 @@ export function VaultDebtSlider({
             </>
           );
         }}
-        renderTrack={(props, _state) => {
+        renderTrack={(props) => {
           initBlackTrackWidth(`${props.style.left}px`);
           return <div {...props}></div>;
         }}

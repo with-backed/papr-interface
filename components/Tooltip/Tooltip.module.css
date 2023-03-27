@@ -6,3 +6,8 @@
   max-width: 550px;
   line-height: 22px;
 }
+
+.reference {
+  border-bottom: 1px black dashed;
+  cursor: help;
+}
