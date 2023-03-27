@@ -201,9 +201,9 @@ export function VaultDebtExplainer({
       </Tooltip>
 
       <Tooltip {...nftValueTooltip}>
-        If contract&apos;s valuation of the collateral drops below{' '}
-        {liquidationTriggerPrice}, this loan will be liquidated at auction to
-        cover the debt.
+        If contract&apos;s valuation of the collateral drops to{' '}
+        {liquidationTriggerPrice} or below, this loan will be liquidated at
+        auction to cover the debt.
       </Tooltip>
     </>
   );
