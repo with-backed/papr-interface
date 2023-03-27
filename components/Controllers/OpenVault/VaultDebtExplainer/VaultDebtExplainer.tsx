@@ -1,31 +1,99 @@
 import { Tooltip, TooltipReference as TTR } from 'components/Tooltip';
 import { ethers } from 'ethers';
-import { formatPercent } from 'lib/numberFormat';
+import { useController } from 'hooks/useController';
+import { useOracleInfo } from 'hooks/useOracleInfo';
+import { useTarget } from 'hooks/useTarget';
+import {
+  formatPercent,
+  formatPercentChange,
+  formatTokenAmount,
+} from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { percentChange } from 'lib/tokenPerformance';
+import { useMemo } from 'react';
 import { useTooltipState } from 'reakit/Tooltip';
 
 import styles from './VaultDebtExplainer.module.css';
 
 type VaultDebtExplainerProps = {
   maxLTV: number;
-  chosenLTV: number;
-  chosenDebt: ethers.BigNumber;
+  maxDebt: number;
+  chosenDebt: number;
+  collateralCount: number;
+  collateralContractAddress: string;
 };
 
 export function VaultDebtExplainer({
   chosenDebt,
-  chosenLTV,
+  maxDebt,
   maxLTV,
+  collateralCount,
+  collateralContractAddress,
 }: VaultDebtExplainerProps) {
+  const { paprToken, underlying } = useController();
+  const targetNow = useTarget();
+  const targetYesterday = useTarget('yesterday');
   const currentLTVTooltip = useTooltipState();
   const accruingInterestTooltip = useTooltipState();
   const nftValueTooltip = useTooltipState();
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
+
+  const chosenLTV = useMemo(
+    () => Math.min((chosenDebt / maxDebt) * maxLTV, maxLTV),
+    [chosenDebt, maxDebt, maxLTV],
+  );
+
+  const debtNow = useMemo(
+    () =>
+      targetNow
+        ? chosenDebt *
+          parseFloat(
+            ethers.utils.formatUnits(targetNow.target, paprToken.decimals),
+          )
+        : 0,
+    [chosenDebt, paprToken, targetNow],
+  );
+
+  const debtYesterday = useMemo(
+    () =>
+      targetYesterday
+        ? chosenDebt *
+          parseFloat(
+            ethers.utils.formatUnits(
+              targetYesterday.target,
+              paprToken.decimals,
+            ),
+          )
+        : 0,
+    [chosenDebt, paprToken, targetYesterday],
+  );
+
+  const formattedDebtNow = useMemo(
+    () =>
+      debtNow > 0
+        ? `${formatTokenAmount(debtNow)} ${underlying.symbol}`
+        : '...',
+    [debtNow, underlying],
+  );
+
+  const debtPercentChange = useMemo(
+    () => formatPercentChange(percentChange(debtYesterday, debtNow)),
+    [debtNow, debtYesterday],
+  );
+
+  const collateralValue = useMemo(() => {
+    if (oracleInfo && oracleInfo[collateralContractAddress]) {
+      const collectionPrice = oracleInfo[collateralContractAddress].price;
+      return `${formatTokenAmount(collectionPrice * collateralCount)} ${
+        underlying.symbol
+      }`;
+    }
+    return '...';
+  }, [collateralContractAddress, collateralCount, oracleInfo, underlying]);
 
   // placeholder variables (will become props/calculations)
   const daysToLiquidation = 199;
   const liquidationTriggerPrice = '0.455 ETH';
-  const formattedDebtNow = '0.144 ETH';
-  const debtPercentChange = '+0.12%';
-  const collateralValue = '0.327 ETH';
 
   return (
     <>

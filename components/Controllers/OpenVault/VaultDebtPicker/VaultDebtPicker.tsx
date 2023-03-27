@@ -469,11 +469,11 @@ export function VaultDebtPicker({
         </tbody>
       </Table>
       <div className={styles.slider}>
-        {!!maxDebtPerNFTInPerpetual && maxDebt && (
+        {!!maxDebtPerNFTInPerpetual && maxDebtNumber && (
           <>
             <VaultDebtSlider
               currentVaultDebtNumber={currentVaultDebtNumber}
-              maxDebtNumber={maxDebtNumber!}
+              maxDebtNumber={maxDebtNumber}
               controlledSliderValue={controlledSliderValue}
               setControlledSliderValue={setControlledSliderValue}
               handleChosenDebtChanged={handleChosenDebtChanged}
@@ -481,7 +481,13 @@ export function VaultDebtPicker({
               setIsBorrowing={setIsBorrowing}
               setHideLoanFormToggle={setHideLoanFormToggle}
             />
-            <VaultDebtExplainer />
+            <VaultDebtExplainer
+              maxLTV={maxLTV}
+              chosenDebt={controlledSliderValue}
+              maxDebt={maxDebtNumber}
+              collateralCount={numCollateralForMaxDebt}
+              collateralContractAddress={collateralContractAddress}
+            />
           </>
         )}
       </div>
