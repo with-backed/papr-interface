@@ -48,6 +48,10 @@ function activityIsAuctionEnd(activity: ActivityType) {
   return !!activity.auctionTokenId && !!activity.auctionEndPrice;
 }
 
+function activityIsLPModified(activity: ActivityType) {
+  return !!activity.totalLiquidityAdded;
+}
+
 export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
   const paprController = useController();
 
@@ -99,6 +103,14 @@ export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
               );
             } else if (activityIsSwap(activity) && showSwaps) {
               return <Swap key={activity.id} activity={activity} />;
+            } else if (activityIsLPModified(activity)) {
+              return (
+                <LPModified
+                  key={activity.id}
+                  activity={activity}
+                  paprController={paprController}
+                />
+              );
             }
           })}
         </tbody>
@@ -363,6 +375,77 @@ function AuctionEnd({
       <td>
         Auction completed: {symbol} #{activity.auctionTokenId} for{' '}
         {formattedEndPrice} papr.
+      </td>
+    </tr>
+  );
+}
+
+function LPModified({
+  activity,
+  paprController,
+}: {
+  activity: ActivityType;
+  paprController: PaprController;
+}) {
+  const isLiquidityRemoved = useMemo(() => {
+    return ethers.BigNumber.from(activity.totalLiquidityAdded!).lt(0);
+  }, [activity.totalLiquidityAdded]);
+
+  const formattedPaprAdded = useMemo(() => {
+    if (paprController.token0IsUnderlying) {
+      return formatBigNum(
+        ethers.BigNumber.from(activity.liquidityAdded1!),
+        paprController.paprToken.decimals,
+        3,
+      );
+    } else {
+      return formatBigNum(
+        ethers.BigNumber.from(activity.liquidityAdded0!),
+        paprController.paprToken.decimals,
+        3,
+      );
+    }
+  }, [
+    activity.liquidityAdded0,
+    activity.liquidityAdded1,
+    paprController.paprToken.decimals,
+    paprController.token0IsUnderlying,
+  ]);
+  const formattedUnderlyingAdded = useMemo(() => {
+    if (paprController.token0IsUnderlying) {
+      return formatBigNum(
+        ethers.BigNumber.from(activity.liquidityAdded0!),
+        paprController.underlying.decimals,
+        3,
+      );
+    } else {
+      return formatBigNum(
+        ethers.BigNumber.from(activity.liquidityAdded1!),
+        paprController.underlying.decimals,
+        3,
+      );
+    }
+  }, [
+    activity.liquidityAdded0,
+    activity.liquidityAdded1,
+    paprController.underlying.decimals,
+    paprController.token0IsUnderlying,
+  ]);
+
+  return (
+    <tr>
+      <td>
+        <EtherscanTransactionLink transactionHash={activity.id}>
+          {humanizedTimestamp(activity.timestamp)}
+        </EtherscanTransactionLink>
+      </td>
+      <td>
+        <EtherscanAddressLink address={activity.user}>
+          {activity.user.substring(0, 8)}
+        </EtherscanAddressLink>{' '}
+        {isLiquidityRemoved ? 'removed' : 'added '} liquidity:{' '}
+        {formattedPaprAdded} {paprController.paprToken.symbol} and{' '}
+        {formattedUnderlyingAdded} {paprController.underlying.symbol}
       </td>
     </tr>
   );
