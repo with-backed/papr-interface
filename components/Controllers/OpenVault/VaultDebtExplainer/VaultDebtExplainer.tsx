@@ -1,8 +1,10 @@
 import { Tooltip, TooltipReference as TTR } from 'components/Tooltip';
+import dayjs from 'dayjs';
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useOracleInfo } from 'hooks/useOracleInfo';
 import { useTarget } from 'hooks/useTarget';
+import { SECONDS_IN_A_YEAR } from 'lib/constants';
 import {
   formatPercent,
   formatPercentChange,
@@ -30,8 +32,9 @@ export function VaultDebtExplainer({
   collateralCount,
   collateralContractAddress,
 }: VaultDebtExplainerProps) {
-  const { paprToken, underlying } = useController();
-  const targetNow = useTarget();
+  const { paprToken, underlying, currentTarget, currentTargetUpdated } =
+    useController();
+  const newTargetResult = useTarget();
   const targetYesterday = useTarget('yesterday');
   const currentLTVTooltip = useTooltipState();
   const accruingInterestTooltip = useTooltipState();
@@ -43,15 +46,27 @@ export function VaultDebtExplainer({
     [chosenDebt, maxDebt, maxLTV],
   );
 
-  const debtNow = useMemo(
+  const underlyingSymbol = useMemo(
+    () => (underlying.symbol === 'WETH' ? 'ETH' : underlying.symbol),
+    [underlying],
+  );
+
+  const newTargetNumber = useMemo(
     () =>
-      targetNow
-        ? chosenDebt *
-          parseFloat(
-            ethers.utils.formatUnits(targetNow.target, paprToken.decimals),
+      newTargetResult
+        ? parseFloat(
+            ethers.utils.formatUnits(
+              newTargetResult.target,
+              paprToken.decimals,
+            ),
           )
-        : 0,
-    [chosenDebt, paprToken, targetNow],
+        : null,
+    [paprToken, newTargetResult],
+  );
+
+  const debtNow = useMemo(
+    () => (newTargetNumber ? chosenDebt * newTargetNumber : 0),
+    [chosenDebt, newTargetNumber],
   );
 
   const debtYesterday = useMemo(
@@ -70,10 +85,8 @@ export function VaultDebtExplainer({
 
   const formattedDebtNow = useMemo(
     () =>
-      debtNow > 0
-        ? `${formatTokenAmount(debtNow)} ${underlying.symbol}`
-        : '...',
-    [debtNow, underlying],
+      debtNow > 0 ? `${formatTokenAmount(debtNow)} ${underlyingSymbol}` : '...',
+    [debtNow, underlyingSymbol],
   );
 
   const debtPercentChange = useMemo(
@@ -84,16 +97,77 @@ export function VaultDebtExplainer({
   const collateralValue = useMemo(() => {
     if (oracleInfo && oracleInfo[collateralContractAddress]) {
       const collectionPrice = oracleInfo[collateralContractAddress].price;
-      return `${formatTokenAmount(collectionPrice * collateralCount)} ${
-        underlying.symbol
-      }`;
+      return `${formatTokenAmount(
+        collectionPrice * collateralCount,
+      )} ${underlyingSymbol}`;
     }
     return '...';
-  }, [collateralContractAddress, collateralCount, oracleInfo, underlying]);
+  }, [
+    collateralContractAddress,
+    collateralCount,
+    oracleInfo,
+    underlyingSymbol,
+  ]);
 
-  // placeholder variables (will become props/calculations)
-  const daysToLiquidation = 199;
-  const liquidationTriggerPrice = '0.455 ETH';
+  const liquidationTriggerPrice = useMemo(() => {
+    if (!newTargetNumber) {
+      return '...';
+    }
+    const amount = (chosenDebt * newTargetNumber) / maxLTV;
+    return `${formatTokenAmount(amount)} ${underlyingSymbol}`;
+  }, [chosenDebt, maxLTV, newTargetNumber, underlyingSymbol]);
+
+  const currentTargetNumber = useMemo(() => {
+    return parseFloat(
+      ethers.utils.formatUnits(currentTarget, underlying.decimals),
+    );
+  }, [currentTarget, underlying.decimals]);
+
+  const contractAPR = useMemo(() => {
+    if (!newTargetResult || !newTargetNumber) {
+      return null;
+    }
+    const change = percentChange(currentTargetNumber, newTargetNumber);
+    // convert to APR
+    return (
+      (change / (newTargetResult.timestamp - currentTargetUpdated)) *
+      SECONDS_IN_A_YEAR
+    );
+  }, [
+    newTargetNumber,
+    currentTargetUpdated,
+    currentTargetNumber,
+    newTargetResult,
+  ]);
+
+  const daysToLiquidation = useMemo(() => {
+    if (
+      oracleInfo &&
+      oracleInfo[collateralContractAddress] &&
+      newTargetNumber &&
+      contractAPR
+    ) {
+      const collectionPrice = oracleInfo[collateralContractAddress].price;
+      const collateralValue = collectionPrice * collateralCount;
+      const hypotheticalTarget = (collateralValue * maxLTV) / chosenDebt;
+      const percentDiff =
+        (hypotheticalTarget - newTargetNumber) / newTargetNumber;
+      const yearsToLiquidation = dayjs.duration({
+        years: percentDiff / contractAPR,
+      });
+      return yearsToLiquidation.asDays();
+    }
+
+    return null;
+  }, [
+    chosenDebt,
+    collateralContractAddress,
+    collateralCount,
+    contractAPR,
+    maxLTV,
+    oracleInfo,
+    newTargetNumber,
+  ]);
 
   return (
     <>
@@ -123,9 +197,7 @@ export function VaultDebtExplainer({
       </Tooltip>
 
       <Tooltip {...accruingInterestTooltip}>
-        {daysToLiquidation === 0
-          ? 'The current interest rate is negative, and is not currently moving this loan closer to liquidation.'
-          : `Assuming today's interest rate and NFT price, interest charges will result in liquidation after ${daysToLiquidation} days.`}
+        {daysToLiquidationMessage(daysToLiquidation)}
       </Tooltip>
 
       <Tooltip {...nftValueTooltip}>
@@ -135,4 +207,13 @@ export function VaultDebtExplainer({
       </Tooltip>
     </>
   );
+}
+
+function daysToLiquidationMessage(daysToLiquidation: number | null) {
+  if (daysToLiquidation === null) {
+    return '...';
+  }
+  return daysToLiquidation <= 0
+    ? 'The current interest rate is negative, and is not currently moving this loan closer to liquidation.'
+    : `Assuming today's interest rate and NFT price, interest charges will result in liquidation after ${daysToLiquidation} days.`;
 }
