@@ -37,12 +37,14 @@ fragment allActivityProperties on Activity {
   }
   auctionTokenId
   auctionEndPrice
-  totalLiquidityAdded
-  totalLiquidity0
-  totalLiquidity1
-  liquidityAdded
-  liquidityAdded0
-  liquidityAdded1
-  positionTickUpper
-  positionTickLower
+  cumulativeLiquidity
+  cumulativeToken0
+  cumulativeToken1
+  liquidityDelta
+  token0Delta
+  token1Delta
+  uniswapLiquidityPosition {
+    tickLower
+    tickUpper
+  }
 }

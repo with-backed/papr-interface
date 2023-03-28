@@ -196,8 +196,8 @@ export function computeDeltasFromActivity(
   controller: PaprController,
   chainId: number,
 ): [ethers.BigNumber, ethers.BigNumber] {
-  const amount0Added = ethers.BigNumber.from(activity.totalLiquidity0!);
-  const amount1Added = ethers.BigNumber.from(activity.totalLiquidity1!);
+  const amount0Added = ethers.BigNumber.from(activity.cumulativeToken0!);
+  const amount1Added = ethers.BigNumber.from(activity.cumulativeToken1!);
 
   const token0 = controller.token0IsUnderlying
     ? erc20TokenToToken(controller.underlying, chainId)
@@ -211,17 +211,17 @@ export function computeDeltasFromActivity(
     token0,
     ethers.BigNumber.from(activity.sqrtPricePool!),
     activity.tickCurrent!,
-    activity.positionTickLower!,
-    activity.positionTickUpper!,
-    ethers.BigNumber.from(activity.totalLiquidityAdded!),
+    activity.uniswapLiquidityPosition!.tickLower,
+    activity.uniswapLiquidityPosition!.tickUpper,
+    ethers.BigNumber.from(activity.cumulativeLiquidity!),
   );
   const currentAmount1 = getAmount1FromLPStats(
     token1,
     ethers.BigNumber.from(activity.sqrtPricePool!),
     activity.tickCurrent!,
-    activity.positionTickLower!,
-    activity.positionTickUpper!,
-    ethers.BigNumber.from(activity.totalLiquidityAdded!),
+    activity.uniswapLiquidityPosition!.tickLower,
+    activity.uniswapLiquidityPosition!.tickUpper,
+    ethers.BigNumber.from(activity.cumulativeLiquidity!),
   );
 
   return [currentAmount0.sub(amount0Added), currentAmount1.sub(amount1Added)];

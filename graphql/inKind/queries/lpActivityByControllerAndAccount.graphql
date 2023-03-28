@@ -3,7 +3,7 @@ query lpActivityByControllerAndAccount($controllerId: String, $account: Bytes) {
     where: {
       controller: $controllerId
       user: $account
-      liquidityAdded_not: null
+      liquidityDelta_not: null
     }
     orderBy: timestamp
     orderDirection: desc
