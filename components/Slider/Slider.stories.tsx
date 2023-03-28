@@ -35,21 +35,3 @@ export const Sliders = () => (
     ))}
   </Wrapper>
 );
-
-export const DangerSliders = () => (
-  <Wrapper>
-    {buttonThemes.map((theme) => (
-      <Slider
-        key={theme}
-        min={0}
-        max={50}
-        renderThumb={(props) => <div {...props}></div>}
-        renderTrack={(props) => <div {...props}></div>}
-        blackTrackWidth={'50px'}
-        hideBlackTrack
-        value={45}
-        theme={theme}
-      />
-    ))}
-  </Wrapper>
-);
