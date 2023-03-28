@@ -35,10 +35,6 @@
 .track.trash {
   background: url('../../public/slider-tile-mask.svg'), var(--paprTRASH-50);
 }
-.track.danger {
-  background: url('../../public/slider-tile-mask.svg'),
-    var(--highlight-alert-100);
-}
 
 /* The track comes in 2 parts. This selects everything _but_ the first element
    with a track classname (i.e., it just selects the second part) and dims it.
@@ -68,9 +64,6 @@
 }
 .thumb.trash:before {
   content: url('../../public/grabber-trash.svg');
-}
-.thumb.danger:before {
-  content: url('../../public/grabber-danger.svg');
 }
 
 .thumb > div {
