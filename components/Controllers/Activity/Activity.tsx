@@ -49,7 +49,7 @@ function activityIsAuctionEnd(activity: ActivityType) {
 }
 
 function activityIsLPModified(activity: ActivityType) {
-  return !!activity.totalLiquidityAdded;
+  return !!activity.liquidityDelta;
 }
 
 export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
@@ -388,46 +388,46 @@ function LPModified({
   paprController: PaprController;
 }) {
   const isLiquidityRemoved = useMemo(() => {
-    return ethers.BigNumber.from(activity.totalLiquidityAdded!).lt(0);
-  }, [activity.totalLiquidityAdded]);
+    return ethers.BigNumber.from(activity.liquidityDelta!).lt(0);
+  }, [activity.liquidityDelta]);
 
   const formattedPaprAdded = useMemo(() => {
     if (paprController.token0IsUnderlying) {
       return formatBigNum(
-        ethers.BigNumber.from(activity.liquidityAdded1!),
+        ethers.BigNumber.from(activity.token1Delta!),
         paprController.paprToken.decimals,
         3,
       );
     } else {
       return formatBigNum(
-        ethers.BigNumber.from(activity.liquidityAdded0!),
+        ethers.BigNumber.from(activity.token0Delta!),
         paprController.paprToken.decimals,
         3,
       );
     }
   }, [
-    activity.liquidityAdded0,
-    activity.liquidityAdded1,
+    activity.token0Delta,
+    activity.token1Delta,
     paprController.paprToken.decimals,
     paprController.token0IsUnderlying,
   ]);
   const formattedUnderlyingAdded = useMemo(() => {
     if (paprController.token0IsUnderlying) {
       return formatBigNum(
-        ethers.BigNumber.from(activity.liquidityAdded0!),
+        ethers.BigNumber.from(activity.token0Delta!),
         paprController.underlying.decimals,
         3,
       );
     } else {
       return formatBigNum(
-        ethers.BigNumber.from(activity.liquidityAdded1!),
+        ethers.BigNumber.from(activity.token1Delta!),
         paprController.underlying.decimals,
         3,
       );
     }
   }, [
-    activity.liquidityAdded0,
-    activity.liquidityAdded1,
+    activity.token0Delta,
+    activity.token1Delta,
     paprController.underlying.decimals,
     paprController.token0IsUnderlying,
   ]);
