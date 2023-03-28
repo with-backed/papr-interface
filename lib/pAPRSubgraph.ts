@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { PaprController } from 'hooks/useController';
 import {
   AuctionDocument,
@@ -14,7 +13,6 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 
 import { configs, SupportedToken } from './config';
-import { computeDeltasFromActivity } from './controllers/uniswap';
 import { SubgraphController } from './PaprController';
 import { clientFromUrl } from './urql';
 
@@ -112,23 +110,6 @@ export async function lpActivityForUser(
     console.error(error);
     return [];
   }
-
-  console.log({
-    data: data?.activities,
-  });
-
-  const deltas = computeDeltasFromActivity(
-    data!.activities[0],
-    controller,
-    configs[token].chainId,
-  );
-
-  console.log({
-    deltas: [
-      ethers.utils.formatUnits(deltas[0], 18),
-      ethers.utils.formatUnits(deltas[1], 18),
-    ],
-  });
 
   return data?.activities || [];
 }

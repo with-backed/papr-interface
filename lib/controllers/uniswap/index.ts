@@ -224,10 +224,5 @@ export function computeDeltasFromActivity(
     ethers.BigNumber.from(activity.totalLiquidityAdded!),
   );
 
-  console.log({
-    currentAmount0,
-    currentAmount1,
-  });
-
   return [currentAmount0.sub(amount0Added), currentAmount1.sub(amount1Added)];
 }
