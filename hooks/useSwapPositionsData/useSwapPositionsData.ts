@@ -1,4 +1,5 @@
-import { Token } from '@uniswap/sdk-core';
+import { CurrencyAmount, Price, Token } from '@uniswap/sdk-core';
+import { priceToClosestTick, TickMath } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils.js';
 import { ActivityType } from 'hooks/useActivity/useActivity';
@@ -91,6 +92,20 @@ export function useSwapPositionsData(
           checkZero(amount1Delta, token1.decimals)
         )
           return activity;
+
+        const price = new Price({
+          baseAmount: CurrencyAmount.fromRawAmount(
+            token0,
+            amount0Delta.abs().toString(),
+          ),
+          quoteAmount: CurrencyAmount.fromRawAmount(
+            token1,
+            amount1Delta.abs().toString(),
+          ),
+        });
+        const closestTick = priceToClosestTick(price);
+        const sqrtPrice = TickMath.getSqrtRatioAtTick(closestTick);
+
         return {
           ...activity,
           amountIn: amount0Delta.isNegative()
@@ -105,6 +120,7 @@ export function useSwapPositionsData(
           tokenOut: amount0Delta.isNegative()
             ? uniTokenToErc20Token(token1)
             : uniTokenToErc20Token(token0),
+          sqrtPricePool: sqrtPrice.toString(),
         };
       })
       .filter((a) => !!a.amountIn);
