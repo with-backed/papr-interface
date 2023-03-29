@@ -1,1 +1,1 @@
-export { useMaxDebt, maxDebt } from './useMaxDebt';
+export { calculateMaxDebt, maxDebt, useMaxDebt } from './useMaxDebt';

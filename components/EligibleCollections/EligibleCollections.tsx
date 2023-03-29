@@ -2,9 +2,17 @@ import { TextButton } from 'components/Button';
 import { ethers } from 'ethers';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
-import { useTarget } from 'hooks/useTarget';
+import { calculateMaxDebt } from 'hooks/useMaxDebt';
+import {
+  OracleInfo,
+  OracleInfoProvider,
+  useOracleInfo,
+} from 'hooks/useOracleInfo/useOracleInfo';
+import { TargetUpdate, useTarget } from 'hooks/useTarget';
 import { SECONDS_IN_A_YEAR } from 'lib/constants';
-import { formatPercent } from 'lib/numberFormat';
+import { formatPercent, formatTokenAmount } from 'lib/numberFormat';
+import { OraclePriceType } from 'lib/oracle/reservoir';
+import { SubgraphController } from 'lib/PaprController';
 import { subgraphControllerByAddress } from 'lib/pAPRSubgraph';
 import { percentChange } from 'lib/tokenPerformance';
 import Image from 'next/image';
@@ -77,15 +85,44 @@ const COLLECTIONS = [
 ];
 
 export function EligibleCollections() {
+  const collections = useMemo(() => COLLECTIONS.map((c) => c.address), []);
+  return (
+    <OracleInfoProvider collections={collections}>
+      <EligibleCollectionsInner />
+    </OracleInfoProvider>
+  );
+}
+
+export function EligibleCollectionsInner() {
+  const config = useConfig();
+  const subgraphData = useAsyncValue(
+    () => subgraphControllerByAddress(config.controllerAddress, 'paprMeme'),
+    [config],
+  );
+  const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const targetResult = useTarget();
+
   return (
     <div className={styles.wrapper}>
-      <APR />
+      <APR paprController={subgraphData?.paprController} />
       <Marquee className={styles.marquee} pauseOnHover gradient={false}>
         {COLLECTIONS.map((c) => (
-          <Collection key={c.address + '-1'} collectionInfo={c} />
+          <Collection
+            paprController={subgraphData?.paprController}
+            oracleInfo={oracleInfo}
+            targetResult={targetResult}
+            key={c.address + '-1'}
+            collectionInfo={c}
+          />
         ))}
         {COLLECTIONS.map((c) => (
-          <Collection key={c.address + '-2'} collectionInfo={c} />
+          <Collection
+            paprController={subgraphData?.paprController}
+            oracleInfo={oracleInfo}
+            targetResult={targetResult}
+            key={c.address + '-2'}
+            collectionInfo={c}
+          />
         ))}
       </Marquee>
     </div>
@@ -94,14 +131,47 @@ export function EligibleCollections() {
 
 type CollectionProps = {
   collectionInfo: typeof COLLECTIONS[number];
+  oracleInfo?: OracleInfo;
+  paprController?: SubgraphController | null;
+  targetResult?: TargetUpdate;
 };
 function Collection({
   collectionInfo: { address, name, image },
+  oracleInfo,
+  paprController,
+  targetResult,
 }: CollectionProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+
+  const maxDebt = useMemo(() => {
+    const placeholder = '...';
+    if (oracleInfo && paprController && targetResult) {
+      const value = calculateMaxDebt(
+        address,
+        oracleInfo,
+        targetResult,
+        paprController.maxLTV,
+        paprController.underlying.decimals,
+      );
+      if (!value) {
+        console.log('bailing ');
+        return placeholder;
+      }
+      const symbol =
+        paprController.underlying.symbol === 'WETH'
+          ? 'ETH'
+          : paprController.underlying.symbol;
+      return `${formatTokenAmount(
+        parseFloat(
+          ethers.utils.formatUnits(value, paprController.underlying.decimals),
+        ),
+      )} ${symbol}`;
+    }
+    return placeholder;
+  }, [address, oracleInfo, paprController, targetResult]);
 
   return (
     <div>
@@ -118,7 +188,7 @@ function Collection({
           <span>Max Loan</span>
         </div>
         <div className={styles['max-loan']}>
-          <span>1.06 ETH</span>
+          <span>{maxDebt}</span>
         </div>
 
         <Image
@@ -139,44 +209,43 @@ function Collection({
   );
 }
 
-function APR() {
-  const config = useConfig();
-  const subgraphData = useAsyncValue(
-    () => subgraphControllerByAddress(config.controllerAddress, 'paprMeme'),
-    [config],
-  );
+type APRProps = {
+  paprController?: SubgraphController | null;
+};
+
+function APR({ paprController }: APRProps) {
   const newTargetResult = useTarget();
 
   const currentTargetNumber = useMemo(() => {
-    if (subgraphData?.paprController) {
+    if (paprController) {
       return parseFloat(
         ethers.utils.formatUnits(
-          subgraphData.paprController.currentTarget,
-          subgraphData.paprController.underlying.decimals,
+          paprController.currentTarget,
+          paprController.underlying.decimals,
         ),
       );
     }
     return null;
-  }, [subgraphData]);
+  }, [paprController]);
 
   const newTargetNumber = useMemo(() => {
-    if (!newTargetResult || !subgraphData?.paprController) {
+    if (!newTargetResult || !paprController) {
       return null;
     }
     return parseFloat(
       ethers.utils.formatUnits(
         newTargetResult.target,
-        subgraphData.paprController.underlying.decimals,
+        paprController.underlying.decimals,
       ),
     );
-  }, [newTargetResult, subgraphData]);
+  }, [newTargetResult, paprController]);
 
   const contractAPR = useMemo(() => {
     if (
       !newTargetResult ||
       !newTargetNumber ||
       !currentTargetNumber ||
-      !subgraphData?.paprController
+      !paprController
     ) {
       return null;
     }
@@ -184,11 +253,10 @@ function APR() {
     // convert to APR
     return formatPercent(
       (change /
-        (newTargetResult.timestamp -
-          subgraphData.paprController.currentTargetUpdated)) *
+        (newTargetResult.timestamp - paprController.currentTargetUpdated)) *
         SECONDS_IN_A_YEAR,
     );
-  }, [newTargetNumber, currentTargetNumber, newTargetResult, subgraphData]);
+  }, [newTargetNumber, currentTargetNumber, newTargetResult, paprController]);
 
   return (
     <div className={styles.bubble}>
@@ -197,8 +265,8 @@ function APR() {
           See your max loan
         </TextButton>
         . paprMEME makes instant{' '}
-        <span className={styles.green}>loans at {contractAPR}</span> for meme
-        collections, up to:
+        <span className={styles.green}>loans at {contractAPR || '...%'}</span>{' '}
+        for meme collections, up to:
       </span>
     </div>
   );
