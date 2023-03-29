@@ -1,4 +1,12 @@
 import { TextButton } from 'components/Button';
+import { ethers } from 'ethers';
+import { useAsyncValue } from 'hooks/useAsyncValue';
+import { useConfig } from 'hooks/useConfig';
+import { useTarget } from 'hooks/useTarget';
+import { SECONDS_IN_A_YEAR } from 'lib/constants';
+import { formatPercent } from 'lib/numberFormat';
+import { subgraphControllerByAddress } from 'lib/pAPRSubgraph';
+import { percentChange } from 'lib/tokenPerformance';
 import Image from 'next/image';
 import Bean from 'public/landing-page-nfts/bean.png';
 import CoolCat from 'public/landing-page-nfts/cool-cat.png';
@@ -10,7 +18,7 @@ import PudgyPenguin from 'public/landing-page-nfts/pudgy-penguin.png';
 import Toad from 'public/landing-page-nfts/toad.png';
 import TubbyCat from 'public/landing-page-nfts/tubby-cat.png';
 import Wizard from 'public/landing-page-nfts/wizard.png';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Marquee from 'react-fast-marquee';
 
 import styles from './EligibleCollections.module.css';
@@ -132,7 +140,56 @@ function Collection({
 }
 
 function APR() {
-  const contractAPR = '4.38%';
+  const config = useConfig();
+  const subgraphData = useAsyncValue(
+    () => subgraphControllerByAddress(config.controllerAddress, 'paprMeme'),
+    [config],
+  );
+  const newTargetResult = useTarget();
+
+  const currentTargetNumber = useMemo(() => {
+    if (subgraphData?.paprController) {
+      return parseFloat(
+        ethers.utils.formatUnits(
+          subgraphData.paprController.currentTarget,
+          subgraphData.paprController.underlying.decimals,
+        ),
+      );
+    }
+    return null;
+  }, [subgraphData]);
+
+  const newTargetNumber = useMemo(() => {
+    if (!newTargetResult || !subgraphData?.paprController) {
+      return null;
+    }
+    return parseFloat(
+      ethers.utils.formatUnits(
+        newTargetResult.target,
+        subgraphData.paprController.underlying.decimals,
+      ),
+    );
+  }, [newTargetResult, subgraphData]);
+
+  const contractAPR = useMemo(() => {
+    if (
+      !newTargetResult ||
+      !newTargetNumber ||
+      !currentTargetNumber ||
+      !subgraphData?.paprController
+    ) {
+      return null;
+    }
+    const change = percentChange(currentTargetNumber, newTargetNumber);
+    // convert to APR
+    return formatPercent(
+      (change /
+        (newTargetResult.timestamp -
+          subgraphData.paprController.currentTargetUpdated)) *
+        SECONDS_IN_A_YEAR,
+    );
+  }, [newTargetNumber, currentTargetNumber, newTargetResult, subgraphData]);
+
   return (
     <div className={styles.bubble}>
       <span>
