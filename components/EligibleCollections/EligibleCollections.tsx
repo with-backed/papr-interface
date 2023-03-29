@@ -196,8 +196,9 @@ function APR() {
         <TextButton className={styles['connect-button']}>
           See your max loan
         </TextButton>
-        . Instant <span className={styles.green}>Loans at {contractAPR}</span>{' '}
-        for meme collections, up to:
+        . paprMEME makes instant{' '}
+        <span className={styles.green}>loans at {contractAPR}</span> for meme
+        collections, up to:
       </span>
     </div>
   );
