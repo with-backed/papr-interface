@@ -1,11 +1,11 @@
-query swapActivityByUser(
-  $user: Bytes
+query swapActivityByAccount(
+  $account: Bytes
   $startTimestamp: Int
   $endTimestamp: Int
 ) {
   activities(
     where: {
-      user: $user
+      user: $account
       amountIn_not: null
       timestamp_gt: $startTimestamp
       timestamp_lt: $endTimestamp

@@ -1,0 +1,16 @@
+query lpActivityByAccount(
+  $account: Bytes
+  $startTimestamp: Int
+  $endTimestamp: Int
+) {
+  activities(
+    where: {
+      user: $account
+      liquidityDelta_not: null
+      timestamp_gt: $startTimestamp
+      timestamp_lt: $endTimestamp
+    }
+  ) {
+    ...allActivityProperties
+  }
+}

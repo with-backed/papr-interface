@@ -5,7 +5,6 @@ import {
 } from '@uniswap/sdk-core';
 import { Pool, SqrtPriceMath, TickMath } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
-import { PaprController } from 'hooks/useController';
 import JSBI from 'jsbi';
 import { ERC20Token } from 'lib/controllers/index';
 import { erc20TokenToToken } from 'lib/uniswapSubgraph';
@@ -193,19 +192,21 @@ export function getAmount1FromLPStats(
 
 export function computeDeltasFromActivity(
   activity: ActivityByControllerQuery['activities'][0],
-  controller: PaprController,
+  token0IsUnderlying: boolean,
+  paprToken: ERC20Token,
+  underlying: ERC20Token,
   chainId: number,
 ): [ethers.BigNumber, ethers.BigNumber] {
   const amount0Added = ethers.BigNumber.from(activity.cumulativeToken0!);
   const amount1Added = ethers.BigNumber.from(activity.cumulativeToken1!);
 
-  const token0 = controller.token0IsUnderlying
-    ? erc20TokenToToken(controller.underlying, chainId)
-    : erc20TokenToToken(controller.paprToken, chainId);
+  const token0 = token0IsUnderlying
+    ? erc20TokenToToken(underlying, chainId)
+    : erc20TokenToToken(paprToken, chainId);
 
-  const token1 = controller.token0IsUnderlying
-    ? erc20TokenToToken(controller.paprToken, chainId)
-    : erc20TokenToToken(controller.underlying, chainId);
+  const token1 = token0IsUnderlying
+    ? erc20TokenToToken(paprToken, chainId)
+    : erc20TokenToToken(underlying, chainId);
 
   const currentAmount0 = getAmount0FromLPStats(
     token0,
