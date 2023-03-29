@@ -72,12 +72,14 @@ export function EligibleCollections() {
   return (
     <div className={styles.wrapper}>
       <APR />
-      <Marquee pauseOnHover gradient={false}>
+      <Marquee className={styles.marquee} pauseOnHover gradient={false}>
         {COLLECTIONS.map((c) => (
-          <Collection key={c.address} collectionInfo={c} />
+          <Collection key={c.address + '-1'} collectionInfo={c} />
+        ))}
+        {COLLECTIONS.map((c) => (
+          <Collection key={c.address + '-2'} collectionInfo={c} />
         ))}
       </Marquee>
-      <WalletCTA />
     </div>
   );
 }
@@ -134,19 +136,11 @@ function APR() {
   return (
     <div className={styles.bubble}>
       <span>
-        Instant <span className={styles.green}>Loans at {contractAPR}</span> for
-        meme collections, up to:
-      </span>
-    </div>
-  );
-}
-
-function WalletCTA() {
-  return (
-    <div className={styles.bubble}>
-      <span>
-        <TextButton className={styles['connect-button']}>Connect</TextButton> to
-        see your max loan
+        <TextButton className={styles['connect-button']}>
+          See your max loan
+        </TextButton>
+        . Instant <span className={styles.green}>Loans at {contractAPR}</span>{' '}
+        for meme collections, up to:
       </span>
     </div>
   );
