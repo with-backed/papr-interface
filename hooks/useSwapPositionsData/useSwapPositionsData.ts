@@ -86,9 +86,9 @@ export function useSwapPositionsData(
           ...a,
           amountIn: amount0Delta.isNegative()
             ? amount0Delta.abs()
-            : amount1Delta,
+            : amount1Delta.abs(),
           amountOut: amount0Delta.isNegative()
-            ? amount1Delta
+            ? amount1Delta.abs()
             : amount0Delta.abs(),
           tokenIn: amount0Delta.isNegative()
             ? uniTokenToErc20Token(token0)
