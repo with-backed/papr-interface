@@ -1,6 +1,5 @@
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useSwapPositionsData } from 'hooks/useSwapPositionsData';
-import { formatBigNum } from 'lib/numberFormat';
 import { useCallback, useState } from 'react';
 import { useAccount } from 'wagmi';
 
@@ -149,37 +148,6 @@ export function SwapPositionsPageContent() {
             {(exitValue / (averagePurchased - averageSold) - 1).toFixed(4)} %)
           </div>
         </div>
-      </div>
-      <div>
-        <p>implicit swaps</p>
-        {swapsWithImplicit
-          ?.filter((s) => !!s.liquidityDelta)
-          .map((s) => (
-            <div key={s.id}>
-              <div>
-                traded {formatBigNum(s.amountIn!, 18)} {s.tokenIn!.symbol} for{' '}
-                {formatBigNum(s.amountOut!, 18)} {s.tokenOut!.symbol}
-              </div>
-            </div>
-          ))}
-      </div>
-      <div>
-        <p>sold papr</p>
-        {swapsWithImplicit
-          ?.filter((s) => s.tokenIn!.symbol === 'paprMEME')
-          .map((s) => (
-            <div key={s.id}>
-              <a
-                href={`https://etherscan.io/tx/${s.id}`}
-                target="_blank"
-                rel="noreferrer">
-                <div>
-                  traded {formatBigNum(s.amountIn!, 18)} {s.tokenIn!.symbol} for{' '}
-                  {formatBigNum(s.amountOut!, 18)} {s.tokenOut!.symbol}
-                </div>
-              </a>
-            </div>
-          ))}
       </div>
     </>
   );

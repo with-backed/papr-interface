@@ -265,12 +265,6 @@ function computeWeightedAveragePrices(
           token1,
         ).toFixed(4),
       );
-      if (
-        a.id ===
-        '0xad0f8aa459f8262def1c469f17d26bfcbace81ca37d6ae96bc22d7657a0ef9ec'
-      ) {
-        console.log({ p });
-      }
       return p * weights[i];
     })
     .reduce((a, b) => a + b, 0);

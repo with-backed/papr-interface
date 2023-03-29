@@ -7,7 +7,6 @@ import { Pool, SqrtPriceMath, TickMath } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
 import JSBI from 'jsbi';
 import { ERC20Token } from 'lib/controllers/index';
-import { formatBigNum } from 'lib/numberFormat';
 import { erc20TokenToToken } from 'lib/uniswapSubgraph';
 import { IUniswapV3Pool } from 'types/generated/abis';
 import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
@@ -240,18 +239,6 @@ export function computeDeltasFromActivities(
     activity.uniswapLiquidityPosition!.tickUpper,
     ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
   );
-
-  if (
-    activity.id ===
-    '0xad0f8aa459f8262def1c469f17d26bfcbace81ca37d6ae96bc22d7657a0ef9ec'
-  ) {
-    console.log({
-      prevAmount0: formatBigNum(prevAmount0, 18),
-      prevAmount1: formatBigNum(prevAmount1, 18),
-      currentAmount0: formatBigNum(currentAmount0, 18),
-      currentAmount1: formatBigNum(currentAmount1, 18),
-    });
-  }
 
   return [currentAmount0.sub(prevAmount0), currentAmount1.sub(prevAmount1)];
 }
