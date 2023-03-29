@@ -44,6 +44,7 @@ fragment allActivityProperties on Activity {
   token0Delta
   token1Delta
   uniswapLiquidityPosition {
+    id
     tickLower
     tickUpper
   }

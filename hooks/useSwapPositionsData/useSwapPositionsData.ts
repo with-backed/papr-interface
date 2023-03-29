@@ -6,7 +6,7 @@ import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { price } from 'lib/controllers/charts/mark';
-import { computeDeltasFromActivity } from 'lib/controllers/uniswap';
+import { computeDeltasFromActivities } from 'lib/controllers/uniswap';
 import { erc20TokenToToken, uniTokenToErc20Token } from 'lib/uniswapSubgraph';
 import { useMemo } from 'react';
 import {
@@ -69,9 +69,18 @@ export function useSwapPositionsData(
       return null;
 
     const implicitSwaps: ActivityType[] = lpActivityForUserData.activities
-      .map((a) => {
-        const [amount0Delta, amount1Delta] = computeDeltasFromActivity(
-          a,
+      .map((activity) => {
+        const prevActivity = lpActivityForUserData.activities.find(
+          (a) =>
+            a.uniswapLiquidityPosition!.id ===
+              activity.uniswapLiquidityPosition!.id &&
+            a.timestamp < activity.timestamp,
+        );
+        if (!prevActivity) return activity;
+
+        const [amount0Delta, amount1Delta] = computeDeltasFromActivities(
+          activity,
+          prevActivity,
           token0IsUnderlying,
           paprToken,
           underlying,
@@ -81,9 +90,9 @@ export function useSwapPositionsData(
           checkZero(amount0Delta, token0.decimals) ||
           checkZero(amount1Delta, token1.decimals)
         )
-          return a;
+          return activity;
         return {
-          ...a,
+          ...activity,
           amountIn: amount0Delta.isNegative()
             ? amount0Delta.abs()
             : amount1Delta.abs(),
@@ -203,6 +212,7 @@ export function useSwapPositionsData(
     netPapr,
     exitValue,
     magicNumber,
+    swapsWithImplicit,
   };
 }
 

@@ -1,5 +1,6 @@
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useSwapPositionsData } from 'hooks/useSwapPositionsData';
+import { formatBigNum } from 'lib/numberFormat';
 import { useCallback, useState } from 'react';
 import { useAccount } from 'wagmi';
 
@@ -34,8 +35,13 @@ export function SwapPositionsPageContent() {
     [setTimestamps],
   );
 
-  const { averagePurchased, averageSold, netPapr, exitValue } =
-    useSwapPositionsData(addressToUse, timestamps.start, timestamps.end);
+  const {
+    averagePurchased,
+    averageSold,
+    netPapr,
+    exitValue,
+    swapsWithImplicit,
+  } = useSwapPositionsData(addressToUse, timestamps.start, timestamps.end);
 
   return (
     <>
@@ -143,6 +149,19 @@ export function SwapPositionsPageContent() {
             {(exitValue / (averagePurchased - averageSold) - 1).toFixed(4)} %)
           </div>
         </div>
+      </div>
+      <div>
+        <p>implicit swaps</p>
+        {swapsWithImplicit
+          ?.filter((s) => !!s.liquidityDelta)
+          .map((s) => (
+            <div key={s.id}>
+              <div>
+                traded {formatBigNum(s.amountIn!, 18)} {s.tokenIn!.symbol} for{' '}
+                {formatBigNum(s.amountOut!, 18)} {s.tokenOut!.symbol}
+              </div>
+            </div>
+          ))}
       </div>
     </>
   );
