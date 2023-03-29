@@ -1,5 +1,5 @@
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
-import { useSwapPositionsData } from 'hooks/useSwapPositionsData/useSwapPositionsData';
+import { useSwapPositionsData } from 'hooks/useSwapPositionsData';
 import { useCallback, useState } from 'react';
 import { useAccount } from 'wagmi';
 
