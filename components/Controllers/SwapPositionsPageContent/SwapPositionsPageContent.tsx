@@ -163,6 +163,24 @@ export function SwapPositionsPageContent() {
             </div>
           ))}
       </div>
+      <div>
+        <p>sold papr</p>
+        {swapsWithImplicit
+          ?.filter((s) => s.tokenIn!.symbol === 'paprMEME')
+          .map((s) => (
+            <div key={s.id}>
+              <a
+                href={`https://etherscan.io/tx/${s.id}`}
+                target="_blank"
+                rel="noreferrer">
+                <div>
+                  traded {formatBigNum(s.amountIn!, 18)} {s.tokenIn!.symbol} for{' '}
+                  {formatBigNum(s.amountOut!, 18)} {s.tokenOut!.symbol}
+                </div>
+              </a>
+            </div>
+          ))}
+      </div>
     </>
   );
 }
