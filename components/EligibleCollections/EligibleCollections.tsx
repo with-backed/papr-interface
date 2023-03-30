@@ -17,12 +17,9 @@ import { useMemo } from 'react';
 import Marquee from 'react-fast-marquee';
 
 import { Collection } from './Collection';
+import { Loader } from './ConnectWallet';
 import { COLLECTIONS } from './constants';
 import styles from './EligibleCollections.module.css';
-
-const ConnectWallet = dynamic(() =>
-  import('./ConnectWallet').then((mod) => mod.ConnectWallet),
-);
 
 export function EligibleCollections() {
   const collections = useMemo(() => COLLECTIONS.map((c) => c.address), []);
@@ -74,6 +71,10 @@ type APRProps = {
 };
 
 function APR({ paprController }: APRProps) {
+  const ConnectWallet = dynamic(
+    () => import('./ConnectWallet').then((mod) => mod.ConnectWallet),
+    { ssr: false, loader: async () => Loader },
+  );
   const newTargetResult = useTarget();
 
   const currentTargetNumber = useMemo(() => {

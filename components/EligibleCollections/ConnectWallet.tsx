@@ -45,3 +45,7 @@ export function ConnectWallet() {
     </ConnectButton.Custom>
   );
 }
+
+export const Loader = () => (
+  <span className={styles.link}>{CONNECT_LABEL}</span>
+);
