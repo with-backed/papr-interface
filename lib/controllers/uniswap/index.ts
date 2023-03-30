@@ -191,13 +191,19 @@ export function getAmount1FromLPStats(
 }
 
 export function computeDeltasFromActivities(
-  activity: ActivityByControllerQuery['activities'][0],
   prevActivity: ActivityByControllerQuery['activities'][0],
+  tickCurrent: number,
+  currentSqrtPrice: ethers.BigNumber,
   token0IsUnderlying: boolean,
   paprToken: ERC20Token,
   underlying: ERC20Token,
   chainId: number,
 ): [ethers.BigNumber, ethers.BigNumber] {
+  const [tickLower, tickUpper] = [
+    prevActivity.uniswapLiquidityPosition!.tickLower,
+    prevActivity.uniswapLiquidityPosition!.tickUpper,
+  ];
+
   const token0 = token0IsUnderlying
     ? erc20TokenToToken(underlying, chainId)
     : erc20TokenToToken(paprToken, chainId);
@@ -210,33 +216,33 @@ export function computeDeltasFromActivities(
     token0,
     ethers.BigNumber.from(prevActivity.sqrtPricePool!),
     prevActivity.tickCurrent!,
-    prevActivity.uniswapLiquidityPosition!.tickLower,
-    prevActivity.uniswapLiquidityPosition!.tickUpper,
+    tickLower,
+    tickUpper,
     ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
   );
   const prevAmount1 = getAmount1FromLPStats(
     token1,
     ethers.BigNumber.from(prevActivity.sqrtPricePool!),
     prevActivity.tickCurrent!,
-    prevActivity.uniswapLiquidityPosition!.tickLower,
-    prevActivity.uniswapLiquidityPosition!.tickUpper,
+    tickLower,
+    tickUpper,
     ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
   );
 
   const currentAmount0 = getAmount0FromLPStats(
     token0,
-    ethers.BigNumber.from(activity.sqrtPricePool!),
-    activity.tickCurrent!,
-    activity.uniswapLiquidityPosition!.tickLower,
-    activity.uniswapLiquidityPosition!.tickUpper,
+    currentSqrtPrice,
+    tickCurrent,
+    tickLower,
+    tickUpper,
     ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
   );
   const currentAmount1 = getAmount1FromLPStats(
     token1,
-    ethers.BigNumber.from(activity.sqrtPricePool!),
-    activity.tickCurrent!,
-    activity.uniswapLiquidityPosition!.tickLower,
-    activity.uniswapLiquidityPosition!.tickUpper,
+    currentSqrtPrice,
+    tickCurrent,
+    tickLower,
+    tickUpper,
     ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
   );
 
