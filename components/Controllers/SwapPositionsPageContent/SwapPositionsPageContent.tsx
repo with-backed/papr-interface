@@ -160,6 +160,7 @@ import { ActivityType } from 'hooks/useActivity/useActivity';
 import { getActivityKind } from '../Activity/Activity';
 
 interface ActivityWithRunningBalance extends ActivityType {
+  runningPaprDebt?: number;
   runningPaprBalance?: number;
   paprDelta?: number;
   ethDelta?: number;
@@ -182,20 +183,27 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
     ActivityWithRunningBalance[] | null
   >(null);
 
-  let x = 0;
+  const x = 0;
 
   useEffect(() => {
     activityData.reverse();
     let runningTotal = 0;
+    let runningDebtTotal = 0;
     const a: ActivityWithRunningBalance[] = activityData.map((d) => {
       runningTotal += d.tokenIn
         ? d.tokenIn.symbol == 'paprMEME'
           ? (d.amountIn / 1e18) * -1
           : d.amountOut / 1e18
         : 0;
+      runningDebtTotal += d.amountBorrowed ? d.amountBorrowed / 1e18 : 0;
+      runningDebtTotal -= d.amountRepaid ? d.amountRepaid / 1e18 : 0;
       const activity: ActivityWithRunningBalance = d;
       activity.runningPaprBalance = runningTotal;
-      // if (activity.token0Delta) {
+      activity.runningPaprDebt = runningDebtTotal;
+      // TODO with Adam's work
+      // if (activity.liquidityDelta) {
+      //   if (activity.controller.token0IsUnderlying) {
+      //   }
       // }
       return d;
     });
@@ -210,19 +218,15 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
           <th>tx</th>
           <th>action type</th>
           <th>vault</th>
-          <th>papr delta</th>
-          <th>eth delta</th>
-          <th>running papr net position</th>
+          <th>running total papr debt</th>
+          <th>papr held delta</th>
+          <th>eth held delta</th>
+          <th>running total papr bought minus sold</th>
         </tr>
       </thead>
       <tbody>
         {activities &&
           activities.map((d) => {
-            x += d.tokenIn
-              ? d.tokenIn.symbol == 'paprMEME'
-                ? (d.amountIn / 1e18) * -1
-                : d.amountOut / 1e18
-              : 0;
             return (
               <tr key={d.id} className={styles.tr}>
                 <td className={styles.td}>
@@ -235,6 +239,7 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
                 </td>
                 <td className={styles.td}>{getActivityKind(d)}</td>
                 <td className={styles.td}>{d.vault?.token.name}</td>
+                <td className={styles.td}>{d.runningPaprDebt}</td>
                 <td className={styles.td}>
                   {d.tokenIn
                     ? d.tokenIn.symbol == 'paprMEME'
