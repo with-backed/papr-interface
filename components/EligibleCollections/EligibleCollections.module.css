@@ -80,6 +80,13 @@
   padding: 0;
 }
 
+.link {
+  composes: connect-button;
+}
+.link:visited {
+  color: black;
+}
+
 .collection-image {
   position: absolute;
   top: 40px;
