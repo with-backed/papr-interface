@@ -73,7 +73,7 @@ type APRProps = {
 function APR({ paprController }: APRProps) {
   const ConnectWallet = dynamic(
     () => import('./ConnectWallet').then((mod) => mod.ConnectWallet),
-    { ssr: false, loader: async () => Loader },
+    { ssr: false, loading: () => <Loader /> },
   );
   const newTargetResult = useTarget();
 
