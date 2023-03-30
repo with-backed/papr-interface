@@ -174,36 +174,35 @@ function Collection({
   }, [address, oracleInfo, paprController, targetResult]);
 
   return (
-    <div>
+    <div
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={styles['collection-tile']}>
       <div
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className={styles['collection-tile']}>
-        <div
-          className={
-            isHovered
-              ? styles['max-loan-label-visible']
-              : styles['max-loan-label']
-          }>
-          <span>Max Loan</span>
-        </div>
-        <div className={styles['max-loan']}>
-          <span>{maxDebt}</span>
-        </div>
+        className={
+          isHovered
+            ? styles['max-loan-label-visible']
+            : styles['max-loan-label']
+        }>
+        <span>Max Loan</span>
+      </div>
+      <div className={styles['max-loan']}>
+        <span>{maxDebt}</span>
+      </div>
 
-        <Image
-          className={styles['collection-image']}
-          src={image}
-          alt={name}
-          height={91}
-          width={91}
-        />
-        <div
-          className={
-            isHovered ? styles['name-bubble-visible'] : styles['name-bubble']
-          }>
-          {name}
-        </div>
+      <Image
+        className={styles['collection-image']}
+        src={image}
+        alt={name}
+        height={91}
+        width={91}
+        placeholder="blur"
+      />
+      <div
+        className={
+          isHovered ? styles['name-bubble-visible'] : styles['name-bubble']
+        }>
+        {name}
       </div>
     </div>
   );
