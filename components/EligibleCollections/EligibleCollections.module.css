@@ -60,8 +60,8 @@
   display: flex;
   flex-basis: auto;
   flex-shrink: 1;
-  height: 42px;
-  margin: 10px auto 0 auto;
+  height: 39px;
+  margin: 11px auto 0 auto;
   align-items: center;
   justify-content: center;
   background-color: white;
@@ -72,7 +72,7 @@
 
 .marquee {
   position: absolute !important;
-  top: 72px;
+  top: 73px;
 }
 
 .connect-button {
@@ -89,7 +89,7 @@
 
 .collection-image {
   position: absolute;
-  top: 40px;
+  top: 41px;
 }
 
 .tab {
