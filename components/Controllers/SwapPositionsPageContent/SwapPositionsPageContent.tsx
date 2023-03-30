@@ -1,6 +1,7 @@
+import { useActivity } from 'hooks/useActivity';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useSwapPositionsData } from 'hooks/useSwapPositionsData';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 import styles from './SwapPositionsPageContent.module.css';
@@ -144,6 +145,115 @@ export function SwapPositionsPageContent() {
           </div>
         </div>
       </div>
+      <br />
+      <ActivityTimeline account={address || ''} />
     </>
   );
 }
+
+interface VoteRowProps {
+  account: string;
+}
+
+import { ActivityType } from 'hooks/useActivity/useActivity';
+
+import { getActivityKind } from '../Activity/Activity';
+
+interface ActivityWithRunningBalance extends ActivityType {
+  runningPaprBalance?: number;
+  paprDelta?: number;
+  ethDelta?: number;
+}
+
+const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
+  const {
+    data: activityData,
+    fetching: activityFetching,
+    fetchMore,
+    remaining,
+  } = useActivity(
+    '0x3b29c19ff2fcea0ff98d0ef5b184354d74ea74b0',
+    account,
+    undefined,
+    500,
+  );
+
+  const [activities, setActivities] = useState<
+    ActivityWithRunningBalance[] | null
+  >(null);
+
+  let x = 0;
+
+  useEffect(() => {
+    activityData.reverse();
+    let runningTotal = 0;
+    const a: ActivityWithRunningBalance[] = activityData.map((d) => {
+      runningTotal += d.tokenIn
+        ? d.tokenIn.symbol == 'paprMEME'
+          ? (d.amountIn / 1e18) * -1
+          : d.amountOut / 1e18
+        : 0;
+      const activity: ActivityWithRunningBalance = d;
+      activity.runningPaprBalance = runningTotal;
+      // if (activity.token0Delta) {
+      // }
+      return d;
+    });
+    a.reverse();
+    setActivities(a);
+  }, [activityData]);
+
+  return (
+    <table className={styles.table}>
+      <thead>
+        <tr className={styles.tr}>
+          <th>tx</th>
+          <th>action type</th>
+          <th>vault</th>
+          <th>papr delta</th>
+          <th>eth delta</th>
+          <th>running papr net position</th>
+        </tr>
+      </thead>
+      <tbody>
+        {activities &&
+          activities.map((d) => {
+            x += d.tokenIn
+              ? d.tokenIn.symbol == 'paprMEME'
+                ? (d.amountIn / 1e18) * -1
+                : d.amountOut / 1e18
+              : 0;
+            return (
+              <tr key={d.id} className={styles.tr}>
+                <td className={styles.td}>
+                  <a
+                    href={`https://etherscan.io/tx/${d.id}`}
+                    target="_blank"
+                    rel="noreferrer">
+                    tx
+                  </a>
+                </td>
+                <td className={styles.td}>{getActivityKind(d)}</td>
+                <td className={styles.td}>{d.vault?.token.name}</td>
+                <td className={styles.td}>
+                  {d.tokenIn
+                    ? d.tokenIn.symbol == 'paprMEME'
+                      ? `-${d.amountIn / 1e18}`
+                      : d.amountOut / 1e18
+                    : 0}
+                </td>
+                <td className={styles.td}>
+                  {d.tokenIn
+                    ? d.tokenIn.symbol == 'paprMEME'
+                      ? d.amountOut / 1e18
+                      : `-${d.amountIn / 1e18}`
+                    : 0}
+                </td>
+                <td className={styles.td}>{d.runningPaprBalance}</td>
+              </tr>
+            );
+          })}
+      </tbody>
+    </table>
+  );
+};

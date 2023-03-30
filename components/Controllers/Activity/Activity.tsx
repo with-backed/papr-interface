@@ -52,6 +52,41 @@ function activityIsLPModified(activity: ActivityType) {
   return !!activity.liquidityDelta;
 }
 
+export enum ActivityKind {
+  Swap = 'Swap',
+  AuctionStart = 'Auction Start',
+  AuctionEnd = 'Auction End',
+  AddCollateral = 'Add Collateral',
+  RemoveCollateral = 'Remove Collateral',
+  LPModified = 'LP Modified',
+}
+
+export function getActivityKind(activity: ActivityType) {
+  if (activityIsAuctionStart(activity)) {
+    return ActivityKind.AuctionStart;
+  }
+
+  if (activityIsAuctionEnd(activity)) {
+    return ActivityKind.AuctionEnd;
+  }
+
+  if (activityIsAddCollateral(activity)) {
+    return ActivityKind.AddCollateral;
+  }
+
+  if (activityIsRemoveCollateral(activity)) {
+    return ActivityKind.RemoveCollateral;
+  }
+
+  if (activityIsSwap(activity)) {
+    return ActivityKind.Swap;
+  }
+
+  if (activityIsLPModified(activity)) {
+    return ActivityKind.LPModified;
+  }
+}
+
 export function Activity({ account, vault, showSwaps = true }: ActivityProps) {
   const paprController = useController();
 
