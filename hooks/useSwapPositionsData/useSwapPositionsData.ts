@@ -1,14 +1,10 @@
-import { CurrencyAmount, Price, Token } from '@uniswap/sdk-core';
-import { priceToClosestTick, TickMath } from '@uniswap/v3-sdk';
-import { ethers } from 'ethers';
-import { getAddress } from 'ethers/lib/utils.js';
 import { ActivityType } from 'hooks/useActivity/useActivity';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
-import { price } from 'lib/controllers/charts/mark';
-import { computeDeltasFromActivities } from 'lib/controllers/uniswap';
-import { erc20TokenToToken, uniTokenToErc20Token } from 'lib/uniswapSubgraph';
+import { usePaprPurchasesData } from 'hooks/usePaprPurchasesData';
+import { usePaprSalesData } from 'hooks/usePaprSalesData';
+import { usePoolTokens } from 'hooks/usePoolTokens';
 import { useMemo } from 'react';
 import {
   LpActivityByAccountDocument,
@@ -18,13 +14,15 @@ import {
 } from 'types/generated/graphql/inKindSubgraph';
 import { useQuery } from 'urql';
 
+import { transformLPActivityToSwap } from './helpers';
+
 export function useSwapPositionsData(
   address: string | undefined,
   startTimestamp: number,
   endTimestamp: number,
 ) {
   const { chainId } = useConfig();
-  const { paprToken, token0IsUnderlying, underlying } = useController();
+  const controller = useController();
   const price = useLatestMarketPrice();
 
   const [{ data: swapActivityForUserData }] =
@@ -48,18 +46,7 @@ export function useSwapPositionsData(
     pause: !address,
   });
 
-  const { token0, token1 } = useMemo(() => {
-    if (token0IsUnderlying)
-      return {
-        token0: erc20TokenToToken(underlying, chainId),
-        token1: erc20TokenToToken(paprToken, chainId),
-      };
-    else
-      return {
-        token0: erc20TokenToToken(paprToken, chainId),
-        token1: erc20TokenToToken(underlying, chainId),
-      };
-  }, [token0IsUnderlying, underlying, paprToken, chainId]);
+  const { token0, token1 } = usePoolTokens();
 
   // returns users swap activities with pseudo swaps for liquidity positions
   const swapsWithImplicit = useMemo(() => {
@@ -77,51 +64,15 @@ export function useSwapPositionsData(
               activity.uniswapLiquidityPosition!.id &&
             a.timestamp < activity.timestamp,
         );
-        if (!prevActivity) return activity;
 
-        const [amount0Delta, amount1Delta] = computeDeltasFromActivities(
+        return transformLPActivityToSwap(
           activity,
           prevActivity,
-          token0IsUnderlying,
-          paprToken,
-          underlying,
+          controller,
+          token0,
+          token1,
           chainId,
         );
-        if (
-          checkZero(amount0Delta, token0.decimals) ||
-          checkZero(amount1Delta, token1.decimals)
-        )
-          return activity;
-
-        const price = new Price({
-          baseAmount: CurrencyAmount.fromRawAmount(
-            token0,
-            amount0Delta.abs().toString(),
-          ),
-          quoteAmount: CurrencyAmount.fromRawAmount(
-            token1,
-            amount1Delta.abs().toString(),
-          ),
-        });
-        const closestTick = priceToClosestTick(price);
-        const sqrtPrice = TickMath.getSqrtRatioAtTick(closestTick);
-
-        return {
-          ...activity,
-          amountIn: amount0Delta.isNegative()
-            ? amount0Delta.abs()
-            : amount1Delta.abs(),
-          amountOut: amount0Delta.isNegative()
-            ? amount1Delta.abs()
-            : amount0Delta.abs(),
-          tokenIn: amount0Delta.isNegative()
-            ? uniTokenToErc20Token(token0)
-            : uniTokenToErc20Token(token1),
-          tokenOut: amount0Delta.isNegative()
-            ? uniTokenToErc20Token(token1)
-            : uniTokenToErc20Token(token0),
-          sqrtPricePool: sqrtPrice.toString(),
-        };
       })
       .filter((a) => !!a.amountIn);
     return [
@@ -131,92 +82,27 @@ export function useSwapPositionsData(
   }, [
     swapActivityForUserData,
     lpActivityForUserData,
-    token0IsUnderlying,
-    paprToken,
-    underlying,
+    controller,
     chainId,
     token0,
     token1,
   ]);
 
-  const {
-    amountPurchased,
-    amountSold,
-    averageSalePrice,
-    averagePurchasePrice,
-    averagePurchased,
-    averageSold,
-    netPapr,
-    exitValue,
-    magicNumber,
-  } = useMemo(() => {
-    if (!swapsWithImplicit || swapsWithImplicit.length === 0)
-      return {
-        amountPurchased: 0,
-        amountSold: 0,
-        averageSalePrice: 0,
-        averagePurchasePrice: 0,
-        averagePurchased: 0,
-        averageSold: 0,
-        netPapr: 0,
-        exitValue: 0,
-        magicNumber: 0,
-      };
+  const { amountSold, averageSalePrice, averageSold } =
+    usePaprSalesData(swapsWithImplicit);
 
-    const sales = swapsWithImplicit.filter(
-      (a) => getAddress(a.tokenIn!.id) === getAddress(paprToken.id),
-    );
-    const amountSold = sales.reduce((a, b) => {
-      return ethers.BigNumber.from(a).add(b.amountIn!);
-    }, ethers.BigNumber.from(0));
-    const amountSoldNum = parseFloat(
-      ethers.utils.formatUnits(amountSold, paprToken.decimals),
-    );
+  const { amountPurchased, averagePurchasePrice, averagePurchased } =
+    usePaprPurchasesData(swapsWithImplicit);
 
-    const averageSalePrice = computeWeightedAveragePrices(
-      sales,
-      'amountIn',
-      'tokenIn',
-      token0IsUnderlying,
-      token0,
-      token1,
-    );
-
-    const purchases = swapsWithImplicit.filter(
-      (a) => getAddress(a.tokenOut!.id) === getAddress(paprToken.id),
-    );
-    const amountPurchased = purchases.reduce((a, b) => {
-      return ethers.BigNumber.from(a).add(b.amountOut!);
-    }, ethers.BigNumber.from(0));
-    const amountPurchasedNum = parseFloat(
-      ethers.utils.formatUnits(amountPurchased, paprToken.decimals),
-    );
-    const averagePurchasePrice = computeWeightedAveragePrices(
-      purchases,
-      'amountOut',
-      'tokenOut',
-      token0IsUnderlying,
-      token0,
-      token1,
-    );
-
-    const averagePurchased = amountPurchasedNum * averagePurchasePrice;
-    const averageSold = amountSoldNum * averageSalePrice;
-
-    const exitValue = (amountPurchasedNum - amountSoldNum) * (price || 0);
+  const { netPapr, exitValue, magicNumber } = useMemo(() => {
+    const exitValue = (amountPurchased - amountSold) * (price || 0);
 
     return {
-      amountPurchased: amountPurchasedNum,
-      amountSold: amountSoldNum,
-      averageSalePrice,
-      averagePurchasePrice,
-      averagePurchased,
-      averageSold,
-      netPapr: amountPurchasedNum - amountSoldNum,
+      netPapr: amountPurchased - amountSold,
       exitValue,
       magicNumber: exitValue - averagePurchased,
     };
-  }, [swapsWithImplicit, paprToken, token0IsUnderlying, token0, token1, price]);
+  }, [amountPurchased, amountSold, averagePurchased, price]);
 
   return {
     amountPurchased,
@@ -230,49 +116,4 @@ export function useSwapPositionsData(
     magicNumber,
     swapsWithImplicit,
   };
-}
-
-function computeWeightedAveragePrices(
-  swapActivities: SwapActivityByAccountQuery['activities'],
-  amount: 'amountIn' | 'amountOut',
-  token: 'tokenIn' | 'tokenOut',
-  token0IsUnderlying: boolean,
-  token0: Token,
-  token1: Token,
-) {
-  const amountsNumbers = swapActivities.map((a) => {
-    return parseFloat(
-      ethers.utils.formatUnits(
-        ethers.BigNumber.from(a[amount]),
-        a[token]!.decimals,
-      ),
-    );
-  });
-  const totalAmount = amountsNumbers.reduce((a, b) => {
-    return a + b;
-  }, 0);
-  const weights = amountsNumbers.map((amount) => {
-    return amount / totalAmount;
-  });
-
-  return swapActivities
-    .map((a, i) => {
-      const p = parseFloat(
-        price(
-          ethers.BigNumber.from(a.sqrtPricePool),
-          token0IsUnderlying ? token1 : token0,
-          token0IsUnderlying ? token0 : token1,
-          token1,
-        ).toFixed(4),
-      );
-      return p * weights[i];
-    })
-    .reduce((a, b) => a + b, 0);
-}
-
-// uniswap helper methods that return liquidity amounts sometime come back as -1e-18 or 1e-18
-// this is a small check to fix that we do not compute these tiny amounts as swaps
-function checkZero(bn: ethers.BigNumber, decimals: number) {
-  const float = parseFloat(ethers.utils.formatUnits(bn, decimals));
-  return float === 0 || float === -1e-18 || float === 1e-18;
 }

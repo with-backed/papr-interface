@@ -34,13 +34,8 @@ export function SwapPositionsPageContent() {
     [setTimestamps],
   );
 
-  const {
-    averagePurchased,
-    averageSold,
-    netPapr,
-    exitValue,
-    swapsWithImplicit,
-  } = useSwapPositionsData(addressToUse, timestamps.start, timestamps.end);
+  const { averagePurchased, averageSold, netPapr, exitValue } =
+    useSwapPositionsData(addressToUse, timestamps.start, timestamps.end);
 
   return (
     <>
