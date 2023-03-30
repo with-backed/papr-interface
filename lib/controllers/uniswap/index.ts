@@ -7,9 +7,7 @@ import { Pool, SqrtPriceMath, TickMath } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
 import JSBI from 'jsbi';
 import { ERC20Token } from 'lib/controllers/index';
-import { erc20TokenToToken } from 'lib/uniswapSubgraph';
 import { IUniswapV3Pool } from 'types/generated/abis';
-import { ActivityByControllerQuery } from 'types/generated/graphql/inKindSubgraph';
 
 // const provider = new ethers.providers.JsonRpcProvider('https://mainnet.infura.io/v3/<YOUR-ENDPOINT-HERE>')
 
@@ -188,63 +186,4 @@ export function getAmount1FromLPStats(
   }
 
   return ethers.utils.parseUnits(currentAmount.toExact(), token1.decimals);
-}
-
-export function computeDeltasFromActivities(
-  prevActivity: ActivityByControllerQuery['activities'][0],
-  tickCurrent: number,
-  currentSqrtPrice: ethers.BigNumber,
-  token0IsUnderlying: boolean,
-  paprToken: ERC20Token,
-  underlying: ERC20Token,
-  chainId: number,
-): [ethers.BigNumber, ethers.BigNumber] {
-  const [tickLower, tickUpper] = [
-    prevActivity.uniswapLiquidityPosition!.tickLower,
-    prevActivity.uniswapLiquidityPosition!.tickUpper,
-  ];
-
-  const token0 = token0IsUnderlying
-    ? erc20TokenToToken(underlying, chainId)
-    : erc20TokenToToken(paprToken, chainId);
-
-  const token1 = token0IsUnderlying
-    ? erc20TokenToToken(paprToken, chainId)
-    : erc20TokenToToken(underlying, chainId);
-
-  const prevAmount0 = getAmount0FromLPStats(
-    token0,
-    ethers.BigNumber.from(prevActivity.sqrtPricePool!),
-    prevActivity.tickCurrent!,
-    tickLower,
-    tickUpper,
-    ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
-  );
-  const prevAmount1 = getAmount1FromLPStats(
-    token1,
-    ethers.BigNumber.from(prevActivity.sqrtPricePool!),
-    prevActivity.tickCurrent!,
-    tickLower,
-    tickUpper,
-    ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
-  );
-
-  const currentAmount0 = getAmount0FromLPStats(
-    token0,
-    currentSqrtPrice,
-    tickCurrent,
-    tickLower,
-    tickUpper,
-    ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
-  );
-  const currentAmount1 = getAmount1FromLPStats(
-    token1,
-    currentSqrtPrice,
-    tickCurrent,
-    tickLower,
-    tickUpper,
-    ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
-  );
-
-  return [currentAmount0.sub(prevAmount0), currentAmount1.sub(prevAmount1)];
 }

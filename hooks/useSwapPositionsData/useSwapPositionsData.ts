@@ -1,5 +1,5 @@
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
-import { useLPActivity } from 'hooks/useLPActivity';
+import { useLPActivityAndImplicitSwaps } from 'hooks/useLPActivityAndImplicitSwaps';
 import { usePaprPurchasesData } from 'hooks/usePaprPurchasesData';
 import { usePaprSalesData } from 'hooks/usePaprSalesData';
 import { useMemo } from 'react';
@@ -27,7 +27,7 @@ export function useSwapPositionsData(
       pause: !address,
     });
 
-  const { implicitSwaps } = useLPActivity(
+  const { implicitSwaps } = useLPActivityAndImplicitSwaps(
     address,
     startTimestamp,
     endTimestamp,
