@@ -146,7 +146,9 @@ export function SwapPositionsPageContent() {
         </div>
       </div>
       <br />
-      <ActivityTimeline account={address || ''} />
+      {addressToUse && addressToUse != '' && (
+        <ActivityTimeline account={addressToUse} />
+      )}
     </>
   );
 }
