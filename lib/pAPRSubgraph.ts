@@ -1,9 +1,6 @@
-import { PaprController } from 'hooks/useController';
 import {
   AuctionDocument,
   AuctionQuery,
-  LpActivityByControllerAndAccountDocument,
-  LpActivityByControllerAndAccountQuery,
   PaprControllerByIdDocument,
   PaprControllerByIdQuery,
   PaprControllersDocument,
@@ -88,28 +85,4 @@ export async function auctionById(auctionId: string, token: SupportedToken) {
   }
 
   return data?.auction || null;
-}
-
-export async function lpActivityForUser(
-  controller: PaprController,
-  account: string,
-  token: SupportedToken,
-) {
-  const client = clientFromUrl(configs[token].paprSubgraph);
-  const { data, error } = await client
-    .query<LpActivityByControllerAndAccountQuery>(
-      LpActivityByControllerAndAccountDocument,
-      {
-        controllerId: controller.id.toLowerCase(),
-        account: account.toLowerCase(),
-      },
-    )
-    .toPromise();
-
-  if (error) {
-    console.error(error);
-    return [];
-  }
-
-  return data?.activities || [];
 }

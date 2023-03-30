@@ -1,0 +1,1 @@
+export { usePaprSalesData } from './usePaprSalesData';

@@ -79,3 +79,12 @@ export function uniSubgraphTokenToToken(
 export function erc20TokenToToken(token: ERC20Token, chainId: number): Token {
   return new Token(chainId, token.id, token.decimals, token.symbol, token.name);
 }
+
+export function uniTokenToErc20Token(token: Token): ERC20Token {
+  return {
+    id: token.address,
+    decimals: token.decimals,
+    symbol: token.symbol!,
+    name: token.name!,
+  };
+}

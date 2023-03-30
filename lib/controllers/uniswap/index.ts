@@ -5,7 +5,6 @@ import {
 } from '@uniswap/sdk-core';
 import { Pool, SqrtPriceMath, TickMath } from '@uniswap/v3-sdk';
 import { ethers } from 'ethers';
-import { PaprController } from 'hooks/useController';
 import JSBI from 'jsbi';
 import { ERC20Token } from 'lib/controllers/index';
 import { erc20TokenToToken } from 'lib/uniswapSubgraph';
@@ -191,21 +190,38 @@ export function getAmount1FromLPStats(
   return ethers.utils.parseUnits(currentAmount.toExact(), token1.decimals);
 }
 
-export function computeDeltasFromActivity(
+export function computeDeltasFromActivities(
   activity: ActivityByControllerQuery['activities'][0],
-  controller: PaprController,
+  prevActivity: ActivityByControllerQuery['activities'][0],
+  token0IsUnderlying: boolean,
+  paprToken: ERC20Token,
+  underlying: ERC20Token,
   chainId: number,
 ): [ethers.BigNumber, ethers.BigNumber] {
-  const amount0Added = ethers.BigNumber.from(activity.cumulativeToken0!);
-  const amount1Added = ethers.BigNumber.from(activity.cumulativeToken1!);
+  const token0 = token0IsUnderlying
+    ? erc20TokenToToken(underlying, chainId)
+    : erc20TokenToToken(paprToken, chainId);
 
-  const token0 = controller.token0IsUnderlying
-    ? erc20TokenToToken(controller.underlying, chainId)
-    : erc20TokenToToken(controller.paprToken, chainId);
+  const token1 = token0IsUnderlying
+    ? erc20TokenToToken(paprToken, chainId)
+    : erc20TokenToToken(underlying, chainId);
 
-  const token1 = controller.token0IsUnderlying
-    ? erc20TokenToToken(controller.paprToken, chainId)
-    : erc20TokenToToken(controller.underlying, chainId);
+  const prevAmount0 = getAmount0FromLPStats(
+    token0,
+    ethers.BigNumber.from(prevActivity.sqrtPricePool!),
+    prevActivity.tickCurrent!,
+    prevActivity.uniswapLiquidityPosition!.tickLower,
+    prevActivity.uniswapLiquidityPosition!.tickUpper,
+    ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
+  );
+  const prevAmount1 = getAmount1FromLPStats(
+    token1,
+    ethers.BigNumber.from(prevActivity.sqrtPricePool!),
+    prevActivity.tickCurrent!,
+    prevActivity.uniswapLiquidityPosition!.tickLower,
+    prevActivity.uniswapLiquidityPosition!.tickUpper,
+    ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
+  );
 
   const currentAmount0 = getAmount0FromLPStats(
     token0,
@@ -213,7 +229,7 @@ export function computeDeltasFromActivity(
     activity.tickCurrent!,
     activity.uniswapLiquidityPosition!.tickLower,
     activity.uniswapLiquidityPosition!.tickUpper,
-    ethers.BigNumber.from(activity.cumulativeLiquidity!),
+    ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
   );
   const currentAmount1 = getAmount1FromLPStats(
     token1,
@@ -221,8 +237,8 @@ export function computeDeltasFromActivity(
     activity.tickCurrent!,
     activity.uniswapLiquidityPosition!.tickLower,
     activity.uniswapLiquidityPosition!.tickUpper,
-    ethers.BigNumber.from(activity.cumulativeLiquidity!),
+    ethers.BigNumber.from(prevActivity.cumulativeLiquidity!),
   );
 
-  return [currentAmount0.sub(amount0Added), currentAmount1.sub(amount1Added)];
+  return [currentAmount0.sub(prevAmount0), currentAmount1.sub(prevAmount1)];
 }
