@@ -1,8 +1,8 @@
 import { BigNumber, BigNumberish } from 'ethers';
 import { parseUnits } from 'ethers/lib/utils';
 import { useController } from 'hooks/useController';
-import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
-import { useTarget } from 'hooks/useTarget';
+import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { TargetUpdate, useTarget } from 'hooks/useTarget';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { useMemo } from 'react';
 
@@ -35,31 +35,47 @@ export function useMaxDebt(
   } = useController();
 
   const result = useMemo(() => {
-    if (!oracleInfo || !targetResult) {
-      return null;
-    }
-
-    if (typeof collateral === 'string') {
-      if (!oracleInfo[collateral]?.price) {
-        return null;
-      }
-      return maxDebt(
-        parseUnits(oracleInfo[collateral].price.toString(), decimals),
-        maxLTV,
-        targetResult.target,
-      );
-    }
-
-    const totalDebtPerCollateral = collateral.map((asset) =>
-      maxDebt(
-        parseUnits(oracleInfo[asset].price.toString(), decimals),
-        maxLTV,
-        targetResult.target,
-      ),
+    return calculateMaxDebt(
+      collateral,
+      oracleInfo,
+      targetResult,
+      maxLTV,
+      decimals,
     );
-
-    return totalDebtPerCollateral.reduce((a, b) => a.add(b), BigNumber.from(0));
   }, [collateral, decimals, maxLTV, oracleInfo, targetResult]);
 
   return result;
+}
+
+export function calculateMaxDebt(
+  collateral: string | string[],
+  oracleInfo: OracleInfo | undefined,
+  targetResult: TargetUpdate | undefined,
+  maxLTV: BigNumberish,
+  decimals: number,
+) {
+  if (!oracleInfo || !targetResult) {
+    return null;
+  }
+
+  if (typeof collateral === 'string') {
+    if (!oracleInfo[collateral]?.price) {
+      return null;
+    }
+    return maxDebt(
+      parseUnits(oracleInfo[collateral].price.toString(), decimals),
+      maxLTV,
+      targetResult.target,
+    );
+  }
+
+  const totalDebtPerCollateral = collateral.map((asset) =>
+    maxDebt(
+      parseUnits(oracleInfo[asset].price.toString(), decimals),
+      maxLTV,
+      targetResult.target,
+    ),
+  );
+
+  return totalDebtPerCollateral.reduce((a, b) => a.add(b), BigNumber.from(0));
 }

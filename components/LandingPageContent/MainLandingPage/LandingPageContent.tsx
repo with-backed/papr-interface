@@ -1,3 +1,4 @@
+import { EligibleCollections } from 'components/EligibleCollections';
 import Image from 'next/legacy/image';
 import LandingPageScale from 'public/landingpage-scale.png';
 import React from 'react';
@@ -6,14 +7,13 @@ import { DashedLine } from './DashedLine';
 import { FAQ } from './FAQ';
 import styles from './LandingPageContent.module.css';
 import { LandingPageDiagram } from './LandingPageDiagram';
-import { PaprMemeBanner } from './PaprMemeBanner';
 import { Tables } from './Tables';
 import { Whitepaper } from './Whitepaper';
 
 export function LandingPageContent() {
   return (
     <div className={styles.wrapper}>
-      <PaprMemeBanner />
+      <EligibleCollections />
       <h1 className={styles.heading}>
         NFT lending
         <br />
