@@ -188,8 +188,6 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
     ActivityWithRunningBalance[] | null
   >(null);
 
-  const x = 0;
-
   useEffect(() => {
     activityData.reverse();
     let runningTotal = 0;
