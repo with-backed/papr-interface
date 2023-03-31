@@ -81,3 +81,10 @@
   .tr:last-child td {
     border-bottom: none;
   }
+
+  .diffExplainer {
+    width: 80%;
+    background-color: lightyellow;
+    border-radius: 10px;
+    padding: 5px;
+  }

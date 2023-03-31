@@ -110,8 +110,15 @@ export function SwapPositionsPageContent() {
         </div>
       </div>
 
-      {/*  */}
       <br />
+      <p className={styles.diffExplainer}>
+        {' '}
+        The below &rdquo;running total papr bought minus sold&rdquo; might
+        differ from &rdquo;papr bought - papr sold&rdquo; shown above because
+        above we model as if you exited all LP positions this moment. Accounting
+        will also be slightly broken if the EOA has used paprMEME individually
+        and as a signer on a multisig.
+      </p>
       {addressToUse && addressToUse != '' && (
         <ActivityTimeline
           account={addressToUse}
@@ -192,7 +199,7 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
       activity.runningPaprDebt = runningDebtTotal;
       activity.kind = getActivityKind(d);
       if (activity.liquidityDelta) {
-        const id = `${activity.id}-psuedo`;
+        const id = `${activity.id}`;
         const implied = implicitSwaps.filter((s) => s.id == id);
         if (implied.length > 0) {
           const s = implied[0];
