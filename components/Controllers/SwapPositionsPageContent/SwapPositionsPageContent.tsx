@@ -69,95 +69,68 @@ export function SwapPositionsPageContent() {
       </div>
       <br />
 
-      <div className={styles.netContent}>
-        <div className={`${styles.col1} ${styles.column}`}>
-          <div className={styles.blue}>
-            <div>papr bought - papr sold: {netPapr.toFixed(4)} papr</div>
-          </div>
-          <p>*</p>
-          <div className={styles.blue}>
-            <div>current papr price: {price} ETH</div>
-          </div>
-
-          <p>=</p>
-          <div className={styles.blue}>
+      {/*  */}
+      <div className={styles.pnlSummary}>
+        <div className={styles.column}>
+          <span className={styles.blue}>
+            papr bought - papr sold: {netPapr.toFixed(4)} papr
+          </span>
+          <span>*</span>
+          <span className={styles.blue}>current papr price: {price} ETH</span>
+          <span>=</span>
+          <span className={styles.blue}>
             {exitValue.toFixed(4)} ETH gain/loss to close papr position
-          </div>
+          </span>
         </div>
-        <div className={`col2 ${styles.column} `}>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-
-          <p> - </p>
+        <div className={styles.bottomMath}>
+          <span>-</span>
         </div>
-        <div className={`col3 ${styles.column}`}>
-          <div>
-            <div className={styles.green}>
-              {/* <div>
-                {' '}
-                {amountPurchased.toFixed(4)} papr purchased *{' '}
-                {averagePurchasePrice.toFixed(4)} ETH weighted avg. price
-              </div> */}
-              <div> {averagePurchased.toFixed(4)} ETH spent on papr</div>
-            </div>
-            <p>-</p>
-            <div className={styles.orange}>
-              {/* <div>
-                {' '}
-                {amountSold.toFixed(4)} papr sold *{' '}
-                {averageSalePrice.toFixed(4)} ETH weighted avg. price
-              </div> */}
-              <div>{averageSold.toFixed(4)} ETH gained from papr sales</div>
-            </div>
-            <p>=</p>
-            <div className={styles.pink}>
-              <div>
-                {(averagePurchased - averageSold).toFixed(4)} net ETH realized
-              </div>
-            </div>
-          </div>
+        <div className={styles.column}>
+          <span className={styles.green}>
+            {averagePurchased.toFixed(4)} ETH spent on papr
+          </span>
+          <span>-</span>
+          <span className={styles.red}>
+            {averageSold.toFixed(4)} ETH gained from papr sales
+          </span>
+          <span>=</span>
+          <span className={styles.pink}>
+            {(averagePurchased - averageSold).toFixed(4)} net ETH realized
+          </span>
         </div>
-        <div className={`col4 ${styles.column} `}>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <p> = </p>
+        <div className={styles.bottomMath}>
+          <span>=</span>
         </div>
-        <div className={`col5 ${styles.column} `}>
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <div className={styles.yellow}>
+        <div className={styles.bottomMath}>
+          <span className={styles.yellow}>
             total unrealized gain/loss:{' '}
             {(exitValue - (averagePurchased - averageSold)).toFixed(4)} ETH (
             {(exitValue / (averagePurchased - averageSold) - 1).toFixed(4)} %)
-          </div>
+          </span>
         </div>
       </div>
+
+      {/*  */}
       <br />
       {addressToUse && addressToUse != '' && (
-        <ActivityTimeline account={addressToUse} />
+        <ActivityTimeline
+          account={addressToUse}
+          startTime={timestamps.start}
+          endTime={timestamps.end}
+        />
       )}
     </>
   );
 }
 
-interface VoteRowProps {
+interface ActivityTimelineProps {
   account: string;
+  startTime: number;
+  endTime: number;
 }
 
 import { ActivityType } from 'hooks/useActivity/useActivity';
+import { useLPActivityAndImplicitSwaps } from 'hooks/useLPActivityAndImplicitSwaps';
 import { usePoolTokens } from 'hooks/usePoolTokens';
 
 import { getActivityKind } from '../Activity/Activity';
@@ -167,9 +140,14 @@ interface ActivityWithRunningBalance extends ActivityType {
   runningPaprBalance?: number;
   paprDelta?: number;
   ethDelta?: number;
+  kind?: string;
 }
 
-const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
+const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
+  account,
+  startTime,
+  endTime,
+}) => {
   const {
     data: activityData,
     fetching: activityFetching,
@@ -182,6 +160,12 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
     500,
   );
 
+  const { implicitSwaps } = useLPActivityAndImplicitSwaps(
+    account,
+    startTime,
+    endTime,
+  );
+
   const { token0, token1 } = usePoolTokens();
 
   const [activities, setActivities] = useState<
@@ -189,10 +173,13 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
   >(null);
 
   useEffect(() => {
-    activityData.reverse();
+    const filteredActivities = activityData.filter(
+      (a) => a.timestamp >= startTime && a.timestamp <= endTime,
+    );
+    filteredActivities.reverse();
     let runningTotal = 0;
     let runningDebtTotal = 0;
-    const a: ActivityWithRunningBalance[] = activityData.map((d) => {
+    const a: ActivityWithRunningBalance[] = filteredActivities.map((d) => {
       runningTotal += d.tokenIn
         ? d.tokenIn.symbol == 'paprMEME'
           ? (d.amountIn / 1e18) * -1
@@ -203,16 +190,29 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
       const activity: ActivityWithRunningBalance = d;
       activity.runningPaprBalance = runningTotal;
       activity.runningPaprDebt = runningDebtTotal;
-      // TODO with Adam's work
-      // if (activity.liquidityDelta) {
-      //   if (activity.controller.token0IsUnderlying) {
-      //   }
-      // }
-      return d;
+      activity.kind = getActivityKind(d);
+      if (activity.liquidityDelta) {
+        const id = `${activity.id}-psuedo`;
+        const implied = implicitSwaps.filter((s) => s.id == id);
+        if (implied.length > 0) {
+          const s = implied[0];
+          activity.amountIn = s.amountIn;
+          activity.amountOut = s.amountOut;
+          activity.tokenIn = s.tokenIn;
+          activity.tokenOut = s.tokenOut;
+          runningTotal += s.tokenIn
+            ? s.tokenIn.symbol == 'paprMEME'
+              ? (s.amountIn / 1e18) * -1
+              : s.amountOut / 1e18
+            : 0;
+        }
+        activity.runningPaprBalance = runningTotal;
+      }
+      return activity;
     });
     a.reverse();
     setActivities(a);
-  }, [activityData]);
+  }, [activityData, startTime, endTime, account, implicitSwaps]);
 
   return (
     <table className={styles.table}>
@@ -240,7 +240,7 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
                     {new Date(d.timestamp * 1000).toLocaleDateString()}
                   </a>
                 </td>
-                <td className={styles.td}>{getActivityKind(d)}</td>
+                <td className={styles.td}>{d.kind}</td>
                 <td className={styles.td}>{d.vault?.token.name}</td>
                 <td className={styles.td}>{d.runningPaprDebt}</td>
                 <td className={styles.td}>

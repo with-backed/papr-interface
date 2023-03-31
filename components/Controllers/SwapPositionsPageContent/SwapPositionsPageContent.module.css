@@ -1,31 +1,52 @@
-.netContent {
-    display: inline-flex;
-}
 
-.column {
-    padding-right: 10px;
-}
 
-.blue {
-    background-color: lightblue;
-}
-
-.green {
-    background-color: limegreen;
-}
-
-.orange {
-    background-color: lightcoral;
-}
-
-.pink {
-    background-color: lightpink;
-}
-
-.yellow {
-    background-color: lightyellow;
-    vertical-align: bottom;
-}
+.pnlSummary {
+    font-family: monospace;
+    display: grid;
+    grid-template-columns: 1fr 16px 1fr 16px 1fr;
+    gap: 10px;
+    width: 80%;
+  }
+  
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .blue {
+    background-color: cornflowerblue;
+    white-space: nowrap;
+    line-height: 20px;
+  }
+  .green {
+    background-color: greenyellow;
+    white-space: nowrap;
+    line-height: 20px;
+  }
+  .red {
+    background-color: crimson;
+    white-space: nowrap;
+    line-height: 20px;
+  }
+  .pink {
+    background-color: coral;
+    white-space: nowrap;
+    line-height: 20px;
+  }
+  .yellow {
+    background-color: cornsilk;
+    white-space: nowrap;
+    line-height: 20px;
+  }
+  
+  .bottomMath {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    line-height: 20px;
+  }  
 
 
 /* table */

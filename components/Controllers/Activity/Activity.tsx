@@ -29,15 +29,23 @@ type ActivityProps = {
 const LIMIT = 5;
 
 function activityIsSwap(activity: ActivityType) {
-  return !!activity.amountIn && !!activity.amountOut;
+  return !!activity.amountIn && !!activity.amountOut && activity.sqrtPricePool;
 }
 
 function activityIsAddCollateral(activity: ActivityType) {
-  return activity.addedCollateral.length > 0 || !!activity.amountBorrowed;
+  return activity.addedCollateral.length > 0 && !!activity.amountBorrowed;
+}
+
+function activityIsIncreaseDebt(activity: ActivityType) {
+  return !!activity.amountBorrowed;
 }
 
 function activityIsRemoveCollateral(activity: ActivityType) {
-  return activity.removedCollateral.length > 0 || !!activity.amountRepaid;
+  return activity.removedCollateral.length > 0 && !!activity.amountRepaid;
+}
+
+function activityIsReduceDebt(activity: ActivityType) {
+  return !!activity.amountRepaid;
 }
 
 function activityIsAuctionStart(activity: ActivityType) {
@@ -59,6 +67,8 @@ export enum ActivityKind {
   AddCollateral = 'Add Collateral',
   RemoveCollateral = 'Remove Collateral',
   LPModified = 'LP Modified',
+  IncreaseDebt = 'Increase Debt',
+  ReduceDebt = 'Reduce Debt',
 }
 
 export function getActivityKind(activity: ActivityType) {
@@ -78,12 +88,20 @@ export function getActivityKind(activity: ActivityType) {
     return ActivityKind.RemoveCollateral;
   }
 
-  if (activityIsSwap(activity)) {
-    return ActivityKind.Swap;
-  }
-
   if (activityIsLPModified(activity)) {
     return ActivityKind.LPModified;
+  }
+
+  if (activityIsIncreaseDebt(activity)) {
+    return ActivityKind.IncreaseDebt;
+  }
+
+  if (activityIsReduceDebt(activity)) {
+    return ActivityKind.ReduceDebt;
+  }
+
+  if (activityIsSwap(activity)) {
+    return ActivityKind.Swap;
   }
 }
 
