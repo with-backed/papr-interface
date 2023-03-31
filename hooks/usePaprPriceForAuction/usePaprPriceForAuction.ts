@@ -1,58 +1,13 @@
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+import { slot0Abi } from 'hooks/useSlot0';
 import { useTimestamp } from 'hooks/useTimestamp';
 import { price } from 'lib/controllers/charts/mark';
 import { erc20TokenToToken } from 'lib/uniswapSubgraph';
 import { useEffect, useMemo, useState } from 'react';
 import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 import { useContractRead } from 'wagmi';
-
-const slot0Abi = [
-  {
-    inputs: [],
-    name: 'slot0',
-    outputs: [
-      {
-        internalType: 'uint160',
-        name: 'sqrtPriceX96',
-        type: 'uint160',
-      },
-      {
-        internalType: 'int24',
-        name: 'tick',
-        type: 'int24',
-      },
-      {
-        internalType: 'uint16',
-        name: 'observationIndex',
-        type: 'uint16',
-      },
-      {
-        internalType: 'uint16',
-        name: 'observationCardinality',
-        type: 'uint16',
-      },
-      {
-        internalType: 'uint16',
-        name: 'observationCardinalityNext',
-        type: 'uint16',
-      },
-      {
-        internalType: 'uint8',
-        name: 'feeProtocol',
-        type: 'uint8',
-      },
-      {
-        internalType: 'bool',
-        name: 'unlocked',
-        type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-] as const;
 
 export function usePaprPriceForAuction(
   auction: NonNullable<AuctionQuery['auction']>,
