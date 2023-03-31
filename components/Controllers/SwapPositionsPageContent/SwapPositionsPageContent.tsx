@@ -158,6 +158,7 @@ interface VoteRowProps {
 }
 
 import { ActivityType } from 'hooks/useActivity/useActivity';
+import { usePoolTokens } from 'hooks/usePoolTokens';
 
 import { getActivityKind } from '../Activity/Activity';
 
@@ -180,6 +181,8 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
     undefined,
     500,
   );
+
+  const { token0, token1 } = usePoolTokens();
 
   const [activities, setActivities] = useState<
     ActivityWithRunningBalance[] | null
@@ -217,7 +220,7 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
     <table className={styles.table}>
       <thead>
         <tr className={styles.tr}>
-          <th>tx</th>
+          <th>Date</th>
           <th>action type</th>
           <th>vault</th>
           <th>running total papr debt</th>
@@ -236,7 +239,7 @@ const ActivityTimeline: React.FC<VoteRowProps> = ({ account }) => {
                     href={`https://etherscan.io/tx/${d.id}`}
                     target="_blank"
                     rel="noreferrer">
-                    tx
+                    {new Date(d.timestamp * 1000).toLocaleDateString()}
                   </a>
                 </td>
                 <td className={styles.td}>{getActivityKind(d)}</td>
