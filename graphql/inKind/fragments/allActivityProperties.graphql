@@ -48,7 +48,4 @@ fragment allActivityProperties on Activity {
     tickLower
     tickUpper
   }
-  controller {
-    token0IsUnderlying
-  }
 }

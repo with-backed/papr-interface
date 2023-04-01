@@ -1,9 +1,13 @@
+import { ethers } from 'ethers';
 import { useActivity } from 'hooks/useActivity';
+import { ActivityType } from 'hooks/useActivity/useActivity';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
+import { useLPActivityAndImplicitSwaps } from 'hooks/useLPActivityAndImplicitSwaps';
 import { useSwapPositionsData } from 'hooks/useSwapPositionsData';
 import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
+import { getActivityKind } from '../Activity/Activity';
 import styles from './SwapPositionsPageContent.module.css';
 
 export function SwapPositionsPageContent() {
@@ -136,12 +140,6 @@ interface ActivityTimelineProps {
   endTime: number;
 }
 
-import { ActivityType } from 'hooks/useActivity/useActivity';
-import { useLPActivityAndImplicitSwaps } from 'hooks/useLPActivityAndImplicitSwaps';
-import { usePoolTokens } from 'hooks/usePoolTokens';
-
-import { getActivityKind } from '../Activity/Activity';
-
 interface ActivityWithRunningBalance extends ActivityType {
   runningPaprDebt?: number;
   runningPaprBalance?: number;
@@ -150,11 +148,11 @@ interface ActivityWithRunningBalance extends ActivityType {
   kind?: string;
 }
 
-const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
+const ActivityTimeline = ({
   account,
   startTime,
   endTime,
-}) => {
+}: ActivityTimelineProps) => {
   const {
     data: activityData,
     fetching: activityFetching,
@@ -173,52 +171,56 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
     endTime,
   );
 
-  const { token0, token1 } = usePoolTokens();
-
   const [activities, setActivities] = useState<
     ActivityWithRunningBalance[] | null
   >(null);
 
   useEffect(() => {
-    const filteredActivities = activityData.filter(
-      (a) => a.timestamp >= startTime && a.timestamp <= endTime,
-    );
-    filteredActivities.reverse();
+    const filteredActivities = activityData
+      .filter((a) => a.timestamp >= startTime && a.timestamp <= endTime)
+      .reverse();
     let runningTotal = 0;
     let runningDebtTotal = 0;
-    const a: ActivityWithRunningBalance[] = filteredActivities.map((d) => {
-      runningTotal += d.tokenIn
-        ? d.tokenIn.symbol == 'paprMEME'
-          ? (d.amountIn / 1e18) * -1
-          : d.amountOut / 1e18
-        : 0;
-      runningDebtTotal += d.amountBorrowed ? d.amountBorrowed / 1e18 : 0;
-      runningDebtTotal -= d.amountRepaid ? d.amountRepaid / 1e18 : 0;
-      const activity: ActivityWithRunningBalance = d;
-      activity.runningPaprBalance = runningTotal;
-      activity.runningPaprDebt = runningDebtTotal;
-      activity.kind = getActivityKind(d);
-      if (activity.liquidityDelta) {
-        const id = `${activity.id}`;
-        const implied = implicitSwaps.filter((s) => s.id == id);
-        if (implied.length > 0) {
-          const s = implied[0];
-          activity.amountIn = s.amountIn;
-          activity.amountOut = s.amountOut;
-          activity.tokenIn = s.tokenIn;
-          activity.tokenOut = s.tokenOut;
-          runningTotal += s.tokenIn
-            ? s.tokenIn.symbol == 'paprMEME'
-              ? (s.amountIn / 1e18) * -1
-              : s.amountOut / 1e18
+    const activitiesWithBalances: ActivityWithRunningBalance[] =
+      filteredActivities
+        .map((activity) => {
+          runningTotal += activity.tokenIn
+            ? activity.tokenIn.symbol == 'paprMEME'
+              ? (activity.amountIn / 1e18) * -1
+              : activity.amountOut / 1e18
             : 0;
-        }
-        activity.runningPaprBalance = runningTotal;
-      }
-      return activity;
-    });
-    a.reverse();
-    setActivities(a);
+          runningDebtTotal += activity.amountBorrowed
+            ? activity.amountBorrowed / 1e18
+            : 0;
+          runningDebtTotal -= activity.amountRepaid
+            ? activity.amountRepaid / 1e18
+            : 0;
+          const activityWithRunningBalance: ActivityWithRunningBalance =
+            activity;
+          activityWithRunningBalance.runningPaprBalance = runningTotal;
+          activityWithRunningBalance.runningPaprDebt = runningDebtTotal;
+          activityWithRunningBalance.kind = getActivityKind(activity);
+          if (activity.liquidityDelta) {
+            const id = activity.id;
+            const implied = implicitSwaps.filter((s) => s.id == id);
+            if (implied.length > 0) {
+              const s = implied[0];
+              activityWithRunningBalance.amountIn = s.amountIn;
+              activityWithRunningBalance.amountOut = s.amountOut;
+              activityWithRunningBalance.tokenIn = s.tokenIn;
+              activityWithRunningBalance.tokenOut = s.tokenOut;
+              runningTotal += s.tokenIn
+                ? s.tokenIn.symbol == 'paprMEME'
+                  ? (s.amountIn / 1e18) * -1
+                  : s.amountOut / 1e18
+                : 0;
+            }
+            activityWithRunningBalance.runningPaprBalance = runningTotal;
+          }
+          return activityWithRunningBalance;
+        })
+        .reverse();
+    setActivities(activitiesWithBalances);
   }, [activityData, startTime, endTime, account, implicitSwaps]);
 
   return (
@@ -236,35 +238,42 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
       </thead>
       <tbody>
         {activities &&
-          activities.map((d) => {
+          activities.map((activity) => {
             return (
-              <tr key={d.id} className={styles.tr}>
+              <tr key={activity.id} className={styles.tr}>
                 <td className={styles.td}>
                   <a
-                    href={`https://etherscan.io/tx/${d.id}`}
+                    href={`https://etherscan.io/tx/${activity.id}`}
                     target="_blank"
                     rel="noreferrer">
-                    {new Date(d.timestamp * 1000).toLocaleDateString()}
+                    {new Date(activity.timestamp * 1000).toLocaleDateString()}
                   </a>
                 </td>
-                <td className={styles.td}>{d.kind}</td>
-                <td className={styles.td}>{d.vault?.token.name}</td>
-                <td className={styles.td}>{d.runningPaprDebt}</td>
+                <td className={styles.td}>{activity.kind}</td>
+                <td className={styles.td}>{activity.vault?.token.name}</td>
+                <td className={styles.td}>{activity.runningPaprDebt}</td>
                 <td className={styles.td}>
-                  {d.tokenIn
-                    ? d.tokenIn.symbol == 'paprMEME'
-                      ? `-${d.amountIn / 1e18}`
-                      : d.amountOut / 1e18
+                  {activity.tokenIn
+                    ? activity.tokenIn.symbol.includes('papr')
+                      ? (activity.amountIn / 1e18) * -1
+                      : activity.amountOut / 1e18
                     : 0}
                 </td>
                 <td className={styles.td}>
-                  {d.tokenIn
-                    ? d.tokenIn.symbol == 'paprMEME'
-                      ? d.amountOut / 1e18
-                      : `-${d.amountIn / 1e18}`
+                  {activity.tokenIn
+                    ? activity.tokenIn.symbol.includes('papr')
+                      ? ethers.utils.formatUnits(
+                          activity.amountOut,
+                          activity.tokenOut?.decimals,
+                        )
+                      : '-' +
+                        ethers.utils.formatUnits(
+                          activity.amountIn,
+                          activity.tokenIn?.decimals,
+                        )
                     : 0}
                 </td>
-                <td className={styles.td}>{d.runningPaprBalance}</td>
+                <td className={styles.td}>{activity.runningPaprBalance}</td>
               </tr>
             );
           })}
