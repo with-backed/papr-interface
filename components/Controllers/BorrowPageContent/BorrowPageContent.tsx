@@ -79,11 +79,13 @@ export function BorrowPageContent() {
           const vault = currentVaults?.find(
             (v) => getAddress(v.token.id) === getAddress(collection),
           );
-          const vaultId = vault!.id;
+          const vaultId = vault?.id;
+          const showVault = vaultId && showHistory[vaultId];
           return (
             <>
               <button
                 onClick={() =>
+                  vaultId &&
                   setShowHistory((prev) => ({
                     ...prev,
                     [vaultId]: !prev[vaultId],
@@ -91,8 +93,8 @@ export function BorrowPageContent() {
                 }>
                 history
               </button>
-              {showHistory[vaultId] && <VaultLoansHistory vault={vault!} />}
-              {!showHistory[vaultId] && (
+              {showVault && <VaultLoansHistory vault={vault} />}
+              {!showVault && (
                 <VaultDebtPicker
                   key={collection}
                   collateralContractAddress={collection}
