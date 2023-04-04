@@ -1,10 +1,15 @@
 import Bean from 'public/landing-page-nfts/bean.png';
+import Chimper from 'public/landing-page-nfts/chimper.png';
 import CoolCat from 'public/landing-page-nfts/cool-cat.png';
 import Dickbutt from 'public/landing-page-nfts/dickbutt.png';
+import Goblin from 'public/landing-page-nfts/goblintown.wtf.png';
+import LilPudgy from 'public/landing-page-nfts/lil-pudgy.png';
 import Loot from 'public/landing-page-nfts/loot.png';
 import Mfer from 'public/landing-page-nfts/mfer.png';
 import Milady from 'public/landing-page-nfts/milady.png';
+import Mooncat from 'public/landing-page-nfts/mooncat.png';
 import PudgyPenguin from 'public/landing-page-nfts/pudgy-penguin.png';
+import SappySeal from 'public/landing-page-nfts/sappy-seal.png';
 import Toad from 'public/landing-page-nfts/toad.png';
 import TubbyCat from 'public/landing-page-nfts/tubby-cat.png';
 import Wizard from 'public/landing-page-nfts/wizard.png';
@@ -59,5 +64,30 @@ export const COLLECTIONS = [
     address: '0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7',
     name: 'Loot (for Adventurers)',
     image: Loot,
+  },
+  {
+    address: '0x524cab2ec69124574082676e6f654a18df49a048',
+    name: 'Lil Pudgys',
+    image: LilPudgy,
+  },
+  {
+    address: '0xc3f733ca98e0dad0386979eb96fb1722a1a05e69',
+    name: 'Mooncats',
+    image: Mooncat,
+  },
+  {
+    address: '0xbce3781ae7ca1a5e050bd9c4c77369867ebc307e',
+    name: 'goblintown.wtf',
+    image: Goblin,
+  },
+  {
+    address: '0x364c828ee171616a39897688a831c2499ad972ec',
+    name: 'Sappy Seals',
+    image: SappySeal,
+  },
+  {
+    address: '0x80336ad7a747236ef41f47ed2c7641828a480baa',
+    name: 'Chimpers',
+    image: Chimper,
   },
 ];
