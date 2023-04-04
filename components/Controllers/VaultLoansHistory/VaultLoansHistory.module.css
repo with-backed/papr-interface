@@ -1,0 +1,8 @@
+.historyTable thead tr th {
+  text-align: center;
+  vertical-align: top;
+}
+
+.historyTable tbody tr td {
+  text-align: center;
+}

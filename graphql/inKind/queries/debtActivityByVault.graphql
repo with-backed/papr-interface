@@ -1,0 +1,14 @@
+query debtActivityByVault($controllerId: String, $vaultId: String) {
+  activities(
+    where: {
+      and: [
+        { vault: $vaultId }
+        { or: [{ amountBorrowed_not: null }, { amountRepaid_not: null }] }
+      ]
+    }
+    orderBy: timestamp
+    orderDirection: asc
+  ) {
+    ...allActivityProperties
+  }
+}
