@@ -15,6 +15,7 @@ import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { usePaprBalance } from 'hooks/usePaprBalance';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
+import { formatDollars } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -92,7 +93,7 @@ export function YourPositions({ onPerformancePage }: YourPositionsProps) {
     if (!maxLoanMinusCurrentDebt) {
       return '...';
     }
-    return formatBigNum(maxLoanMinusCurrentDebt, paprToken.decimals, 4);
+    return formatBigNum(maxLoanMinusCurrentDebt, paprToken.decimals, 3);
   }, [maxLoanMinusCurrentDebt, paprToken.decimals]);
 
   const maxLoanAmountInUnderlying = useMemo(() => {
@@ -114,7 +115,7 @@ export function YourPositions({ onPerformancePage }: YourPositionsProps) {
   }, [currentVaults]);
 
   const formattedTotalPaprMemeDebt = useMemo(() => {
-    return formatBigNum(totalPaprMemeDebt, paprToken.decimals, 4);
+    return formatBigNum(totalPaprMemeDebt, paprToken.decimals, 3);
   }, [totalPaprMemeDebt, paprToken.decimals]);
 
   const totalPaprMemeDebtInUnderlying = useMemo(() => {
@@ -229,14 +230,14 @@ export function VaultOverview({ vaultInfo, ethUSDPrice }: VaultOverviewProps) {
         <NFTMarquee collateral={vaultInfo.collateral} />
       </td>
       <td>
-        {formatBigNum(vaultInfo.debt, paprToken.decimals, 4)} {paprToken.symbol}
+        {formatBigNum(vaultInfo.debt, paprToken.decimals, 3)} {paprToken.symbol}
       </td>
       <td>
         <TooltipReference {...borrowedUSDTooltip}>
-          {debtValue ? debtValue.toFixed(4) : '...'} {underlying.symbol}
+          {debtValue ? formatTokenAmount(debtValue) : '...'} {underlying.symbol}
         </TooltipReference>
         <Tooltip {...borrowedUSDTooltip}>
-          {borrowedInUSD ? `$${borrowedInUSD.toFixed(2)}` : '...'}
+          {borrowedInUSD ? `${formatDollars(borrowedInUSD)}` : '...'}
         </Tooltip>
       </td>
       <td>
