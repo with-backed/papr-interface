@@ -39,7 +39,7 @@ const PoolStats = dynamic(
 export function ControllerOverviewContent() {
   return (
     <div className={styles.wrapper}>
-      <YourPositions />
+      <YourPositions onPerformancePage />
       <ContractStatus />
       <MarketStatus />
       <PoolStats />

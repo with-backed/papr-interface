@@ -67,7 +67,7 @@ export function BorrowPageContent() {
 
   return (
     <div className={controllerStyles.wrapper}>
-      <YourPositions />
+      <YourPositions onPerformancePage={false} />
       {!!address &&
         uniqueCollections.map((collection) => (
           <VaultDebtPicker
