@@ -4,8 +4,8 @@ import { OraclePriceType } from 'lib/oracle/reservoir';
 import { percentChange } from 'lib/tokenPerformance';
 import { useMemo, useRef } from 'react';
 import {
-  TwabForCollectionByTimeQuery,
-  TwabForCollectionByTimeDocument,
+  LatestTwabForCollectionBeforeTimeQuery,
+  LatestTwabForCollectionBeforeTimeDocument,
 } from 'types/generated/graphql/twabs';
 import { useQuery } from 'urql';
 
@@ -19,27 +19,29 @@ export function useCollectionTwapBidChange(collection: string) {
   );
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
 
-  const [{ data: twabData, error }] = useQuery<TwabForCollectionByTimeQuery>({
-    query: TwabForCollectionByTimeDocument,
-    variables: {
-      collection: collection.toLowerCase(),
-      earlierThan: twentyFourHoursAgo.current,
-    },
-    context: useMemo(
-      () => ({
-        url: twabsApi,
-        fetchOptions: {
-          headers: {
-            'content-type': 'application/json',
-            'x-hasura-admin-secret':
-              process.env.NEXT_PUBLIC_TWABS_GRAPHQL_TOKEN!,
+  const [{ data: twabData }] = useQuery<LatestTwabForCollectionBeforeTimeQuery>(
+    {
+      query: LatestTwabForCollectionBeforeTimeDocument,
+      variables: {
+        collection: collection.toLowerCase(),
+        earlierThan: twentyFourHoursAgo.current,
+      },
+      context: useMemo(
+        () => ({
+          url: twabsApi,
+          fetchOptions: {
+            headers: {
+              'content-type': 'application/json',
+              'x-hasura-admin-secret':
+                process.env.NEXT_PUBLIC_TWABS_GRAPHQL_TOKEN!,
+            },
+            method: 'POST',
           },
-          method: 'POST',
-        },
-      }),
-      [twabsApi],
-    ),
-  });
+        }),
+        [twabsApi],
+      ),
+    },
+  );
 
   const currentPriceForCollection = useMemo(() => {
     if (!oracleInfo) return null;
@@ -47,7 +49,6 @@ export function useCollectionTwapBidChange(collection: string) {
   }, [oracleInfo, collection]);
   const price24hrAgo = useMemo(() => {
     if (!twabData) return null;
-    console.log({ twabData });
     return twabData.twabs[0].price;
   }, [twabData]);
 

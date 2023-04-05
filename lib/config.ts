@@ -34,6 +34,7 @@ const paprHero: Config = {
   reservoirAPI: 'https://api-goerli.reservoir.tools',
   erc721Subgraph:
     'https://api.thegraph.com/subgraphs/name/adamgobes/erc721-goerli',
+  twabsApi: '',
 };
 
 const paprMeme = {

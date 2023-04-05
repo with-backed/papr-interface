@@ -1,4 +1,7 @@
-query twabForCollectionByTime($collection: bpchar, $earlierThan: timestamptz) {
+query latestTwabForCollectionBeforeTime(
+  $collection: bpchar
+  $earlierThan: timestamptz
+) {
   twabs(
     limit: 1
     order_by: { created_at: desc }
