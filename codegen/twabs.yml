@@ -1,0 +1,12 @@
+overwrite: true
+schema:
+  - 'https://optimal-mole-21.hasura.app/v1/graphql':
+      headers: { x-hasura-admin-secret: '{insert hasura key here}' }
+documents: './graphql/twabs/**/*.graphql'
+generates:
+  types/generated/graphql/twabs.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'urql-introspection'
+      - 'typed-document-node'

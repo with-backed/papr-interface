@@ -1,6 +1,7 @@
 import { Tooltip, TooltipReference as TTR } from 'components/Tooltip';
 import dayjs from 'dayjs';
 import { ethers } from 'ethers';
+import { useCollectionTwapBidChange } from 'hooks/useCollectionTwapBidChange';
 import { useController } from 'hooks/useController';
 import { useOracleInfo } from 'hooks/useOracleInfo';
 import { useTarget } from 'hooks/useTarget';
@@ -169,6 +170,10 @@ export function VaultDebtExplainer({
     newTargetNumber,
   ]);
 
+  const { twapPriceChange } = useCollectionTwapBidChange(
+    collateralContractAddress,
+  );
+
   return (
     <>
       <p>
@@ -191,8 +196,9 @@ export function VaultDebtExplainer({
 
           <span>V = (7-day avg. top bid)</span>
           <span>{collateralValue}</span>
-          {/* We don't yet have data to compute percent change for this */}
-          <span></span>
+
+          {twapPriceChange && <span>({formatPercent(twapPriceChange)})</span>}
+          {!twapPriceChange && <span>...</span>}
         </div>
       </Tooltip>
 
