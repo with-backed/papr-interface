@@ -1,36 +1,43 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { VaultHealth } from 'components/Controllers/Loans/VaultHealth';
 import { Fieldset } from 'components/Fieldset';
+import { NFTMarquee } from 'components/NFTMarquee';
 import { Table } from 'components/Table';
+import { Tooltip } from 'components/Tooltip';
+import { ethers } from 'ethers';
 import { formatUnits, getAddress } from 'ethers/lib/utils';
 import { useAccountNFTs } from 'hooks/useAccountNFTs';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
+import { useETHToUSDPrice } from 'hooks/useETHToUSDPrice';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useMaxDebt } from 'hooks/useMaxDebt';
-import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePaprBalance } from 'hooks/usePaprBalance';
-import { SupportedToken } from 'lib/config';
-import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
+import { formatDollars } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
+import Link from 'next/link';
 import { useMemo } from 'react';
+import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
 import { SubgraphVault } from 'types/SubgraphVault';
 import { useAccount, useNetwork } from 'wagmi';
 
 import styles from './YourPositions.module.css';
 
-export function YourPositions() {
+type YourPositionsProps = {
+  onPerformancePage: boolean;
+};
+
+export function YourPositions({ onPerformancePage }: YourPositionsProps) {
   const { address } = useAccount();
   const { tokenName, chainId } = useConfig();
   const { chain } = useNetwork();
-  const paprController = useController();
+  const { paprToken, underlying, allowedCollateral } = useController();
 
   const latestMarketPrice = useLatestMarketPrice();
-  const oracleInfo = useOracleInfo(OraclePriceType.twap);
-  const { balance } = usePaprBalance(paprController.paprToken.id);
+  const ethUSDPrice = useETHToUSDPrice();
+  const { balance } = usePaprBalance(paprToken.id);
   const { currentVaults } = useCurrentVaults(address);
 
   const wrongNetwork = useMemo(() => {
@@ -38,20 +45,13 @@ export function YourPositions() {
   }, [chain?.id, chainId]);
 
   const collateralContractAddresses = useMemo(() => {
-    return paprController.allowedCollateral.map((ac) => ac.token.id);
-  }, [paprController.allowedCollateral]);
+    return allowedCollateral.map((ac) => ac.token.id);
+  }, [allowedCollateral]);
 
   const { userCollectionNFTs } = useAccountNFTs(
     address,
     collateralContractAddresses,
   );
-
-  const uniqueCollections = useMemo(() => {
-    const vaultAndUserAddresses = userCollectionNFTs
-      .map((nft) => getAddress(nft.address))
-      .concat((currentVaults || []).map((v) => getAddress(v.token.id)));
-    return Array.from(new Set(vaultAndUserAddresses));
-  }, [userCollectionNFTs, currentVaults]);
 
   const collateralAssets = useMemo(
     () =>
@@ -62,7 +62,7 @@ export function YourPositions() {
             .map((v) =>
               Array(v.collateralCount)
                 .fill('')
-                .map((_) => getAddress(v.token.id))
+                .map(() => getAddress(v.token.id))
                 .flat(),
             )
             .flat(),
@@ -89,23 +89,22 @@ export function YourPositions() {
       : maxLoanMinusCurrentDebt;
   }, [currentVaults, maxLoanInDebtTokens]);
 
+  const formattedMaxLoan = useMemo(() => {
+    if (!maxLoanMinusCurrentDebt) {
+      return '...';
+    }
+    return formatBigNum(maxLoanMinusCurrentDebt, paprToken.decimals, 3);
+  }, [maxLoanMinusCurrentDebt, paprToken.decimals]);
+
   const maxLoanAmountInUnderlying = useMemo(() => {
     if (!maxLoanMinusCurrentDebt || !latestMarketPrice) {
-      return null;
+      return '...';
     }
 
-    return (
-      parseFloat(
-        formatUnits(maxLoanMinusCurrentDebt, paprController.paprToken.decimals),
-      ) * latestMarketPrice
-    ).toFixed(5);
-  }, [
-    latestMarketPrice,
-    maxLoanMinusCurrentDebt,
-    paprController.paprToken.decimals,
-  ]);
+    return (parseFloat(formattedMaxLoan) * latestMarketPrice).toFixed(4);
+  }, [latestMarketPrice, formattedMaxLoan, maxLoanMinusCurrentDebt]);
 
-  const totalPaprMemeDebt = useMemo(() => {
+  const totalPaprMemeDebt: ethers.BigNumber = useMemo(() => {
     if (!currentVaults) return BigNumber.from(0);
     return currentVaults
       .map((vault) => vault.debt)
@@ -115,21 +114,16 @@ export function YourPositions() {
       );
   }, [currentVaults]);
 
-  const totalPaprMemeDebtInUnderlying = useAsyncValue(async () => {
-    if (totalPaprMemeDebt.isZero()) return null;
-    const quoteResult = await getQuoteForSwap(
-      totalPaprMemeDebt,
-      paprController.paprToken.id,
-      paprController.underlying.id,
-      tokenName as SupportedToken,
+  const formattedTotalPaprMemeDebt = useMemo(() => {
+    return formatBigNum(totalPaprMemeDebt, paprToken.decimals, 3);
+  }, [totalPaprMemeDebt, paprToken.decimals]);
+
+  const totalPaprMemeDebtInUnderlying = useMemo(() => {
+    if (!latestMarketPrice) return '...';
+    return (parseFloat(formattedTotalPaprMemeDebt) * latestMarketPrice).toFixed(
+      4,
     );
-    return quoteResult.quote;
-  }, [
-    tokenName,
-    paprController.paprToken.id,
-    paprController.underlying.id,
-    totalPaprMemeDebt,
-  ]);
+  }, [formattedTotalPaprMemeDebt, latestMarketPrice]);
 
   if (!address || wrongNetwork) {
     return (
@@ -155,69 +149,44 @@ export function YourPositions() {
   return (
     <Fieldset legend={`🧮 YOUR ${tokenName} POSITIONS`}>
       <BalanceInfo balance={balance} />
-      <div>
-        Based on the NFTs in your wallet, you&apos;re eligible for loans from{' '}
-        {uniqueCollections.length} collection(s), with a max loan amount of{' '}
-        {!maxLoanAmountInUnderlying && <span>...</span>}
-        {maxLoanAmountInUnderlying && (
-          <>
-            {maxLoanAmountInUnderlying} {paprController.underlying.symbol}
-          </>
-        )}
-      </div>
-      <div>{totalPaprMemeDebt.isZero() && <p>No {tokenName} loans yet</p>}</div>
-      <div className={styles.paragraphs}>
-        {!totalPaprMemeDebt.isZero() && totalPaprMemeDebtInUnderlying && (
-          <p>
-            You owe{' '}
-            <b>
-              {formatBigNum(
-                totalPaprMemeDebt,
-                paprController.paprToken.decimals,
-              )}{' '}
-              {paprController.paprToken.symbol}
-            </b>{' '}
-            worth{' '}
-            <b>
-              {formatBigNum(
-                totalPaprMemeDebtInUnderlying,
-                paprController.underlying.decimals,
-              )}{' '}
-              {paprController.underlying.symbol}
-            </b>
-          </p>
-        )}
-      </div>
+      <p>
+        Existing debt: You owe {formattedTotalPaprMemeDebt} {paprToken.symbol} (
+        {totalPaprMemeDebtInUnderlying} {underlying.symbol})
+      </p>
+      <p>
+        New debt: Borrow up to {formattedMaxLoan} {paprToken.symbol} (
+        {maxLoanAmountInUnderlying} {underlying.symbol})
+      </p>
+      {onPerformancePage && (
+        <p>
+          View your activity on the{' '}
+          <Link href={`/tokens/${tokenName}/borrow`}>Borrow</Link> page
+        </p>
+      )}
       {currentVaults && (
         <Table className={styles.vaultTable}>
           <thead>
             <tr>
-              <th>
-                <p>COLLECTION</p>
-              </th>
-              <th>
-                <p>NFTS</p>
-              </th>
+              <th></th>
               <th>
                 <p>BORROWED</p>
               </th>
               <th>
-                <p>CLOSING COST</p>
+                <p>DEBT VALUE</p>
               </th>
               <th>
-                <p>UTILIZATION</p>
+                <p>HEALTH</p>
               </th>
             </tr>
           </thead>
           <tbody>
-            {!!oracleInfo &&
-              currentVaults.map((vault) => (
-                <VaultOverview
-                  vaultInfo={vault}
-                  oracleInfo={oracleInfo}
-                  key={vault.id}
-                />
-              ))}
+            {currentVaults.map((vault) => (
+              <VaultOverview
+                vaultInfo={vault}
+                key={vault.id}
+                ethUSDPrice={ethUSDPrice}
+              />
+            ))}
           </tbody>
         </Table>
       )}
@@ -226,24 +195,28 @@ export function YourPositions() {
 }
 
 type VaultOverviewProps = {
-  oracleInfo: OracleInfo;
   vaultInfo: SubgraphVault;
+  ethUSDPrice: number | undefined;
 };
 
-export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
-  const { tokenName } = useConfig();
+export function VaultOverview({ vaultInfo, ethUSDPrice }: VaultOverviewProps) {
+  const latestMarketPrice = useLatestMarketPrice();
   const { paprToken, underlying } = useController();
-  const nftSymbol = vaultInfo.token.symbol;
-  const costToClose = useAsyncValue(async () => {
-    if (BigNumber.from(vaultInfo.debt).isZero()) return BigNumber.from(0);
-    const quoteResult = await getQuoteForSwapOutput(
-      BigNumber.from(vaultInfo.debt),
-      underlying.id,
-      paprToken.id,
-      tokenName as SupportedToken,
+  const debtValue = useMemo(() => {
+    if (!latestMarketPrice) return null;
+    return (
+      parseFloat(formatUnits(vaultInfo.debt, paprToken.decimals)) *
+      latestMarketPrice
     );
-    return quoteResult.quote;
-  }, [vaultInfo.debt, tokenName, paprToken.id, underlying.id]);
+  }, [vaultInfo.debt, latestMarketPrice, paprToken.decimals]);
+
+  const borrowedUSDTooltip = useTooltipState({
+    placement: 'bottom',
+  });
+  const borrowedInUSD = useMemo(() => {
+    if (!debtValue || !ethUSDPrice) return null;
+    return debtValue * ethUSDPrice;
+  }, [debtValue, ethUSDPrice]);
 
   if (
     BigNumber.from(vaultInfo.debt).isZero() &&
@@ -254,21 +227,18 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
   return (
     <tr>
       <td>
-        <p>{nftSymbol}</p>
+        <NFTMarquee collateral={vaultInfo.collateral} />
       </td>
       <td>
-        <p>{vaultInfo.collateral.length}</p>
+        {formatBigNum(vaultInfo.debt, paprToken.decimals, 3)} {paprToken.symbol}
       </td>
       <td>
-        <p>
-          {formatBigNum(vaultInfo.debt, paprToken.decimals)} {paprToken.symbol}
-        </p>
-      </td>
-      <td>
-        <p>
-          {costToClose && formatBigNum(costToClose, underlying.decimals)}{' '}
-          {underlying.symbol}
-        </p>
+        <TooltipReference {...borrowedUSDTooltip}>
+          {debtValue ? formatTokenAmount(debtValue) : '...'} {underlying.symbol}
+        </TooltipReference>
+        <Tooltip {...borrowedUSDTooltip}>
+          {borrowedInUSD ? `${formatDollars(borrowedInUSD)}` : '...'}
+        </Tooltip>
       </td>
       <td>
         <VaultHealth vault={vaultInfo} />
@@ -309,7 +279,7 @@ function BalanceInfo({ balance }: BalanceInfoProps) {
   }, [paprToken, paprMemeBalance, latestMarketPrice, underlying.symbol]);
   return (
     <p>
-      You hold <b>{formattedBalance}</b> worth <b>{formattedValue}</b>.
+      Wallet balance: You hold {formattedBalance} ({formattedValue})
     </p>
   );
 }
