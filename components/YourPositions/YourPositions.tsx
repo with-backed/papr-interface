@@ -7,16 +7,13 @@ import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
 import { formatUnits, getAddress } from 'ethers/lib/utils';
 import { useAccountNFTs } from 'hooks/useAccountNFTs';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useCurrentVaults } from 'hooks/useCurrentVault/useCurrentVault';
+import { useETHToUSDPrice } from 'hooks/useETHToUSDPrice';
 import { useLatestMarketPrice } from 'hooks/useLatestMarketPrice';
 import { useMaxDebt } from 'hooks/useMaxDebt';
-import { OracleInfo, useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePaprBalance } from 'hooks/usePaprBalance';
-import { getUnitPriceForEth } from 'lib/coingecko';
-import { SupportedNetwork } from 'lib/config';
 import { formatBigNum, formatTokenAmount } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import Link from 'next/link';
@@ -38,7 +35,7 @@ export function YourPositions({ onPerformancePage }: YourPositionsProps) {
   const { paprToken, underlying, allowedCollateral } = useController();
 
   const latestMarketPrice = useLatestMarketPrice();
-  const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const ethUSDPrice = useETHToUSDPrice();
   const { balance } = usePaprBalance(paprToken.id);
   const { currentVaults } = useCurrentVaults(address);
 
@@ -162,8 +159,7 @@ export function YourPositions({ onPerformancePage }: YourPositionsProps) {
       {onPerformancePage && (
         <p>
           View your activity on the{' '}
-          <Link href={`/tokens/${tokenName}/borrow`}>borrow</Link> or{' '}
-          <Link href={`/tokens/${tokenName}/swap`}>swap</Link> page
+          <Link href={`/tokens/${tokenName}/borrow`}>Borrow</Link> page
         </p>
       )}
       {currentVaults && (
@@ -183,14 +179,13 @@ export function YourPositions({ onPerformancePage }: YourPositionsProps) {
             </tr>
           </thead>
           <tbody>
-            {!!oracleInfo &&
-              currentVaults.map((vault) => (
-                <VaultOverview
-                  vaultInfo={vault}
-                  oracleInfo={oracleInfo}
-                  key={vault.id}
-                />
-              ))}
+            {currentVaults.map((vault) => (
+              <VaultOverview
+                vaultInfo={vault}
+                key={vault.id}
+                ethUSDPrice={ethUSDPrice}
+              />
+            ))}
           </tbody>
         </Table>
       )}
@@ -199,12 +194,11 @@ export function YourPositions({ onPerformancePage }: YourPositionsProps) {
 }
 
 type VaultOverviewProps = {
-  oracleInfo: OracleInfo;
   vaultInfo: SubgraphVault;
+  ethUSDPrice: number | undefined;
 };
 
-export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
-  const { tokenName, network } = useConfig();
+export function VaultOverview({ vaultInfo, ethUSDPrice }: VaultOverviewProps) {
   const latestMarketPrice = useLatestMarketPrice();
   const { paprToken, underlying } = useController();
   const debtValue = useMemo(() => {
@@ -218,15 +212,10 @@ export function VaultOverview({ vaultInfo }: VaultOverviewProps) {
   const borrowedUSDTooltip = useTooltipState({
     placement: 'bottom',
   });
-  const borrowedInUSD = useAsyncValue(async () => {
-    if (!debtValue) return null;
-    const ethPrice = await getUnitPriceForEth(
-      'usd',
-      network as SupportedNetwork,
-    );
-    if (!ethPrice) return null;
-    return debtValue * ethPrice;
-  }, [debtValue, network]);
+  const borrowedInUSD = useMemo(() => {
+    if (!debtValue || !ethUSDPrice) return null;
+    return debtValue * ethUSDPrice;
+  }, [debtValue, ethUSDPrice]);
 
   if (
     BigNumber.from(vaultInfo.debt).isZero() &&
