@@ -49,17 +49,18 @@ export function useCollectionTwapBidChange(collection: string) {
   }, [oracleInfo, collection]);
   const price24hrAgo = useMemo(() => {
     if (!twabData) return null;
-    return twabData.twabs[0].price;
+    const latest = twabData.twabs[0];
+    return latest ? latest.price : null;
   }, [twabData]);
 
   const twapPriceChange = useMemo(() => {
-    if (!currentPriceForCollection || !twabData) return null;
-    return percentChange(twabData.twabs[0].price, currentPriceForCollection);
-  }, [twabData, currentPriceForCollection]);
+    if (!currentPriceForCollection || !price24hrAgo) return null;
+    return percentChange(price24hrAgo, currentPriceForCollection);
+  }, [currentPriceForCollection, price24hrAgo]);
 
   return {
-    twapPriceChange,
     currentPriceForCollection,
     price24hrAgo,
+    twapPriceChange,
   };
 }
