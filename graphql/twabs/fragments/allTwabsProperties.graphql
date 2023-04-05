@@ -1,0 +1,5 @@
+fragment allTwabsProperties on twabs {
+  price
+  token_address
+  created_at
+}

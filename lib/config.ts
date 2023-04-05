@@ -54,6 +54,7 @@ const paprMeme = {
   reservoirAPI: 'https://api.reservoir.tools',
   erc721Subgraph:
     'https://api.thegraph.com/subgraphs/name/sunguru98/mainnet-erc721-subgraph',
+  twabsApi: 'https://optimal-mole-21.hasura.app/v1/graphql',
 };
 
 export const configs = {

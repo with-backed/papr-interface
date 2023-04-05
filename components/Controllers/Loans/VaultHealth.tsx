@@ -1,6 +1,7 @@
 import { HealthBar } from 'components/HealthBar';
 import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
+import { useCollectionTwapBidChange } from 'hooks/useCollectionTwapBidChange';
 import { useController } from 'hooks/useController';
 import { useLTV } from 'hooks/useLTV';
 import { useOracleInfo } from 'hooks/useOracleInfo';
@@ -70,6 +71,7 @@ export function VaultHealth({ vault }: VaultHealthProps) {
           debt={debtNumber}
           collateralValue={collateralValue}
           symbol={symbol}
+          vaultCollateralAddress={vault.token.id}
         />
       </Tooltip>
     </>
@@ -82,6 +84,7 @@ type VaultHealthTooltipContentProps = {
   debt: number;
   collateralValue: string;
   symbol: string;
+  vaultCollateralAddress: string;
 };
 
 function VaultHealthTooltipContent({
@@ -90,6 +93,7 @@ function VaultHealthTooltipContent({
   debt,
   collateralValue,
   symbol,
+  vaultCollateralAddress,
 }: VaultHealthTooltipContentProps) {
   const { paprToken } = useController();
   const targetNow = useTarget();
@@ -123,6 +127,10 @@ function VaultHealthTooltipContent({
     [debtNumberNow, symbol],
   );
 
+  const { twapPriceChange } = useCollectionTwapBidChange(
+    vaultCollateralAddress,
+  );
+
   return (
     <div className={styles.tooltip}>
       <span>Loan to Value (LTV) calculation</span>
@@ -136,7 +144,8 @@ function VaultHealthTooltipContent({
       <span>V = (7-day avg. top bid)</span>
       <span>{collateralValue}</span>
       {/* We don't yet have data to compute percent change for this */}
-      <span></span>
+      {twapPriceChange && <span>({formatPercent(twapPriceChange)})</span>}
+      {!twapPriceChange && <span>...</span>}
 
       {/* Blank space */}
       <span>

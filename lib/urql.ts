@@ -6,9 +6,10 @@ import { createClient } from '@urql/core';
 // be invalidated.
 const requestPolicy = 'network-only';
 
-export function clientFromUrl(url: string) {
+export function clientFromUrl(url: string, fetchOptions?: any) {
   return createClient({
     url,
     requestPolicy,
+    fetchOptions,
   });
 }

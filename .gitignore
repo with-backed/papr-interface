@@ -37,7 +37,9 @@ yarn-error.log*
 
 # gen
 /abis/types
-/types/generated
+/types/generated/abis/*
+/types/generated/graphql/*
+!/types/generated/graphql/twabs.ts
 
 # intellij
 .idea/

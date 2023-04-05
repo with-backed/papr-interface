@@ -1,0 +1,12 @@
+query twabForCollectionByTime($collection: bpchar, $earlierThan: timestamptz) {
+  twabs(
+    limit: 1
+    order_by: { created_at: desc }
+    where: {
+      token_address: { _eq: $collection }
+      created_at: { _lt: $earlierThan }
+    }
+  ) {
+    ...allTwabsProperties
+  }
+}

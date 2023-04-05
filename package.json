@@ -21,6 +21,7 @@
     "graphql:generate:in-kind": "graphql-codegen --config codegen/inKind.yml",
     "graphql:generate:uniswap": "graphql-codegen --config codegen/uniswap.yml",
     "graphql:generate:erc721": "graphql-codegen --config codegen/erc721.yml",
+    "graphql:generate:twabs": "graphql-codegen --config codegen/twabs.yml",
     "abis:generate": "yarn typechain --target ethers-v5 --out-dir ./types/generated/abis './abis/*.json'"
   },
   "dependencies": {
