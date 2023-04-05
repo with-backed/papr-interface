@@ -4,15 +4,12 @@ import { Fieldset } from 'components/Fieldset';
 import { Table } from 'components/Table';
 import dayjs from 'dayjs';
 import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useAuctionTopBid } from 'hooks/useAuctionTopBid';
-import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
+import { useETHToUSDPrice } from 'hooks/useETHToUSDPrice';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
 import { useNFTFlagged } from 'hooks/useNFTFlagged';
 import { usePaprPriceForAuction } from 'hooks/usePaprPriceForAuction';
-import { getUnitPriceForEth } from 'lib/coingecko';
-import { SupportedNetwork } from 'lib/config';
 import {
   allExchanges,
   Exchange,
@@ -40,7 +37,6 @@ export function AuctionPageContent({
   auction,
   refresh,
 }: AuctionPageContentProps) {
-  const config = useConfig();
   const controller = useController();
   const { paprPrice } = usePaprPriceForAuction(auction);
 
@@ -91,9 +87,7 @@ export function AuctionPageContent({
     controller.paprToken.decimals,
   ]);
 
-  const ethToUSDPrice = useAsyncValue(() => {
-    return getUnitPriceForEth('usd', config.network as SupportedNetwork);
-  }, [config.network]);
+  const ethToUSDPrice = useETHToUSDPrice();
 
   const liveAuctionPriceUSD = useMemo(() => {
     if (!liveAuctionPriceUnderlying || !ethToUSDPrice) return null;
