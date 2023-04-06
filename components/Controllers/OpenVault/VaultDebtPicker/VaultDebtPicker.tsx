@@ -11,9 +11,10 @@ import { getAddress } from 'ethers/lib/utils';
 import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
 import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
-import { PaprController, useController } from 'hooks/useController';
+import { useController } from 'hooks/useController';
 import { useMaxDebt } from 'hooks/useMaxDebt';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
+import { usePoolQuote } from 'hooks/usePoolQuote';
 import { useTarget } from 'hooks/useTarget';
 import { useTheme } from 'hooks/useTheme';
 import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
@@ -30,7 +31,7 @@ import {
 } from 'lib/controllers';
 import { price } from 'lib/controllers/charts/mark';
 import { calculateSwapFee } from 'lib/controllers/fees';
-import { formatBigNum, formatPercent } from 'lib/numberFormat';
+import { formatBigNum } from 'lib/numberFormat';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { erc20TokenToToken } from 'lib/uniswapSubgraph';
 import {
@@ -41,21 +42,23 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Input, TooltipReference, useTooltipState } from 'reakit';
-import { VaultsByOwnerForControllerQuery } from 'types/generated/graphql/inKindSubgraph';
+import { TooltipReference, useTooltipState } from 'reakit';
 import {
   AuctionsByNftOwnerAndCollectionDocument,
   AuctionsByNftOwnerAndCollectionQuery,
 } from 'types/generated/graphql/inKindSubgraph';
+import { SubgraphVault } from 'types/SubgraphVault';
 import { useQuery } from 'urql';
 import { useAccount } from 'wagmi';
 
+import { AmountToBorrowOrRepayInput } from '../AmountToBorrowOrRepayInput';
+import { LoanActionSummary } from '../LoanActionSummary';
 import { VaultDebtExplainer } from '../VaultDebtExplainer';
 import styles from './VaultDebtPicker.module.css';
 
 type VaultDebtPickerProps = {
   oracleInfo: OracleInfo;
-  vault: VaultsByOwnerForControllerQuery['vaults']['0'] | undefined;
+  vault: SubgraphVault | undefined;
   collateralContractAddress: string;
   userNFTsForVault: AccountNFTsResponse[];
   refresh: () => void;
@@ -85,7 +88,7 @@ export function VaultDebtPicker({
     );
   }, [vault?.collateral.length, depositNFTs, withdrawNFTs]);
 
-  const [{ data: auctionsByNftOwnerAndCollection, fetching, error }] =
+  const [{ data: auctionsByNftOwnerAndCollection }] =
     useQuery<AuctionsByNftOwnerAndCollectionQuery>({
       query: AuctionsByNftOwnerAndCollectionDocument,
       variables: {
@@ -537,7 +540,6 @@ export function VaultDebtPicker({
               )}
               <div>
                 <AmountToBorrowOrRepayInput
-                  paprController={paprController}
                   debtToBorrowOrRepay={debtToBorrowOrRepay}
                   isBorrowing={isBorrowing}
                   currentVaultDebt={currentVaultDebt}
@@ -551,7 +553,6 @@ export function VaultDebtPicker({
         {!loanFormHidden && (
           <div className={styles['loan-form']}>
             <LoanActionSummary
-              controller={paprController}
               debtToBorrowOrRepay={debtToBorrowOrRepay}
               quote={isBorrowing ? underlyingToBorrow : underlyingToRepay}
               fee={isBorrowing ? underlyingBorrowFee : underlyingRepayFee}
@@ -577,87 +578,6 @@ export function VaultDebtPicker({
         )}
       </div>
     </Fieldset>
-  );
-}
-
-type AmountToBorrowOrRepayInputProps = {
-  paprController: PaprController;
-  isBorrowing: boolean;
-  currentVaultDebt: ethers.BigNumber;
-  debtToBorrowOrRepay: ethers.BigNumber;
-  setControlledSliderValue: (val: number) => void;
-  setChosenDebt: (val: ethers.BigNumber) => void;
-};
-
-function AmountToBorrowOrRepayInput({
-  paprController,
-  isBorrowing,
-  currentVaultDebt,
-  debtToBorrowOrRepay,
-  setControlledSliderValue,
-  setChosenDebt,
-}: AmountToBorrowOrRepayInputProps) {
-  const decimals = useMemo(
-    () => paprController.paprToken.decimals,
-    [paprController.paprToken.decimals],
-  );
-
-  const [amount, setAmount] = useState<string>(
-    ethers.utils.formatUnits(debtToBorrowOrRepay, decimals),
-  );
-  const [editingInput, setEditingInput] = useState<boolean>(false);
-
-  const inputValue = useMemo(() => {
-    if (editingInput) return amount;
-    const amountBigNumber = amount
-      ? ethers.utils.parseUnits(amount, decimals)
-      : ethers.BigNumber.from(0);
-    return formatBigNum(amountBigNumber, decimals);
-  }, [amount, decimals, editingInput]);
-
-  const handleInputValueChanged = useCallback(
-    async (val: string) => {
-      setAmount(val);
-      if (!val || isNaN(parseFloat(val)) || parseFloat(val) < 0) return; // do not change slider if input is invalid
-
-      const debtDelta: ethers.BigNumber = ethers.utils.parseUnits(
-        val,
-        decimals,
-      );
-
-      const newDebt = isBorrowing
-        ? currentVaultDebt.add(debtDelta)
-        : currentVaultDebt.sub(debtDelta);
-      const formattedNewDebt = formatBigNum(newDebt, decimals);
-
-      setChosenDebt(newDebt);
-      setControlledSliderValue(parseFloat(formattedNewDebt));
-    },
-    [
-      decimals,
-      setChosenDebt,
-      setControlledSliderValue,
-      isBorrowing,
-      currentVaultDebt,
-    ],
-  );
-
-  useEffect(() => {
-    if (!editingInput) {
-      setAmount(formatBigNum(debtToBorrowOrRepay, decimals));
-    }
-  }, [debtToBorrowOrRepay, decimals, editingInput]);
-
-  return (
-    <span className={styles.debtAmountInputWrapper}>
-      <Input
-        value={`${inputValue}`}
-        type="number"
-        onChange={(e) => handleInputValueChanged(e.target.value)}
-        onFocus={() => setEditingInput(true)}
-        onBlur={() => setEditingInput(false)}
-      />
-    </span>
   );
 }
 
@@ -778,137 +698,6 @@ function CollateralRow({
   );
 }
 
-type LoanActionSummaryProps = {
-  controller: PaprController;
-  isBorrowing: boolean;
-  usingPerpetual: boolean;
-  debtToBorrowOrRepay: ethers.BigNumber;
-  quote: ethers.BigNumber | null;
-  fee: ethers.BigNumber | null;
-  slippage: number | null;
-  projectedAPR: number | null;
-  setUsingPerpetual: (val: boolean) => void;
-  errorMessage: string;
-};
-
-function LoanActionSummary({
-  controller,
-  isBorrowing,
-  usingPerpetual,
-  debtToBorrowOrRepay,
-  quote,
-  fee,
-  slippage,
-  projectedAPR,
-  setUsingPerpetual,
-  errorMessage,
-}: LoanActionSummaryProps) {
-  const theme = useTheme();
-
-  const quoteWithFee = useMemo(() => {
-    if (!quote || !fee) return null;
-    if (isBorrowing) return quote.sub(fee);
-    else return quote.add(fee);
-  }, [quote, fee, isBorrowing]);
-
-  return (
-    <div className={styles.loanActionSummaryWrapper}>
-      <div className={[styles.loanActionSummary, styles[theme]].join(' ')}>
-        <div>
-          <div>
-            <p>
-              {isBorrowing ? 'Borrow' : 'Repay'} {controller.paprToken.symbol}
-            </p>
-          </div>
-          <div>
-            <p>
-              {formatBigNum(debtToBorrowOrRepay, controller.paprToken.decimals)}
-            </p>
-          </div>
-        </div>
-        <div>
-          <div className={styles.swapQuote}>
-            <input
-              type="checkbox"
-              onChange={() => setUsingPerpetual(!usingPerpetual)}
-            />
-            {isBorrowing && <p>Swap for {controller.underlying.symbol}</p>}
-            {!isBorrowing && <p>Swap from {controller.underlying.symbol}</p>}
-          </div>
-          <div>
-            {quote && (
-              <p
-                className={`${
-                  usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
-                }`}>
-                {formatBigNum(quote, controller.underlying.decimals)}
-              </p>
-            )}
-            {!quote && <p>...</p>}
-          </div>
-        </div>
-        <div
-          className={`${
-            usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
-          }`}>
-          <div>
-            <p>Slippage</p>
-          </div>
-          <div>
-            {slippage !== null && <p>{slippage.toFixed(2)}%</p>}
-            {slippage === null && <p>...</p>}
-          </div>
-        </div>
-        <div
-          className={`${
-            usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
-          }`}>
-          <div>
-            <p>papr.wtf swap fee (0.3%)</p>
-          </div>
-          <div>
-            {fee && <p>{formatBigNum(fee, controller.underlying.decimals)}</p>}
-            {!fee && <p>-</p>}
-          </div>
-        </div>
-        <div
-          className={`${
-            usingPerpetual ? [styles.greyed, styles[theme]].join(' ') : ''
-          }`}>
-          <div>
-            <p>Projected Contract Rate</p>
-          </div>
-          <div>
-            {projectedAPR && <p>{formatPercent(projectedAPR)}</p>}
-            {!projectedAPR && <p>-</p>}
-          </div>
-        </div>
-        <div>
-          <div>
-            <p>
-              {isBorrowing ? 'Receive' : 'Pay'}{' '}
-              {usingPerpetual
-                ? controller.paprToken.symbol
-                : controller.underlying.symbol}
-            </p>
-          </div>
-          <div>
-            {usingPerpetual
-              ? formatBigNum(debtToBorrowOrRepay, controller.paprToken.decimals)
-              : quoteWithFee &&
-                formatBigNum(quoteWithFee, controller.underlying.decimals)}
-          </div>
-        </div>
-        {!!errorMessage && (
-          <div className={styles.error}>
-            <p>{errorMessage}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 type CostToCloseOrMaximumLoanProps = {
   vaultHasDebt: boolean;
   vaultDebt: ethers.BigNumber;
@@ -925,41 +714,21 @@ function CostToCloseOrMaximumLoan({
   const { tokenName } = useConfig();
   const controller = useController();
 
-  const costToClose = useAsyncValue(async () => {
-    if (!vaultHasDebt) return null;
-    const quoteResult = await getQuoteForSwapOutput(
-      vaultDebt,
-      controller.underlying.id,
-      controller.paprToken.id,
-      tokenName as SupportedToken,
-    );
-    return quoteResult.quote;
-  }, [
-    vaultHasDebt,
+  const { quote: costToClose } = usePoolQuote(
     vaultDebt,
-    controller.paprToken.id,
     controller.underlying.id,
-    tokenName,
-  ]);
+    controller.paprToken.id,
+    'exactOut',
+    !vaultHasDebt,
+  );
 
-  const maxDebtUnderlying = useAsyncValue(async () => {
-    if (!maxLoanPerNFT || vaultHasDebt) return null;
-    const maxDebtForAllNFTs = maxLoanPerNFT.mul(numberOfNFTs);
-    const quoteResult = await getQuoteForSwap(
-      maxDebtForAllNFTs,
-      controller.paprToken.id,
-      controller.underlying.id,
-      tokenName as SupportedToken,
-    );
-    return quoteResult.quote;
-  }, [
-    vaultHasDebt,
-    maxLoanPerNFT,
-    numberOfNFTs,
+  const { quote: maxDebtUnderlying } = usePoolQuote(
+    maxLoanPerNFT?.mul(numberOfNFTs),
     controller.paprToken.id,
     controller.underlying.id,
-    tokenName,
-  ]);
+    'exactIn',
+    vaultHasDebt,
+  );
 
   if (vaultDebt && vaultDebt.gt(0)) {
     return (
