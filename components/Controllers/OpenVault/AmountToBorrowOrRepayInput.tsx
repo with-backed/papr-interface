@@ -4,7 +4,7 @@ import { formatBigNum } from 'lib/numberFormat';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Input } from 'reakit';
 
-import styles from './VaultDebtPicker.module.css';
+import styles from './VaultDebtPicker/VaultDebtPicker.module.css';
 
 type AmountToBorrowOrRepayInputProps = {
   isBorrowing: boolean;

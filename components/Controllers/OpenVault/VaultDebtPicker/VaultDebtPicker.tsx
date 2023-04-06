@@ -9,25 +9,21 @@ import { Toggle } from 'components/Toggle';
 import { ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { AccountNFTsResponse } from 'hooks/useAccountNFTs';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
 import { useMaxDebt } from 'hooks/useMaxDebt';
+import { useNFTSymbol } from 'hooks/useNFTSymbol';
 import { OracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { usePoolQuote } from 'hooks/usePoolQuote';
 import { useTarget } from 'hooks/useTarget';
 import { useTheme } from 'hooks/useTheme';
+import { useVaultComponentNFTs } from 'hooks/useVaultComponentNFTs';
 import { VaultWriteType } from 'hooks/useVaultWrite/helpers';
 import { SupportedToken } from 'lib/config';
 import {
   computeNewProjectedAPR,
-  computeSlippageForSwap,
   convertOneScaledValue,
-  emptyQuoteResult,
-  getQuoteForSwap,
-  getQuoteForSwapOutput,
   getUniqueNFTId,
-  QuoterResult,
 } from 'lib/controllers';
 import { price } from 'lib/controllers/charts/mark';
 import { calculateSwapFee } from 'lib/controllers/fees';
@@ -43,13 +39,7 @@ import {
   useState,
 } from 'react';
 import { TooltipReference, useTooltipState } from 'reakit';
-import {
-  AuctionsByNftOwnerAndCollectionDocument,
-  AuctionsByNftOwnerAndCollectionQuery,
-} from 'types/generated/graphql/inKindSubgraph';
 import { SubgraphVault } from 'types/SubgraphVault';
-import { useQuery } from 'urql';
-import { useAccount } from 'wagmi';
 
 import { AmountToBorrowOrRepayInput } from '../AmountToBorrowOrRepayInput';
 import { LoanActionSummary } from '../LoanActionSummary';
@@ -73,7 +63,6 @@ export function VaultDebtPicker({
 }: VaultDebtPickerProps) {
   // init hooks
   const paprController = useController();
-  const { address } = useAccount();
   const { tokenName, chainId } = useConfig();
   const target = useTarget();
   const theme = useTheme();
@@ -88,53 +77,11 @@ export function VaultDebtPicker({
     );
   }, [vault?.collateral.length, depositNFTs, withdrawNFTs]);
 
-  const [{ data: auctionsByNftOwnerAndCollection }] =
-    useQuery<AuctionsByNftOwnerAndCollectionQuery>({
-      query: AuctionsByNftOwnerAndCollectionDocument,
-      variables: {
-        nftOwner: address!,
-        collection: collateralContractAddress.toLowerCase(),
-      },
-    });
-
-  const userAndVaultNFTs = useMemo(() => {
-    return (vault?.collateral || [])
-      .map((c) => ({
-        address: vault?.token.id,
-        tokenId: c.tokenId,
-        inVault: true,
-        isLiquidating: false,
-        isLiquidated: false,
-      }))
-      .concat(
-        (auctionsByNftOwnerAndCollection?.auctions || []).map((a) => ({
-          address: a.auctionAssetContract.id,
-          tokenId: a.auctionAssetID,
-          inVault: false,
-          isLiquidating: !a.endPrice,
-          isLiquidated: !!a.endPrice,
-        })),
-      )
-      .concat(
-        userNFTsForVault
-          .filter(
-            // filter out nfts that are already in the vault, major assumption here is goldsky is faster than thegraph
-            (nft) =>
-              vault?.collateral.find(
-                (c) =>
-                  getAddress(vault.token.id) === getAddress(nft.address) &&
-                  c.tokenId === nft.tokenId,
-              ) === undefined,
-          )
-          .map((nft) => ({
-            address: nft.address,
-            tokenId: nft.tokenId,
-            inVault: false,
-            isLiquidating: false,
-            isLiquidated: false,
-          })),
-      );
-  }, [userNFTsForVault, vault, auctionsByNftOwnerAndCollection?.auctions]);
+  const userAndVaultNFTs = useVaultComponentNFTs(
+    collateralContractAddress,
+    userNFTsForVault,
+    vault,
+  );
 
   // debt variables
   const maxDebtPerNFTInPerpetual = useMaxDebt(
@@ -205,44 +152,26 @@ export function VaultDebtPicker({
     return currentVaultDebt.sub(chosenDebt);
   }, [chosenDebt, currentVaultDebt]);
 
-  const underlyingBorrowQuote: (QuoterResult & { slippage: number }) | null =
-    useAsyncValue(async () => {
-      if (debtToBorrowOrRepay.isZero() || !isBorrowing)
-        return { ...emptyQuoteResult, slippage: 0 };
-      const quoteResult = await getQuoteForSwap(
-        debtToBorrowOrRepay,
-        paprController.paprToken.id,
-        paprController.underlying.id,
-        tokenName as SupportedToken,
-      );
-      if (!quoteResult.quote) return null;
-      const slippage = await computeSlippageForSwap(
-        quoteResult.quote,
-        paprController.paprToken,
-        paprController.underlying,
-        debtToBorrowOrRepay,
-        true,
-        tokenName as SupportedToken,
-      );
-      return { ...quoteResult, slippage };
-    }, [
-      isBorrowing,
-      debtToBorrowOrRepay,
-      paprController.paprToken,
-      paprController.underlying,
-      tokenName,
-    ]);
+  const underlyingBorrowQuote = usePoolQuote({
+    amount: debtToBorrowOrRepay,
+    inputToken: paprController.underlying,
+    outputToken: paprController.paprToken,
+    tradeType: 'exactIn',
+    withSlippage: true,
+    skip: !isBorrowing || debtToBorrowOrRepay.isZero(),
+  });
+
   const underlyingToBorrow = useMemo(() => {
-    if (!underlyingBorrowQuote) return ethers.BigNumber.from(0);
+    if (!underlyingBorrowQuote.quote) return ethers.BigNumber.from(0);
     return underlyingBorrowQuote.quote;
   }, [underlyingBorrowQuote]);
   const underlyingBorrowFee = useMemo(() => {
-    if (!underlyingBorrowQuote?.quote || usingPerpetual) return null;
+    if (!underlyingBorrowQuote.quote || usingPerpetual) return null;
     return calculateSwapFee(underlyingBorrowQuote.quote);
   }, [underlyingBorrowQuote, usingPerpetual]);
 
   const slippageForBorrow = useMemo(() => {
-    if (!underlyingBorrowQuote) return 0;
+    if (!underlyingBorrowQuote.quote) return 0;
     return underlyingBorrowQuote.slippage;
   }, [underlyingBorrowQuote]);
 
@@ -251,39 +180,21 @@ export function VaultDebtPicker({
     return underlyingBorrowQuote.sqrtPriceX96After;
   }, [usingPerpetual, underlyingBorrowQuote]);
 
-  const underlyingRepayQuote: (QuoterResult & { slippage: number }) | null =
-    useAsyncValue(async () => {
-      if (isBorrowing || debtToBorrowOrRepay.isZero())
-        return { ...emptyQuoteResult, slippage: 0 };
-      const quoteResult = await getQuoteForSwapOutput(
-        debtToBorrowOrRepay,
-        paprController.underlying.id,
-        paprController.paprToken.id,
-        tokenName as SupportedToken,
-      );
-      if (!quoteResult.quote) return null;
-      const slippage = await computeSlippageForSwap(
-        quoteResult.quote,
-        paprController.underlying,
-        paprController.paprToken,
-        debtToBorrowOrRepay,
-        false,
-        tokenName as SupportedToken,
-      );
-      return { ...quoteResult, slippage };
-    }, [
-      isBorrowing,
-      debtToBorrowOrRepay,
-      paprController.paprToken,
-      paprController.underlying,
-      tokenName,
-    ]);
+  const underlyingRepayQuote = usePoolQuote({
+    amount: debtToBorrowOrRepay,
+    inputToken: paprController.underlying,
+    outputToken: paprController.paprToken,
+    tradeType: 'exactOut',
+    withSlippage: true,
+    skip: isBorrowing || debtToBorrowOrRepay.isZero(),
+  });
+
   const underlyingToRepay = useMemo(() => {
-    if (!underlyingRepayQuote?.quote) return ethers.BigNumber.from(0);
+    if (!underlyingRepayQuote.quote) return ethers.BigNumber.from(0);
     return underlyingRepayQuote.quote;
   }, [underlyingRepayQuote]);
   const underlyingRepayFee = useMemo(() => {
-    if (!underlyingRepayQuote?.quote || usingPerpetual) return null;
+    if (!underlyingRepayQuote.quote || usingPerpetual) return null;
     return calculateSwapFee(underlyingRepayQuote.quote);
   }, [underlyingRepayQuote, usingPerpetual]);
 
@@ -380,14 +291,7 @@ export function VaultDebtPicker({
     chainId,
   ]);
 
-  const nftSymbol = useMemo(
-    () =>
-      paprController.allowedCollateral.find(
-        (ac) =>
-          getAddress(ac.token.id) === getAddress(collateralContractAddress),
-      )!.token.symbol,
-    [paprController.allowedCollateral, collateralContractAddress],
-  );
+  const nftSymbol = useNFTSymbol(collateralContractAddress);
 
   const maxLTV = useMemo(
     () =>
@@ -711,24 +615,25 @@ function CostToCloseOrMaximumLoan({
   maxLoanPerNFT,
   numberOfNFTs,
 }: CostToCloseOrMaximumLoanProps) {
-  const { tokenName } = useConfig();
   const controller = useController();
 
-  const { quote: costToClose } = usePoolQuote(
-    vaultDebt,
-    controller.underlying.id,
-    controller.paprToken.id,
-    'exactOut',
-    !vaultHasDebt,
-  );
+  const { quote: costToClose } = usePoolQuote({
+    amount: vaultDebt,
+    inputToken: controller.underlying,
+    outputToken: controller.paprToken,
+    tradeType: 'exactOut',
+    withSlippage: false,
+    skip: !vaultHasDebt,
+  });
 
-  const { quote: maxDebtUnderlying } = usePoolQuote(
-    maxLoanPerNFT?.mul(numberOfNFTs),
-    controller.paprToken.id,
-    controller.underlying.id,
-    'exactIn',
-    vaultHasDebt,
-  );
+  const { quote: maxDebtUnderlying } = usePoolQuote({
+    amount: maxLoanPerNFT?.mul(numberOfNFTs),
+    inputToken: controller.paprToken,
+    outputToken: controller.underlying,
+    tradeType: 'exactIn',
+    withSlippage: false,
+    skip: vaultHasDebt,
+  });
 
   if (vaultDebt && vaultDebt.gt(0)) {
     return (

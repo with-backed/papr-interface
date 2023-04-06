@@ -4,7 +4,7 @@ import { useTheme } from 'hooks/useTheme';
 import { formatBigNum, formatPercent } from 'lib/numberFormat';
 import { useMemo } from 'react';
 
-import styles from './VaultDebtPicker.module.css';
+import styles from './VaultDebtPicker/VaultDebtPicker.module.css';
 
 type LoanActionSummaryProps = {
   isBorrowing: boolean;

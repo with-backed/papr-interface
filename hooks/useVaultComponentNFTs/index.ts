@@ -1,0 +1,1 @@
+export { useVaultComponentNFTs } from './useVaultComponentNFTs';
