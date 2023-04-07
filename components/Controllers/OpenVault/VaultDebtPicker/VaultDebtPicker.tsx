@@ -154,8 +154,8 @@ export function VaultDebtPicker({
 
   const underlyingBorrowQuote = usePoolQuote({
     amount: debtToBorrowOrRepay,
-    inputToken: paprController.underlying,
-    outputToken: paprController.paprToken,
+    inputToken: paprController.paprToken,
+    outputToken: paprController.underlying,
     tradeType: 'exactIn',
     withSlippage: true,
     skip: !isBorrowing || debtToBorrowOrRepay.isZero(),
