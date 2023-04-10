@@ -124,8 +124,6 @@ function BuyButton({
     },
   } as any);
 
-  console.log({ data, write, error });
-
   const buttonText = useMemo(() => {
     if (!oracleSynced) return 'Waiting for oracle...';
     return 'Purchase';
