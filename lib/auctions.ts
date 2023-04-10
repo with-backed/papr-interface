@@ -11,5 +11,5 @@ export function currentPrice(
   const m = Math.pow(percentRemainingPerPeriod, ratio);
   const q = Math.floor(m * 1e10);
   const p = startPrice.mul(q).div(1e10);
-  return p;
+  return p.add(ethers.BigNumber.from(1000000000)); // small padding of 0.000000001 to ensure max price is big enough;
 }

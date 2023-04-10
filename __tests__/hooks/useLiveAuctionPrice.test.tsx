@@ -1,9 +1,10 @@
+import { approximatelyEquals } from '__tests__/lib/auctions.test';
 import { renderHook } from '@testing-library/react-hooks';
 import { ethers } from 'ethers';
 import { ControllerContextProvider } from 'hooks/useController';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
-import { subgraphController } from 'lib/mockData/mockPaprController';
 import { getQuoteForSwapOutput } from 'lib/controllers';
+import { subgraphController } from 'lib/mockData/mockPaprController';
 
 const auction = {
   id: '108336989422393537136663695875967233446296675148947056443769352774099790856152',
@@ -80,15 +81,20 @@ describe('useLiveAuctionPrice', () => {
       },
     );
     expect(result.current.liveTimestamp).toBe(startTime);
-    expect(result.current.liveAuctionPrice.eq(startPrice)).toBe(true);
+    expect(
+      approximatelyEquals(result.current.liveAuctionPrice, startPrice),
+    ).toBe(true);
     expect(result.current.liveAuctionPriceUnderlying).toBe(null); // starting underlying should be null as it fetches quote
     expect(result.current.priceUpdated).toBe(false);
 
     await waitForNextUpdate();
 
-    expect(result.current.liveAuctionPriceUnderlying?.eq(startPrice)).toBe(
-      true,
-    );
+    expect(
+      approximatelyEquals(
+        startPrice,
+        result.current.liveAuctionPriceUnderlying!,
+      ),
+    ).toBe(true);
 
     jest.advanceTimersToNextTimer();
 
