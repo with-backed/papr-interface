@@ -180,15 +180,13 @@ export function YourPositions({ onPerformancePage }: YourPositionsProps) {
             </tr>
           </thead>
           <tbody>
-            {currentVaults
-              .filter((v) => v.collateralCount > 0)
-              .map((vault) => (
-                <VaultOverview
-                  vaultInfo={vault}
-                  key={vault.id}
-                  ethUSDPrice={ethUSDPrice}
-                />
-              ))}
+            {currentVaults.map((vault) => (
+              <VaultOverview
+                vaultInfo={vault}
+                key={vault.id}
+                ethUSDPrice={ethUSDPrice}
+              />
+            ))}
           </tbody>
         </Table>
       )}
