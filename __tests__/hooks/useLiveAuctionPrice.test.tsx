@@ -1,5 +1,5 @@
-import { renderHook } from '@testing-library/react-hooks';
 import { approximatelyEquals } from '__tests__/lib/auctions.test';
+import { renderHook } from '@testing-library/react-hooks';
 import { ethers } from 'ethers';
 import { ControllerContextProvider } from 'hooks/useController';
 import { useLiveAuctionPrice } from 'hooks/useLiveAuctionPrice';
