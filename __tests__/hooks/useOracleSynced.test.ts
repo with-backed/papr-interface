@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks';
 import { useOracleSynced } from 'hooks/useOracleSynced';
-import { getLatestBlockTimestamp } from 'lib/chainHelpers';
+import { useTimestamp } from 'hooks/useTimestamp';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 
 jest.mock('hooks/useOracleInfo/useOracleInfo', () => ({
@@ -20,39 +20,40 @@ jest.mock('hooks/useOracleInfo/useOracleInfo', () => ({
   }),
 }));
 
-jest.mock('lib/chainHelpers', () => ({
-  getLatestBlockTimestamp: jest.fn(),
+jest.mock('hooks/useTimestamp', () => ({
+  useTimestamp: jest.fn(),
 }));
 
-const mockedGetLatestBlockTimestamp =
-  getLatestBlockTimestamp as jest.MockedFunction<
-    typeof getLatestBlockTimestamp
-  >;
+const mockUseTimestamp = useTimestamp as jest.MockedFunction<
+  typeof useTimestamp
+>;
 
 describe('useOracleSync', () => {
   it('returns true when oracle message is older than latest block timestamp', async () => {
-    mockedGetLatestBlockTimestamp.mockResolvedValue(1001);
-    const { result, waitForNextUpdate } = renderHook(() =>
+    mockUseTimestamp.mockReturnValue({
+      blockNumber: 0,
+      timestamp: 1001,
+    });
+    const { result } = renderHook(() =>
       useOracleSynced(
         '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
         OraclePriceType.lower,
       ),
     );
-    expect(result.current).toBe(false);
-    await waitForNextUpdate();
     expect(result.current).toBe(true);
   });
 
   it('returns false when oracle message is newer than latest block timestamp', async () => {
-    mockedGetLatestBlockTimestamp.mockResolvedValue(999);
-    const { result, waitForNextUpdate } = renderHook(() =>
+    mockUseTimestamp.mockReturnValue({
+      blockNumber: 0,
+      timestamp: 999,
+    });
+    const { result } = renderHook(() =>
       useOracleSynced(
         '0x36b8f7b7be4680c3511e764e0d2b56d54ad57d6e',
         OraclePriceType.lower,
       ),
     );
-    expect(result.current).toBe(false);
-    await waitForNextUpdate();
     expect(result.current).toBe(false);
   });
 });

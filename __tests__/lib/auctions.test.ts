@@ -1,11 +1,19 @@
 import { ethers } from 'ethers';
-import { currentPrice } from 'lib/auctions';
-import { ONE } from 'lib/constants';
-import { convertOneScaledValue } from 'lib/controllers';
+import { AuctionType, currentPrice } from 'lib/auctions';
 
+const startTimestamp = 10_000;
 const oneDayInSeconds = 60 * 60 * 24;
 const startPrice = ethers.BigNumber.from(10).pow(18);
-const perPeriodDecayPercentWad = convertOneScaledValue(ONE.mul(9).div(10), 8);
+const perPeriodDecayPercentWad = ethers.BigNumber.from('900000000000000000');
+
+const mockAuction: Partial<AuctionType> = {
+  start: {
+    timestamp: startTimestamp,
+  },
+  perPeriodDecayPercentWad,
+  startPrice,
+  secondsInPeriod: oneDayInSeconds,
+};
 
 export function approximatelyEquals(
   n1: ethers.BigNumber,
@@ -25,12 +33,8 @@ describe('auction library', () => {
       [4, ethers.BigNumber.from(10).pow(14)],
       [10, ethers.BigNumber.from(10).pow(8)],
     ])('after %d days', (numDays, expected) => {
-      const result = currentPrice(
-        startPrice,
-        numDays * oneDayInSeconds,
-        oneDayInSeconds,
-        perPeriodDecayPercentWad,
-      );
+      const timestamp = numDays * oneDayInSeconds + startTimestamp;
+      const result = currentPrice(mockAuction as AuctionType, timestamp);
       expect(approximatelyEquals(result, expected)).toBeTruthy();
     });
   });

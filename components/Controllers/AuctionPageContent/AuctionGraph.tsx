@@ -3,7 +3,6 @@ import { Context } from 'chartjs-plugin-datalabels';
 import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { currentPrice } from 'lib/auctions';
-import { convertOneScaledValue } from 'lib/controllers';
 import { formatBigNum } from 'lib/numberFormat';
 import { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
@@ -20,7 +19,6 @@ export function generateTimestampsAndPrices(
   const chartY: number[] = [];
   const startTime = auction.start.timestamp;
   const endTime = startTime + 86400 * 3;
-  const startPrice = ethers.BigNumber.from(auction.startPrice);
 
   for (
     let t = startTime;
@@ -29,20 +27,8 @@ export function generateTimestampsAndPrices(
   ) {
     chartX.push(t);
     chartY.push(
-      parseFloat(
-        formatBigNum(
-          currentPrice(
-            startPrice,
-            t - startTime,
-            parseInt(auction.secondsInPeriod),
-            convertOneScaledValue(
-              ethers.BigNumber.from(auction.perPeriodDecayPercentWad),
-              4,
-            ),
-          ),
-          18,
-        ),
-      ) * latestUniswapPrice,
+      parseFloat(formatBigNum(currentPrice(auction, t), 18)) *
+        latestUniswapPrice,
     );
   }
   return [chartX, chartY];
