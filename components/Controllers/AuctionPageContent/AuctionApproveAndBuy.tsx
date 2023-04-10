@@ -98,7 +98,7 @@ function BuyButton({
       secondsInPeriod: auction.secondsInPeriod,
       startPrice: auction.startPrice,
     };
-    const maxPrice = liveAuctionPrice;
+    const maxPrice = liveAuctionPrice.add(ethers.BigNumber.from(100)); // small padding of 100e-18 to ensure max price is big enough
     const sendTo = address;
     const oracleDetails = oracleInfo[auction.auctionAssetContract.id];
     const oracleInfoStruct = getOraclePayloadFromReservoirObject(oracleDetails);
