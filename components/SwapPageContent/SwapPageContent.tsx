@@ -14,12 +14,10 @@ import {
 import { Fieldset } from 'components/Fieldset';
 import { Tooltip } from 'components/Tooltip';
 import { ethers } from 'ethers';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
+import { usePoolQuote } from 'hooks/usePoolQuote';
 import { useTheme } from 'hooks/useTheme';
-import { SupportedToken } from 'lib/config';
-import { getQuoteForSwap, getQuoteForSwapOutput } from 'lib/controllers';
 import { price } from 'lib/controllers/charts/mark';
 import { SWAP_FEE_BIPS, SWAP_FEE_TO } from 'lib/controllers/fees';
 import { erc20TokenToToken } from 'lib/uniswapSubgraph';
@@ -111,40 +109,41 @@ export function SwapPageContent() {
     }
   }, [paprTheme]);
 
-  const sqrtPriceAfter = useAsyncValue(async () => {
-    if (!amounts) return null;
-    const paprIn = paprTokenField === Field.INPUT;
-    const paprOut = paprTokenField === Field.OUTPUT;
+  const paprIn = useMemo(
+    () => paprTokenField === Field.INPUT,
+    [paprTokenField],
+  );
+  const paprOut = useMemo(
+    () => paprTokenField === Field.OUTPUT,
+    [paprTokenField],
+  );
 
+  const amountForQuote = useMemo(() => {
+    if (!amounts) return null;
     if (paprIn) {
-      const quoteResult = await getQuoteForSwap(
-        ethers.utils.parseUnits(
-          amounts.input.toExact(),
-          amounts.input.currency.decimals,
-        ),
-        amounts.input.currency.wrapped.address,
-        underlying.id,
-        tokenName as SupportedToken,
+      return ethers.utils.parseUnits(
+        amounts.input.toExact(),
+        amounts.input.currency.decimals,
       );
-      return quoteResult.sqrtPriceX96After;
     } else if (paprOut) {
-      const quoteResult = await getQuoteForSwapOutput(
-        ethers.utils.parseUnits(
-          amounts.output.toExact(),
-          amounts.output.currency.decimals,
-        ),
-        underlying.id,
-        amounts.output.currency.wrapped.address,
-        tokenName as SupportedToken,
+      return ethers.utils.parseUnits(
+        amounts.output.toExact(),
+        amounts.output.currency.decimals,
       );
-      return quoteResult.sqrtPriceX96After;
-    } else {
-      return null;
     }
-  }, [amounts, tokenName, paprTokenField, underlying.id]);
+  }, [amounts, paprIn, paprOut]);
+
+  const { sqrtPriceX96After: sqrtPriceAfter } = usePoolQuote({
+    amount: amountForQuote || undefined,
+    inputToken: paprIn ? paprToken : underlying,
+    outputToken: paprIn ? underlying : paprToken,
+    withSlippage: false,
+    tradeType: paprIn ? 'exactIn' : 'exactOut',
+    skip: !amounts,
+  });
 
   useEffect(() => {
-    if (!sqrtPriceAfter || !amounts) return;
+    if (!sqrtPriceAfter) return;
     if (!paprTokenField) {
       setPaprPrice(null);
       return;
@@ -166,7 +165,6 @@ export function SwapPageContent() {
   }, [
     sqrtPriceAfter,
     paprTokenField,
-    amounts,
     token0IsUnderlying,
     underlying,
     paprToken,

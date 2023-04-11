@@ -199,13 +199,13 @@ export async function computeSlippageForSwap(
   tokenIn: ERC20Token,
   tokenOut: ERC20Token,
   amount: ethers.BigNumber,
-  useExactInput: boolean,
+  tradeType: 'exactIn' | 'exactOut',
   tokenName: SupportedToken,
 ) {
   const withoutSlippageAmount = ethers.BigNumber.from('10000000');
   const quoter = Quoter(configs[tokenName].jsonRpcProvider, tokenName);
   let quoteWithoutSlippage: ethers.BigNumber;
-  if (useExactInput) {
+  if (tradeType === 'exactIn') {
     ({ amountOut: quoteWithoutSlippage } =
       await quoter.callStatic.quoteExactInputSingle({
         tokenIn: tokenIn.id,
@@ -229,7 +229,7 @@ export async function computeSlippageForSwap(
     ethers.utils.formatUnits(
       quoteWithSlippage,
       ethers.BigNumber.from(
-        useExactInput ? tokenOut.decimals : tokenIn.decimals,
+        tradeType === 'exactIn' ? tokenOut.decimals : tokenIn.decimals,
       ),
     ),
   );
@@ -237,7 +237,7 @@ export async function computeSlippageForSwap(
     ethers.utils.formatUnits(
       quoteWithoutSlippage,
       ethers.BigNumber.from(
-        useExactInput ? tokenOut.decimals : tokenIn.decimals,
+        tradeType === 'exactIn' ? tokenOut.decimals : tokenIn.decimals,
       ),
     ),
   );

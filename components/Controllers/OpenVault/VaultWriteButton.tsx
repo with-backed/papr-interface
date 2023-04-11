@@ -180,7 +180,6 @@ export function VaultWriteButton({
       {!usingSafeTransferFrom && depositNFTs.length > 0 && (
         <ApproveNFTButton
           collateralContractAddress={collateralContractAddress}
-          approved={collateralApproved}
           setApproved={setCollateralApproved}
         />
       )}

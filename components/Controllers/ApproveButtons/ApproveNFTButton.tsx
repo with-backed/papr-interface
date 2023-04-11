@@ -1,6 +1,6 @@
 import { TransactionButton } from 'components/Button';
-import { useAsyncValue } from 'hooks/useAsyncValue';
 import { useController } from 'hooks/useController';
+import { useNFTSymbol } from 'hooks/useNFTSymbol';
 import { useSignerOrProvider } from 'hooks/useSignerOrProvider';
 import { pirsch } from 'lib/pirsch';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -14,13 +14,11 @@ import {
 
 type ApproveNFTButtonProps = {
   collateralContractAddress: string;
-  approved: boolean;
   setApproved: (val: boolean) => void;
 };
 
 export function ApproveNFTButton({
   collateralContractAddress,
-  approved,
   setApproved,
 }: ApproveNFTButtonProps) {
   const paprController = useController();
@@ -47,10 +45,8 @@ export function ApproveNFTButton({
     initializeApproved();
   }, [initializeApproved]);
 
-  const symbol = useAsyncValue(
-    () => collateralContract.symbol(),
-    [collateralContract],
-  );
+  const symbol = useNFTSymbol(collateralContractAddress);
+
   const { config } = usePrepareContractWrite({
     address: collateralContract.address as `0x${string}`,
     abi: erc721ABI,
