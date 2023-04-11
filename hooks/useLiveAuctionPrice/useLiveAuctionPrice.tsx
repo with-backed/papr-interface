@@ -1,17 +1,16 @@
 import { ethers } from 'ethers';
 import { useConfig } from 'hooks/useConfig';
 import { useController } from 'hooks/useController';
-import { currentPrice } from 'lib/auctions';
+import { AuctionType, currentPrice } from 'lib/auctions';
 import { SupportedToken } from 'lib/config';
-import { convertOneScaledValue, getQuoteForSwapOutput } from 'lib/controllers';
+import { getQuoteForSwapOutput } from 'lib/controllers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 
 const currentTimeInSeconds = () => Math.floor(new Date().getTime() / 1000);
 const ONE_HOUR_IN_SECONDS = 60 * 60;
 
 export function useLiveAuctionPrice(
-  auction: NonNullable<AuctionQuery['auction']>,
+  auction: AuctionType,
   priceRefreshTime = 14000,
   pause = false,
 ) {
@@ -23,16 +22,7 @@ export function useLiveAuctionPrice(
 
   const liveAuctionPrice = useMemo(() => {
     if (auction.endPrice) return ethers.BigNumber.from(auction.endPrice);
-    const secondsElapsed = liveTimestamp - auction.start.timestamp;
-    return currentPrice(
-      ethers.BigNumber.from(auction.startPrice),
-      secondsElapsed,
-      parseInt(auction.secondsInPeriod),
-      convertOneScaledValue(
-        ethers.BigNumber.from(auction.perPeriodDecayPercentWad),
-        4,
-      ),
-    );
+    return currentPrice(auction, liveTimestamp);
   }, [auction, liveTimestamp]);
 
   const calculateLiveAuctionPriceUnderlying = useCallback(() => {
@@ -51,16 +41,9 @@ export function useLiveAuctionPrice(
 
   const hourlyPriceChange = useMemo(() => {
     const timestamp = currentTimeInSeconds();
-    const secondsElapsedAnHourAgo =
-      timestamp - ONE_HOUR_IN_SECONDS - auction.start.timestamp;
     const priceAnHourAgo = currentPrice(
-      ethers.BigNumber.from(auction.startPrice),
-      secondsElapsedAnHourAgo,
-      parseInt(auction.secondsInPeriod),
-      convertOneScaledValue(
-        ethers.BigNumber.from(auction.perPeriodDecayPercentWad),
-        4,
-      ),
+      auction,
+      timestamp - ONE_HOUR_IN_SECONDS,
     );
     return liveAuctionPrice.sub(priceAnHourAgo);
   }, [liveAuctionPrice, auction]);

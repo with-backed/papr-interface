@@ -5,6 +5,8 @@ import { ethers } from 'ethers';
 import { useController } from 'hooks/useController';
 import { useOracleInfo } from 'hooks/useOracleInfo/useOracleInfo';
 import { useOracleSynced } from 'hooks/useOracleSynced';
+import { useTimestamp } from 'hooks/useTimestamp';
+import { AuctionType, currentPrice } from 'lib/auctions';
 import { formatBigNum } from 'lib/numberFormat';
 import {
   getOraclePayloadFromReservoirObject,
@@ -12,13 +14,12 @@ import {
 } from 'lib/oracle/reservoir';
 import { useMemo, useState } from 'react';
 import { INFTEDA } from 'types/generated/abis/PaprController';
-import { AuctionQuery } from 'types/generated/graphql/inKindSubgraph';
 import { useAccount, useContractWrite, usePrepareContractWrite } from 'wagmi';
 
 import styles from './AuctionApproveAndBuy.module.css';
 
 type AuctionApproveAndBuyProps = {
-  auction: NonNullable<AuctionQuery['auction']>;
+  auction: AuctionType;
   liveAuctionPrice: ethers.BigNumber;
   refresh: () => void;
 };
@@ -57,7 +58,6 @@ export default function AuctionApproveAndBuy({
           />
           <BuyButton
             auction={auction}
-            liveAuctionPrice={liveAuctionPrice}
             tokenApproved={paprTokenApproved}
             refresh={refresh}
           />
@@ -68,18 +68,12 @@ export default function AuctionApproveAndBuy({
 }
 
 type BuyButtonProps = {
-  auction: NonNullable<AuctionQuery['auction']>;
-  liveAuctionPrice: ethers.BigNumber;
+  auction: AuctionType;
   tokenApproved: boolean;
   refresh: () => void;
 };
 
-function BuyButton({
-  auction,
-  liveAuctionPrice,
-  tokenApproved,
-  refresh,
-}: BuyButtonProps) {
+function BuyButton({ auction, tokenApproved, refresh }: BuyButtonProps) {
   const { address } = useAccount();
   const controller = useController();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
@@ -87,8 +81,16 @@ function BuyButton({
     auction.auctionAssetContract.id,
     OraclePriceType.twap,
   );
+  const blockTimestamp = useTimestamp();
+
+  // ensure that the price we pass into the contract write is the most accurate maxPrice using the current block timestamp
+  const auctionPriceFromBlockTimestamp = useMemo(() => {
+    if (!blockTimestamp) return null;
+    return currentPrice(auction, blockTimestamp.timestamp);
+  }, [blockTimestamp, auction]);
+
   const purchaseArgs = useMemo(() => {
-    if (!oracleInfo || !address) return null;
+    if (!oracleInfo || !address || !auctionPriceFromBlockTimestamp) return null;
     const auctionArg: INFTEDA.AuctionStruct = {
       auctionAssetContract: auction.auctionAssetContract.id,
       auctionAssetID: auction.auctionAssetID,
@@ -98,13 +100,13 @@ function BuyButton({
       secondsInPeriod: auction.secondsInPeriod,
       startPrice: auction.startPrice,
     };
-    const maxPrice = liveAuctionPrice;
+    const maxPrice = auctionPriceFromBlockTimestamp;
     const sendTo = address;
     const oracleDetails = oracleInfo[auction.auctionAssetContract.id];
     const oracleInfoStruct = getOraclePayloadFromReservoirObject(oracleDetails);
 
     return { auctionArg, maxPrice, sendTo, oracleInfoStruct };
-  }, [auction, liveAuctionPrice, address, oracleInfo]);
+  }, [auction, auctionPriceFromBlockTimestamp, address, oracleInfo]);
   const { config } = usePrepareContractWrite({
     address: controller.id as `0x${string}`,
     functionName: 'purchaseLiquidationAuctionNFT',
@@ -125,9 +127,9 @@ function BuyButton({
   } as any);
 
   const buttonText = useMemo(() => {
-    if (!oracleSynced) return 'Waiting for oracle...';
+    if (!oracleSynced || !blockTimestamp) return 'Waiting for oracle...';
     return 'Purchase';
-  }, [oracleSynced]);
+  }, [oracleSynced, blockTimestamp]);
 
   const buttonDisabled = useMemo(() => {
     return !tokenApproved || !oracleSynced;
