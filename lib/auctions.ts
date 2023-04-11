@@ -5,7 +5,7 @@ import { convertOneScaledValue } from './controllers';
 
 export type AuctionType = NonNullable<AuctionQuery['auction']>;
 
-export function currentPrice(auction: AuctionType, timestamp: number) {
+export function currentPrice(auction: AuctionType, currentTimestamp: number) {
   const startPrice = ethers.BigNumber.from(auction.startPrice);
   const secondsInPeriod = parseInt(auction.secondsInPeriod);
   const perPeriodDecayPercent = convertOneScaledValue(
@@ -13,7 +13,7 @@ export function currentPrice(auction: AuctionType, timestamp: number) {
     4,
   );
 
-  const secondsElapsed = timestamp - auction.start.timestamp;
+  const secondsElapsed = currentTimestamp - auction.start.timestamp;
   const ratio = secondsElapsed / secondsInPeriod;
   const percentRemainingPerPeriod = 1 - perPeriodDecayPercent;
   const m = Math.pow(percentRemainingPerPeriod, ratio);
