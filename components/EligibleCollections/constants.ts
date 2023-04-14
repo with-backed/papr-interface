@@ -2,7 +2,6 @@ import Bean from 'public/landing-page-nfts/bean.png';
 import Chimper from 'public/landing-page-nfts/chimper.png';
 import CoolCat from 'public/landing-page-nfts/cool-cat.png';
 import Dickbutt from 'public/landing-page-nfts/dickbutt.png';
-import Goblin from 'public/landing-page-nfts/goblintown.wtf.png';
 import LilPudgy from 'public/landing-page-nfts/lil-pudgy.png';
 import Loot from 'public/landing-page-nfts/loot.png';
 import Mfer from 'public/landing-page-nfts/mfer.png';
@@ -74,11 +73,6 @@ export const COLLECTIONS = [
     address: '0xc3f733ca98e0dad0386979eb96fb1722a1a05e69',
     name: 'Mooncats',
     image: Mooncat,
-  },
-  {
-    address: '0xbce3781ae7ca1a5e050bd9c4c77369867ebc307e',
-    name: 'goblintown.wtf',
-    image: Goblin,
   },
   {
     address: '0x364c828ee171616a39897688a831c2499ad972ec',
