@@ -4,19 +4,22 @@ import { Tooltip } from 'components/Tooltip';
 import { useConfig } from 'hooks/useConfig';
 import Marquee from 'react-fast-marquee';
 import { TooltipReference, useTooltipState } from 'reakit/Tooltip';
-import { VaultCollateral } from 'types/generated/graphql/inKindSubgraph';
 
 import styles from './NFTMarquee.module.css';
 
 type NFTMarqueeProps = {
-  collateral: VaultCollateral[];
+  collateralContractAddress: string;
+  tokenIds: string[];
 };
 
-export function NFTMarquee({ collateral }: NFTMarqueeProps) {
+export function NFTMarquee({
+  collateralContractAddress,
+  tokenIds,
+}: NFTMarqueeProps) {
   const { centerNetwork } = useConfig();
   const result = useCollection({
     network: centerNetwork as any,
-    address: collateral[0].id.split('-')[0],
+    address: collateralContractAddress,
   });
   const tooltip = useTooltipState({ placement: 'right' });
 
@@ -25,16 +28,16 @@ export function NFTMarquee({ collateral }: NFTMarqueeProps) {
       <TooltipReference {...tooltip}>
         <Marquee
           className={styles.marquee}
-          play={collateral.length > 1}
+          play={tokenIds.length > 1}
           pauseOnHover
           speed={10}
           // gradient messed with our CSS
           gradient={false}>
-          {collateral.map((c) => (
+          {tokenIds.map((tokenId) => (
             <CenterAsset
-              key={c.id}
-              address={c.id.split('-')[0]}
-              tokenId={c.tokenId}
+              key={tokenId}
+              address={collateralContractAddress}
+              tokenId={tokenId}
               preset="small"
             />
           ))}
@@ -42,15 +45,15 @@ export function NFTMarquee({ collateral }: NFTMarqueeProps) {
       </TooltipReference>
       <Tooltip {...tooltip}>
         <div className={styles['collateral-column']}>
-          {collateral.map((c) => (
-            <div className={styles['collateral-row']} key={c.id}>
+          {tokenIds.map((tokenId) => (
+            <div className={styles['collateral-row']} key={tokenId}>
               <CenterAsset
-                address={c.id.split('-')[0]}
-                tokenId={c.tokenId}
+                address={collateralContractAddress}
+                tokenId={tokenId}
                 preset="small"
               />
               <span>
-                {result?.name} #{c.tokenId}
+                {result?.name} #{tokenId}
               </span>
             </div>
           ))}

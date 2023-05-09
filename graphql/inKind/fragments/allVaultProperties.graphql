@@ -10,4 +10,10 @@ fragment allVaultProperties on Vault {
     tokenId
   }
   collateralCount
+  ongoingAuctions: auctions(where: { endPrice: null }) {
+    ...allAuctionProperties
+  }
+  pastAuctions: auctions(where: { endPrice_not: null }) {
+    ...allAuctionProperties
+  }
 }

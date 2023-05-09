@@ -1,5 +1,6 @@
 import { BigNumberish } from 'ethers';
 import { createGenericContext } from 'lib/createGenericContext';
+import { AuctionsByNftOwnerAndCollectionQuery } from 'types/generated/graphql/inKindSubgraph';
 
 interface ERC20Token {
   id: string;
@@ -43,6 +44,8 @@ export interface PaprController {
               id: string;
               tokenId: string;
             }[];
+        ongoingAuctions: AuctionsByNftOwnerAndCollectionQuery['auctions'];
+        pastAuctions: AuctionsByNftOwnerAndCollectionQuery['auctions'];
       }[]
     | null
     | undefined;
