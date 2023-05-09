@@ -32,10 +32,19 @@ export function VaultRow({ account, vault }: VaultRowProps) {
 
   const { tokenName } = useConfig();
 
+  const tokenIdsForMarquee = useMemo(() => {
+    return vault.collateral
+      .map((c) => c.tokenId)
+      .concat(vault.ongoingAuctions.map((auction) => auction.auctionAssetID));
+  }, [vault]);
+
   return (
     <tr>
       <td className={styles['marquee-column']}>
-        <NFTMarquee collateral={vault.collateral} />
+        <NFTMarquee
+          collateralContractAddress={vault.token.id}
+          tokenIds={tokenIdsForMarquee}
+        />
       </td>
       <td>
         <Link href={`/tokens/${tokenName}/vaults/${vault.id}`}>

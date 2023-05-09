@@ -218,6 +218,14 @@ export function VaultOverview({ vaultInfo, ethUSDPrice }: VaultOverviewProps) {
     return debtValue * ethUSDPrice;
   }, [debtValue, ethUSDPrice]);
 
+  const tokenIdsForMarquee = useMemo(() => {
+    return vaultInfo.collateral
+      .map((c) => c.tokenId)
+      .concat(
+        vaultInfo.ongoingAuctions.map((auction) => auction.auctionAssetID),
+      );
+  }, [vaultInfo]);
+
   if (
     BigNumber.from(vaultInfo.debt).isZero() &&
     vaultInfo.collateral.length === 0
@@ -227,7 +235,10 @@ export function VaultOverview({ vaultInfo, ethUSDPrice }: VaultOverviewProps) {
   return (
     <tr>
       <td>
-        <NFTMarquee collateral={vaultInfo.collateral} />
+        <NFTMarquee
+          collateralContractAddress={vaultInfo.token.id}
+          tokenIds={tokenIdsForMarquee}
+        />
       </td>
       <td>
         {formatBigNum(vaultInfo.debt, paprToken.decimals, 3)} {paprToken.symbol}

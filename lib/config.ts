@@ -25,9 +25,9 @@ const paprHero: Config = {
   alchemyId,
   etherscanUrl: 'https://goerli.etherscan.io',
   network: 'goerli',
-  controllerAddress: '0x092018ff54df5bfa53e1c6e75ad0e2d8991a8b1e',
+  controllerAddress: '0x937968d77f8e312574d659ccd9a527ec063ff601',
   underlyingAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
-  paprTokenAddress: '0x6f32f58cd64d0ba76a16f5e8ff11498d965a82dc',
+  paprTokenAddress: '0x7b863de6be0c945a2317af4ed78959da10a7eddc',
   uniswapSubgraph:
     'https://api.thegraph.com/subgraphs/name/liqwiz/uniswap-v3-goerli',
   paprSubgraph: goerliSubgraph,
@@ -51,7 +51,7 @@ const paprMeme = {
   paprTokenAddress: '0x320aaab3038bc08317f5a4be19ea1d9608551d79',
   uniswapSubgraph: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3',
   paprSubgraph:
-    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr/0.2.02/gn',
+    'https://api.goldsky.com/api/public/project_cl9fqfatx1kql0hvkak9eesug/subgraphs/papr/0.2.04/gn',
   reservoirAPI: 'https://api.reservoir.tools',
   erc721Subgraph:
     'https://api.thegraph.com/subgraphs/name/sunguru98/mainnet-erc721-subgraph',

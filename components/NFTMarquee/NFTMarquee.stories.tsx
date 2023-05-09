@@ -24,42 +24,25 @@ const Wrapper: FunctionComponent = ({ children }) => (
   </ConfigProvider>
 );
 
-const penguins = [
-  {
-    id: '0xbd3531da5cf5857e7cfaa92426877b022e612cf8-2804',
-    tokenId: '2804',
-    __typename: 'VaultCollateral' as const,
-  },
-  {
-    id: '0xbd3531da5cf5857e7cfaa92426877b022e612cf8-3791',
-    tokenId: '3791',
-    __typename: 'VaultCollateral' as const,
-  },
-  {
-    id: '0xbd3531da5cf5857e7cfaa92426877b022e612cf8-7395',
-    tokenId: '7395',
-    __typename: 'VaultCollateral' as const,
-  },
-];
+const penguinsContractAddress = '0xbd3531da5cf5857e7cfaa92426877b022e612cf8';
+const penguinTokenIds = ['2804', '3791', '7395'];
 
-const dickbutts = [
-  {
-    id: '0x42069abfe407c60cf4ae4112bedead391dba1cdb-2318',
-    tokenId: '2318',
-    __typename: 'VaultCollateral' as const,
-  },
-  {
-    id: '0x42069abfe407c60cf4ae4112bedead391dba1cdb-5341',
-    tokenId: '5341',
-    __typename: 'VaultCollateral' as const,
-  },
-];
+const dickbuttsContractAddress = '0x42069abfe407c60cf4ae4112bedead391dba1cdb';
+const dickbuttsTokenIds = ['2318', '5341'];
 
 export const Marquees = () => (
   <Wrapper>
-    <NFTMarquee collateral={[...penguins, ...dickbutts]} />
-    <NFTMarquee collateral={penguins} />
-    <NFTMarquee collateral={dickbutts} />
-    <NFTMarquee collateral={penguins.slice(0, 1)} />
+    <NFTMarquee
+      collateralContractAddress={penguinsContractAddress}
+      tokenIds={penguinTokenIds}
+    />
+    <NFTMarquee
+      collateralContractAddress={dickbuttsContractAddress}
+      tokenIds={dickbuttsTokenIds}
+    />
+    <NFTMarquee
+      collateralContractAddress={penguinsContractAddress}
+      tokenIds={penguinTokenIds.slice(0, 1)}
+    />
   </Wrapper>
 );
