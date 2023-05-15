@@ -17,12 +17,14 @@ type ApproveTokenButtonProps = {
   token: ERC20Token;
   tokenApproved: boolean;
   setTokenApproved: (val: boolean) => void;
+  minAmountRequired?: ethers.BigNumber;
 };
 
 export function ApproveTokenButton({
   token,
   tokenApproved,
   setTokenApproved,
+  minAmountRequired = ethers.BigNumber.from(0),
 }: ApproveTokenButtonProps) {
   const controller = useController();
   const { address } = useAccount();
@@ -39,13 +41,21 @@ export function ApproveTokenButton({
       signerOrProvider,
     );
     if (
-      (await connectedToken.allowance(address, controller.id)) >
-      ethers.BigNumber.from(0)
+      (await connectedToken.allowance(address, controller.id)).gt(
+        minAmountRequired,
+      )
     ) {
       setTokenApproved(true);
     }
     setApprovedLoading(false);
-  }, [controller, address, setTokenApproved, signerOrProvider, token]);
+  }, [
+    controller,
+    address,
+    setTokenApproved,
+    signerOrProvider,
+    token,
+    minAmountRequired,
+  ]);
 
   useEffect(() => {
     initializeUnderlyingApproved();

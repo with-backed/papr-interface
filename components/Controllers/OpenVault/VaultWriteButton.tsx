@@ -188,13 +188,15 @@ export function VaultWriteButton({
           token={paprController.paprToken}
           tokenApproved={debtTokenApproved}
           setTokenApproved={setDebtTokenApproved}
+          minAmountRequired={amount}
         />
       )}
-      {writeType === VaultWriteType.RepayWithSwap && (
+      {writeType === VaultWriteType.RepayWithSwap && quote && (
         <ApproveTokenButton
           token={paprController.underlying}
           tokenApproved={underlyingApproved}
           setTokenApproved={setUnderlyingApproved}
+          minAmountRequired={quote}
         />
       )}
       <TransactionButton
