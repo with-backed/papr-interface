@@ -41,8 +41,9 @@ export function ApproveTokenButton({
       signerOrProvider,
     );
     if (
-      (await connectedToken.allowance(address, controller.id)) >
-      ethers.BigNumber.from(minAmountRequired)
+      (await connectedToken.allowance(address, controller.id)).gt(
+        minAmountRequired,
+      )
     ) {
       setTokenApproved(true);
     }
