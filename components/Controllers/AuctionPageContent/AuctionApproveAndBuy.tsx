@@ -55,6 +55,7 @@ export default function AuctionApproveAndBuy({
             token={controller.paprToken}
             tokenApproved={paprTokenApproved}
             setTokenApproved={setPaprTokenApproved}
+            minAmountRequired={liveAuctionPrice}
           />
           <BuyButton
             auction={auction}
