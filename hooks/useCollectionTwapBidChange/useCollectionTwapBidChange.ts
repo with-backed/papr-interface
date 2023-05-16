@@ -2,46 +2,28 @@ import { useConfig } from 'hooks/useConfig';
 import { useOracleInfo } from 'hooks/useOracleInfo';
 import { OraclePriceType } from 'lib/oracle/reservoir';
 import { percentChange } from 'lib/tokenPerformance';
-import { useMemo, useRef } from 'react';
-import {
-  LatestTwabForCollectionBeforeTimeQuery,
-  LatestTwabForCollectionBeforeTimeDocument,
-} from 'types/generated/graphql/twabs';
-import { useQuery } from 'urql';
+import { useEffect, useMemo, useState } from 'react';
+import { LatestTwabForCollectionBeforeTimeQuery } from 'types/generated/graphql/twabs';
 
 export function useCollectionTwapBidChange(collection: string) {
-  const { twabsApi } = useConfig();
-  const now = useRef(new Date());
-  const twentyFourHoursAgo = useRef(
-    new Date(
-      (now.current.getTime() / 1000 - 24 * 60 * 60) * 1000,
-    ).toISOString(),
-  );
+  const { tokenName } = useConfig();
   const oracleInfo = useOracleInfo(OraclePriceType.twap);
+  const [twabData, setTwabData] =
+    useState<LatestTwabForCollectionBeforeTimeQuery | null>(null);
 
-  const [{ data: twabData }] = useQuery<LatestTwabForCollectionBeforeTimeQuery>(
-    {
-      query: LatestTwabForCollectionBeforeTimeDocument,
-      variables: {
-        collection: collection.toLowerCase(),
-        earlierThan: twentyFourHoursAgo.current,
-      },
-      context: useMemo(
-        () => ({
-          url: twabsApi,
-          fetchOptions: {
-            headers: {
-              'content-type': 'application/json',
-              'x-hasura-admin-secret':
-                process.env.NEXT_PUBLIC_TWABS_GRAPHQL_TOKEN!,
-            },
-            method: 'POST',
-          },
-        }),
-        [twabsApi],
-      ),
-    },
-  );
+  useEffect(() => {
+    async function getData() {
+      const req = await fetch(
+        `/api/tokens/${tokenName}/twabs/collections/${collection}`,
+        {
+          method: 'POST',
+        },
+      );
+      return req.json();
+    }
+
+    getData().then(setTwabData);
+  }, [collection, tokenName]);
 
   const currentPriceForCollection = useMemo(() => {
     if (!oracleInfo) return null;
