@@ -11,7 +11,7 @@ import {
 // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
 const cors = Cors({
   origin: true,
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  methods: '*',
   preflightContinue: false,
   optionsSuccessStatus: 204,
 });
