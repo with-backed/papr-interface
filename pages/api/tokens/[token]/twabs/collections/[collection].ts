@@ -1,3 +1,4 @@
+import Cors from 'cors';
 import { configs, SupportedToken, validateToken } from 'lib/config';
 import { clientFromUrl } from 'lib/urql';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -6,10 +7,38 @@ import {
   LatestTwabForCollectionBeforeTimeQuery,
 } from 'types/generated/graphql/twabs';
 
+// Initializing the cors middleware
+// You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
+const cors = Cors({
+  methods: ['POST', 'GET', 'HEAD'],
+});
+
+// Helper method to wait for a middleware to execute before continuing
+// And to throw an error when an error happens in a middleware
+function runMiddleware(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  fn: Function,
+) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result: any) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+
+      return resolve(result);
+    });
+  });
+}
+
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<LatestTwabForCollectionBeforeTimeQuery | null>,
 ) {
+  // Run the middleware
+  await runMiddleware(req, res, cors);
+
   try {
     validateToken(req.query);
     const { token, collection } = req.query as {
