@@ -13,3 +13,8 @@
 .wrapper:visited {
   color: black;
 }
+
+.text {
+  letter-spacing: 0.1em;
+  margin-right: 4rem;
+}
