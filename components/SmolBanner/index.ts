@@ -1,0 +1,1 @@
+export { SmolBanner } from './SmolBanner';
