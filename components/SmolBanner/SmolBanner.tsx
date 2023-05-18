@@ -21,7 +21,7 @@ export function SmolBanner() {
       href="https://adventure.papr.wtf"
       target="_blank"
       className={styles.wrapper}>
-      <Marquee gradient={false} autoFill speed={30}>
+      <Marquee gradient={false} autoFill speed={15}>
         <span className={styles.text}>{TEXT}</span>
       </Marquee>
     </Link>
