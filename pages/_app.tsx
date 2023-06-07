@@ -14,7 +14,6 @@ import {
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { ApplicationProviders } from 'components/ApplicationProviders';
 import { AppWrapper } from 'components/layouts/AppWrapper';
-import { SmolBanner } from 'components/SmolBanner';
 import { ConfigProvider } from 'hooks/useConfig';
 import { isSupportedToken, SupportedToken } from 'lib/config';
 import { AppProps } from 'next/app';
@@ -69,7 +68,6 @@ export default function App({ Component, pageProps }: AppProps) {
       <ApplicationProviders>
         <AppWrapper>
           <ErrorBanners />
-          <SmolBanner />
           <Header />
           <Component {...pageProps} />
           <Footer />
