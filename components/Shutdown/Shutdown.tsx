@@ -13,12 +13,12 @@ export function Shutdown() {
       <Image height={117} src={AngelBunny} alt="" priority placeholder="blur" />
       <div>
         <p>
-          The Backed protocol is stopping active development. This interface
-          will be taken offline on September 1, 2023. Read{' '}
+          This interface will go offline September 1, 2023. The protocol will
+          continue to operate. Read{' '}
           <Link className={styles.link} href={ANNOUNCEMENT_URL} target="_blank">
             the announcement
-          </Link>
-          .
+          </Link>{' '}
+          for more details .
         </p>
       </div>
     </div>
