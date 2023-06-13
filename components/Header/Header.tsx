@@ -1,5 +1,6 @@
 import { Button } from 'components/Button';
 import { ConnectWallet as ConnectWalletComponent } from 'components/ConnectWallet';
+import { Shutdown } from 'components/Shutdown';
 import { useConfig } from 'hooks/useConfig';
 import { useTheme } from 'hooks/useTheme';
 import { SupportedToken } from 'lib/config';
@@ -211,6 +212,7 @@ export function Header() {
           <ConnectWallet />
         </DisclosureContent>
       </div>
+      <Shutdown />
     </nav>
   );
 }

@@ -44,9 +44,11 @@
 }
 
 .nav {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
   width: 100%;
   padding: 21px 0;
-  height: 151px;
 }
 
 .logo-only-nav {

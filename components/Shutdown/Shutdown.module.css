@@ -1,0 +1,16 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  max-width: 659px;
+  min-height: 149px;
+  background: var(--background-white);
+  margin: 0 auto;
+  padding: 15px;
+}
+
+.link,
+.link:visited {
+  color: black;
+  text-decoration: underline;
+}
