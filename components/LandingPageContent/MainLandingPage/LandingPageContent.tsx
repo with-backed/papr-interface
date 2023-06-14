@@ -1,4 +1,3 @@
-import { EligibleCollections } from 'components/EligibleCollections';
 import Image from 'next/legacy/image';
 import LandingPageScale from 'public/landingpage-scale.png';
 import React from 'react';
@@ -13,7 +12,6 @@ import { Whitepaper } from './Whitepaper';
 export function LandingPageContent() {
   return (
     <div className={styles.wrapper}>
-      <EligibleCollections />
       <h1 className={styles.heading}>
         NFT lending
         <br />
