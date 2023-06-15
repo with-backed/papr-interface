@@ -40,11 +40,11 @@ const prodPages: Page[] = [
     route: ``,
     matcher: '',
   },
-  // {
-  //   name: 'Borrow',
-  //   route: `borrow`,
-  //   matcher: 'borrow',
-  // },
+  {
+    name: 'Borrow',
+    route: `borrow`,
+    matcher: 'borrow',
+  },
   {
     name: 'Swap',
     route: `swap`,
