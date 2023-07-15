@@ -62,6 +62,7 @@ export const ApplicationProviders: FunctionComponent = ({ children }) => {
     () =>
       getDefaultWallets({
         appName: 'Backed',
+        projectId: '350569e85a7ff1842b079dc92cf87b48',
         chains,
       }),
     [chains],
