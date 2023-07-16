@@ -61,8 +61,8 @@ export const ApplicationProviders: FunctionComponent = ({ children }) => {
   const { connectors } = useMemo(
     () =>
       getDefaultWallets({
-        appName: 'Backed',
-        projectId: '350569e85a7ff1842b079dc92cf87b48',
+        appName: 'papr.wtf',
+        projectId: 'f3e09fb8e85b3482ad92cc096fcc4a88',
         chains,
       }),
     [chains],
